@@ -123,7 +123,7 @@ LINK_DIRECTORIES(
 # set library directories for windows external dependencies
 IF (WIN32)
     LINK_DIRECTORIES(
-        ${GLOBAL_EXT_DIR}/lib/${SCHISM_PLATFORM}
+        ${GLOBAL_EXT_DIR}/lib
     )
 ENDIF (WIN32)
 
