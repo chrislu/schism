@@ -1,0 +1,35 @@
+[*]root
+ |
+ |- [bin]
+ |- [ext]                             // external dependencies
+ |   |
+ |   |- [bin]
+ |   |   |
+ |   |   |- [{platform_name}]
+ |   |       |
+ |   |       |- [debug]
+ |   |       |- [release]
+ |   |
+ |   |- [inc]
+ |   |- [lib]
+ |   |   |- [{platform_name}]
+ |   |       |
+ |   |       |- [debug]
+ |   |       |- [release]
+ |   |
+ |   |- _lib_versions.txt
+ |
+ |- [lib]
+ |   |
+ |   |- [debug]
+ |   |- [release]
+ |
+ |- [projects]                      // project files different compilers or
+ |   |                              // build environments
+ |   |- [{compiler}]
+ |
+ |- [src]                           // the project source code
+     |
+     |- [common]                    // common header files
+     |- [app_{name}]                // application sub project
+     |- [lib_{name}]                // library sub project
