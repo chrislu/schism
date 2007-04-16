@@ -126,17 +126,17 @@ void main()
     vec4 col;
 
     for (int k = 0;
-            k < 65536
+            k < _max_loop_counter
          && (dst.a < alpha_termination)
          && inside_volume_bounds(sample_pos, frag_depth_objspc);
          k++)
     {
-        //for (int i = 0;
-        //        i < _max_loop_counter
-        //     && (dst.a < alpha_termination)
-        //     && inside_volume_bounds(sample_pos, frag_depth_objspc);
-        //     i++)
-        //{
+        for (int i = 0;
+                i < _max_loop_counter
+             && (dst.a < alpha_termination)
+             && inside_volume_bounds(sample_pos, frag_depth_objspc);
+             i++)
+        {
 
             // get sample
             src = texture3D(_volume, sample_pos);
@@ -149,7 +149,7 @@ void main()
 
             // increment ray
             sample_pos += volume_ray_step;
-        //}
+        }
     }
 
     // debug bullshit

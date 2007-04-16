@@ -10,6 +10,9 @@ FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl/*.cpp)
 FILE(GLOB HEADER_FILES                  ${SRC_DIR}/ogl/*.h)
 FILE(GLOB INLINE_FILES                  ${SRC_DIR}/ogl/*.inl)
 
+FILE(GLOB SOURCE_FILES_FB_OBJECT        ${SRC_DIR}/ogl/framebuffer_object/*.cpp)
+FILE(GLOB HEADER_FILES_FB_OBJECT        ${SRC_DIR}/ogl/framebuffer_object/*.h)
+
 FILE(GLOB SOURCE_FILES_MANIPULATORS     ${SRC_DIR}/ogl/manipulators/*.cpp)
 FILE(GLOB HEADER_FILES_MANIPULATORS     ${SRC_DIR}/ogl/manipulators/*.h)
 
@@ -29,6 +32,7 @@ FILE(GLOB INLINE_FILES_MATH             ${SRC_DIR}/ogl/math/*.inl)
 SET(SOURCE_GROUP_DELIMITER "/")
 
 SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
+SOURCE_GROUP(source_files/framebuffer_object FILES ${SOURCE_FILES_FB_OBJECT}        ${HEADER_FILES_FB_OBJECT})
 SOURCE_GROUP(source_files/manipulators      FILES ${SOURCE_FILES_MANIPULATORS}      ${HEADER_FILES_MANIPULATORS})
 SOURCE_GROUP(source_files/math              FILES                                   ${HEADER_FILES_MATH}                ${INLINE_FILES_MATH})
 SOURCE_GROUP(source_files/shader_objects    FILES ${SOURCE_FILES_SHADER_OBJECTS}    ${HEADER_FILES_SHADER_OBJECTS})
@@ -38,6 +42,7 @@ SOURCE_GROUP(source_files/utilities         FILES ${SOURCE_FILES_UTILITIES}     
 # combine source file lists
 SET(SOURCE_FILES
     ${SOURCE_FILES}
+    ${SOURCE_FILES_FB_OBJECT}
     ${SOURCE_FILES_MANIPULATORS}
     ${SOURCE_FILES_SHADER_OBJECTS}
     ${SOURCE_FILES_TEXTURES}
@@ -46,6 +51,7 @@ SET(SOURCE_FILES
 
 SET(HEADER_FILES
     ${HEADER_FILES}
+    ${HEADER_FILES_FB_OBJECT}
     ${HEADER_FILES_MANIPULATORS}
     ${HEADER_FILES_MATH}
     ${HEADER_FILES_SHADER_OBJECTS}
