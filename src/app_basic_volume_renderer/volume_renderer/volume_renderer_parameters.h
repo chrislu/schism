@@ -23,16 +23,11 @@ namespace gl
         math::vec3f_t           _point_of_interest;
         math::vec3f_t           _extend;
         math::vec3f_t           _aspect;
-        math::vec3f_t           _cross_plane_positions;
-        
+
         math::vec2f_t           _screen_dimensions;
 
         float                   _step_size;
 
-        bool                    _cp_enabled;
-
-        float                   _last_frame_time; // in msec
-        
         gl::texture_1d          _color_alpha_texture;
         gl::texture_3d          _volume_texture;
 

@@ -197,7 +197,6 @@ void draw_geometry_color_buffer()
     glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
 
     glDisable(GL_LIGHTING);
-    glDisable(GL_LIGHT0);
     glDisable(GL_BLEND);
 
 
@@ -230,6 +229,7 @@ void draw_geometry_color_buffer()
             // enable and bind the color buffer texture rectangle
             glEnable(GL_TEXTURE_RECTANGLE_ARB);
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, fbo_color_id);
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
             // draw a screen filling quad
             // (0, 0) to (1, 1) because of the set ortho projection
@@ -302,7 +302,7 @@ bool init_gl()
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    glClearColor(0.5f,0.5f,0.5f,1);
+    glClearColor(0.3f,0.3f,0.3f,1);
 
     // setup depth testing
     glDepthFunc(GL_LESS);

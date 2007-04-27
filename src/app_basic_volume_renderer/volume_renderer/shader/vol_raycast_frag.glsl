@@ -10,12 +10,7 @@ varying vec3            _ray_dir;
 varying vec3            _obj_pos;
 
 // uniforms
-uniform vec3            _bounds_min;
-uniform vec3            _bounds_max;
-
 uniform vec2            _screen_dimensions;
-
-uniform vec3            _cross_plane_positions;
 
 uniform sampler3D       _volume;
 uniform sampler1D       _color_alpha;
@@ -23,7 +18,6 @@ uniform sampler1D       _color_alpha;
 uniform sampler2DRect   _geom_depth;
 
 uniform float           _step_size;
-uniform int             _max_loop_counter;
 
 #ifdef RAYCAST_INSIDE_VOLUME
 uniform vec4            _near_plane;
@@ -32,10 +26,6 @@ uniform vec4            _near_plane;
 // global consts
 const vec3  lumi_convert = vec3(0.3, 0.59, 0.11);
 const float alpha_termination = float(0.98);
-
-// globals
-// for axis aligned volume cross section rendering
-// vec3    entry_in_front_of_planes;
 
 vec3 debug_col;
 
@@ -126,13 +116,13 @@ void main()
     vec4 col;
 
     for (int k = 0;
-            k < _max_loop_counter
+            k < 255
          && (dst.a < alpha_termination)
          && inside_volume_bounds(sample_pos, frag_depth_objspc);
          k++)
     {
         for (int i = 0;
-                i < _max_loop_counter
+                i < 255
              && (dst.a < alpha_termination)
              && inside_volume_bounds(sample_pos, frag_depth_objspc);
              i++)

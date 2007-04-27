@@ -147,7 +147,7 @@ bool open_volume_file(const std::string& filename)
 
     update_color_alpha_table();
 
-    _volrend_params._step_size = 300;
+    _volrend_params._step_size = 666;
 
     std::cout << "end loading file: " << filename << std::endl;
 
