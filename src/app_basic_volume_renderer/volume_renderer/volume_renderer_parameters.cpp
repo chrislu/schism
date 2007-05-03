@@ -16,8 +16,12 @@ namespace gl
           _point_of_interest(prop._point_of_interest),
           _extend(prop._extend),
           _aspect(prop._aspect),
+          _voxel_size(prop._voxel_size),
+          _screen_dimensions(prop._screen_dimensions),
           _volume_texture(prop._volume_texture),
-          _color_alpha_texture(prop._color_alpha_texture)
+          _color_alpha_texture(prop._color_alpha_texture),
+          _geom_depth_texture_id(prop._geom_depth_texture_id)
+
     {
     }
 
@@ -31,8 +35,11 @@ namespace gl
         _point_of_interest          = rhs._point_of_interest;
         _extend                     = rhs._extend;
         _aspect                     = rhs._aspect;
+        _voxel_size                 = rhs._voxel_size;
+        _screen_dimensions          = rhs._screen_dimensions;
         _volume_texture             = rhs._volume_texture;
         _color_alpha_texture        = rhs._color_alpha_texture;
+        _geom_depth_texture_id      = rhs._geom_depth_texture_id;
 
         return (*this);
     }
