@@ -12,6 +12,8 @@ varying vec3            _obj_pos;
 // uniforms
 uniform vec2            _screen_dimensions;
 
+uniform vec3            _voxel_size;
+
 uniform sampler3D       _volume;
 uniform sampler1D       _color_alpha;
 
@@ -38,17 +40,45 @@ float   calculate_fragment_depth_objspc();
 
 
 // implementation
-vec4 do_shading(in vec4 inp)
+vec4 do_shading(in vec3 sample_pos, in vec4 inp)
 {
     vec4 ret;
 
     ret = texture1D(_color_alpha, inp.r);
+#if 0
+    // calculate gradient
+    vec3 grad;
+
+    float nx  = texture3D(_volume, sample_pos - vec3(_voxel_size.x, 0.0, 0.0)).r;
+    float px  = texture3D(_volume, sample_pos + vec3(_voxel_size.x, 0.0, 0.0)).r;
+
+    float ny  = texture3D(_volume, sample_pos - vec3(0.0, _voxel_size.y, 0.0)).r;
+    float py  = texture3D(_volume, sample_pos + vec3(0.0, _voxel_size.y, 0.0)).r;
+
+    float nz  = texture3D(_volume, sample_pos - vec3(0.0, 0.0, _voxel_size.z)).r;
+    float pz  = texture3D(_volume, sample_pos + vec3(0.0, 0.0, _voxel_size.z)).r;
+
+    grad.x    = (px - nx) / 2.0;
+    grad.y    = (py - ny) / 2.0;
+    grad.z    = (pz - nz) / 2.0;
+    // end gradient calculation
 
     // lighting
+    vec3 n = normalize(gl_TextureMatrix[0] * vec4(gl_NormalMatrix * -grad, 0.0)).xyz; 
+    vec3 l = normalize(gl_LightSource[0].position.xyz); // assume parallel light!
+    //vec3 v = normalize(view_dir);
+    //vec3 h = normalize(l + v);//gl_LightSource[0].halfVector);//
+
+    if (length(n) > 0.2) {
+    ret.rgb =  gl_LightSource[0].ambient.rgb
+             + ret.rgb * gl_LightSource[0].diffuse.rgb * max(0.0, dot(n, l));/*
+             //+ gl_FrontLightProduct[0].specular * pow(max(0.0, dot(n, h)), gl_FrontMaterial.shininess);*/
+
+    }
     //vec3 n = -normalize(inp.rgb * 2.0 - vec3(1.0)); 
     //vec3 l = normalize(_light_dir_tr); 
     //ret.rgb = ret.rgb*0.6 + ret.rgb * _light_col_diff * max(0.0, dot(n, l));
-
+#endif
     return (ret);
 }
 
@@ -130,7 +160,7 @@ void main()
 
             // get sample
             src = texture3D(_volume, sample_pos);
-            col = do_shading(src);
+            col = do_shading(sample_pos, src);
 
             // compositing
             float omda_sa = (1.0 - dst.a)*col.a;

@@ -556,6 +556,8 @@ int main(int argc, char **argv)
     glutInitWindowSize(winx, winy);
     glutCreateWindow("OpenGL - basic volume renderer");
 
+    //glutFullScreen();
+
     // init the GL context
     if (!gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;

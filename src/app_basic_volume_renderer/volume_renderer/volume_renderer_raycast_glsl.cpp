@@ -254,6 +254,8 @@ namespace gl
         _program_obj_front_pass.set_uniform_1i("_color_alpha", 1);
         _program_obj_front_pass.set_uniform_1i("_geom_depth", 2);
 
+        _program_obj_front_pass.set_uniform_3fv("_voxel_size", 1, params._voxel_size.vec_array);
+
         _program_obj_front_pass.set_uniform_1f("_step_size", 1.0f/params._step_size);
         _program_obj_front_pass.set_uniform_2fv("_screen_dimensions", 1, params._screen_dimensions.vec_array);
 
@@ -270,6 +272,8 @@ namespace gl
             _program_obj_back_pass.set_uniform_1i("_volume", 0);
             _program_obj_back_pass.set_uniform_1i("_color_alpha", 1);
             _program_obj_back_pass.set_uniform_1i("_geom_depth", 2);
+
+            _program_obj_back_pass.set_uniform_3fv("_voxel_size", 1, params._voxel_size.vec_array);
 
             _program_obj_back_pass.set_uniform_1f("_step_size", 1.0f/params._step_size);
             _program_obj_back_pass.set_uniform_2fv("_screen_dimensions", 1, params._screen_dimensions.vec_array);
