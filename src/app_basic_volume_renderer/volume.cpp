@@ -132,26 +132,36 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._volume_texture.unbind();
 
     
+//#define NOT_VRGEO
     // reset transfer functions
     _data_properties._alpha_transfer.clear();
-    //_data_properties._alpha_transfer.add_point(0,   0.0f);
-    //_data_properties._alpha_transfer.add_point(120,   0.0f);
-    //_data_properties._alpha_transfer.add_point(121,   1.0f);
-    //_data_properties._alpha_transfer.add_point(255, 1.0f);
+
+#ifdef NOT_VRGEO
+    _data_properties._alpha_transfer.add_point(0,   0.0f);
+    //_data_properties._alpha_transfer.add_point(130, 0.0f);
+    //_data_properties._alpha_transfer.add_point(140, 1.0f);
+    _data_properties._alpha_transfer.add_point(255, 1.0f);
+#else
     _data_properties._alpha_transfer.add_point(0,   1.0f);
     _data_properties._alpha_transfer.add_point(100,  0.0f);
     _data_properties._alpha_transfer.add_point(128, 0.0f);
     _data_properties._alpha_transfer.add_point(160, 0.0f);
     _data_properties._alpha_transfer.add_point(255, 1.0f);
+#endif
 
     _data_properties._color_transfer.clear();
+#ifdef NOT_VRGEO
+    _data_properties._color_transfer.add_point(0,   math::vec3f_t(0.0f, 0.0f, 0.0f));
+    _data_properties._color_transfer.add_point(255, math::vec3f_t(1.0f, 1.0f, 1.0f));
+#else
     _data_properties._color_transfer.add_point(0,   math::vec3f_t(0.0f, 0.0f, 1.0f));
     _data_properties._color_transfer.add_point(128, math::vec3f_t(1.0f, 1.0f, 1.0f));
     _data_properties._color_transfer.add_point(255, math::vec3f_t(1.0f, 0.0f, 0.0f));
+#endif
 
     update_color_alpha_table();
 
-    _volrend_params._step_size      = 666;
+    _volrend_params._step_size      = 512;
     _volrend_params._voxel_size.x   = 1.0f / float(_data_properties._dimensions.x);
     _volrend_params._voxel_size.y   = 1.0f / float(_data_properties._dimensions.y);
     _volrend_params._voxel_size.z   = 1.0f / float(_data_properties._dimensions.z);

@@ -302,7 +302,8 @@ bool init_gl()
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    glClearColor(0.3f,0.3f,0.3f,1);
+    //glClearColor(0.3f,0.3f,0.3f,1);
+    glClearColor(0.0f,0.0f,0.0f,1);
 
     // setup depth testing
     glDepthFunc(GL_LESS);

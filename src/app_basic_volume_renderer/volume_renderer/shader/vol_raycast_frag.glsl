@@ -8,6 +8,7 @@
 varying vec3            _cam_pos;
 varying vec3            _ray_dir;
 varying vec3            _obj_pos;
+varying vec3            _view_dir;
 
 // uniforms
 uniform vec2            _screen_dimensions;
@@ -27,36 +28,42 @@ uniform vec4            _near_plane;
 
 // global consts
 const vec3  lumi_convert = vec3(0.3, 0.59, 0.11);
-const float alpha_termination = float(0.98);
+const float alpha_termination = float(1.0);
 
 vec3 debug_col;
 
 // function declarations
-vec4    do_shading(in vec4 inp);
+vec4    color_lookup(in vec4 inp);
+vec4    do_shading(in vec3 sample_pos, in vec4 inp);
 bool    inside_volume_bounds(const in vec3  position,
                              const in float geom_sample_dist);
 vec3    calculate_starting_point(const in vec3 ray_step);
 float   calculate_fragment_depth_objspc();
 
-
 // implementation
+vec4 color_lookup(in vec4 inp)
+{
+    return (texture1D(_color_alpha, inp.r));
+}
+
 vec4 do_shading(in vec3 sample_pos, in vec4 inp)
 {
     vec4 ret;
 
-    ret = texture1D(_color_alpha, inp.r);
-#if 0
-    // calculate gradient
+    ret = color_lookup(inp);
+#if 1
+    // calculate gradient dependent on current transfer function
+    // using central differences
     vec3 grad;
 
-    float nx  = texture3D(_volume, sample_pos - vec3(_voxel_size.x, 0.0, 0.0)).r;
-    float px  = texture3D(_volume, sample_pos + vec3(_voxel_size.x, 0.0, 0.0)).r;
+    float nx  = color_lookup(texture3D(_volume, sample_pos - vec3(_voxel_size.x, 0.0, 0.0))).a;
+    float px  = color_lookup(texture3D(_volume, sample_pos + vec3(_voxel_size.x, 0.0, 0.0))).a;
 
-    float ny  = texture3D(_volume, sample_pos - vec3(0.0, _voxel_size.y, 0.0)).r;
-    float py  = texture3D(_volume, sample_pos + vec3(0.0, _voxel_size.y, 0.0)).r;
+    float ny  = color_lookup(texture3D(_volume, sample_pos - vec3(0.0, _voxel_size.y, 0.0))).a;
+    float py  = color_lookup(texture3D(_volume, sample_pos + vec3(0.0, _voxel_size.y, 0.0))).a;
 
-    float nz  = texture3D(_volume, sample_pos - vec3(0.0, 0.0, _voxel_size.z)).r;
-    float pz  = texture3D(_volume, sample_pos + vec3(0.0, 0.0, _voxel_size.z)).r;
+    float nz  = color_lookup(texture3D(_volume, sample_pos - vec3(0.0, 0.0, _voxel_size.z))).a;
+    float pz  = color_lookup(texture3D(_volume, sample_pos + vec3(0.0, 0.0, _voxel_size.z))).a;
 
     grad.x    = (px - nx) / 2.0;
     grad.y    = (py - ny) / 2.0;
@@ -65,19 +72,17 @@ vec4 do_shading(in vec3 sample_pos, in vec4 inp)
 
     // lighting
     vec3 n = normalize(gl_TextureMatrix[0] * vec4(gl_NormalMatrix * -grad, 0.0)).xyz; 
-    vec3 l = normalize(gl_LightSource[0].position.xyz); // assume parallel light!
-    //vec3 v = normalize(view_dir);
-    //vec3 h = normalize(l + v);//gl_LightSource[0].halfVector);//
+    vec3 l = normalize(gl_TextureMatrix[0] * gl_LightSource[0].position).xyz; // assume parallel light!
+    vec3 v = normalize(_view_dir);
+    vec3 h = normalize(v + l);
 
-    if (length(n) > 0.2) {
-    ret.rgb =  gl_LightSource[0].ambient.rgb
-             + ret.rgb * gl_LightSource[0].diffuse.rgb * max(0.0, dot(n, l));/*
-             //+ gl_FrontLightProduct[0].specular * pow(max(0.0, dot(n, h)), gl_FrontMaterial.shininess);*/
+    // !! specular still buggy...
+    if (length(n) > 0.1) {
+    ret.rgb =  //gl_LightSource[0].ambient.rgb
+             + ret.rgb * gl_LightSource[0].diffuse.rgb * (dot(n, l) * 0.5 + 0.5);//max(0.0, dot(n, l));/*
+             //+ ret.rgb * gl_LightSource[0].specular.rgb * pow(max(0.0, dot(n, h)), gl_FrontMaterial.shininess);
 
     }
-    //vec3 n = -normalize(inp.rgb * 2.0 - vec3(1.0)); 
-    //vec3 l = normalize(_light_dir_tr); 
-    //ret.rgb = ret.rgb*0.6 + ret.rgb * _light_col_diff * max(0.0, dot(n, l));
 #endif
     return (ret);
 }
