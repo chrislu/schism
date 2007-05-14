@@ -2,100 +2,27 @@
 #ifndef SCM_MATH_LIB_H_INCLUDED
 #define SCM_MATH_LIB_H_INCLUDED
 
+#include <cassert>
 #include <cmath>
 
 namespace math
 {
     // trigonometiy
-    inline const float sin(const float rad)
-    {
-        return (std::sin(rad));
-    }
+    using std::sin;
+    using std::asin;
+    using std::cos;
+    using std::acos;
+    using std::tan;
+    using std::atan;
+    using std::sqrt;
+    using std::log;
+    using std::log10;
 
-    inline const double sin(const double rad)
-    {
-        return (std::sin(rad));
-    }
-
-    inline const float asin(const float rad)
-    {
-        return (std::asin(rad));
-    }
-
-    inline const double asin(const double rad)
-    {
-        return (std::asin(rad));
-    }
-
-    inline const float cos(const float rad)
-    {
-        return (std::cos(rad));
-    }
-
-    inline const double cos(const double rad)
-    {
-        return (std::cos(rad));
-    }
-
-    inline const float acos(const float rad)
-    {
-        return (std::acos(rad));
-    }
-
-    inline const double acos(const double rad)
-    {
-        return (std::acos(rad));
-    }
-
-    inline const float tan(const float rad)
-    {
-        return (std::tan(rad));
-    }
-
-    inline const double tan(const double rad)
-    {
-        return (std::tan(rad));
-    }
-
-    inline const float atan(const float rad)
-    {
-        return (std::atan(rad));
-    }
-
-    inline const double atan(const double rad)
-    {
-        return (std::atan(rad));
-    }
-
-    inline const float sqrt(const float x)
-    {
-        return (std::sqrt(x));
-    }
-
-    inline const double sqrt(const double x)
-    {
-        return (std::sqrt(x));
-    }
-
-    inline const float log(const float x)
-    {
-        return (std::log(x));
-    }
-
-    inline const double log(const double x)
-    {
-        return (std::log(x));
-    }
-
-    inline const float log10(const float x)
-    {
-        return (std::log10(x));
-    }
-
-    inline const double log10(const double x)
-    {
-        return (std::log10(x));
-    }
+    using std::abs;
+    using std::fabs;
+    using std::floor;
+    using std::ceil;
+    using std::pow;
 
     // functions
     template<typename scal>
@@ -107,59 +34,13 @@ namespace math
     template<typename T> 
     inline T max(const T a, const T b)
     { 
-        return ( (a > b) ? a : b );
+        return ((a > b) ? a : b );
     }
 
     template<typename T>
     inline T min(const T a, const T b)
     {
-        return ( (a < b) ? a : b );
-    }
-
-    template<typename T>
-    inline const T abs(const T a)
-    {
-        return ( (a < T(0)) ? -a : a );
-    }
-    
-    inline const float abs(const float x)
-    {
-        return (std::fabs(x));
-    }
-
-    inline const double abs(const double x)
-    {
-        return (std::fabs(x));
-    }
-
-    inline const float floor(const float x)
-    {
-        return (std::floor(x));
-    }
-
-    inline const double floor(const double x)
-    {
-        return (std::floor(x));
-    }
-
-    inline const float ceil(const float x)
-    {
-        return (std::ceil(x));
-    }
-
-    inline const double ceil(const double x)
-    {
-        return (std::ceil(x));
-    }
-
-    inline const float pow(const float x, const float y)
-    {
-        return (std::pow(x, y));
-    }
-
-    inline const double pow(const double x, const double y)
-    {
-        return (std::pow(x, y));
+        return ((a < b) ? a : b );
     }
 
     template<typename T> 
@@ -217,10 +98,26 @@ namespace math
 	    return (deg * scm_scalar(0.017453292519943295769236907684886));
     }
 
-    inline bool is_pow_of_2(unsigned x)
+    inline bool is_power_of_two(unsigned x)
     {
 	    return (! ( x & (x-1)));
     }
+
+    inline unsigned next_power_of_two(unsigned x)
+    {
+        assert(sizeof(x) == 4);
+
+        --x;
+
+        x |= x >> 1;
+        x |= x >> 2;
+        x |= x >> 4;
+        x |= x >> 8;
+        x |= x >> 16;
+
+        return (++x);
+    }
+
 } // namespace math
 
 #endif // SCM_MATH_LIB_H_INCLUDED

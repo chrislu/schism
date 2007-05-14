@@ -6,7 +6,7 @@ SET(SRC_DIR "${GLOBAL_SRC_DIR}/app_glut_tests")
 SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_08_fbo.cpp) #ogl_04_glsl_phong_shading.cpp)
+FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_10_freetype_font_rendering.cpp)
 FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
 FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
 
@@ -69,6 +69,7 @@ IF (WIN32)
     INCLUDE_DIRECTORIES(
         ${GLOBAL_EXT_DIR}/inc
         ${GLOBAL_EXT_DIR}/inc/boost
+        ${GLOBAL_EXT_DIR}/inc/freetype
     )
 ENDIF (WIN32)
 
@@ -96,6 +97,7 @@ IF (WIN32)
         devIL
         glew32
         glut32
+        freetype2
     )
 ENDIF (WIN32)
 IF (UNIX)

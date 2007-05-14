@@ -2,7 +2,7 @@
 #include "trackball_manipulator.h"
 
 #include <ogl/gl.h>
-#include <cmath>
+#include <scm_core/math/math.h>
 
 namespace gl
 {
@@ -15,17 +15,16 @@ namespace gl
     }
 
     float trackball_manipulator::project_to_sphere(float x, float y) const {
-        using namespace std;
 
         // inspired by OpenSG code of the TrackballNavigator class
         float len_sqr = x*x + y*y;
-        float len     = sqrtf(len_sqr);
+        float len     = math::sqrt(len_sqr);
 
         // if point lies inside sphere map it to the sphere, if it lies 
         // outside map it to hyperbola (at radius/sqrt(2) sphere and
         // hyperbola intersect and so this is the decission point)
-        if (len < _radius / sqrtf(2.0f)) {
-            return (sqrtf(_radius * _radius - len_sqr));
+        if (len < _radius / math::sqrt(2.0f)) {
+            return (math::sqrt(_radius * _radius - len_sqr));
         } else {
             // hyperbola z = r²/(2*d)
             return ((_radius*_radius) / (2.0f * len));
@@ -33,7 +32,6 @@ namespace gl
     }
 
     void trackball_manipulator::rotation(float fx, float fy, float tx, float ty) {
-        using namespace std;
 
         // test if fx - tx or fy - ty > float.epsilon
         math::vec3f_t   start(fx, fy, project_to_sphere(fx, fy));
@@ -58,9 +56,8 @@ namespace gl
     }
 
     void trackball_manipulator::translation(float x, float y) {
-        using namespace std;
 
-        float dolly_abs = abs(_dolly);
+        float dolly_abs = math::fabs(_dolly);
         float near_dist = 1.f; // rough estimate, maybe construct this better
                                // from the projection matrix
 
