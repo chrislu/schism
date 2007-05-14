@@ -48,6 +48,13 @@ FILE(GLOB SOURCE_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.cpp)
 FILE(GLOB HEADER_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.h)
 FILE(GLOB INLINE_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.inl)
 
+FILE(GLOB SOURCE_FILES_TIME             ${SRC_DIR}/scm_core/time/*.cpp)
+FILE(GLOB HEADER_FILES_TIME             ${SRC_DIR}/scm_core/time/*.h)
+FILE(GLOB INLINE_FILES_TIME             ${SRC_DIR}/scm_core/time/*.inl)
+FILE(GLOB SOURCE_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.cpp)
+FILE(GLOB HEADER_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.h)
+FILE(GLOB INLINE_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.inl)
+
 FILE(GLOB SOURCE_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.cpp)
 FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.h)
 FILE(GLOB INLINE_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.inl)
@@ -56,19 +63,21 @@ FILE(GLOB INLINE_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.inl)
 # define source groups
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
-SOURCE_GROUP(source_files/console           FILES ${SOURCE_FILES_CONSOLE}           ${HEADER_FILES_CONSOLE}             ${INLINE_FILES_CONSOLE})
-SOURCE_GROUP(source_files/console/detail    FILES ${SOURCE_FILES_CONSOLE_DETAIL}    ${HEADER_FILES_CONSOLE_DETAIL}      ${INLINE_FILES_CONSOLE_DETAIL})
-SOURCE_GROUP(source_files/exception         FILES ${SOURCE_FILES_EXCEPTION}         ${HEADER_FILES_EXCEPTION}           ${INLINE_FILES_EXCEPTION})
-SOURCE_GROUP(source_files/math              FILES ${SOURCE_FILES_MATH}              ${HEADER_FILES_MATH}                ${INLINE_FILES_MATH})
-SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                  ${INLINE_FILES_PLATFORM})
-SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}         ${INLINE_FILES_PLATFORM_GRAPHICS})
-SOURCE_GROUP(source_files/platfotm/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}  ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
-SOURCE_GROUP(source_files/root              FILES ${SOURCE_FILES_ROOT}              ${HEADER_FILES_ROOT}                ${INLINE_FILES_ROOT})
-SOURCE_GROUP(source_files/root/detail       FILES ${SOURCE_FILES_ROOT_DETAIL}       ${HEADER_FILES_ROOT_DETAIL}         ${INLINE_FILES_ROOT_DETAIL})
-SOURCE_GROUP(source_files/script            FILES ${SOURCE_FILES_SCRIPT}            ${HEADER_FILES_SCRIPT}              ${INLINE_FILES_SCRIPT})
-SOURCE_GROUP(source_files/script/detail     FILES ${SOURCE_FILES_SCRIPT_DETAIL}     ${HEADER_FILES_SCRIPT_DETAIL}       ${INLINE_FILES_SCRIPT_DETAIL})
-SOURCE_GROUP(source_files/utilities         FILES ${SOURCE_FILES_UTILITIES}         ${HEADER_FILES_UTILITIES}           ${INLINE_FILES_UTILITIES})
+SOURCE_GROUP(source_files                           FILES ${SOURCE_FILES}                           ${HEADER_FILES}                             ${INLINE_FILES})
+SOURCE_GROUP(source_files/console                   FILES ${SOURCE_FILES_CONSOLE}                   ${HEADER_FILES_CONSOLE}                     ${INLINE_FILES_CONSOLE})
+SOURCE_GROUP(source_files/console/detail            FILES ${SOURCE_FILES_CONSOLE_DETAIL}            ${HEADER_FILES_CONSOLE_DETAIL}              ${INLINE_FILES_CONSOLE_DETAIL})
+SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTION}                 ${HEADER_FILES_EXCEPTION}                   ${INLINE_FILES_EXCEPTION})
+SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH}                        ${INLINE_FILES_MATH})
+SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                    ${INLINE_FILES_PLATFORM})
+SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}           ${INLINE_FILES_PLATFORM_GRAPHICS})
+SOURCE_GROUP(source_files/platfotm/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
+SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
+SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
+SOURCE_GROUP(source_files/script                    FILES ${SOURCE_FILES_SCRIPT}                    ${HEADER_FILES_SCRIPT}                      ${INLINE_FILES_SCRIPT})
+SOURCE_GROUP(source_files/script/detail             FILES ${SOURCE_FILES_SCRIPT_DETAIL}             ${HEADER_FILES_SCRIPT_DETAIL}               ${INLINE_FILES_SCRIPT_DETAIL})
+SOURCE_GROUP(source_files/time                      FILES ${SOURCE_FILES_TIME}                      ${HEADER_FILES_TIME}                        ${INLINE_FILES_TIME})
+SOURCE_GROUP(source_files/time/detail               FILES ${SOURCE_FILES_TIME_DETAIL}               ${HEADER_FILES_TIME_DETAIL}                 ${INLINE_FILES_TIME_DETAIL})
+SOURCE_GROUP(source_files/utilities                 FILES ${SOURCE_FILES_UTILITIES}                 ${HEADER_FILES_UTILITIES}                   ${INLINE_FILES_UTILITIES})
 
 # combine source file lists
 SET(SOURCE_FILES
@@ -76,6 +85,8 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_EXCEPTION}
     ${SOURCE_FILES_MATH}
     ${SOURCE_FILES_PLATFORM}
+    ${SOURCE_FILES_TIME}
+    ${SOURCE_FILES_TIME_DETAIL}
     ${SOURCE_FILES_UTILITIES}
 )
 
@@ -83,6 +94,8 @@ SET(HEADER_FILES
     ${HEADER_FILES}                
     ${HEADER_FILES_EXCEPTION}
     ${HEADER_FILES_MATH}
+    ${HEADER_FILES_TIME}
+    ${HEADER_FILES_TIME_DETAIL}
     ${HEADER_FILES_UTILITIES}
 )
 
@@ -90,6 +103,8 @@ SET(INLINE_FILES
     ${INLINE_FILES}
     ${INLINE_FILES_EXCEPTION}
     ${INLINE_FILES_MATH}
+    ${INLINE_FILES_TIME}
+    ${INLINE_FILES_TIME_DETAIL}
     ${INLINE_FILES_UTILITIES}
 )
 
@@ -181,6 +196,6 @@ ENDIF (WIN32)
 
 IF (UNIX)
     TARGET_LINK_LIBRARIES(lib_scm_core
-        lua
+        #lua
     )
 ENDIF (UNIX)
