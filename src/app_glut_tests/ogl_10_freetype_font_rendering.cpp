@@ -12,6 +12,8 @@
 #include <ogl/shader_objects/program_object.h>
 #include <ogl/shader_objects/shader_object.h>
 
+#include <scm_core/time/timer.h>
+
 #include <image_handling/image_loader.h>
 
 #include <ft2build.h>
@@ -44,7 +46,7 @@ unsigned tex1_id = 0;
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/cour.ttf");//consola.ttf");//
+    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/consola.ttf");//cour.ttf");//
     unsigned        _font_pixel_size        = 9;
     unsigned        _display_dpi_resolution = 96;
 
@@ -246,6 +248,12 @@ bool init_gl()
 
 void display()
 {
+    static scm::core::timer _timer;
+    static double           _accum_time     = 0.0;
+    static unsigned         _accum_count    = 0;
+
+    _timer.start();
+
     // clear the color and depth buffer
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -313,6 +321,17 @@ void display()
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
+    _timer.stop();
+
+    _accum_time += _timer.get_time();
+    ++_accum_count;
+
+    if (_accum_time > 1000.0) {
+        std::cout << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
+
+        _accum_time     = 0.0;
+        _accum_count    = 0;
+    }
 }
 
 void resize(int w, int h)

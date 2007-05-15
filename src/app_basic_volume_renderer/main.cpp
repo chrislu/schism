@@ -19,6 +19,8 @@
 
 #include <ogl/manipulators/trackball_manipulator.h>
 
+#include <scm_core/time/timer.h>
+
 #include <volume_renderer/volume_renderer_raycast_glsl.h>
 
 // math
@@ -368,6 +370,12 @@ void shutdown_gl()
 
 void display()
 {
+    static scm::core::timer _timer;
+    static double           _accum_time     = 0.0;
+    static unsigned         _accum_count    = 0;
+
+    _timer.start();
+
     // clear the color and depth buffer
     if (draw_geometry) {
         glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT |*/ GL_STENCIL_BUFFER_BIT);
@@ -436,6 +444,17 @@ void display()
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
+    _timer.stop();
+
+    _accum_time += _timer.get_time();
+    ++_accum_count;
+
+    if (_accum_time > 1000.0) {
+        std::cout << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
+
+        _accum_time     = 0.0;
+        _accum_count    = 0;
+    }
 }
 
 void resize(int w, int h)
