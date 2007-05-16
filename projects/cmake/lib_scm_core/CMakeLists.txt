@@ -70,7 +70,7 @@ SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTI
 SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH}                        ${INLINE_FILES_MATH})
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                    ${INLINE_FILES_PLATFORM})
 SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}           ${INLINE_FILES_PLATFORM_GRAPHICS})
-SOURCE_GROUP(source_files/platfotm/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
+SOURCE_GROUP(source_files/platform/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
 SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
 SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
 SOURCE_GROUP(source_files/script                    FILES ${SOURCE_FILES_SCRIPT}                    ${HEADER_FILES_SCRIPT}                      ${INLINE_FILES_SCRIPT})

@@ -23,7 +23,7 @@
     #define SCM_COMPILER            SCM_COMPILER_MSVC
     #define SCM_COMPILER_VER        _MSC_VER
 #elif defined(__GNUC__)
-    #define SCM_COMPILER OGRE_COMPILER_GNUC
+    #define SCM_COMPILER            SCM_COMPILER_GNUC
     #define SCM_COMPILER_VER        (((__GNUC__)*100) + \
                                     (__GNUC_MINOR__*10) + \
                                     __GNUC_PATCHLEVEL__)
@@ -34,7 +34,7 @@
 // platform
 #if defined(__WIN32__) || defined(_WIN32)
     #define SCM_PLATFORM            SCM_PLATFORM_WINDOWS
-#elif defined( __APPLE_CC__)
+#elif defined(__APPLE_CC__)
     #define SCM_PLATFORM            SCM_PLATFORM_APPLE
 #else
     #define SCM_PLATFORM            SCM_PLATFORM_LINUX

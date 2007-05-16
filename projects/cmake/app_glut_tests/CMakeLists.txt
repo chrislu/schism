@@ -95,9 +95,9 @@ TARGET_LINK_LIBRARIES(app_glut_tests
 IF (WIN32)
     TARGET_LINK_LIBRARIES(app_glut_tests
         devIL
+        freetype2
         glew32
         glut32
-        freetype2
     )
 ENDIF (WIN32)
 IF (UNIX)
