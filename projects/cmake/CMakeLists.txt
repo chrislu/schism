@@ -15,7 +15,7 @@ SET(SCHISM_VERSION "${schism_MAJOR_VERSION}.${schism_MINOR_VERSION}.${schism_BUI
 
 #-----------------------------------------------------------------------------
 # Setup external library strings
-SET(SCHISM_BOOST_VERSION "1_35")
+SET(SCHISM_BOOST_VERSION "1_34")
 
 #-----------------------------------------------------------------------------
 # Setup some CMake build options

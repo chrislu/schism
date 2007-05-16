@@ -37,7 +37,7 @@ namespace scm
                 {
                     QueryPerformanceCounter(&_performance_counter._current_time);
 
-                    assert(_performance_couter._current_time != 0);
+                    assert(_performance_counter._current_time.QuadPart != 0);
                     
                     return (  (static_cast<double>(_performance_counter._current_time.QuadPart)
                             / _performance_counter._frequency)
