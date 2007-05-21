@@ -53,8 +53,8 @@ unsigned tex_font_h = 0;
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/consola.ttf");//cour.ttf");//
-    unsigned        _font_pixel_size        = 10;
+    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/vgaoem.fon");//cour.ttf");//consola.ttf");//
+    unsigned        _font_pixel_size        = 9;
     unsigned        _display_dpi_resolution = 96;
 
     scm::core::timer _timer;
@@ -109,34 +109,56 @@ bool init_font_rendering()
             std::cout << "error loading glyph at char code: " << i << std::endl;
         }
         else {
-           //FT_Glyph_To_Bitmap( &ft_face->glyph, FT_RENDER_MODE_NORMAL, 0, 0 );
-           //FT_BitmapGlyph  bitmap = (FT_BitmapGlyph)image;
-            //// Move The Face's Glyph Into A Glyph Object.
             if (FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
                 std::cout << "error rendering glyph at char code: " << i << std::endl;
             }
             FT_Bitmap& bitmap = ft_face->glyph->bitmap;
-            //// This Reference Will Make Accessing The Bitmap Easier.
 
             dst_x = (i & 0x0F) * font_glyph_size.x;
             dst_y = (i >> 4)   * font_glyph_size.y;
 
+            switch (bitmap.pixel_mode) {
+                case FT_PIXEL_MODE_GRAY:
+                    for (int dy = 0; dy < bitmap.rows; ++dy) {
+
+                        unsigned src_off = dy * bitmap.width;
+                        unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
+                        memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
+                    }
+                    break;
+                case FT_PIXEL_MODE_MONO:
+                    //std::cout << "r: " << bitmap.rows << "\tw: " << bitmap.width << "\tp: " << bitmap.pitch << std::endl;
+                    for (int dy = 0; dy < bitmap.rows; ++dy) {
+                        for (int dx = 0; dx < bitmap.pitch; ++dx) {
+
+                            unsigned        src_off     = dx + dy * bitmap.pitch;
+                            unsigned char   src_byte    = bitmap.buffer[src_off];
+
+                            for (int bx = 0; bx < 8; ++bx) {
+
+                                unsigned dst_off    = (dst_x + dx * 8 + bx) + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
+
+                                unsigned char  src_set = src_byte & (0x80 >> bx);
+                                unsigned char* plah = &src_byte;
+
+                                font_tex[dst_off] = src_set ? 255u : 0u;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    std::cout << "unsupported pixel_mode" << std::endl;
+                    continue;
+            }
+
             //std::cout << i << " w: " << bitmap.width << "\th: " << bitmap.rows << "\tp: " << bitmap.pitch << std::endl;
 
-            for (int dy = 0; dy < bitmap.rows; ++dy) {
+            //for (int dy = 0; dy < bitmap.rows; ++dy) {
 
-                unsigned src_off = dy * bitmap.width;
-                unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
-                memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
-
-                //for (int dx = 0; dx < bitmap.width; ++dx) {
-
-                    //unsigned src_off = dx + dy * bitmap.width;
-                    //unsigned dst_off = (dst_x + dx) + (dst_y + dy) * font_tex_size.x;
-
-                    //font_tex[dst_off] = bitmap.buffer[src_off];
-                //}
-            }
+            //    unsigned src_off = dy * bitmap.width;
+            //    unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
+            //    memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
+            //}
 
 
 
