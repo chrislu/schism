@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <ogl/gl.h>
@@ -18,6 +19,8 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <freetype/ftmodapi.h>
+
 
 #include <scm_core/math/math.h>
 
@@ -43,13 +46,19 @@ float dolly_sens = 10.0f;
 unsigned tex0_id = 0;
 unsigned tex1_id = 0;
 
+unsigned tex_font = 0;
+unsigned tex_font_w = 0;
+unsigned tex_font_h = 0;
+
 bool init_font_rendering()
 {
     // soon to be parameters
     std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/consola.ttf");//cour.ttf");//
-    unsigned        _font_pixel_size        = 9;
+    unsigned        _font_pixel_size        = 10;
     unsigned        _display_dpi_resolution = 96;
 
+    scm::core::timer _timer;
+    _timer.start();
 
     FT_Library      ft_lib;
 
@@ -58,6 +67,12 @@ bool init_font_rendering()
         std::cout << "error initializing freetype library" << std::endl;
         return (false);
     }
+
+    //switch (FT_Get_TrueType_Engine_Type(ft_lib)) {
+    //    case FT_TRUETYPE_ENGINE_TYPE_NONE:          std::cout << "FT_TRUETYPE_ENGINE_TYPE_NONE"       << std::endl; break;
+    //    case FT_TRUETYPE_ENGINE_TYPE_UNPATENTED:    std::cout << "FT_TRUETYPE_ENGINE_TYPE_UNPATENTED" << std::endl; break;
+    //    case FT_TRUETYPE_ENGINE_TYPE_PATENTED:      std::cout << "FT_TRUETYPE_ENGINE_TYPE_PATENTED"   << std::endl; break;
+    //}
 
     // load font face
     FT_Face         ft_face;
@@ -73,22 +88,68 @@ bool init_font_rendering()
         return (false);
     }
 
-    for (int i = 0; i < 256; ++i) {
+    math::vec<unsigned, 2> font_glyph_size  = math::vec<unsigned, 2>(ft_face->size->metrics.max_advance >> 6,
+                                                                     ft_face->size->metrics.height >> 6);
+
+    math::vec<unsigned, 2> font_tex_size    = math::vec<unsigned, 2>(font_glyph_size * 16u);
+
+    //std::cout << "font_glyph_size: (" << font_glyph_size.x << ", " << font_glyph_size.y << ")" << std::endl;
+    //std::cout << "font_tex_size: (" << font_tex_size.x << ", " << font_tex_size.y << ")" << std::endl;
+
+    // allocate texture destination memory
+    boost::scoped_array<unsigned char> font_tex(new unsigned char[font_tex_size.x * font_tex_size.y]);
+
+    // clear texture background to black
+    memset(font_tex.get(), 0u, font_tex_size.x * font_tex_size.y);
+
+    unsigned dst_x, dst_y;
+
+    for (unsigned i = 0; i < 256; ++i) {
         if(FT_Load_Glyph(ft_face, FT_Get_Char_Index(ft_face, i), FT_LOAD_DEFAULT)) {
             std::cout << "error loading glyph at char code: " << i << std::endl;
         }
         else {
-            // Move The Face's Glyph Into A Glyph Object.
-            FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL);
-            // This Reference Will Make Accessing The Bitmap Easier.
-            FT_Bitmap& bitmap=ft_face->glyph->bitmap;
+           //FT_Glyph_To_Bitmap( &ft_face->glyph, FT_RENDER_MODE_NORMAL, 0, 0 );
+           //FT_BitmapGlyph  bitmap = (FT_BitmapGlyph)image;
+            //// Move The Face's Glyph Into A Glyph Object.
+            if (FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
+                std::cout << "error rendering glyph at char code: " << i << std::endl;
+            }
+            FT_Bitmap& bitmap = ft_face->glyph->bitmap;
+            //// This Reference Will Make Accessing The Bitmap Easier.
 
-            std::cout << i << " w: " << bitmap.width << " h: " << bitmap.rows << " a: " << (ft_face->glyph->advance.x >> 6) << std::endl;
-            //std::cout << i << " w: " << (float)(ft_face->bbox.xMax - ft_face->bbox.xMin) / (float)64 << " h: " << (float)(ft_face->bbox.yMax - ft_face->bbox.yMin) / (float)64 << std::endl;
+            dst_x = (i & 0x0F) * font_glyph_size.x;
+            dst_y = (i >> 4)   * font_glyph_size.y;
+
+            //std::cout << i << " w: " << bitmap.width << "\th: " << bitmap.rows << "\tp: " << bitmap.pitch << std::endl;
+
+            for (int dy = 0; dy < bitmap.rows; ++dy) {
+
+                unsigned src_off = dy * bitmap.width;
+                unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
+                memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
+
+                //for (int dx = 0; dx < bitmap.width; ++dx) {
+
+                    //unsigned src_off = dx + dy * bitmap.width;
+                    //unsigned dst_off = (dst_x + dx) + (dst_y + dy) * font_tex_size.x;
+
+                    //font_tex[dst_off] = bitmap.buffer[src_off];
+                //}
+            }
+
+
+
+    //        //std::cout << i << " w: " << bitmap.width << "\th: " << bitmap.rows << "\tax: " << (ft_face->glyph->advance.x >> 6) << "\tay: " << 
+    //                           //  (/*float(ft_face->max_advance_height) / float(ft_face->units_per_EM) * */ft_face->size->metrics.height >> 6) << std::endl;//(ft_face->glyph->linearVertAdvance >> 16) << "." << (ft_face->glyph->linearVertAdvance & 0x0000FFFF)<< std::endl;
+    //        //std::cout << i << " w: " << (float)(ft_face->bbox.xMax - ft_face->bbox.xMin) / (float)64 << " h: " << (float)(ft_face->bbox.yMax - ft_face->bbox.yMin) / (float)64 << std::endl;
 
 
         }
     }
+
+
+
 
 
 
@@ -103,6 +164,36 @@ bool init_font_rendering()
     if (FT_Done_FreeType(ft_lib) != 0) {
         std::cout << "error shutting down freetype library" << std::endl;
     }
+
+
+    glGenTextures(1, &tex_font);
+
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex_font);
+    glEnable(GL_TEXTURE_RECTANGLE_ARB);
+
+
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_LUMINANCE, font_tex_size.x, font_tex_size.y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, (void*)font_tex.get());
+    if (glGetError() != GL_NO_ERROR) {
+        std::cout << "error: texture upload failed" << std::endl;
+        return (false);
+    }
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glDisable(GL_TEXTURE_RECTANGLE_ARB);
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+    tex_font_w = font_tex_size.x;
+    tex_font_h = font_tex_size.y;
+
+    _timer.stop();
+
+    std::cout.precision(2);
+    std::cout << std::fixed << "font setup time: " << _timer.get_time() << "msec" << std::endl;
+
 
     return (true);
 }
@@ -245,6 +336,53 @@ bool init_gl()
     return (true);
 }
 
+void draw_font_image()
+{
+    // retrieve current matrix mode
+    GLint  current_matrix_mode;
+    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, winx, 0, winy, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    //glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+
+    glEnable(GL_TEXTURE_RECTANGLE_ARB);
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex_font);
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+//glTranslatef(30, 30, 0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex2f(  0.0f, 0.0f);
+        glTexCoord2f(tex_font_w, 0.0f);
+        glVertex2f(  tex_font_w, 0.0f);
+        glTexCoord2f(tex_font_w, tex_font_h);
+        glVertex2f(  tex_font_w, tex_font_h);
+        glTexCoord2f(0.0f, tex_font_h);
+        glVertex2f(  0.0f, tex_font_h);
+    glEnd();
+
+
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+    glDisable(GL_TEXTURE_RECTANGLE_ARB);
+    glDisable(GL_BLEND);
+
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    
+    // restore saved matrix mode
+    glMatrixMode(current_matrix_mode);
+}
 
 void display()
 {
@@ -319,6 +457,8 @@ void display()
     // restore previously saved modelview matrix
     glPopMatrix();
 
+    draw_font_image();
+
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
     _timer.stop();
@@ -327,7 +467,8 @@ void display()
     ++_accum_count;
 
     if (_accum_time > 1000.0) {
-        std::cout << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
+        std::cout.precision(2);
+        std::cout << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
 
         _accum_time     = 0.0;
         _accum_count    = 0;
