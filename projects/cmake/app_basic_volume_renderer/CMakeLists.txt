@@ -141,6 +141,8 @@ IF (WIN32)
         glut32
         optimized boost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
         debug boost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
+        optimized libboost_program_options-vc80-mt-${SCHISM_BOOST_VERSION}
+        debug libboost_program_options-vc80-mt-gd-${SCHISM_BOOST_VERSION}
     )
 ENDIF (WIN32)
 IF (UNIX)
@@ -148,6 +150,7 @@ IF (UNIX)
         GLEW
         glut
         boost_filesystem
+        boost_program_options
     )
 ENDIF (UNIX)
 
@@ -155,5 +158,3 @@ ADD_DEPENDENCIES(app_basic_volume_renderer
     lib_ogl
     lib_scm_core
 )
-
-

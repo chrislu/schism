@@ -98,6 +98,8 @@ IF (WIN32)
         freetype2
         glew32
         glut32
+        optimized libboost_program_options-vc80-mt-${SCHISM_BOOST_VERSION}
+        debug libboost_program_options-vc80-mt-gd-${SCHISM_BOOST_VERSION}
     )
 ENDIF (WIN32)
 IF (UNIX)
@@ -105,6 +107,7 @@ IF (UNIX)
         IL
         GLEW
         glut
+        boost_program_options
     )
 ENDIF (UNIX)
 

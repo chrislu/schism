@@ -28,7 +28,7 @@ uniform vec4            _near_plane;
 
 // global consts
 const vec3  lumi_convert = vec3(0.3, 0.59, 0.11);
-const float alpha_termination = float(1.0);
+const float alpha_termination = float(0.99);
 
 vec3 debug_col;
 

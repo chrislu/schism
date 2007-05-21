@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include <boost/program_options.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -53,8 +54,8 @@ unsigned tex_font_h = 0;
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/vgaoem.fon");//cour.ttf");//consola.ttf");//
-    unsigned        _font_pixel_size        = 9;
+    std::string     _font_file_name         = std::string("C:/WINDOWS/fonts/consola.ttf");//vgaoem.fon");//cour.ttf");//
+    unsigned        _font_pixel_size        = 24;
     unsigned        _display_dpi_resolution = 96;
 
     scm::core::timer _timer;
@@ -114,14 +115,14 @@ bool init_font_rendering()
             }
             FT_Bitmap& bitmap = ft_face->glyph->bitmap;
 
-            dst_x = (i & 0x0F) * font_glyph_size.x;
-            dst_y = (i >> 4)   * font_glyph_size.y;
+            dst_x =                   (i & 0x0F) * font_glyph_size.x;
+            dst_y = font_tex_size.y - ((i >> 4) + 1)   * font_glyph_size.y;
 
             switch (bitmap.pixel_mode) {
                 case FT_PIXEL_MODE_GRAY:
                     for (int dy = 0; dy < bitmap.rows; ++dy) {
 
-                        unsigned src_off = dy * bitmap.width;
+                        unsigned src_off = dy * bitmap.pitch;
                         unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
                         memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
                     }
@@ -579,6 +580,37 @@ void keyboard(unsigned char key, int x, int y)
 
 int main(int argc, char **argv)
 {
+    int width;
+    int height;
+    bool fullscreen;
+
+    try {
+        boost::program_options::options_description  cmd_options("program options");
+
+        cmd_options.add_options()
+            ("help", "show this help message")
+            ("width", boost::program_options::value<int>(&width)->default_value(1024), "output width")
+            ("height", boost::program_options::value<int>(&height)->default_value(640), "output height")
+            ("fullscreen", boost::program_options::value<bool>(&fullscreen)->default_value(false), "run in fullscreen mode");
+
+        boost::program_options::variables_map       command_line;
+        boost::program_options::parsed_options      parsed_cmd_line =  boost::program_options::parse_command_line(argc, argv, cmd_options);
+        boost::program_options::store(parsed_cmd_line, command_line);
+        boost::program_options::notify(command_line);
+
+        if (command_line.count("help")) {
+            std::cout << "usage: " << std::endl;
+            std::cout << cmd_options;
+            return (0);
+        }
+        winx = width;
+        winy = height;
+    }
+    catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+        return (-1);
+    }
+
     // the stuff that has to be done
     glutInit(&argc, argv);
     // init a double buffered framebuffer with depth buffer and 4 channels
@@ -586,6 +618,10 @@ int main(int argc, char **argv)
     // create window with initial dimensions
     glutInitWindowSize(winx, winy);
     glutCreateWindow("simple_glut");
+
+    if (fullscreen) {
+        glutFullScreen();
+    }
 
     // init the GL context
     if (!gl::initialize()) {
