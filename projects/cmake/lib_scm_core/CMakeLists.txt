@@ -34,12 +34,12 @@ FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/gra
 FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.h)
 FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_ROOT             ${SRC_DIR}/scm_core/root/*.cpp)
-FILE(GLOB HEADER_FILES_ROOT             ${SRC_DIR}/scm_core/root/*.h)
-FILE(GLOB INLINE_FILES_ROOT             ${SRC_DIR}/scm_core/root/*.inl)
-FILE(GLOB SOURCE_FILES_ROOT_DETAIL      ${SRC_DIR}/scm_core/root/detail/*.cpp)
-FILE(GLOB HEADER_FILES_ROOT_DETAIL      ${SRC_DIR}/scm_core/root/detail/*.h)
-FILE(GLOB INLINE_FILES_ROOT_DETAIL      ${SRC_DIR}/scm_core/root/detail/*.inl)
+FILE(GLOB SOURCE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.cpp)
+FILE(GLOB HEADER_FILES_CORE             ${SRC_DIR}/scm_core/core/*.h)
+FILE(GLOB INLINE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.inl)
+FILE(GLOB SOURCE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.cpp)
+FILE(GLOB HEADER_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.h)
+FILE(GLOB INLINE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.inl)
 
 FILE(GLOB SOURCE_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.cpp)
 FILE(GLOB HEADER_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.h)
@@ -71,8 +71,8 @@ SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}  
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                    ${INLINE_FILES_PLATFORM})
 SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}           ${INLINE_FILES_PLATFORM_GRAPHICS})
 SOURCE_GROUP(source_files/platform/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
-SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
-SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
+SOURCE_GROUP(source_files/core                      FILES ${SOURCE_FILES_CORE}                      ${HEADER_FILES_CORE}                        ${INLINE_FILES_CORE})
+SOURCE_GROUP(source_files/core/detail               FILES ${SOURCE_FILES_CORE_DETAIL}               ${HEADER_FILES_CORE_DETAIL}                 ${INLINE_FILES_CORE_DETAIL})
 SOURCE_GROUP(source_files/script                    FILES ${SOURCE_FILES_SCRIPT}                    ${HEADER_FILES_SCRIPT}                      ${INLINE_FILES_SCRIPT})
 SOURCE_GROUP(source_files/script/detail             FILES ${SOURCE_FILES_SCRIPT_DETAIL}             ${HEADER_FILES_SCRIPT_DETAIL}               ${INLINE_FILES_SCRIPT_DETAIL})
 SOURCE_GROUP(source_files/time                      FILES ${SOURCE_FILES_TIME}                      ${HEADER_FILES_TIME}                        ${INLINE_FILES_TIME})
@@ -116,8 +116,8 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_PLATFORM}
     ${SOURCE_FILES_PLATFORM_GRAPHICS}
     ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${SOURCE_FILES_ROOT}
-    ${SOURCE_FILES_ROOT_DETAIL}
+    ${SOURCE_FILES_CORE}
+    ${SOURCE_FILES_CORE_DETAIL}
     ${SOURCE_FILES_SCRIPT}
     ${SOURCE_FILES_SCRIPT_DETAIL}
 )
@@ -129,8 +129,8 @@ SET(HEADER_FILES
     ${HEADER_FILES_PLATFORM}
     ${HEADER_FILES_PLATFORM_GRAPHICS}
     ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${HEADER_FILES_ROOT}
-    ${HEADER_FILES_ROOT_DETAIL}
+    ${HEADER_FILES_CORE}
+    ${HEADER_FILES_CORE_DETAIL}
     ${HEADER_FILES_SCRIPT}
     ${HEADER_FILES_SCRIPT_DETAIL}
 )
@@ -141,8 +141,8 @@ SET(INLINE_FILES
     ${INLINE_FILES_PLATFORM}
     ${INLINE_FILES_PLATFORM_GRAPHICS}
     ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${INLINE_FILES_ROOT}
-    ${INLINE_FILES_ROOT_DETAIL}
+    ${INLINE_FILES_CORE}
+    ${INLINE_FILES_CORE_DETAIL}
     ${INLINE_FILES_SCRIPT}
     ${INLINE_FILES_SCRIPT_DETAIL}
 )
@@ -191,6 +191,8 @@ IF (WIN32)
     TARGET_LINK_LIBRARIES(lib_scm_core
         liblua
         libluabind
+        optimized libboost_signals-vc80-mt-${SCHISM_BOOST_VERSION}
+        debug libboost_signals-vc80-mt-gd-${SCHISM_BOOST_VERSION}
     )
 ENDIF (WIN32)
 

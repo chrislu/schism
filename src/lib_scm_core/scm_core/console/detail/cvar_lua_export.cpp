@@ -17,9 +17,12 @@ extern "C"
 
 #include <scm_core/console/cvar.h>
 
-using namespace scm::core;
+namespace scm {
+namespace con {
+namespace detail {
 
-void scm::core::detail::cvar_export_lua_binding(lua_State* l_state)
+
+void cvar_export_lua_binding(lua_State* l_state)
 {
     using namespace luabind;
 
@@ -63,5 +66,9 @@ void scm::core::detail::cvar_export_lua_binding(lua_State* l_state)
             .def(other<std::string>() == const_self)
     ];
 }
+
+} // namespace detail
+} // namespace con
+} // namespace scm
 
 #include <scm_core/utilities/luabind_warning_enable.h>

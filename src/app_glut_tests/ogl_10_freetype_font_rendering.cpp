@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <scm_core/math/math.h>
+#include <boost/date_time.hpp>
 #include <boost/program_options.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -15,6 +17,11 @@
 #include <ogl/shader_objects/shader_object.h>
 
 #include <scm_core/time/timer.h>
+#include <scm_core/time/detail/get_time.h>
+
+#include <scm_core/core.h>
+#include <scm_core/console/console_system.h>
+#include <scm_core/console/console_output_listener.h>
 
 #include <image_handling/image_loader.h>
 
@@ -23,7 +30,6 @@
 #include <freetype/ftmodapi.h>
 
 
-#include <scm_core/math/math.h>
 
 boost::scoped_ptr<gl::program_object>  _shader_program;
 boost::scoped_ptr<gl::shader_object>   _vertex_shader;
@@ -491,7 +497,7 @@ void display()
 
     if (_accum_time > 1000.0) {
         std::cout.precision(2);
-        std::cout << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
+        std::cout << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) / 1000.0 << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000000.0) << std::endl;
 
         _accum_time     = 0.0;
         _accum_count    = 0;
@@ -577,6 +583,9 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
+#include <scm_core/time/time_traits_boost_ptime.h>
+
+typedef scm::core::time_traits<boost::posix_time::ptime>    ttrait;
 
 int main(int argc, char **argv)
 {
@@ -611,6 +620,68 @@ int main(int argc, char **argv)
         return (-1);
     }
 
+    scm::core::timer    _timer;
+    scm::core::timer    _timer2;
+
+
+    system("pause");
+
+
+    unsigned            _test_loop_count = 1000;
+
+    // perfcounter
+    for (unsigned k = 0; k < 10u; ++k) {
+        _timer.start();
+        for (unsigned i = 0; i < (_test_loop_count/* * pow(10.0f, (float)k)*/); ++i) {
+            //_timer2.start();
+            scm::core::detail::get_time();
+        }
+        _timer.stop();
+
+        std::cout.precision(6);
+        std::cout << "time for : " << std::fixed << _timer.get_time() / ((double)_test_loop_count /** pow(10.0f, (float)k)*/) << "usec" << std::endl << std::flush;
+    }
+
+    //_timer.start();
+    //while ()) {
+    //    scm::core::detail::get_time();
+    //}
+    //_timer.stop();
+
+    //std::cout.precision(6);
+    //std::cout << "time for : " << std::fixed << _timer.get_time() / (double)_test_loop_count << "msec" << std::endl;
+#if 0
+    // ftime
+    _timer.start();
+    for (unsigned i = 0; i < _test_loop_count; ++i) {
+        boost::posix_time::microsec_clock::universal_time();
+    }
+
+    _timer.stop();
+    std::cout.precision(6);
+    std::cout << "time for : " << std::fixed << _timer.get_time() / (double)_test_loop_count << "msec" << std::endl;
+
+    ttrait::time_t start;
+    ttrait::time_t end;
+
+    start = ttrait::current_time();
+    for (unsigned i = 0; i < _test_loop_count; ++i) {
+        //_timer2.start();
+        scm::core::detail::get_time();
+    }
+    end = ttrait::current_time();
+    std::cout.precision(6);
+    std::cout << "time for : " << std::fixed << ttrait::to_milliseconds(ttrait::difference(end, start)) / (double)_test_loop_count << "msec" << std::endl;
+
+    start = ttrait::current_time();
+    for (unsigned i = 0; i < _test_loop_count; ++i) {
+        boost::posix_time::microsec_clock::universal_time();
+    }
+    end = ttrait::current_time();
+    std::cout.precision(6);
+    std::cout << "time for : " << std::fixed << ttrait::to_milliseconds(ttrait::difference(end, start)) / (double)_test_loop_count << "msec" << std::endl;
+#endif
+
     // the stuff that has to be done
     glutInit(&argc, argv);
     // init a double buffered framebuffer with depth buffer and 4 channels
@@ -622,6 +693,28 @@ int main(int argc, char **argv)
     if (fullscreen) {
         glutFullScreen();
     }
+
+    // init the GL context
+    if (!scm::initialize()) {
+        std::cout << "error initializing scm library" << std::endl;
+        return (-1);
+    }
+
+    scm::console.get() << "sick, sad world!" << std::endl /*<< std::endl*/
+                       << std::fixed << 1.343434 << 666 << std::endl;
+
+    scm::console.get() << scm::con::log_level(scm::con::warning) << "warning" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::debug) << "debug" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::error) << "error" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::panic) << "panic" << std::endl;
+
+    scm::root.get().get_std_console_listener().set_log_threshold(scm::con::debug);
+
+    scm::console.get() << scm::con::log_level(scm::con::warning) << "warning" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::debug) << "debug" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::error) << "error" << std::endl;
+    scm::console.get() << scm::con::log_level(scm::con::panic) << "panic" << std::endl;
+
 
     // init the GL context
     if (!gl::initialize()) {

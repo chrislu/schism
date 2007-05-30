@@ -1,7 +1,9 @@
 
 #include "script_system.h"
 
-#include <scm_core/core.h>
+//#include <scm_core/core/core.h>
+
+#if 0
 #include <scm_core/console/console.h>
 
 #include <fstream>
@@ -69,3 +71,5 @@ script_result_t script_system_interface::interpret_script(std::istream& script,
 {
     return (SCRIPT_SYNTAX_ERROR);
 }
+
+#endif

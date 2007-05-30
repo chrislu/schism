@@ -1,28 +1,21 @@
 
+
 #ifndef CORE_H_INCLUDED
 #define CORE_H_INCLUDED
 
+#include <scm_core/core/int_types.h>
+#include <scm_core/core/ptr_types.h>
+#include <scm_core/core/root_system.h>
 #include <scm_core/platform/platform.h>
 
-#include <scm_core/int_types.h>
-#include <scm_core/ptr_types.h>
+#include <scm_core/console.h>
 
-#include <scm_core/root/global_system_access.h>
+namespace scm {
 
+extern __scm_export core::core_system_singleton<core::root_system>::type  root;
 
-namespace scm
-{
-    namespace core
-    {
-        class system_root_interface;
-        class console_interface;
-        class script_system_interface;
-
-        extern __scm_export global_system_access<system_root_interface>::type   root;
-        extern __scm_export global_system_access<console_interface>::type       console;
-        extern __scm_export global_system_access<script_system_interface>::type script_system;
-
-    } // namespace core
+bool __scm_export initialize();
+bool __scm_export shutdown();
 
 } // namespace scm
 

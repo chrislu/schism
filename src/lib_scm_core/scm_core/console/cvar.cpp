@@ -4,7 +4,7 @@
 #include <limits>
 #include <boost/lexical_cast.hpp>
 
-using namespace scm::core;
+using namespace scm::con;
 
 cvar::cvar()
     : _current_type(CVAR_T_UNASSIGNED),
@@ -67,7 +67,7 @@ bool cvar::equals(const cvar& rhs) const
             && _string_data  == rhs._string_data);
 }
 
-std::ostream& scm::core::operator << (std::ostream& os, const cvar& var) {
+std::ostream& scm::con::operator << (std::ostream& os, const cvar& var) {
     
     switch (var._current_type) {
         case cvar::CVAR_T_NUMBER:       os << var._number_data << " (cvar_type: number)"; break;

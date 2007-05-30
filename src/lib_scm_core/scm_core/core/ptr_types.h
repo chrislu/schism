@@ -9,19 +9,17 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
-namespace scm
-{
-    namespace core
-    {
-        using boost::scoped_ptr;
-        using boost::scoped_array;
-        using boost::shared_ptr;
-        using boost::shared_array;
-        using boost::weak_ptr;
-        using boost::intrusive_ptr;
+namespace scm {
+namespace core {
 
-    } // core
+using boost::scoped_ptr;
+using boost::scoped_array;
+using boost::shared_ptr;
+using boost::shared_array;
+using boost::weak_ptr;
+using boost::intrusive_ptr;
 
-} // scm
+} // namespace core
+} // namespace scm
 
 #endif // PTR_TYPES_H_INCLUDED

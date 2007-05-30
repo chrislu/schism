@@ -7,7 +7,9 @@
 
 #include <scm_core/platform/platform.h>
 
-#include <scm_core/core.h>
+#if 0
+
+#include <scm_core/core/core.h>
 #include <scm_core/console/console.h>
 
 using namespace scm::core;
@@ -20,6 +22,7 @@ extern "C"
     #include <lauxlib.h>
 }
 #include <luabind/luabind.hpp>
+
 
 namespace
 {
@@ -95,8 +98,8 @@ bool script_system_lua::initialize()
     _l_state = lua_open();
 
     if (_l_state == 0) {
-        console.get() << "script_system_lua::initialize(): (error)";
-        console.get() << "unable to create lua_State (lua_open() returned NULL)" << std::endl;
+        console.get() << "script_system_lua::initialize(): (error)"
+                      << "unable to create lua_State (lua_open() returned NULL)" << std::endl;
         return (false);
     }
 
@@ -120,8 +123,8 @@ script_result_t script_system_lua::process_script(std::istream& in_stream,
     lua_istream_reader_data     tmp_stream_data = lua_istream_reader_data(in_stream);
 
     return (int_process_script(lua_istream_reader,
-            &tmp_stream_data,
-            input_source_name));
+                               &tmp_stream_data,
+                               input_source_name));
 }
 
 script_result_t script_system_lua::process_script(const std::string& in_string,
@@ -130,8 +133,8 @@ script_result_t script_system_lua::process_script(const std::string& in_string,
     lua_string_reader_data      tmp_string_data = lua_string_reader_data(in_string);
 
     return (int_process_script(lua_string_reader,
-            &tmp_string_data,
-            input_source_name));
+                               &tmp_string_data,
+                               input_source_name));
 }
 
 script_result_t script_system_lua::int_process_script(lua_Reader input_reader,
@@ -161,8 +164,8 @@ script_result_t script_system_lua::int_process_script(lua_Reader input_reader,
             }
         }
         else { // l_status == LUA_ERRMEM
-            console.get() << "script_system_lua::process_script(): (error)";
-            console.get() << "memory error while loading script (lua_load() returned LUA_ERRMEM)" << std::endl;
+            console.get() << "script_system_lua::process_script(): (error)"
+                          << "memory error while loading script (lua_load() returned LUA_ERRMEM)" << std::endl;
             return (SCRIPT_MEMORY_ERROR);
         }
     }
@@ -184,5 +187,7 @@ script_result_t script_system_lua::int_process_script(lua_Reader input_reader,
     // everything went fine
     return (SCRIPT_NO_ERROR);
 }
+
+#endif
 
 #include <scm_core/utilities/luabind_warning_enable.h>
