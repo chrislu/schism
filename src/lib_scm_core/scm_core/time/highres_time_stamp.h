@@ -3,11 +3,11 @@
 #define HIGHRES_TIME_STAMP_H_INCLUDED
 
 namespace scm {
-namespace core {
+namespace time {
 
 
 
-} // namespace core
+} // namespace time
 } // namespace scm
 
 #endif // HIGHRES_TIME_STAMP_H_INCLUDED

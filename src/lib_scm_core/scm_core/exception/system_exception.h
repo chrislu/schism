@@ -9,17 +9,16 @@
 #include <scm_core/platform/platform.h>
 #include <scm_core/utilities/platform_warning_disable.h>
 
-namespace scm
-{
-    namespace core
-    {
-        class __scm_export system_exception : public std::runtime_error
-        {
-        public:
-            system_exception(const std::string&);
-        };
+namespace scm {
+namespace core {
 
-    } // namespace core
+class __scm_export system_exception : public std::runtime_error
+{
+public:
+    system_exception(const std::string&);
+}; // system_exception
+
+} // namespace core
 } // namespace scm
 
 #include <scm_core/utilities/platform_warning_enable.h>

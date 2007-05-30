@@ -36,7 +36,10 @@ public:
     bool                            initialize();
     bool                            shutdown();
 
-    con::console_output_listener&    get_std_console_listener();   
+    std::string                     get_version_string() const;
+
+    core::system&                   get_subsystem(const std::string& /*sys_name*/);
+    con::console_output_listener&   get_std_console_listener();
 
 protected:
     scoped_ptr<con::console_system>                     _console;
@@ -48,7 +51,8 @@ protected:
     system_container        _subsystems;
     system_assoc_container  _subsystems_named;
 
-    void                    register_subsystem(const std::string& /*sys_name*/, scm::core::system* /*sys_ptr*/);
+    void                    register_subsystem(const std::string& /*sys_name*/,
+                                               scm::core::system* /*sys_ptr*/);
     void                    unregister_subsystem(const std::string& /*sys_name*/);
     void                    unregister_subsystems();
 

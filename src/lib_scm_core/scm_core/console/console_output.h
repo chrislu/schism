@@ -23,10 +23,12 @@ class console_output_listener;
 
 enum log_levels
 {
-    debug       = 100,
-    warning     = 50,
-    error       = 20,
-    panic       = 0
+    debug       =  100,
+    info        =  70,
+    warning     =  50,
+    error       =  20,
+    panic       =  0,
+    output      = -1
 };
 
 struct log_level;

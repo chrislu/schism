@@ -64,7 +64,7 @@ bool init_font_rendering()
     unsigned        _font_pixel_size        = 24;
     unsigned        _display_dpi_resolution = 96;
 
-    scm::core::timer _timer;
+    scm::time::timer _timer;
     _timer.start();
 
     FT_Library      ft_lib;
@@ -415,7 +415,7 @@ void draw_font_image()
 
 void display()
 {
-    static scm::core::timer _timer;
+    static scm::time::timer _timer;
     static double           _accum_time     = 0.0;
     static unsigned         _accum_count    = 0;
 
@@ -495,9 +495,15 @@ void display()
     _accum_time += _timer.get_time();
     ++_accum_count;
 
-    if (_accum_time > 1000.0) {
-        std::cout.precision(2);
-        std::cout << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) / 1000.0 << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000000.0) << std::endl;
+    if (_accum_time > 1000000.0) {
+        std::stringstream   output;
+
+        output.precision(2);
+        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) / 1000000.0 << "msec \t"
+                             << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000000.0)
+                             << std::endl;
+
+        scm::console.get() << output.str();
 
         _accum_time     = 0.0;
         _accum_count    = 0;
@@ -620,10 +626,11 @@ int main(int argc, char **argv)
         return (-1);
     }
 
-    scm::core::timer    _timer;
-    scm::core::timer    _timer2;
+    scm::time::timer    _timer;
+    scm::time::timer    _timer2;
 
 
+#if 0
     system("pause");
 
 
@@ -650,7 +657,6 @@ int main(int argc, char **argv)
 
     //std::cout.precision(6);
     //std::cout << "time for : " << std::fixed << _timer.get_time() / (double)_test_loop_count << "msec" << std::endl;
-#if 0
     // ftime
     _timer.start();
     for (unsigned i = 0; i < _test_loop_count; ++i) {
@@ -700,6 +706,12 @@ int main(int argc, char **argv)
         return (-1);
     }
 
+    scm::root.get().get_std_console_listener().set_log_threshold(scm::con::panic);
+    scm::console.get() << scm::con::log_level(scm::con::output)
+                       << "schism "
+                       << scm::root.get().get_version_string() << std::endl;
+
+#if 0
     scm::console.get() << "sick, sad world!" << std::endl /*<< std::endl*/
                        << std::fixed << 1.343434 << 666 << std::endl;
 
@@ -714,7 +726,7 @@ int main(int argc, char **argv)
     scm::console.get() << scm::con::log_level(scm::con::debug) << "debug" << std::endl;
     scm::console.get() << scm::con::log_level(scm::con::error) << "error" << std::endl;
     scm::console.get() << scm::con::log_level(scm::con::panic) << "panic" << std::endl;
-
+#endif
 
     // init the GL context
     if (!gl::initialize()) {

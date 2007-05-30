@@ -3,13 +3,16 @@
 
 #include <cassert>
 
+#include <boost/lexical_cast.hpp>
+
 #include <scm_core/core.h>
 
 #include <scm_core/console/console_system.h>
+#include <scm_core/console/console_output_listener_stdout.h>
 #include <scm_core/core/root_system.h>
 #include <scm_core/core/core_system_singleton.h>
-
-#include <scm_core/console/console_output_listener_stdout.h>
+#include <scm_core/core/version.h>
+#include <scm_core/exception/system_exception.h>
 
 namespace scm {
 
@@ -68,6 +71,49 @@ bool root_system::shutdown()
     _initialized = false;
     return (true);
 }
+
+std::string root_system::get_version_string() const
+{
+    using boost::lexical_cast;
+
+    std::string output;
+
+    output = lexical_cast<std::string>(VERSION_MAJOR) + std::string(".") +
+             lexical_cast<std::string>(VERSION_MINOR) + std::string(".") +
+             lexical_cast<std::string>(VERSION_REVISION) + std::string("_") +
+             VERSION_TAG + std::string("_") +
+             VERSION_BUILD_TAG + std::string(" '") +
+             VERSION_NAME  + std::string("'");
+
+    return (output);
+
+}
+
+scm::core::system& root_system::get_subsystem(const std::string& sys_name)
+{
+    system_container::size_type         index;
+    system_assoc_container::iterator    prev = _subsystems_named.find(sys_name);
+
+    if (prev != _subsystems_named.end()) {
+        index = prev->second;
+        
+        assert(_subsystems[index].first != 0);
+        
+        return *(_subsystems[index].first);
+    }
+    else {
+        std::stringstream output;
+
+        output << "root_system::get_subsystem(): "
+               << "subsystem '" << sys_name << "' not found" << std::endl;
+
+        console.get() << con::log_level(con::error)
+                      << output.str();
+
+        throw scm::core::system_exception(output.str());
+    }
+}
+
 
 scm::con::console_output_listener& root_system::get_std_console_listener()
 {
