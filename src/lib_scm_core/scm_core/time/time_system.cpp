@@ -68,7 +68,7 @@ inline time_duration time_system::get_elapsed_duration(time_stamp start,
     time_stamp  diff((end > start) ? (end - start) : (~start + 1 + end));
 
     double      dur =   static_cast<double>(diff)
-                      / static_cast<double>(detail::high_res_time_stamp::ticks_per_second());
+                      / static_cast<double>(detail::high_res_time_stamp::ticks_per_second() / 1e9);
     
-    return (nanosec(static_cast<time_stamp>(dur * 1e9)));
+    return (nanosec(static_cast<time_stamp>(dur)));
 }

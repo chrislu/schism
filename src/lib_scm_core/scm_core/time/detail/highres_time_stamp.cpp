@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <boost/cast.hpp>
+
 #include <scm_core/console.h>
 #include <scm_core/platform/platform.h>
 
@@ -61,7 +63,7 @@ time_stamp get_pfc_frequency()
         return (false);
     }
 
-    return (frequency.QuadPart);
+    return (boost::numeric_cast<time_stamp>(frequency.QuadPart));
 }
 
 const time_stamp      pfc_frequency = get_pfc_frequency();
@@ -82,7 +84,7 @@ time_stamp high_res_time_stamp::ticks_per_second()
 
 time_stamp high_res_time_stamp::now()
 {
-    LARGE_INTEGER       current_time_counter;
+    static LARGE_INTEGER       current_time_counter;
 
     if (!QueryPerformanceCounter(&current_time_counter)) {
         char* error_msg;
@@ -109,40 +111,37 @@ time_stamp high_res_time_stamp::now()
         return (0);
     }
 
-    return (current_time_counter.QuadPart);
+    return (boost::numeric_cast<time_stamp>(current_time_counter.QuadPart));
 }
 
 #elif    SCM_PLATFORM == SCM_PLATFORM_LINUX \
       || SCM_PLATFORM == SCM_PLATFORM_APPLE
 
-//template<class time_traits>
-//bool high_res_time_stamp<time_traits>::initialize()
-//{
-//    return (true);
-//}
-//template<class time_traits>
-//inline typename high_res_time_stamp<time_traits>::time_type
-//high_res_time_stamp<time_traits>::now()
-//{
-//    // dummy
-//    return (_overhead);
-//}
 
+#include <ctime>
 
-#include <sys/time.h>
-#include <time.h>
-
-namespace
+bool high_res_time_stamp::initialize()
 {
-    static timeval _time_values;
-} // namespace
+    // calculate overhead of 'now' funktion
 
-inline double get_time()
+    return (true);
+}
+
+time_stamp high_res_time_stamp::ticks_per_second()
 {
-    gettimeofday(&_time_values, 0);
+    return (1000000000);
+}
 
-    return (   1000.0 * static_cast<double>(_time_values.tv_sec)
-             + 0.001  * static_cast<double>(_time_values.tv_usec));
+time_stamp high_res_time_stamp::now()
+{
+    static timespec current_time;
+    
+    clock_gettime(CLOCK_MONOTONIC, &current_time);
+    
+    return timevalue(now.tv_sec - clock_process_initial.tv_sec, now.tv_nsec);
+
+    return (  boost::numeric_cast<time_stamp>(current_time.tv_sec) * 1000000000
+            + boost::numeric_cast<time_stamp>(current_time.tv_nsec));
 }
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
