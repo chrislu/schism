@@ -70,9 +70,9 @@ bool open_volume_file(const std::string& filename)
 
     unsigned max_dim = math::max(data_dimensions.x, math::max(data_dimensions.y, data_dimensions.z));
 
-    _volrend_params._aspect.x = (float)data_dimensions.x/(float)max_dim;
-    _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim;
-    _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim;
+    _volrend_params._aspect.x = (float)data_dimensions.x/(float)max_dim * -1.0f;
+    _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim *  2.0f;
+    _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim * -3.0f;
 
     scm::regular_grid_data_3d<unsigned char> data;
 
