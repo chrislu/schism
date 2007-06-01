@@ -21,6 +21,10 @@ class console_output_listener;
 class console_output_listener_stdout;
 } // namespace con
 
+namespace time {
+class time_system;
+} // namespace time
+
 namespace core {
 
 class __scm_export root_system : public system
@@ -44,6 +48,7 @@ public:
 protected:
     scoped_ptr<con::console_system>                     _console;
     scoped_ptr<con::console_output_listener_stdout>     _console_listener;
+    scoped_ptr<time::time_system>                       _timing;
 
     void                    setup_global_system_singletons();
     void                    reset_global_system_singletons();

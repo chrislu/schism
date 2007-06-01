@@ -14,17 +14,18 @@
 
 // gl
 #include <ogl/gl.h>
+#include <GL/glut.h>
 #include <ogl/utilities/error_checker.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 #include <ogl/manipulators/trackball_manipulator.h>
+#include <ogl/time/time_query.h>
 
-#include <scm_core/time/timer.h>
+#include <scm_core/time/high_res_timer.h>
 
 #include <volume_renderer/volume_renderer_raycast_glsl.h>
 
-// math
+#include <scm_core/core.h>
 #include <scm_core/math/math.h>
 
 #include <volume.h>
@@ -300,6 +301,13 @@ bool init_gl()
     else {
         std::cout << "GL_ARB_texture_rectangle supported" << std::endl;
     }
+    if (!gl::time_query::is_supported()) {
+        std::cout << "gl::time_query not supported" << std::endl;
+        return (false);
+    }
+    else {
+        std::cout << "gl::time_query available" << std::endl;
+    }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glPixelStorei(GL_PACK_ALIGNMENT,1);
@@ -371,11 +379,14 @@ void shutdown_gl()
 
 void display()
 {
-    static scm::core::timer _timer;
-    static double           _accum_time     = 0.0;
-    static unsigned         _accum_count    = 0;
+    static scm::time::high_res_timer    _timer;
+    static gl::time_query               _gl_timer;
+    static double                       _accum_time     = 0.0;
+    static double                       _gl_accum_time  = 0.0;
+    static unsigned                     _accum_count    = 0;
 
     _timer.start();
+    _gl_timer.start();
 
     // clear the color and depth buffer
     if (draw_geometry) {
@@ -443,17 +454,31 @@ void display()
     glPopMatrix();
     //phong_shader->unbind();
 
+    _gl_timer.stop();
+
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
     _timer.stop();
 
-    _accum_time += _timer.get_time();
+    _gl_timer.collect_result();
+
+    _accum_time         += scm::time::to_milliseconds(_timer.get_time());
+    _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
     if (_accum_time > 1000.0) {
-        std::cout << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \tfps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0) << std::endl;
+        std::stringstream   output;
+
+        output.precision(2);
+        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \t"
+                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec \t"
+                             << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0)
+                             << std::endl;
+
+        scm::console.get() << output.str();
 
         _accum_time     = 0.0;
+        _gl_accum_time  = 0.0;
         _accum_count    = 0;
     }
 }
@@ -611,6 +636,11 @@ int main(int argc, char **argv)
         glutFullScreen();
     }
 
+    // init the GL context
+    if (!scm::initialize()) {
+        std::cout << "error initializing scm library" << std::endl;
+        return (-1);
+    }
     // init the GL context
     if (!gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;

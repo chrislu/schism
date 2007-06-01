@@ -13,12 +13,14 @@
 #include <scm_core/core/core_system_singleton.h>
 #include <scm_core/core/version.h>
 #include <scm_core/exception/system_exception.h>
+#include <scm_core/time/time_system.h>
 
 namespace scm {
 
 // initialize extern singleton instances
 core::core_system_singleton<core::root_system>::type        root        = core::core_system_singleton<core::root_system>::type();
 core::core_system_singleton<con::console_system>::type      console     = core::core_system_singleton<con::console_system>::type();
+core::core_system_singleton<time::time_system>::type        timing     = core::core_system_singleton<time::time_system>::type();
 
 } // namespace scm
 
@@ -43,10 +45,17 @@ bool root_system::initialize()
 
     // console
     _console.reset(new con::console_system());
+    console.set_instance(_console.get());
     register_subsystem("console", _console.get());
 
     _console_listener.reset(new scm::con::console_output_listener_stdout(*_console.get()));
 
+    // timing
+    _timing.reset(new time::time_system());
+    register_subsystem("timing", _timing.get());
+
+    console.get() << con::log_level(con::info)
+                  << "initializing subsystems:"  << std::endl;
     if (!initialize_subsystems()) {
         console.get() << con::log_level(con::error)
                       << "root_system::initialize(): "
@@ -57,6 +66,8 @@ bool root_system::initialize()
     // set global singleton access
     setup_global_system_singletons();
 
+    console.get() << con::log_level(con::info)
+                  << "initialization successful"  << std::endl;
     _initialized = true;
     return (true);
 }
@@ -78,11 +89,12 @@ std::string root_system::get_version_string() const
 
     std::string output;
 
-    output = lexical_cast<std::string>(VERSION_MAJOR) + std::string(".") +
+    output = SCHISM_NAME + std::string(" (") +
+             lexical_cast<std::string>(VERSION_MAJOR) + std::string(".") +
              lexical_cast<std::string>(VERSION_MINOR) + std::string(".") +
              lexical_cast<std::string>(VERSION_REVISION) + std::string("_") +
              VERSION_TAG + std::string("_") +
-             VERSION_BUILD_TAG + std::string(" '") +
+             VERSION_BUILD_TAG + std::string(") '") +
              VERSION_NAME  + std::string("'");
 
     return (output);
@@ -126,12 +138,14 @@ void root_system::setup_global_system_singletons()
 {
     scm::root.set_instance(this);
     scm::console.set_instance(_console.get());
+    scm::timing.set_instance(_timing.get());
 }
 
 void root_system::reset_global_system_singletons()
 {
     scm::root.set_instance(0);
     scm::console.set_instance(0);
+    scm::timing.set_instance(0);
 }
 
 void root_system::register_subsystem(const std::string& sys_name, scm::core::system* sys_ptr)
@@ -182,6 +196,9 @@ bool root_system::initialize_subsystems()
     system_container::iterator      sys_it;
 
     for (sys_it = _subsystems.begin(); sys_it != _subsystems.end(); ++sys_it) {
+        console.get() << con::log_level(con::info)
+                      << " - initializing: '" << sys_it->second << "'" << std::endl;
+
         if (!sys_it->first->initialize()) {
             console.get() << con::log_level(con::error)
                           << "root_system::initialize_subsystems(): "
@@ -198,6 +215,8 @@ void root_system::shutdown_subsystems()
     system_container::reverse_iterator    sys_it;
 
     for (sys_it = _subsystems.rbegin(); sys_it != _subsystems.rend(); ++sys_it) {
+        console.get() << con::log_level(con::info)
+                      << " - shutting down: '" << sys_it->second << "'" << std::endl;
         if (!sys_it->first->shutdown()) {
             console.get() << con::log_level(con::error)
                           << "root_system::shutdown_subsystems(): "

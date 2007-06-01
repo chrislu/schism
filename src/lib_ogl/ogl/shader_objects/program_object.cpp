@@ -1,6 +1,8 @@
 
 #include "program_object.h"
 
+#include <cassert>
+
 #include <ogl/gl.h>
 #include <ogl/shader_objects/shader_object.h>
 
@@ -8,8 +10,11 @@ namespace gl
 {
 
     program_object::program_object()
+        : _prog(0)
     {
         _prog = glCreateProgram();
+
+        assert(_prog != 0);
     }
 
     program_object::~program_object()

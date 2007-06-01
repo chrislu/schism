@@ -22,6 +22,9 @@ FILE(GLOB HEADER_FILES_SHADER_OBJECTS   ${SRC_DIR}/ogl/shader_objects/*.h)
 FILE(GLOB SOURCE_FILES_TEXTURES         ${SRC_DIR}/ogl/textures/*.cpp)
 FILE(GLOB HEADER_FILES_TEXTURES         ${SRC_DIR}/ogl/textures/*.h)
 
+FILE(GLOB SOURCE_FILES_TIME             ${SRC_DIR}/ogl/time/*.cpp)
+FILE(GLOB HEADER_FILES_TIME             ${SRC_DIR}/ogl/time/*.h)
+
 FILE(GLOB SOURCE_FILES_UTILITIES        ${SRC_DIR}/ogl/utilities/*.cpp)
 FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/ogl/utilities/*.h)
 
@@ -37,6 +40,7 @@ SOURCE_GROUP(source_files/manipulators      FILES ${SOURCE_FILES_MANIPULATORS}  
 SOURCE_GROUP(source_files/math              FILES                                   ${HEADER_FILES_MATH}                ${INLINE_FILES_MATH})
 SOURCE_GROUP(source_files/shader_objects    FILES ${SOURCE_FILES_SHADER_OBJECTS}    ${HEADER_FILES_SHADER_OBJECTS})
 SOURCE_GROUP(source_files/textures          FILES ${SOURCE_FILES_TEXTURES}          ${HEADER_FILES_TEXTURES})
+SOURCE_GROUP(source_files/time              FILES ${SOURCE_FILES_TIME}              ${HEADER_FILES_TIME})
 SOURCE_GROUP(source_files/utilities         FILES ${SOURCE_FILES_UTILITIES}         ${HEADER_FILES_UTILITIES})
 
 # combine source file lists
@@ -46,6 +50,7 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_MANIPULATORS}
     ${SOURCE_FILES_SHADER_OBJECTS}
     ${SOURCE_FILES_TEXTURES}
+    ${SOURCE_FILES_TIME}
     ${SOURCE_FILES_UTILITIES}
 )
 
@@ -56,6 +61,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_MATH}
     ${HEADER_FILES_SHADER_OBJECTS}
     ${HEADER_FILES_TEXTURES}
+    ${HEADER_FILES_TIME}
     ${HEADER_FILES_UTILITIES}
 )
 

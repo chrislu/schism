@@ -8,6 +8,7 @@
 #include <boost/program_options.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <ogl/gl.h>
 #include <GL/glut.h>
@@ -15,13 +16,11 @@
 #include <ogl/manipulators/trackball_manipulator.h>
 #include <ogl/shader_objects/program_object.h>
 #include <ogl/shader_objects/shader_object.h>
+#include <ogl/time/time_query.h>
 
-#include <scm_core/time/timer.h>
-#include <scm_core/time/detail/get_time.h>
+#include <scm_core/time/high_res_timer.h>
 
 #include <scm_core/core.h>
-#include <scm_core/console/console_system.h>
-#include <scm_core/console/console_output_listener.h>
 
 #include <image_handling/image_loader.h>
 
@@ -64,7 +63,7 @@ bool init_font_rendering()
     unsigned        _font_pixel_size        = 24;
     unsigned        _display_dpi_resolution = 96;
 
-    scm::time::timer _timer;
+    scm::time::high_res_timer _timer;
     _timer.start();
 
     FT_Library      ft_lib;
@@ -220,9 +219,13 @@ bool init_font_rendering()
 
     _timer.stop();
 
-    std::cout.precision(2);
-    std::cout << std::fixed << "font setup time: " << _timer.get_time() << "msec" << std::endl;
+    std::stringstream output;
 
+    output.precision(2);
+    output << std::fixed
+           << "font setup time: " << scm::time::to_milliseconds(_timer.get_time()) << "msec" << std::endl;
+
+    scm::console.get() << output.str();
 
     return (true);
 }
@@ -237,6 +240,13 @@ bool init_gl()
     }
     else {
         std::cout << "OpenGL 2.0 supported, OpenGL Version: " << (char*)glGetString(GL_VERSION) << std::endl;
+    }
+    if (!gl::time_query::is_supported()) {
+        std::cout << "gl::time_query not supported" << std::endl;
+        return (false);
+    }
+    else {
+        std::cout << "gl::time_query available" << std::endl;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -415,15 +425,18 @@ void draw_font_image()
 
 void display()
 {
-    static scm::time::timer _timer;
     static double           _accum_time     = 0.0;
+    static double           _gl_accum_time  = 0.0;
     static unsigned         _accum_count    = 0;
 
+    static scm::time::high_res_timer _timer;
+    static gl::time_query            _gl_timer;
+
     _timer.start();
+    _gl_timer.start();
 
     // clear the color and depth buffer
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
     // push current modelview matrix
     glPushMatrix();
 
@@ -485,27 +498,34 @@ void display()
 
     // restore previously saved modelview matrix
     glPopMatrix();
-
+#if 0
+#endif
     draw_font_image();
+    _gl_timer.stop();
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
     _timer.stop();
 
-    _accum_time += _timer.get_time();
+    _gl_timer.collect_result();
+
+    _accum_time += scm::time::to_milliseconds(_timer.get_time());
+    _gl_accum_time += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
-    if (_accum_time > 1000000.0) {
+    if (_accum_time > 1000.0) {
         std::stringstream   output;
 
         output.precision(2);
-        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) / 1000000.0 << "msec \t"
-                             << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000000.0)
+        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \t"
+                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec \t"
+                             << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0)
                              << std::endl;
 
         scm::console.get() << output.str();
 
         _accum_time     = 0.0;
+        _gl_accum_time  = 0.0;
         _accum_count    = 0;
     }
 }
@@ -589,12 +609,30 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-#include <scm_core/time/time_traits_boost_ptime.h>
-
-typedef scm::core::time_traits<boost::posix_time::ptime>    ttrait;
+//#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/date_time/gregorian/gregorian.hpp>
+//
+//#include <scm_core/time/time_system.h>
 
 int main(int argc, char **argv)
 {
+   // using namespace boost;
+
+   // posix_time::ptime   t1(gregorian::day_clock::universal_day(), posix_time::hours(23) + posix_time::minutes(59) + posix_time::seconds(59)); //
+   // posix_time::ptime   t2(gregorian::day_clock::universal_day(), posix_time::hours(0) + posix_time::minutes(0) + posix_time::seconds(1)); //
+   // //posix_time::ptime   t1(gregorian::date(2002, 1, 1), posix_time::hours(23) + posix_time::minutes(59) + posix_time::seconds(59)); //
+   // //posix_time::ptime   t2(gregorian::date(2002, 1, 2), posix_time::hours(0) + posix_time::minutes(0) + posix_time::seconds(1)); //
+   //// posix_time::ptime   t2(gregorian::date(2002, 1, 1), scm::time::time_system::time_traits::nanosec(1000));//posix_time::nanosec(1)); //
+
+   // std::cout << t1 << std::endl;
+
+   // posix_time::time_duration d1 = t2 - t1;
+
+   // std::cout << d1.is_special() << std::endl;
+   // std::cout << d1 << std::endl;
+
+    //std::cout << sizeof(boost::posix_time::ptime) << std::endl;
+
     int width;
     int height;
     bool fullscreen;
@@ -626,11 +664,11 @@ int main(int argc, char **argv)
         return (-1);
     }
 
-    scm::time::timer    _timer;
-    scm::time::timer    _timer2;
 
 
 #if 0
+    scm::time::timer    _timer;
+    scm::time::timer    _timer2;
     system("pause");
 
 
@@ -706,11 +744,25 @@ int main(int argc, char **argv)
         return (-1);
     }
 
-    scm::root.get().get_std_console_listener().set_log_threshold(scm::con::panic);
-    scm::console.get() << scm::con::log_level(scm::con::output)
-                       << "schism "
-                       << scm::root.get().get_version_string() << std::endl;
+#if 0
+    //scm::root.get().get_std_console_listener().set_log_threshold(scm::con::panic);
+    //scm::console.get() << scm::con::log_level(scm::con::output)
+    //                   << scm::root.get().get_version_string() << std::endl;
+    //scm::console.get() << scm::con::log_level(scm::con::output)
+    //                   << "sizeof(long) = " << sizeof(long) << std::endl;
+    //Must match with time_resolutions enum in date_time/time_defs.h
+    const char* const resolution_names[] = {"Second", "Deci", "Centi", "Milli",
+    "Ten_Thousanth", "Micro", "Nano"};
 
+    using namespace boost::posix_time;
+
+    scm::console.get() << scm::con::log_level(scm::con::output)
+                       << "Resolution: "
+                       << resolution_names[time_duration::rep_type::resolution()] 
+                       << " -- Ticks per second: "
+                       << time_duration::rep_type::res_adjust() << std::endl;
+
+#endif
 #if 0
     scm::console.get() << "sick, sad world!" << std::endl /*<< std::endl*/
                        << std::fixed << 1.343434 << 666 << std::endl;

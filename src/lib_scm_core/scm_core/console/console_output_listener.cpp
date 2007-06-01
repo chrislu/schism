@@ -9,7 +9,7 @@ using namespace scm::con;
 
 console_output_listener::console_output_listener(console_system& con)
     : _console(con),
-      _log_threshold(con::warning)
+      _log_threshold(con::info)
 {
     _connection = _console._out_stream.connect_output_listener(boost::bind(&console_output_listener::update, this, _1, _2));
 }

@@ -9,6 +9,7 @@
 #include <scm_core/platform/platform.h>
 
 #include <scm_core/console.h>
+#include <scm_core/timing.h>
 
 namespace scm {
 

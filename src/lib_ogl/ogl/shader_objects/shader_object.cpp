@@ -1,6 +1,8 @@
 
 #include "shader_object.h"
 
+#include <cassert>
+
 #include <fstream>
 #include <boost/scoped_array.hpp>
 
@@ -13,6 +15,8 @@ namespace gl
           _obj(0)
     {
         _obj = glCreateShader(_type);
+
+        assert(_obj != 0);
     }
 
     shader_object::~shader_object()
