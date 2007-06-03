@@ -16,6 +16,20 @@ FILE(GLOB SOURCE_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.cpp
 FILE(GLOB HEADER_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.h)
 FILE(GLOB INLINE_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.inl)
 
+FILE(GLOB SOURCE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.cpp)
+FILE(GLOB HEADER_FILES_CORE             ${SRC_DIR}/scm_core/core/*.h)
+FILE(GLOB INLINE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.inl)
+FILE(GLOB SOURCE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.cpp)
+FILE(GLOB HEADER_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.h)
+FILE(GLOB INLINE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.inl)
+
+FILE(GLOB SOURCE_FILES_FONT             ${SRC_DIR}/scm_core/font/*.cpp)
+FILE(GLOB HEADER_FILES_FONT             ${SRC_DIR}/scm_core/font/*.h)
+FILE(GLOB INLINE_FILES_FONT             ${SRC_DIR}/scm_core/font/*.inl)
+FILE(GLOB SOURCE_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.cpp)
+FILE(GLOB HEADER_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.h)
+FILE(GLOB INLINE_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.inl)
+
 FILE(GLOB SOURCE_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.cpp)
 FILE(GLOB HEADER_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.h)
 FILE(GLOB INLINE_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.inl)
@@ -34,12 +48,12 @@ FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/gra
 FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.h)
 FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.cpp)
-FILE(GLOB HEADER_FILES_CORE             ${SRC_DIR}/scm_core/core/*.h)
-FILE(GLOB INLINE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.inl)
-FILE(GLOB SOURCE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.cpp)
-FILE(GLOB HEADER_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.h)
-FILE(GLOB INLINE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.inl)
+FILE(GLOB SOURCE_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.cpp)
+FILE(GLOB HEADER_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.h)
+FILE(GLOB INLINE_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.inl)
+FILE(GLOB SOURCE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.cpp)
+FILE(GLOB HEADER_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.h)
+FILE(GLOB INLINE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.inl)
 
 FILE(GLOB SOURCE_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.cpp)
 FILE(GLOB HEADER_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.h)
@@ -66,13 +80,17 @@ SET(SOURCE_GROUP_DELIMITER "/")
 SOURCE_GROUP(source_files                           FILES ${SOURCE_FILES}                           ${HEADER_FILES}                             ${INLINE_FILES})
 SOURCE_GROUP(source_files/console                   FILES ${SOURCE_FILES_CONSOLE}                   ${HEADER_FILES_CONSOLE}                     ${INLINE_FILES_CONSOLE})
 SOURCE_GROUP(source_files/console/detail            FILES ${SOURCE_FILES_CONSOLE_DETAIL}            ${HEADER_FILES_CONSOLE_DETAIL}              ${INLINE_FILES_CONSOLE_DETAIL})
+SOURCE_GROUP(source_files/core                      FILES ${SOURCE_FILES_CORE}                      ${HEADER_FILES_CORE}                        ${INLINE_FILES_CORE})
+SOURCE_GROUP(source_files/core/detail               FILES ${SOURCE_FILES_CORE_DETAIL}               ${HEADER_FILES_CORE_DETAIL}                 ${INLINE_FILES_CORE_DETAIL})
+SOURCE_GROUP(source_files/font                      FILES ${SOURCE_FILES_FONT}                      ${HEADER_FILES_FONT}                        ${INLINE_FILES_FONT})
+SOURCE_GROUP(source_files/font/detail               FILES ${SOURCE_FILES_FONT_DETAIL}               ${HEADER_FILES_FONT_DETAIL}                 ${INLINE_FILES_FONT_DETAIL})
 SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTION}                 ${HEADER_FILES_EXCEPTION}                   ${INLINE_FILES_EXCEPTION})
 SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH}                        ${INLINE_FILES_MATH})
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                    ${INLINE_FILES_PLATFORM})
 SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}           ${INLINE_FILES_PLATFORM_GRAPHICS})
 SOURCE_GROUP(source_files/platform/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
-SOURCE_GROUP(source_files/core                      FILES ${SOURCE_FILES_CORE}                      ${HEADER_FILES_CORE}                        ${INLINE_FILES_CORE})
-SOURCE_GROUP(source_files/core/detail               FILES ${SOURCE_FILES_CORE_DETAIL}               ${HEADER_FILES_CORE_DETAIL}                 ${INLINE_FILES_CORE_DETAIL})
+SOURCE_GROUP(source_files/resource                  FILES ${SOURCE_FILES_RESOURCE}                  ${HEADER_FILES_RESOURCE}                    ${INLINE_FILES_RESOURCE})
+SOURCE_GROUP(source_files/resource/detail           FILES ${SOURCE_FILES_RESOURCE_DETAIL}           ${HEADER_FILES_RESOURCE_DETAIL}             ${INLINE_FILES_RESOURCE_DETAIL})
 SOURCE_GROUP(source_files/script                    FILES ${SOURCE_FILES_SCRIPT}                    ${HEADER_FILES_SCRIPT}                      ${INLINE_FILES_SCRIPT})
 SOURCE_GROUP(source_files/script/detail             FILES ${SOURCE_FILES_SCRIPT_DETAIL}             ${HEADER_FILES_SCRIPT_DETAIL}               ${INLINE_FILES_SCRIPT_DETAIL})
 SOURCE_GROUP(source_files/time                      FILES ${SOURCE_FILES_TIME}                      ${HEADER_FILES_TIME}                        ${INLINE_FILES_TIME})
@@ -82,9 +100,19 @@ SOURCE_GROUP(source_files/utilities                 FILES ${SOURCE_FILES_UTILITI
 # combine source file lists
 SET(SOURCE_FILES
     ${SOURCE_FILES}
+    ${SOURCE_FILES_CONSOLE}
+    ${SOURCE_FILES_CONSOLE_DETAIL}
+    ${SOURCE_FILES_CORE}
+    ${SOURCE_FILES_CORE_DETAIL}
     ${SOURCE_FILES_EXCEPTION}
+    ${SOURCE_FILES_FONT}
+    ${SOURCE_FILES_FONT_DETAIL}
     ${SOURCE_FILES_MATH}
+    ${SOURCE_FILES_RESOURCE}
+    ${SOURCE_FILES_RESOURCE_DETAIL}
     ${SOURCE_FILES_PLATFORM}
+    ${SOURCE_FILES_PLATFORM_GRAPHICS}
+    ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}
     ${SOURCE_FILES_TIME}
     ${SOURCE_FILES_TIME_DETAIL}
     ${SOURCE_FILES_UTILITIES}
@@ -92,8 +120,19 @@ SET(SOURCE_FILES
 
 SET(HEADER_FILES
     ${HEADER_FILES}                
+    ${HEADER_FILES_CONSOLE}
+    ${HEADER_FILES_CONSOLE_DETAIL}
+    ${HEADER_FILES_CORE}
+    ${HEADER_FILES_CORE_DETAIL}
     ${HEADER_FILES_EXCEPTION}
+    ${HEADER_FILES_FONT}
+    ${HEADER_FILES_FONT_DETAIL}
     ${HEADER_FILES_MATH}
+    ${HEADER_FILES_RESOURCE}
+    ${HEADER_FILES_RESOURCE_DETAIL}
+    ${HEADER_FILES_PLATFORM}
+    ${HEADER_FILES_PLATFORM_GRAPHICS}
+    ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}
     ${HEADER_FILES_TIME}
     ${HEADER_FILES_TIME_DETAIL}
     ${HEADER_FILES_UTILITIES}
@@ -101,8 +140,19 @@ SET(HEADER_FILES
 
 SET(INLINE_FILES
     ${INLINE_FILES}
+    ${INLINE_FILES_CONSOLE}
+    ${INLINE_FILES_CONSOLE_DETAIL}
+    ${INLINE_FILES_CORE}
+    ${INLINE_FILES_CORE_DETAIL}
     ${INLINE_FILES_EXCEPTION}
+    ${INLINE_FILES_FONT}
+    ${INLINE_FILES_FONT_DETAIL}
     ${INLINE_FILES_MATH}
+    ${INLINE_FILES_RESOURCE}
+    ${INLINE_FILES_RESOURCE_DETAIL}
+    ${INLINE_FILES_PLATFORM}
+    ${INLINE_FILES_PLATFORM_GRAPHICS}
+    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL}
     ${INLINE_FILES_TIME}
     ${INLINE_FILES_TIME_DETAIL}
     ${INLINE_FILES_UTILITIES}
@@ -111,38 +161,17 @@ SET(INLINE_FILES
 IF (WIN32)
 SET(SOURCE_FILES
     ${SOURCE_FILES}
-    ${SOURCE_FILES_CONSOLE}
-    ${SOURCE_FILES_CONSOLE_DETAIL}
-    ${SOURCE_FILES_PLATFORM}
-    ${SOURCE_FILES_PLATFORM_GRAPHICS}
-    ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${SOURCE_FILES_CORE}
-    ${SOURCE_FILES_CORE_DETAIL}
     ${SOURCE_FILES_SCRIPT}
     ${SOURCE_FILES_SCRIPT_DETAIL}
 )
 
 SET(HEADER_FILES
     ${HEADER_FILES}                
-    ${HEADER_FILES_CONSOLE}
-    ${HEADER_FILES_CONSOLE_DETAIL}
-    ${HEADER_FILES_PLATFORM}
-    ${HEADER_FILES_PLATFORM_GRAPHICS}
-    ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${HEADER_FILES_CORE}
-    ${HEADER_FILES_CORE_DETAIL}
     ${HEADER_FILES_SCRIPT}
     ${HEADER_FILES_SCRIPT_DETAIL}
 )
 SET(INLINE_FILES
     ${INLINE_FILES}
-    ${INLINE_FILES_CONSOLE}
-    ${INLINE_FILES_CONSOLE_DETAIL}
-    ${INLINE_FILES_PLATFORM}
-    ${INLINE_FILES_PLATFORM_GRAPHICS}
-    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL}
-    ${INLINE_FILES_CORE}
-    ${INLINE_FILES_CORE_DETAIL}
     ${INLINE_FILES_SCRIPT}
     ${INLINE_FILES_SCRIPT_DETAIL}
 )
@@ -165,6 +194,7 @@ IF (WIN32)
     INCLUDE_DIRECTORIES(
         ${GLOBAL_EXT_DIR}/inc
         ${GLOBAL_EXT_DIR}/inc/boost
+        ${GLOBAL_EXT_DIR}/inc/freetype
         ${GLOBAL_EXT_DIR}/inc/lua
         ${GLOBAL_EXT_DIR}/inc/luabind
     )
@@ -189,6 +219,7 @@ ADD_LIBRARY(lib_scm_core SHARED ${SOURCE_FILES})
 # link libraries
 IF (WIN32)
     TARGET_LINK_LIBRARIES(lib_scm_core
+        freetype2
         liblua
         libluabind
         optimized libboost_signals-vc80-mt-${SCHISM_BOOST_VERSION}

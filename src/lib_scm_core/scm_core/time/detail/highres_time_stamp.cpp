@@ -117,7 +117,6 @@ time_stamp high_res_time_stamp::now()
 #elif    SCM_PLATFORM == SCM_PLATFORM_LINUX \
       || SCM_PLATFORM == SCM_PLATFORM_APPLE
 
-
 #include <ctime>
 
 bool high_res_time_stamp::initialize()
@@ -137,8 +136,6 @@ time_stamp high_res_time_stamp::now()
     static timespec current_time;
     
     clock_gettime(CLOCK_MONOTONIC, &current_time);
-    
-    return timevalue(now.tv_sec - clock_process_initial.tv_sec, now.tv_nsec);
 
     return (  boost::numeric_cast<time_stamp>(current_time.tv_sec) * 1000000000
             + boost::numeric_cast<time_stamp>(current_time.tv_nsec));

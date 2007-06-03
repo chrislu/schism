@@ -22,7 +22,13 @@ namespace math
     typedef vec<double, 3>      vec3d_t;
     typedef vec<double, 4>      vec4d_t;
 
-    typedef vec<int, 2>         point_t;
+    typedef vec<int, 2>         vec2i_t;
+    typedef vec<int, 3>         vec3i_t;
+    typedef vec<int, 4>         vec4i_t;
+
+    typedef vec<unsigned, 2>    vec2ui_t;
+    typedef vec<unsigned, 3>    vec3ui_t;
+    typedef vec<unsigned, 4>    vec4ui_t;
 
     typedef mat<float, 2, 2>    mat2x2f_t;
     typedef mat<float, 3, 3>    mat3x3f_t;
