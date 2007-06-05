@@ -10,11 +10,16 @@
 namespace scm {
 namespace font {
 
+// enum bitmap mode
+// mono
+// gray
+// lcd
+
+
 class __scm_export face_loader
 {
 public:
     face_loader();
-    face_loader(const std::string& /*font_dir*/);
     virtual ~face_loader();
 
     bool        load(const std::string& /*file_name*/,
@@ -22,9 +27,6 @@ public:
                      unsigned           /*disp_res*/ = 72);
 
 protected:
-
-
-    std::string     _font_directory;
 
 }; // class face_loader
 

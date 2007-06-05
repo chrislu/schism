@@ -10,6 +10,13 @@ namespace gl
     {
     }
 
+    texture_2d::texture_2d(const GLenum target)
+        : texture(target),
+          _width(0),
+          _height(0)
+    {
+    }
+
     texture_2d::~texture_2d()
     {
     }

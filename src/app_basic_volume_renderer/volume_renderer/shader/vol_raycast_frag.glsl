@@ -51,7 +51,7 @@ vec4 do_shading(in vec3 sample_pos, in vec4 inp)
     vec4 ret;
 
     ret = color_lookup(inp);
-#if 1
+#if 0
     // calculate gradient dependent on current transfer function
     // using central differences
     vec3 grad;
@@ -90,7 +90,10 @@ vec4 do_shading(in vec3 sample_pos, in vec4 inp)
 bool inside_volume_bounds(const in vec3  position,
                           const in float geom_sample_dist)
 {
-    return (   (length(position - _cam_pos) < geom_sample_dist)
+    vec3    sample_to_cam = vec3(position - _cam_pos);
+    
+    return (   (dot(sample_to_cam, sample_to_cam) < geom_sample_dist)
+    //return (   (length(position - _cam_pos) < geom_sample_dist)
             /*&& all(greaterThanEqual(position, _bounds_min))
             && all(lessThanEqual(position, _bounds_max))
             && all(greaterThan(position * entry_in_front_of_planes, _cross_plane_positions * entry_in_front_of_planes))*/);
@@ -134,7 +137,10 @@ float calculate_fragment_depth_objspc()
 
     //debug_col = geom_frag_coord_objspc.xyz / geom_frag_coord_objspc.w;
 
-    return (length((geom_frag_coord_objspc.xyz / geom_frag_coord_objspc.w).xyz - _cam_pos));
+    vec3 frag_to_cam = vec3((geom_frag_coord_objspc.xyz / geom_frag_coord_objspc.w).xyz - _cam_pos);
+
+    //return (length((geom_frag_coord_objspc.xyz / geom_frag_coord_objspc.w).xyz - _cam_pos));
+    return (dot(frag_to_cam, frag_to_cam));
 }
 
 void main()

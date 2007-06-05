@@ -13,6 +13,7 @@
 #include <scm_core/core/core_system_singleton.h>
 #include <scm_core/core/version.h>
 #include <scm_core/exception/system_exception.h>
+#include <scm_core/resource/resource_manager.h>
 #include <scm_core/time/time_system.h>
 
 namespace scm {
@@ -20,7 +21,7 @@ namespace scm {
 // initialize extern singleton instances
 core::core_system_singleton<core::root_system>::type        root        = core::core_system_singleton<core::root_system>::type();
 core::core_system_singleton<con::console_system>::type      console     = core::core_system_singleton<con::console_system>::type();
-core::core_system_singleton<time::time_system>::type        timing     = core::core_system_singleton<time::time_system>::type();
+core::core_system_singleton<time::time_system>::type        timing      = core::core_system_singleton<time::time_system>::type();
 
 } // namespace scm
 
@@ -101,6 +102,28 @@ std::string root_system::get_version_string() const
 
 }
 
+scm::con::console_output_listener& root_system::get_std_console_listener()
+{
+    assert(_console_listener.get() != 0);
+
+    return (*_console_listener);
+}
+
+void root_system::setup_global_system_singletons()
+{
+    scm::root.set_instance(this);
+    scm::console.set_instance(_console.get());
+    scm::timing.set_instance(_timing.get());
+}
+
+void root_system::reset_global_system_singletons()
+{
+    scm::root.set_instance(0);
+    scm::console.set_instance(0);
+    scm::timing.set_instance(0);
+}
+
+// subsystems
 scm::core::system& root_system::get_subsystem(const std::string& sys_name)
 {
     system_container::size_type         index;
@@ -124,28 +147,6 @@ scm::core::system& root_system::get_subsystem(const std::string& sys_name)
 
         throw scm::core::system_exception(output.str());
     }
-}
-
-
-scm::con::console_output_listener& root_system::get_std_console_listener()
-{
-    assert(_console_listener.get() != 0);
-
-    return (*_console_listener);
-}
-
-void root_system::setup_global_system_singletons()
-{
-    scm::root.set_instance(this);
-    scm::console.set_instance(_console.get());
-    scm::timing.set_instance(_timing.get());
-}
-
-void root_system::reset_global_system_singletons()
-{
-    scm::root.set_instance(0);
-    scm::console.set_instance(0);
-    scm::timing.set_instance(0);
 }
 
 void root_system::register_subsystem(const std::string& sys_name, scm::core::system* sys_ptr)
@@ -223,4 +224,75 @@ void root_system::shutdown_subsystems()
                           << "subsystem '" << sys_it->second << "' shutdown returned with error" << std::endl;
         }
     }
+}
+
+// resource managers
+void root_system::register_resource_manager(scm::res::resource_manager_base*const man,
+                                            std::size_t                           id)
+{
+    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    
+    if (man_it != _resource_managers.end()) {
+        console.get() << con::log_level(con::warning)
+                      << "root_system::register_resource_manager(): "
+                      << "resource manager (id = '" << id << "') allready registered: "
+                      << "overriding present instance" << std::endl;
+        
+        man_it->second->shutdown();
+
+        _resource_managers.erase(man_it);
+    }
+
+    _resource_managers.insert(resource_manager_container::value_type(id, man));
+}
+
+void root_system::unregister_resource_manager(std::size_t id)
+{
+    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    
+    if (man_it != _resource_managers.end()) {
+        
+        assert(man_it->second != 0);
+        
+        man_it->second->shutdown();
+        _resource_managers.erase(man_it);
+    }
+}
+
+scm::res::resource_manager_base& root_system::get_resource_manager(std::size_t id)
+{
+    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    
+    if (man_it != _resource_managers.end()) {
+        
+        assert(man_it->second != 0);
+        
+        return (*(man_it->second));
+    }
+    else {
+        std::stringstream output;
+
+        output << "root_system::get_resource_manager(): "
+               << "resource manager (id = '" << id << "') not found" << std::endl;
+
+        console.get() << con::log_level(con::error)
+                      << output.str();
+
+        throw scm::core::system_exception(output.str());
+    }
+}
+
+void root_system::unregister_resource_managers()
+{
+    resource_manager_container::iterator man_it;
+
+    for (man_it  = _resource_managers.begin();
+         man_it != _resource_managers.end();
+         ++man_it) {
+
+        assert(man_it->second != 0);
+        man_it->second->shutdown();
+    }
+
+    _resource_managers.clear();
 }

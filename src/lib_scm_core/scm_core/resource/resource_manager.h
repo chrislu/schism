@@ -2,33 +2,58 @@
 #ifndef RESOURCE_MANAGER_H_INCLUDED
 #define RESOURCE_MANAGER_H_INCLUDED
 
+#include <cstddef>
 #include <map>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
+#include <scm_core/resource/resource.h>
+#include <scm_core/resource/resource_pointer.h>
 
 #include <scm_core/core/basic_system_interfaces.h>
-#include <scm_core/core/ptr_types.h>
-#include <scm_core/resource/resource.h>
-
 #include <scm_core/platform/platform.h>
 #include <scm_core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace res {
 
-class __scm_export resource_manager_base : public core::system
+class resource_pointer_base;
+
+class __scm_export resource_manager_base : public core::system,
+                                           public boost::enable_shared_from_this<resource_manager_base>
 {
+protected:
+    typedef boost::shared_ptr<resource_base>    res_ptr_type;
+    typedef std::map<resource_base::hash_type,
+                     std::pair<res_ptr_type,
+                               std::size_t> >   resource_container;
+
 public:
     resource_manager_base();
     virtual ~resource_manager_base();
 
     using core::system::initialize;
-    using core::system::shutdown;
+    virtual bool                shutdown();
+
+    bool                        is_loaded(const resource_pointer_base& /*inst*/)   const;
+    bool                        is_loaded(const resource_base::hash_type /*hash*/) const;
+
+    resource_pointer_base       retrieve_instance(const resource_base::hash_type /*hash*/);
+
+    void                        register_instance(const resource_pointer_base& /*inst*/);
+    void                        release_instance(const resource_pointer_base&  /*inst*/);
+
+protected:
+    resource_pointer_base       insert_instance(const resource_base::hash_type /*hash*/,
+                                                const res_ptr_type&            /*ptr*/);
+
+    void                        clear_resources();
+
+    resource_container          _resources;
 
 private:
-    virtual void               clear_instances()    = 0;
 
-    boost::shared_ptr<resource_manager_base> _this;
 }; // class resource_manager_base
 
 
@@ -36,32 +61,24 @@ template<class res_type>
 class resource_manager : public resource_manager_base
 {
 public:
-    typedef typename res_type::descriptor_type   res_desc_type;
-
-protected:
-    typedef core::shared_ptr<res_type>          res_ptr_type;
-    typedef std::map<res_desc_type,
-                     std::pair<res_ptr_type,
-                               std::size_t> >   instance_container;
+    typedef res_type                            resource_type;
+    typedef typename res_type::descriptor_type  resource_descriptor_type;
 
 public:
     resource_manager();
     virtual ~resource_manager();
 
-    bool                        initialize();
-    bool                        shutdown();
+    bool                                is_loaded(const resource_descriptor_type& /*desc*/) const;
 
-    resource<res_type>          find_instance(const res_desc_type&          /*desc*/);
-    resource<res_type>          create_instance(const res_desc_type&        /*desc*/);
+    resource_pointer<res_type>          retrieve_instance(const resource_descriptor_type& /*desc*/);
+    resource_pointer<res_type>          create_instance(const resource_descriptor_type&   /*desc*/);
 
-    void                        register_instance(const resource<res_type>& /*inst*/);
-    void                        release_instance(const resource<res_type>&  /*inst*/);
+    res_type&                           to_resource(resource_pointer_base&        /*ref*/) const;
+    resource_pointer<res_type>&         to_resource_ptr(resource_pointer_base&    /*ref*/) const;
+
+protected:
 
 private:
-    void                        clear_instances();
-    instance_container          _loaded_instances;
-
-    boost::shared_ptr<resource_manager<res_type> > _this;
 
 }; // class resource_manager
 

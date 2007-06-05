@@ -27,6 +27,8 @@ namespace gl
 
 
     protected:
+        texture_2d(const GLenum target);
+
         unsigned        _width;
         unsigned        _height;
 

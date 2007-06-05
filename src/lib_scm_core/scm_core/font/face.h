@@ -2,46 +2,45 @@
 #ifndef FONT_FACE_H_INCLUDED
 #define FONT_FACE_H_INCLUDED
 
+#include <map>
 #include <string>
 
-#include <scm_core/math/math.h>
-#include <scm_core/resource/resource_type_base.h>
+#include <scm_core/font/glyph.h>
+
+#include <scm_core/platform/platform.h>
+#include <scm_core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace font {
 
-struct face_descriptor
-{
-    face_descriptor() : _size(0) {}
-    face_descriptor(const face_descriptor& desc) : _name(desc._name), _size(desc._size) {}
-
-    std::string         _name;
-    unsigned            _size;
-};
-
-class face : public res::resource_type_base<face_descriptor>
+class __scm_export face
 {
 public:
-    face() {}
-    face(const face_descriptor& desc) : res::resource_type_base<face_descriptor>(desc) {}
-    virtual ~face() {}
+    typedef std::map<unsigned, glyph>       character_glyph_mapping;
 
-    math::vec2i_t       _tex_lower_left;
-    math::vec2i_t       _tex_upper_right;
+public:
+    face();
+    virtual ~face();
 
-    unsigned            _advance;
-    math::vec2i_t       _bearing;
+    const std::string&              get_name() const;
+    const unsigned                  get_size() const;
 
-}; // struct font_face
+    const glyph&                    get_glyph() const;
+    int                             get_kerning(unsigned left, unsigned right) const;
 
-inline bool operator<(const face_descriptor& lhs,
-                      const face_descriptor& rhs)
-{
-    return   ((lhs._name < rhs._name)
-           || (lhs._size < rhs._size));
-}
+protected:
+    std::string                     _name;
+    unsigned                        _size_at_72dpi;
+
+    character_glyph_mapping         _glyph_mapping;
+
+private:
+
+}; // class face
 
 } // namespace font
 } // namespace scm
+
+#include <scm_core/utilities/platform_warning_enable.h>
 
 #endif // FONT_FACE_H_INCLUDED

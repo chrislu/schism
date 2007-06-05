@@ -83,13 +83,16 @@ bool init_font_rendering()
     scm::time::high_res_timer _timer;
     _timer.start();
 
-    FT_Library      ft_lib;
+    FT_Library      ft_lib_;
 
     // initialize freetype
-    if (FT_Init_FreeType(&ft_lib) != 0) {
+    if (FT_Init_FreeType(&ft_lib_) != 0) {
         std::cout << "error initializing freetype library" << std::endl;
         return (false);
     }
+
+    const     FT_Library      ft_lib = ft_lib_;
+
 
     //switch (FT_Get_TrueType_Engine_Type(ft_lib)) {
     //    case FT_TRUETYPE_ENGINE_TYPE_NONE:          std::cout << "FT_TRUETYPE_ENGINE_TYPE_NONE"       << std::endl; break;
