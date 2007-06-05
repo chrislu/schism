@@ -226,6 +226,8 @@ IF (WIN32)
         debug libboost_signals-vc80-mt-gd-${SCHISM_BOOST_VERSION}
         optimized libboost_date_time-vc80-mt-${SCHISM_BOOST_VERSION}
         debug libboost_date_time-vc80-mt-gd-${SCHISM_BOOST_VERSION}
+        optimized libboost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
+        debug libboost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
     )
 ENDIF (WIN32)
 

@@ -313,8 +313,9 @@ bool init_gl()
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    //glClearColor(0.3f,0.3f,0.3f,1);
-    glClearColor(0.0f,0.0f,0.0f,1);
+    glClearColor(0.2f,0.2f,0.2f,1);
+    //glClearColor(0.0f,0.0f,0.0f,1);
+    //glClearColor(1.0f,1.0f,1.0f,1.0f);
 
     // setup depth testing
     glDepthFunc(GL_LESS);
@@ -405,7 +406,7 @@ void display()
         // geometry pass
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo_id);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        render_geometry();
+        //render_geometry();
         //_volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
@@ -466,7 +467,7 @@ void display()
     _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
-    if (_accum_time > 1000.0) {
+    if (_accum_time > 1000000.0) {
         std::stringstream   output;
 
         output.precision(2);

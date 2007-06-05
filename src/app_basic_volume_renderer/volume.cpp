@@ -41,7 +41,6 @@ bool open_volume_file(const std::string& filename)
 
     unsigned                voxel_components;
 
-
     if (file_extension == ".raw") {
         vol_loader.reset(new gl::volume_data_loader_raw());
     }
@@ -70,9 +69,9 @@ bool open_volume_file(const std::string& filename)
 
     unsigned max_dim = math::max(data_dimensions.x, math::max(data_dimensions.y, data_dimensions.z));
 
-    _volrend_params._aspect.x = (float)data_dimensions.x/(float)max_dim * -1.0f;
-    _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim *  2.0f;
-    _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim * -3.0f;
+    _volrend_params._aspect.x = (float)data_dimensions.x/(float)max_dim;
+    _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim;
+    _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim;
 
     scm::regular_grid_data_3d<unsigned char> data;
 
@@ -132,14 +131,14 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._volume_texture.unbind();
 
     
-//#define NOT_VRGEO
+#define NOT_VRGEO
     // reset transfer functions
     _data_properties._alpha_transfer.clear();
 
 #ifdef NOT_VRGEO
     _data_properties._alpha_transfer.add_point(0,   0.0f);
-    //_data_properties._alpha_transfer.add_point(130, 0.0f);
-    //_data_properties._alpha_transfer.add_point(140, 1.0f);
+    //_data_properties._alpha_transfer.add_point(90, 0.0f);
+    //_data_properties._alpha_transfer.add_point(100, 1.0f);
     _data_properties._alpha_transfer.add_point(255, 1.0f);
 #else
     _data_properties._alpha_transfer.add_point(0,   1.0f);
@@ -152,6 +151,7 @@ bool open_volume_file(const std::string& filename)
     _data_properties._color_transfer.clear();
 #ifdef NOT_VRGEO
     _data_properties._color_transfer.add_point(0,   math::vec3f_t(0.0f, 0.0f, 0.0f));
+    //_data_properties._color_transfer.add_point(90,  math::vec3f_t(0.9f, 0.8f, 0.6f));
     _data_properties._color_transfer.add_point(255, math::vec3f_t(1.0f, 1.0f, 1.0f));
 #else
     _data_properties._color_transfer.add_point(0,   math::vec3f_t(0.0f, 0.0f, 1.0f));
