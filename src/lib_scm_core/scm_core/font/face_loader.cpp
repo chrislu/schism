@@ -213,7 +213,7 @@ bool face_loader::load_style(face::style_type   style,
         font_bbox_y = math::vec2f_t(ft_font.get_face()->bbox.yMin * y_scale,
                                     ft_font.get_face()->bbox.yMax * y_scale);
 
-        font_face._line_spacing  = static_cast<int>(ft_font.get_face()->height * y_scale);
+        font_face._line_spacing  = static_cast<int>(math::ceil(ft_font.get_face()->height * y_scale));
 
     }
     else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
@@ -264,11 +264,13 @@ bool face_loader::load_style(face::style_type   style,
 
         glyph&      cur_glyph = cur_glyph_mapping[i];
 
-        if(FT_Load_Glyph(ft_font.get_face(), FT_Get_Char_Index(ft_font.get_face(), i), FT_LOAD_DEFAULT)) {
+        if(FT_Load_Glyph(ft_font.get_face(),
+                         FT_Get_Char_Index(ft_font.get_face(), i),
+                         FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT)) {
             continue;
         }
 
-        if (FT_Render_Glyph(ft_font.get_face()->glyph, FT_RENDER_MODE_NORMAL)) {
+        if (FT_Render_Glyph(ft_font.get_face()->glyph, FT_RENDER_MODE_LIGHT)) {
             continue;
         }
         FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
@@ -314,7 +316,15 @@ bool face_loader::load_style(face::style_type   style,
         cur_glyph._tex_lower_left   = math::vec2i_t(dst_x, dst_y);
         cur_glyph._tex_upper_right  = cur_glyph._tex_lower_left + actual_glyph_bbox;
 
-        cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
+        if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
+            // linearHoriAdvance contains the 16.16 representation of the horizontal advance
+            // horiAdvance contains only the rounded advance which can be off by 1 and
+            // lead to sub styles beeing rendered to narrow
+            cur_glyph._advance          =  FT_CeilFix(ft_font.get_face()->glyph->linearHoriAdvance) >> 16;
+        }
+        else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+            cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
+        }
         cur_glyph._bearing          = math::vec2i_t(ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
                                                       (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
                                                     - (ft_font.get_face()->glyph->metrics.height >> 6));
@@ -374,6 +384,13 @@ void face_loader::find_font_styles(const std::string& font_file,
                                       / (font_file_base + std::string("b") + font_file_ext);
     if (exists(font_file_bold) && !is_directory(font_file_bold)) {
         styles.insert(val_type(face::bold, font_file_bold.string()));
+    }
+    else {
+        font_file_bold =  font_file_dir
+                        / (font_file_base + std::string("bd") + font_file_ext);
+        if (exists(font_file_bold) && !is_directory(font_file_bold)) {
+            styles.insert(val_type(face::bold, font_file_bold.string()));
+        }
     }
 
     // search for bold italic style (z or bi name addition)
