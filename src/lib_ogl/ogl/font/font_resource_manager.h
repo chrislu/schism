@@ -1,8 +1,0 @@
-
-#ifndef GL_FONT_RESOURCE_MANAGER_H_INCLUDED
-#define GL_FONT_RESOURCE_MANAGER_H_INCLUDED
-
-namespace gl {
-} // namespace gl
-
-#endif // GL_FONT_RESOURCE_MANAGER_H_INCLUDED
