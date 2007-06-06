@@ -24,6 +24,9 @@ static const std::string    VERSION_BUILD_TAG   = std::string("debug");
 static const std::string    VERSION_BUILD_TAG   = std::string("release");
 #endif
 
+// name candidates:
+//   - lux aeterna
+
 } // namespace core
 } // namespace scm
 

@@ -17,23 +17,27 @@
 #include <ogl/manipulators/trackball_manipulator.h>
 #include <ogl/shader_objects/program_object.h>
 #include <ogl/shader_objects/shader_object.h>
+#include <ogl/textures/texture_2d_rect.h>
 #include <ogl/time/time_query.h>
+#include <ogl/utilities/error_checker.h>
 
 #include <scm_core/time/high_res_timer.h>
 
 #include <scm_core/core.h>
+#include <scm_core/font/face.h>
+#include <scm_core/font/glyph.h>
+#include <scm_core/font/face_loader.h>
 
 #include <image_handling/image_loader.h>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include <freetype/ftmodapi.h>
+boost::scoped_ptr<gl::program_object>   _shader_program;
+boost::scoped_ptr<gl::shader_object>    _vertex_shader;
+boost::scoped_ptr<gl::shader_object>    _fragment_shader;
 
-
-
-boost::scoped_ptr<gl::program_object>  _shader_program;
-boost::scoped_ptr<gl::shader_object>   _vertex_shader;
-boost::scoped_ptr<gl::shader_object>   _fragment_shader;
+boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_regular;
+boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_bold;
+boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_italic;
+boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_bold_italic;
 
 gl::trackball_manipulator _trackball_manip;
 
@@ -53,311 +57,176 @@ float dolly_sens = 10.0f;
 unsigned tex0_id = 0;
 unsigned tex1_id = 0;
 
-unsigned tex_font = 0;
-unsigned tex_font_w = 0;
-unsigned tex_font_h = 0;
-
-struct font_face
-{
-    math::vec2i_t       _tex_lower_left;
-    math::vec2i_t       _tex_upper_right;
-
-    unsigned            _hor_advance;
-
-    math::vec2i_t       _bearing;
-}; // struct font_face
-
-typedef std::map<unsigned, font_face>      font_face_container;
-
-font_face_container font_faces;
-
-char font_face_kerning_table[256][256];
+scm::font::face     _font_face;
 
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("./../../../res/fonts/consolai.ttf");//vgaoem.fon");//cour.ttf");//
-    unsigned        _font_size              = 18;
-    unsigned        _display_dpi_resolution = 72;
+    std::string     _font_file_name         = std::string("fonts/consola.ttf");//vgaoem.fon");//calibri.ttf");//
+    unsigned        _font_size              = 9;
+    unsigned        _display_dpi_resolution = 96;
+
+    gl::error_checker _error_check;
 
     scm::time::high_res_timer _timer;
     _timer.start();
 
-    FT_Library      ft_lib_;
+    scm::font::face_loader    _face_loader("./../../../res/");
 
-    // initialize freetype
-    if (FT_Init_FreeType(&ft_lib_) != 0) {
-        std::cout << "error initializing freetype library" << std::endl;
+    if (!_face_loader.load(_font_face, _font_file_name, _font_size, _display_dpi_resolution)) {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "error opening font file"
+                           << std::endl;
+
         return (false);
     }
 
-    const     FT_Library      ft_lib = ft_lib_;
+    if (_font_face.has_style(scm::font::face::regular)) {
+        _font_texture_regular.reset(new gl::texture_2d_rect);
 
+        _font_texture_regular->bind();
+        _font_texture_regular->tex_image(0,
+                                         GL_ALPHA,
+                                         _face_loader.get_current_face_texture(scm::font::face::regular)._size.x,
+                                         _face_loader.get_current_face_texture(scm::font::face::regular)._size.y,
+                                         GL_ALPHA,
+                                         GL_UNSIGNED_BYTE,
+                                         (void*)_face_loader.get_current_face_texture(scm::font::face::regular)._data.get());
 
-    //switch (FT_Get_TrueType_Engine_Type(ft_lib)) {
-    //    case FT_TRUETYPE_ENGINE_TYPE_NONE:          std::cout << "FT_TRUETYPE_ENGINE_TYPE_NONE"       << std::endl; break;
-    //    case FT_TRUETYPE_ENGINE_TYPE_UNPATENTED:    std::cout << "FT_TRUETYPE_ENGINE_TYPE_UNPATENTED" << std::endl; break;
-    //    case FT_TRUETYPE_ENGINE_TYPE_PATENTED:      std::cout << "FT_TRUETYPE_ENGINE_TYPE_PATENTED"   << std::endl; break;
-    //}
+        if (!_error_check.ok()) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "<unnamed>::init_font_rendering(): "
+                               << "error uploading face texture: "
+                               << _error_check.get_error_string()
+                               << std::endl;
 
-    // load font face
-    FT_Face         ft_face;
-    if (FT_New_Face(ft_lib, _font_file_name.c_str(), 0, &ft_face) != 0) {
-        std::cout << "error loading font file (" << _font_file_name << ")" << std::endl;
-        return (false);
-    }
-
-    if (ft_face->face_flags & FT_FACE_FLAG_SCALABLE) {
-        std::cout << "scalable font" << std::endl;
-    }
-    else if (ft_face->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
-
-        std::set<int> available_sizes;
-
-        std::cout << "fixed size font" << std::endl;
-        std::cout << "available sizes:" << std::endl;
-
-        for (int i = 0; i < ft_face->num_fixed_sizes; ++i) {
-            available_sizes.insert(ft_face->available_sizes[i].height);
-        }
-
-        if (available_sizes.empty()) {
-            std::cout << "no sized defined" << std::endl;
             return (false);
         }
 
-        // scale size to our current display resolution
-        _font_size = (_display_dpi_resolution * _font_size + 36) / 72;
+        _font_texture_regular->tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        _font_texture_regular->tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        // now find closest matching size
-        std::set<int>::const_iterator lower_bound = available_sizes.lower_bound(_font_size); // first >=
-        std::set<int>::const_iterator upper_bound = available_sizes.upper_bound(_font_size); // first >
+        _font_texture_regular->tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        _font_texture_regular->tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        if (   upper_bound == available_sizes.end()) {
-            _font_size = *available_sizes.rbegin();
-        }
-        else {
-            _font_size = *lower_bound;
-        }
-
-        // ok bitmap fonts are in pixel sizes (i.e. 72dpi), so scale the size
-        _font_size = (72 * _font_size + _display_dpi_resolution / 2) / _display_dpi_resolution;
     }
     else {
-        std::cout << "unsupported font format" << std::endl;
-    }
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "regular style missing"
+                           << std::endl;
 
-    // rendering the font bullshit into a texture
-    if (FT_Set_Char_Size(ft_face, 0, _font_size << 6, 0, _display_dpi_resolution) != 0) {
-        std::cout << "error setting font sizes" << std::endl;
         return (false);
     }
 
-    math::vec2f_t bbox_x;
-    math::vec2f_t bbox_y;
+    if (_font_face.has_style(scm::font::face::italic)) {
+        _font_texture_italic.reset(new gl::texture_2d_rect);
 
-    if (ft_face->face_flags & FT_FACE_FLAG_SCALABLE) {
-        float   em_size = 1.0 * ft_face->units_per_EM;
-        float   x_scale =  ft_face->size->metrics.x_ppem / em_size;
-        float   y_scale =  ft_face->size->metrics.y_ppem / em_size;
+        _font_texture_italic->bind();
+        _font_texture_italic->tex_image(0,
+                                         GL_ALPHA,
+                                         _face_loader.get_current_face_texture(scm::font::face::italic)._size.x,
+                                         _face_loader.get_current_face_texture(scm::font::face::italic)._size.y,
+                                         GL_ALPHA,
+                                         GL_UNSIGNED_BYTE,
+                                         (void*)_face_loader.get_current_face_texture(scm::font::face::italic)._data.get());
 
-        bbox_x = math::vec2f_t(ft_face->bbox.xMin * x_scale,
-                               ft_face->bbox.xMax * x_scale);
-        bbox_y = math::vec2f_t(ft_face->bbox.yMin * y_scale,
-                               ft_face->bbox.yMax * y_scale);
-    }
-    else if (ft_face->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+        if (!_error_check.ok()) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "<unnamed>::init_font_rendering(): "
+                               << "error uploading face texture: "
+                               << _error_check.get_error_string()
+                               << std::endl;
 
-        bbox_x = math::vec2f_t(0,
-                               ft_face->size->metrics.max_advance >> 6);
-        bbox_y = math::vec2f_t(0,
-                               ft_face->size->metrics.height >> 6);
-    }
-  ///* convert design distances to floating point pixels */
-  //std::cout << "xMin" << (ft_face->bbox.xMin *  x_scale ) << std::endl;
-  //std::cout << "xMax" << (ft_face->bbox.xMax *  x_scale ) << std::endl;
-  //std::cout << "yMin" << (ft_face->bbox.yMin *  y_scale ) << std::endl;
-  //std::cout << "yMax" << (ft_face->bbox.yMax *  y_scale ) << std::endl;
-  //std::cout << "aMax" << ((ft_face->size->metrics.max_advance >> 6)) << std::endl;
-  //std::cout << "height" << (ft_face->height *  y_scale ) << std::endl;
-
-  math::vec2i_t font_glyph_size  = math::vec2i_t(math::ceil(bbox_x.y) - math::floor(bbox_x.x),
-                                                 math::ceil(bbox_y.y) - math::floor(bbox_y.x));
-
-  std::cout << "bbox.x" << font_glyph_size.x << std::endl;
-  std::cout << "bbox.y" << font_glyph_size.y << std::endl;
-/////////////////////////
-    //std::cout << "ma: " << (ft_face->size->metrics.max_advance & 63);
-    //std::cout << "mh: " << (ft_face->size->metrics.height & 63);
-
-    math::vec2i_t font_tex_size    = math::vec2i_t(font_glyph_size * 16);
-
-    // allocate texture destination memory
-    boost::scoped_array<unsigned char> font_tex(new unsigned char[font_tex_size.x * font_tex_size.y]);
-
-    // clear texture background to black
-    memset(font_tex.get(), 0u, font_tex_size.x * font_tex_size.y);
-
-    unsigned dst_x, dst_y;
-
-    font_face cur_font_face;
-
-    for (unsigned i = 0; i < 256; ++i) {
-        if(FT_Load_Glyph(ft_face, FT_Get_Char_Index(ft_face, i), FT_LOAD_DEFAULT)) {
-            std::cout << "error loading glyph at char code: " << i << std::endl;
+            return (false);
         }
-        else {
-            if (FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
-                std::cout << "error rendering glyph at char code: " << i << std::endl;
-            }
-            FT_Bitmap& bitmap = ft_face->glyph->bitmap;
 
-            //std::cout << i << " bx: " <<  (ft_face->glyph->metrics.horiBearingX >> 6)
-            //               << "\tby: " << ((ft_face->glyph->metrics.height >> 6) - (ft_face->glyph->metrics.horiBearingY >> 6))
-            //               << "\ta: " <<  (ft_face->glyph->metrics.horiAdvance  >> 6)<< std::endl;
+        _font_texture_italic->tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        _font_texture_italic->tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-            dst_x =                   (i & 0x0F) * font_glyph_size.x;
-            dst_y = font_tex_size.y - ((i >> 4) + 1)   * font_glyph_size.y;
+        _font_texture_italic->tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        _font_texture_italic->tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            math::vec2i_t ftex_size(0, bitmap.rows);
-
-            switch (bitmap.pixel_mode) {
-                case FT_PIXEL_MODE_GRAY:
-
-                    ftex_size.x = bitmap.width;
-
-                    //if (bitmap.pitch > font_glyph_size.x) {
-                    //    std::cout << i << " " << (bitmap.pitch - font_glyph_size.x) << std::endl;
-                    //}
-
-                    for (int dy = 0; dy < bitmap.rows; ++dy) {
-
-                        unsigned src_off = dy * bitmap.pitch;
-                        unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;// + (font_glyph_size.y - bitmap.rows) * font_tex_size.x;
-                        memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
-                    }
-                    break;
-                case FT_PIXEL_MODE_MONO:
-                    //std::cout << "r: " << bitmap.rows << "\tw: " << bitmap.width << "\tp: " << bitmap.pitch << std::endl;
-                    ftex_size.x = bitmap.width;
-                    for (int dy = 0; dy < bitmap.rows; ++dy) {
-                        for (int dx = 0; dx < bitmap.pitch; ++dx) {
-
-                            unsigned        src_off     = dx + dy * bitmap.pitch;
-                            unsigned char   src_byte    = bitmap.buffer[src_off];
-
-                            for (int bx = 0; bx < 8; ++bx) {
-
-                                unsigned dst_off    = (dst_x + dx * 8 + bx) + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
-
-                                unsigned char  src_set = src_byte & (0x80 >> bx);
-                                unsigned char* plah = &src_byte;
-
-                                font_tex[dst_off] = src_set ? 255u : 0u;
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    std::cout << "unsupported pixel_mode" << std::endl;
-                    continue;
-
-            }
-            cur_font_face._tex_lower_left   = math::vec2i_t(dst_x, dst_y);
-            cur_font_face._tex_upper_right  = cur_font_face._tex_lower_left + ftex_size;
-
-            cur_font_face._hor_advance      = ft_face->glyph->metrics.horiAdvance >> 6;
-            cur_font_face._bearing          = math::vec2i_t(ft_face->glyph->metrics.horiBearingX >> 6,
-                                                            (ft_face->glyph->metrics.horiBearingY >> 6) - (ft_face->glyph->metrics.height >> 6));
-
-            font_faces.insert(font_face_container::value_type(i, cur_font_face));
-
-            //std::cout << i << " w: " << bitmap.width << "\th: " << bitmap.rows << "\tp: " << bitmap.pitch << std::endl;
-
-            //for (int dy = 0; dy < bitmap.rows; ++dy) {
-
-            //    unsigned src_off = dy * bitmap.width;
-            //    unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * font_tex_size.x;
-            //    memcpy(font_tex.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
-            //}
-
-
-
-    //        //std::cout << i << " w: " << bitmap.width << "\th: " << bitmap.rows << "\tax: " << (ft_face->glyph->advance.x >> 6) << "\tay: " << 
-    //                           //  (/*float(ft_face->max_advance_height) / float(ft_face->units_per_EM) * */ft_face->size->metrics.height >> 6) << std::endl;//(ft_face->glyph->linearVertAdvance >> 16) << "." << (ft_face->glyph->linearVertAdvance & 0x0000FFFF)<< std::endl;
-    //        //std::cout << i << " w: " << (float)(ft_face->bbox.xMax - ft_face->bbox.xMin) / (float)64 << " h: " << (float)(ft_face->bbox.yMax - ft_face->bbox.yMin) / (float)64 << std::endl;
-
-
-        }
-    }
-
-
-    if (ft_face->face_flags & FT_FACE_FLAG_KERNING) {
-        std::cout << "has kerning" << std::endl;
-        for (unsigned l = 0; l < 256; ++l) {
-            FT_UInt l_glyph_index = FT_Get_Char_Index(ft_face, l);
-            for (unsigned r = 0; r < 256; ++r) {
-                FT_UInt r_glyph_index = FT_Get_Char_Index(ft_face, r);
-                FT_Vector  delta;
-                FT_Get_Kerning(ft_face, l_glyph_index, r_glyph_index,
-                               FT_KERNING_DEFAULT, &delta);
-
-                //if ((delta.x >> 6) != 0) {
-                //    std::cout << l << " " << r << (delta.x >> 6) << std::endl;
-                //}
-
-                font_face_kerning_table[l][r] = (delta.x >> 6);
-
-            }
-        }
     }
     else {
-        for (unsigned l = 0; l < 256; ++l) {
-            for (unsigned r = 0; r < 256; ++r) {
+        scm::console.get() << scm::con::log_level(scm::con::info)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "italic style missing"
+                           << std::endl;
+    }
 
-                font_face_kerning_table[l][r] = 0;
-            }
+    if (_font_face.has_style(scm::font::face::bold)) {
+        _font_texture_bold.reset(new gl::texture_2d_rect);
+
+        _font_texture_bold->bind();
+        _font_texture_bold->tex_image(0,
+                                         GL_ALPHA,
+                                         _face_loader.get_current_face_texture(scm::font::face::bold)._size.x,
+                                         _face_loader.get_current_face_texture(scm::font::face::bold)._size.y,
+                                         GL_ALPHA,
+                                         GL_UNSIGNED_BYTE,
+                                         (void*)_face_loader.get_current_face_texture(scm::font::face::bold)._data.get());
+
+        if (!_error_check.ok()) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "<unnamed>::init_font_rendering(): "
+                               << "error uploading face texture: "
+                               << _error_check.get_error_string()
+                               << std::endl;
+
+            return (false);
         }
+
+        _font_texture_bold->tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        _font_texture_bold->tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        _font_texture_bold->tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        _font_texture_bold->tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    }
+    else {
+        scm::console.get() << scm::con::log_level(scm::con::info)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "bold style missing"
+                           << std::endl;
     }
 
+    if (_font_face.has_style(scm::font::face::bold_italic)) {
+        _font_texture_bold_italic.reset(new gl::texture_2d_rect);
 
+        _font_texture_bold_italic->bind();
+        _font_texture_bold_italic->tex_image(0,
+                                         GL_ALPHA,
+                                         _face_loader.get_current_face_texture(scm::font::face::bold_italic)._size.x,
+                                         _face_loader.get_current_face_texture(scm::font::face::bold_italic)._size.y,
+                                         GL_ALPHA,
+                                         GL_UNSIGNED_BYTE,
+                                         (void*)_face_loader.get_current_face_texture(scm::font::face::bold_italic)._data.get());
 
+        if (!_error_check.ok()) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "<unnamed>::init_font_rendering(): "
+                               << "error uploading face texture: "
+                               << _error_check.get_error_string()
+                               << std::endl;
 
+            return (false);
+        }
 
-    // shutdown font face
-    if (FT_Done_Face(ft_face) != 0) {
-        std::cout << "error closing font face" << std::endl;
-        return (false);
+        _font_texture_bold_italic->tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        _font_texture_bold_italic->tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        _font_texture_bold_italic->tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        _font_texture_bold_italic->tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     }
-
-    // shutfdown freetype
-    if (FT_Done_FreeType(ft_lib) != 0) {
-        std::cout << "error shutting down freetype library" << std::endl;
+    else {
+        scm::console.get() << scm::con::log_level(scm::con::info)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "bold_italic style missing"
+                           << std::endl;
     }
-
-
-    glGenTextures(1, &tex_font);
-
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex_font);
-    glEnable(GL_TEXTURE_RECTANGLE_ARB);
-
-
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_ALPHA, font_tex_size.x, font_tex_size.y, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (void*)font_tex.get());
-    if (glGetError() != GL_NO_ERROR) {
-        std::cout << "error: texture upload failed" << std::endl;
-        return (false);
-    }
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glDisable(GL_TEXTURE_RECTANGLE_ARB);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-
-    tex_font_w = font_tex_size.x;
-    tex_font_h = font_tex_size.y;
 
     _timer.stop();
 
@@ -524,6 +393,8 @@ void draw_font_image()
     GLint  current_matrix_mode;
     glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
 
+    // setup orthogonal projection
+    // setup as 1:1 pixel mapping
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -532,33 +403,41 @@ void draw_font_image()
     glPushMatrix();
     glLoadIdentity();
 
+    glColor3f(1, 1, 1);
+
+    // save states which we change in here
+    glPushAttrib(GL_LIGHTING_BIT);
+    glDisable(GL_LIGHTING);
+    glPushAttrib(GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+
+    // setup blending
+    glPushAttrib(GL_COLOR_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_TEXTURE_RECTANGLE_ARB);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex_font);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    _font_texture_regular->bind();
 
-    glTranslatef(20, 20, 0);
-
-//glTranslatef(30, 30, 0);
+    // draw a quad in the size of the font texture
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
         glVertex2f(  0.0f, 0.0f);
-        glTexCoord2f(tex_font_w, 0.0f);
-        glVertex2f(  tex_font_w, 0.0f);
-        glTexCoord2f(tex_font_w, tex_font_h);
-        glVertex2f(  tex_font_w, tex_font_h);
-        glTexCoord2f(0.0f, tex_font_h);
-        glVertex2f(  0.0f, tex_font_h);
+        glTexCoord2f(_font_texture_regular->get_width(), 0.0f);
+        glVertex2f(  _font_texture_regular->get_width(), 0.0f);
+        glTexCoord2f(_font_texture_regular->get_width(), _font_texture_regular->get_height());
+        glVertex2f(  _font_texture_regular->get_width(), _font_texture_regular->get_height());
+        glTexCoord2f(0.0f, _font_texture_regular->get_height());
+        glVertex2f(  0.0f, _font_texture_regular->get_height());
     glEnd();
 
+    _font_texture_regular->unbind();
 
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-    glDisable(GL_TEXTURE_RECTANGLE_ARB);
-    glDisable(GL_BLEND);
+    // restore saved states
+    glPopAttrib();
+    glPopAttrib();
+    glPopAttrib();
 
-
+    // restore previous projection
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -588,12 +467,50 @@ void draw_quad(const math::vec2i_t& lower_left,
     glEnd();
 }
 
-void draw_string(const std::string& stuff_that_matters)
+void draw_string(scm::font::face::style_type style,
+                 const math::vec2i_t& position,
+                 const std::string& stuff_that_matters)
 {
+    using namespace scm::font;
+
+    gl::texture_2d_rect* cur_style_tex;
+
+    switch (style) {
+        case face::regular:
+            cur_style_tex = _font_texture_regular.get();
+            break;
+        case face::italic:
+            if (_font_face.has_style(style)) {
+                cur_style_tex = _font_texture_italic.get();
+            }
+            else {
+                cur_style_tex = _font_texture_regular.get();
+            }
+            break;
+        case face::bold:
+            if (_font_face.has_style(style)) {
+                cur_style_tex = _font_texture_bold.get();
+            }
+            else {
+                cur_style_tex = _font_texture_regular.get();
+            }
+            break;
+        case face::bold_italic:
+            if (_font_face.has_style(style)) {
+                cur_style_tex = _font_texture_bold_italic.get();
+            }
+            else {
+                cur_style_tex = _font_texture_regular.get();
+            }
+            break;
+    };
+
     // retrieve current matrix mode
     GLint  current_matrix_mode;
     glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
 
+    // setup orthogonal projection
+    // setup as 1:1 pixel mapping
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -602,76 +519,61 @@ void draw_string(const std::string& stuff_that_matters)
     glPushMatrix();
     glLoadIdentity();
 
+    // save states which we change in here
+    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
+    glPushAttrib(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
-    //glBlendFuncSeparate(GL_SRC_COLOR,
-    //                    GL_ONE_MINUS_SRC_COLOR,
-    //                    GL_SRC_COLOR,
-    //                    GL_ONE_MINUS_SRC_COLOR);
+
+    // setup blending
+    glPushAttrib(GL_COLOR_BUFFER_BIT);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_TEXTURE_RECTANGLE_ARB);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex_font);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    cur_style_tex->bind();
 
-    math::vec2i_t current_pos = math::vec2i_t(20 + 1, winy / 2 - 1);
-
-    glColor4f(0, 0, 0, 1);
+    math::vec2i_t current_pos = position;
 
     unsigned prev = 0;
 
     for (std::string::const_iterator c = stuff_that_matters.begin();
          c != stuff_that_matters.end();
          ++c) {
-        font_face cf = font_faces[*c];
+        const scm::font::glyph& cur_glyph = _font_face.get_glyph(*c, style);
 
         if (prev) {
-            current_pos.x += font_face_kerning_table[prev][*c];
-            //if (font_face_kerning_table[prev][*c]!= 0)
-            //    std::cout << *c << font_face_kerning_table[prev][*c] << std::endl;
+            current_pos.x += _font_face.get_kerning(prev, *c, style);
         }
 
-        draw_quad(current_pos + cf._bearing,
-                  current_pos + cf._bearing + cf._tex_upper_right - cf._tex_lower_left,
-                  cf._tex_lower_left,
-                  cf._tex_upper_right);
+        // draw shadow first
+        glColor4f(0, 0, 0, 1);
+        draw_quad(current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing,
+                  current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
+                  cur_glyph._tex_lower_left,
+                  cur_glyph._tex_upper_right);
 
-        current_pos.x += cf._hor_advance;
+        // draw glyph
+        glColor4f(1, 1, 1, 1);
+        draw_quad(current_pos + cur_glyph._bearing,
+                  current_pos + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
+                  cur_glyph._tex_lower_left,
+                  cur_glyph._tex_upper_right);
+
+        // advance the position
+        current_pos.x += cur_glyph._advance;
+
+        // remember just drawn glyph for kerning
         prev = *c;
     }
     
-    glColor4f(1, 1, 1, 1);
-    current_pos = math::vec2i_t(20, winy / 2);
-    //current_pos = math::vec2i_t(20 + 1, winy / 2 - 1 - 25);
-    
-    prev = 0;
+    cur_style_tex->unbind();
 
-    for (std::string::const_iterator c = stuff_that_matters.begin();
-         c != stuff_that_matters.end();
-         ++c) {
-        font_face cf = font_faces[*c];
+    // restore saved states
+    glPopAttrib();
+    glPopAttrib();
+    glPopAttrib();
 
-        if (prev) {
-            current_pos.x += font_face_kerning_table[prev][*c];
-        }
-
-        draw_quad(current_pos + cf._bearing,
-                  current_pos + cf._bearing + cf._tex_upper_right - cf._tex_lower_left,
-                  cf._tex_lower_left,
-                  cf._tex_upper_right);
-
-        current_pos.x += cf._hor_advance;
-        prev = *c;
-    }
-
-
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-    glDisable(GL_TEXTURE_RECTANGLE_ARB);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-
+    // restore previous projection
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -763,11 +665,21 @@ void display()
 
     // restore previously saved modelview matrix
     glPopMatrix();
-#if 0
-#endif
+
     //draw_font_image();
 
-    draw_string("mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+    draw_string(scm::font::face::regular,
+                math::vec2i_t(20, winy - 40),
+                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+    draw_string(scm::font::face::italic,
+                math::vec2i_t(20, winy - 40 - _font_face.get_line_spacing()),
+                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+    draw_string(scm::font::face::bold,
+                math::vec2i_t(20, winy - 40 - 2 * _font_face.get_line_spacing()),
+                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+    draw_string(scm::font::face::bold_italic,
+                math::vec2i_t(20, winy - 40 - 3 * _font_face.get_line_spacing()),
+                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
 
     _gl_timer.stop();
 
@@ -880,84 +792,8 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-//#include <boost/date_time/posix_time/posix_time.hpp>
-//#include <boost/date_time/gregorian/gregorian.hpp>
-//
-//#include <scm_core/time/time_system.h>
-
-
-#include <boost/shared_ptr.hpp>
-
 int main(int argc, char **argv)
 {
-    struct plah
-    {
-        boost::weak_ptr<float>     _q;
-
-        float& get() const {
-            return (*_q.lock());
-        }
-
-    };
-
-    plah pl;
-
-    boost::shared_ptr<float>  p(new float);
-    boost::shared_ptr<float>  p2(new float);
-
-    *p  = 5.0f;
-    *p2 = 4.0f;
-    pl._q = boost::weak_ptr<float>(p);
-
-    boost::weak_ptr<float>     q(p);
-    boost::weak_ptr<float>     r(p);
-
-    boost::weak_ptr<float>     r2(p2);
-
-    *r.lock() = 6.0f;
-
-    float& g = pl.get();
-
-    float  f = pl.get();
-
-    if (!(p < q.lock()) && !(q.lock() < p)) {//p == q.lock()) {
-        std::cout << 3 << std::endl;
-    }
-
-    if (!(q < r) && !(r < q)) {
-        std::cout << 1 << std::endl;
-    }
-
-    if (boost::shared_ptr<float> m = q.lock()) {
-        std::cout << 2 << std::endl;
-    }
-
-    p.reset(new float);
-    *p = 1.1f;
-
-    r = r2;
-
-    if (!(q < r) && !(r < q) ) {
-        std::cout << 1 << std::endl;
-    }
-
-   // using namespace boost;
-
-   // posix_time::ptime   t1(gregorian::day_clock::universal_day(), posix_time::hours(23) + posix_time::minutes(59) + posix_time::seconds(59)); //
-   // posix_time::ptime   t2(gregorian::day_clock::universal_day(), posix_time::hours(0) + posix_time::minutes(0) + posix_time::seconds(1)); //
-   // //posix_time::ptime   t1(gregorian::date(2002, 1, 1), posix_time::hours(23) + posix_time::minutes(59) + posix_time::seconds(59)); //
-   // //posix_time::ptime   t2(gregorian::date(2002, 1, 2), posix_time::hours(0) + posix_time::minutes(0) + posix_time::seconds(1)); //
-   //// posix_time::ptime   t2(gregorian::date(2002, 1, 1), scm::time::time_system::time_traits::nanosec(1000));//posix_time::nanosec(1)); //
-
-   // std::cout << t1 << std::endl;
-
-   // posix_time::time_duration d1 = t2 - t1;
-
-   // std::cout << d1.is_special() << std::endl;
-   // std::cout << d1 << std::endl;
-
-    //std::cout << sizeof(boost::posix_time::ptime) << std::endl;
-
     int width;
     int height;
     bool fullscreen;
@@ -990,67 +826,6 @@ int main(int argc, char **argv)
     }
 
 
-
-#if 0
-    scm::time::timer    _timer;
-    scm::time::timer    _timer2;
-    system("pause");
-
-
-    unsigned            _test_loop_count = 1000;
-
-    // perfcounter
-    for (unsigned k = 0; k < 10u; ++k) {
-        _timer.start();
-        for (unsigned i = 0; i < (_test_loop_count/* * pow(10.0f, (float)k)*/); ++i) {
-            //_timer2.start();
-            scm::core::detail::get_time();
-        }
-        _timer.stop();
-
-        std::cout.precision(6);
-        std::cout << "time for : " << std::fixed << _timer.get_time() / ((double)_test_loop_count /** pow(10.0f, (float)k)*/) << "usec" << std::endl << std::flush;
-    }
-
-    //_timer.start();
-    //while ()) {
-    //    scm::core::detail::get_time();
-    //}
-    //_timer.stop();
-
-    //std::cout.precision(6);
-    //std::cout << "time for : " << std::fixed << _timer.get_time() / (double)_test_loop_count << "msec" << std::endl;
-    // ftime
-    _timer.start();
-    for (unsigned i = 0; i < _test_loop_count; ++i) {
-        boost::posix_time::microsec_clock::universal_time();
-    }
-
-    _timer.stop();
-    std::cout.precision(6);
-    std::cout << "time for : " << std::fixed << _timer.get_time() / (double)_test_loop_count << "msec" << std::endl;
-
-    ttrait::time_t start;
-    ttrait::time_t end;
-
-    start = ttrait::current_time();
-    for (unsigned i = 0; i < _test_loop_count; ++i) {
-        //_timer2.start();
-        scm::core::detail::get_time();
-    }
-    end = ttrait::current_time();
-    std::cout.precision(6);
-    std::cout << "time for : " << std::fixed << ttrait::to_milliseconds(ttrait::difference(end, start)) / (double)_test_loop_count << "msec" << std::endl;
-
-    start = ttrait::current_time();
-    for (unsigned i = 0; i < _test_loop_count; ++i) {
-        boost::posix_time::microsec_clock::universal_time();
-    }
-    end = ttrait::current_time();
-    std::cout.precision(6);
-    std::cout << "time for : " << std::fixed << ttrait::to_milliseconds(ttrait::difference(end, start)) / (double)_test_loop_count << "msec" << std::endl;
-#endif
-
     // the stuff that has to be done
     glutInit(&argc, argv);
     // init a double buffered framebuffer with depth buffer and 4 channels
@@ -1068,43 +843,6 @@ int main(int argc, char **argv)
         std::cout << "error initializing scm library" << std::endl;
         return (-1);
     }
-
-
-#if 0
-    //scm::root.get().get_std_console_listener().set_log_threshold(scm::con::panic);
-    //scm::console.get() << scm::con::log_level(scm::con::output)
-    //                   << scm::root.get().get_version_string() << std::endl;
-    //scm::console.get() << scm::con::log_level(scm::con::output)
-    //                   << "sizeof(long) = " << sizeof(long) << std::endl;
-    //Must match with time_resolutions enum in date_time/time_defs.h
-    const char* const resolution_names[] = {"Second", "Deci", "Centi", "Milli",
-    "Ten_Thousanth", "Micro", "Nano"};
-
-    using namespace boost::posix_time;
-
-    scm::console.get() << scm::con::log_level(scm::con::output)
-                       << "Resolution: "
-                       << resolution_names[time_duration::rep_type::resolution()] 
-                       << " -- Ticks per second: "
-                       << time_duration::rep_type::res_adjust() << std::endl;
-
-#endif
-#if 0
-    scm::console.get() << "sick, sad world!" << std::endl /*<< std::endl*/
-                       << std::fixed << 1.343434 << 666 << std::endl;
-
-    scm::console.get() << scm::con::log_level(scm::con::warning) << "warning" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::debug) << "debug" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::error) << "error" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::panic) << "panic" << std::endl;
-
-    scm::root.get().get_std_console_listener().set_log_threshold(scm::con::debug);
-
-    scm::console.get() << scm::con::log_level(scm::con::warning) << "warning" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::debug) << "debug" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::error) << "error" << std::endl;
-    scm::console.get() << scm::con::log_level(scm::con::panic) << "panic" << std::endl;
-#endif
 
     // init the GL context
     if (!gl::initialize()) {

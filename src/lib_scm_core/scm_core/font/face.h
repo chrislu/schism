@@ -15,6 +15,8 @@
 namespace scm {
 namespace font {
 
+class face_loader;
+
 class __scm_export face
 {
 public:
@@ -25,6 +27,7 @@ public:
         bold_italic
     } style_type;
 
+protected:
     typedef std::map<unsigned, glyph>               character_glyph_mapping;
     typedef boost::multi_array<char, 2>             kerning_table;
 
@@ -42,21 +45,29 @@ public:
     const std::string&              get_name() const;
     unsigned                        get_size() const;
 
-    bool                            has_style(style_type   /*style*/) const;
+    int                             get_line_spacing() const;
 
-    const glyph&                    get_glyph(style_type   /*style*/ = regular) const;
-    int                             get_kerning(unsigned   /*left*/,
-                                                unsigned   /*right*/,
-                                                style_type /*style*/ = regular) const;
+    bool                            has_style(style_type /*style*/) const;
+
+    const glyph&                    get_glyph(unsigned char /*ind*/,
+                                              style_type    /*style*/ = regular) const;
+    int                             get_kerning(unsigned char /*left*/,
+                                                unsigned char /*right*/,
+                                                style_type    /*style*/ = regular) const;
 
 protected:
+    const face_style&               get_face_style(style_type /*style*/) const;
 
 private:
     std::string                     _name;
-    unsigned                        _size_at_72dpi; // pixel_size... rough but nearest
+    unsigned                        _size_at_72dpi;
+    unsigned                        _line_spacing;
 
-    character_glyph_mapping         _glyph_mapping;
+    void                            clear();
 
+    face_style_mapping              _glyph_mappings;
+
+    friend class face_loader;
 }; // class face
 
 } // namespace font

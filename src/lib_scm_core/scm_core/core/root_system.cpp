@@ -51,6 +51,10 @@ bool root_system::initialize()
 
     _console_listener.reset(new scm::con::console_output_listener_stdout(*_console.get()));
 
+    console.get() << con::log_level(con::output)
+                  << get_version_string()
+                  << std::endl;
+
     // timing
     _timing.reset(new time::time_system());
     register_subsystem("timing", _timing.get());

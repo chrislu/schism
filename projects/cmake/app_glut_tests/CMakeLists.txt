@@ -69,7 +69,6 @@ IF (WIN32)
     INCLUDE_DIRECTORIES(
         ${GLOBAL_EXT_DIR}/inc
         ${GLOBAL_EXT_DIR}/inc/boost
-        ${GLOBAL_EXT_DIR}/inc/freetype
     )
 ENDIF (WIN32)
 
@@ -95,7 +94,6 @@ TARGET_LINK_LIBRARIES(app_glut_tests
 IF (WIN32)
     TARGET_LINK_LIBRARIES(app_glut_tests
         devIL
-        freetype2
         glew32
         glut32
         optimized libboost_program_options-vc80-mt-${SCHISM_BOOST_VERSION}

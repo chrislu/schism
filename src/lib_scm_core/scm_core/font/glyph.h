@@ -17,7 +17,7 @@ struct __scm_export glyph
     math::vec2i_t       _tex_lower_left;
     math::vec2i_t       _tex_upper_right;
 
-    unsigned            _hor_advance;
+    unsigned            _advance;
 
     math::vec2i_t       _bearing;
 
