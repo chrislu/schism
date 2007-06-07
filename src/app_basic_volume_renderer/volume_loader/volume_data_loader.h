@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-#include <scm_core/math/math.h>
+#include <scm/core/math/math.h>
 
 #include <data_analysis/regular_grid_data_3d.h>
 #include <data_analysis/regular_grid_data_3d_write_accessor.h>

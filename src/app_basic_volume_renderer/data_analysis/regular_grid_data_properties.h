@@ -4,7 +4,7 @@
 
 #include <data_analysis/value_range.h>
 
-#include <scm_core/math/math.h>
+#include <scm/core/math/math.h>
 
 namespace scm
 {

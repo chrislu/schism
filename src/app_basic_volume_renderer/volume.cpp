@@ -20,9 +20,9 @@
 #include <windows.h>
 #endif
 
-#include <ogl/utilities/error_checker.h>
+#include <scm/ogl/utilities/error_checker.h>
 
-#include <scm_core/math/math.h>
+#include <scm/core/math/math.h>
 
 gl::volume_renderer_parameters                      _volrend_params = gl::volume_renderer_parameters();
 data_properties                                     _data_properties = data_properties();
@@ -115,7 +115,7 @@ bool open_volume_file(const std::string& filename)
                              data.get_data().get())) {
 
         std::cout << "end texture upload - FAILED reason: ";
-        gl::error_checker ech;
+        scm::gl::error_checker ech;
         std::cout << ech.get_error_string(_volrend_params._volume_texture.get_last_error()) << std::endl;
         return (false);
     }
@@ -131,7 +131,7 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._volume_texture.unbind();
 
     
-#define NOT_VRGEO
+//#define NOT_VRGEO
     // reset transfer functions
     _data_properties._alpha_transfer.clear();
 
@@ -230,7 +230,7 @@ bool update_color_alpha_table()
                              combined_lut.get())) {
 
         std::cout << "end texture upload - FAILED reason: ";
-        gl::error_checker ech;
+        scm::gl::error_checker ech;
         std::cout << ech.get_error_string(_volrend_params._color_alpha_texture.get_last_error()) << std::endl;
         return (false);
     }

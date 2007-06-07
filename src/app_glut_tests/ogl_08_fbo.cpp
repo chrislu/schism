@@ -5,24 +5,24 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 #include <GL/glut.h>
 
-#include <ogl/manipulators/trackball_manipulator.h>
-#include <ogl/shader_objects/program_object.h>
-#include <ogl/shader_objects/shader_object.h>
+#include <scm/ogl/manipulators/trackball_manipulator.h>
+#include <scm/ogl/shader_objects/program_object.h>
+#include <scm/ogl/shader_objects/shader_object.h>
 
 #include <image_handling/image_loader.h>
 
-boost::scoped_ptr<gl::program_object>  _shader_program;
-boost::scoped_ptr<gl::shader_object>   _vertex_shader;
-boost::scoped_ptr<gl::shader_object>   _fragment_shader;
+boost::scoped_ptr<scm::gl::program_object>  _shader_program;
+boost::scoped_ptr<scm::gl::shader_object>   _vertex_shader;
+boost::scoped_ptr<scm::gl::shader_object>   _fragment_shader;
 
-boost::scoped_ptr<gl::program_object>  _fbo_shader_program;
-boost::scoped_ptr<gl::shader_object>   _fbo_vertex_shader;
-boost::scoped_ptr<gl::shader_object>   _fbo_fragment_shader;
+boost::scoped_ptr<scm::gl::program_object>  _fbo_shader_program;
+boost::scoped_ptr<scm::gl::shader_object>   _fbo_vertex_shader;
+boost::scoped_ptr<scm::gl::shader_object>   _fbo_fragment_shader;
 
-gl::trackball_manipulator _trackball_manip;
+scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 1024;
 int winy = 640;
@@ -48,11 +48,11 @@ bool init_gl()
 {
     // check for opengl verison 2.0 with
     // opengl shading language support
-    if (!gl::is_supported("GL_VERSION_2_0")) {
+    if (!scm::gl::is_supported("GL_VERSION_2_0")) {
         std::cout << "GL_VERSION_2_0 not supported" << std::endl;
         return (false);
     }
-    if (!gl::is_supported("GL_EXT_framebuffer_object")) {
+    if (!scm::gl::is_supported("GL_EXT_framebuffer_object")) {
         std::cout << "GL_EXT_framebuffer_object not supported" << std::endl;
         return (false);
     }
@@ -78,9 +78,9 @@ bool init_gl()
 
     _trackball_manip.dolly(1);
 
-    _shader_program.reset(new gl::program_object());
-    _vertex_shader.reset(new gl::shader_object(GL_VERTEX_SHADER));
-    _fragment_shader.reset(new gl::shader_object(GL_FRAGMENT_SHADER));
+    _shader_program.reset(new scm::gl::program_object());
+    _vertex_shader.reset(new scm::gl::shader_object(GL_VERTEX_SHADER));
+    _fragment_shader.reset(new scm::gl::shader_object(GL_FRAGMENT_SHADER));
 
     // load shader code from files
     if (!_vertex_shader->set_source_code_from_file("./../../../src/app_glut_tests/shader/texture_vertex_program.glsl")) {
@@ -121,9 +121,9 @@ bool init_gl()
        return (false);
     }
 
-    _fbo_shader_program.reset(new gl::program_object());
-    _fbo_vertex_shader.reset(new gl::shader_object(GL_VERTEX_SHADER));
-    _fbo_fragment_shader.reset(new gl::shader_object(GL_FRAGMENT_SHADER));
+    _fbo_shader_program.reset(new scm::gl::program_object());
+    _fbo_vertex_shader.reset(new scm::gl::shader_object(GL_VERTEX_SHADER));
+    _fbo_fragment_shader.reset(new scm::gl::shader_object(GL_FRAGMENT_SHADER));
 
     // load shader code from files
     if (!_fbo_vertex_shader->set_source_code_from_file("./../../../src/app_glut_tests/shader/fbo_blur_vertex_program.glsl")) {
@@ -509,7 +509,7 @@ int main(int argc, char **argv)
     glutCreateWindow("simple_glut");
 
     // init the GL context
-    if (!gl::initialize()) {
+    if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;
         return (-1);
     }

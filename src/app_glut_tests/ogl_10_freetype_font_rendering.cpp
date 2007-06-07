@@ -4,42 +4,43 @@
 #include <set>
 #include <string>
 
-#include <scm_core/math/math.h>
+#include <scm/core/math/math.h>
 #include <boost/date_time.hpp>
 #include <boost/program_options.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 #include <GL/glut.h>
 
-#include <ogl/manipulators/trackball_manipulator.h>
-#include <ogl/shader_objects/program_object.h>
-#include <ogl/shader_objects/shader_object.h>
-#include <ogl/textures/texture_2d_rect.h>
-#include <ogl/time/time_query.h>
-#include <ogl/utilities/error_checker.h>
+#include <scm/ogl/manipulators/trackball_manipulator.h>
+#include <scm/ogl/shader_objects/program_object.h>
+#include <scm/ogl/shader_objects/shader_object.h>
+#include <scm/ogl/textures/texture_2d_rect.h>
+#include <scm/ogl/time/time_query.h>
+#include <scm/ogl/utilities/error_checker.h>
 
-#include <scm_core/time/high_res_timer.h>
+#include <scm/core/time/high_res_timer.h>
 
-#include <scm_core/core.h>
-#include <scm_core/font/face.h>
-#include <scm_core/font/glyph.h>
-#include <scm_core/font/face_loader.h>
+#include <scm/core.h>
+#include <scm/core/core.h>
+#include <scm/core/font/face.h>
+#include <scm/core/font/glyph.h>
+#include <scm/core/font/face_loader.h>
 
 #include <image_handling/image_loader.h>
 
-boost::scoped_ptr<gl::program_object>   _shader_program;
-boost::scoped_ptr<gl::shader_object>    _vertex_shader;
-boost::scoped_ptr<gl::shader_object>    _fragment_shader;
+boost::scoped_ptr<scm::gl::program_object>   _shader_program;
+boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
+boost::scoped_ptr<scm::gl::shader_object>    _fragment_shader;
 
-boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_regular;
-boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_bold;
-boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_italic;
-boost::scoped_ptr<gl::texture_2d_rect>  _font_texture_bold_italic;
+boost::scoped_ptr<scm::gl::texture_2d_rect>  _font_texture_regular;
+boost::scoped_ptr<scm::gl::texture_2d_rect>  _font_texture_bold;
+boost::scoped_ptr<scm::gl::texture_2d_rect>  _font_texture_italic;
+boost::scoped_ptr<scm::gl::texture_2d_rect>  _font_texture_bold_italic;
 
-gl::trackball_manipulator _trackball_manip;
+scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 1024;
 int winy = 640;
@@ -62,13 +63,16 @@ scm::font::face     _font_face;
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("fonts/consola.ttf");//vgaoem.fon");//calibri.ttf");//
-    unsigned        _font_size              = 9;
+    std::string     _font_file_name         = std::string("fonts/segoeui.ttf");//consola.ttf");//vgafix.fon");//cour.ttf");//calibri.ttf");//
+    unsigned        _font_size              = 12;
     unsigned        _display_dpi_resolution = 96;
 
-    gl::error_checker _error_check;
+    scm::gl::error_checker _error_check;
 
     scm::time::high_res_timer _timer;
+
+    glFlush();
+    glFinish();
     _timer.start();
 
     scm::font::face_loader    _face_loader("./../../../res/");
@@ -83,7 +87,7 @@ bool init_font_rendering()
     }
 
     if (_font_face.has_style(scm::font::face::regular)) {
-        _font_texture_regular.reset(new gl::texture_2d_rect);
+        _font_texture_regular.reset(new scm::gl::texture_2d_rect);
 
         _font_texture_regular->bind();
         _font_texture_regular->tex_image(0,
@@ -121,7 +125,7 @@ bool init_font_rendering()
     }
 
     if (_font_face.has_style(scm::font::face::italic)) {
-        _font_texture_italic.reset(new gl::texture_2d_rect);
+        _font_texture_italic.reset(new scm::gl::texture_2d_rect);
 
         _font_texture_italic->bind();
         _font_texture_italic->tex_image(0,
@@ -157,7 +161,7 @@ bool init_font_rendering()
     }
 
     if (_font_face.has_style(scm::font::face::bold)) {
-        _font_texture_bold.reset(new gl::texture_2d_rect);
+        _font_texture_bold.reset(new scm::gl::texture_2d_rect);
 
         _font_texture_bold->bind();
         _font_texture_bold->tex_image(0,
@@ -193,7 +197,7 @@ bool init_font_rendering()
     }
 
     if (_font_face.has_style(scm::font::face::bold_italic)) {
-        _font_texture_bold_italic.reset(new gl::texture_2d_rect);
+        _font_texture_bold_italic.reset(new scm::gl::texture_2d_rect);
 
         _font_texture_bold_italic->bind();
         _font_texture_bold_italic->tex_image(0,
@@ -228,6 +232,9 @@ bool init_font_rendering()
                            << std::endl;
     }
 
+    glFlush();
+    glFinish();
+
     _timer.stop();
 
     std::stringstream output;
@@ -245,26 +252,28 @@ bool init_gl()
 {
     // check for opengl verison 2.0 with
     // opengl shading language support
-    if (!gl::is_supported("GL_VERSION_2_0")) {
+    if (!scm::gl::is_supported("GL_VERSION_2_0")) {
         std::cout << "GL_VERSION_2_0 not supported" << std::endl;
         return (false);
     }
     else {
         std::cout << "OpenGL 2.0 supported, OpenGL Version: " << (char*)glGetString(GL_VERSION) << std::endl;
     }
-    if (!gl::time_query::is_supported()) {
-        std::cout << "gl::time_query not supported" << std::endl;
+    if (!scm::gl::time_query::is_supported()) {
+        std::cout << "scm::gl::time_query not supported" << std::endl;
         return (false);
     }
     else {
-        std::cout << "gl::time_query available" << std::endl;
+        std::cout << "scm::gl::time_query available" << std::endl;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    glClearColor(0.2f,0.2f,0.2f,1);
+    glClearColor(0, 0, 0, 1);
+    //glClearColor(1, 1, 1, 1);
+    //glClearColor(0.2f,0.2f,0.2f,1);
     //glClearColor(0.8f,0.8f,0.8f,1);
 
     // setup depth testing
@@ -276,9 +285,9 @@ bool init_gl()
 
     _trackball_manip.dolly(1);
 
-    _shader_program.reset(new gl::program_object());
-    _vertex_shader.reset(new gl::shader_object(GL_VERTEX_SHADER));
-    _fragment_shader.reset(new gl::shader_object(GL_FRAGMENT_SHADER));
+    _shader_program.reset(new scm::gl::program_object());
+    _vertex_shader.reset(new scm::gl::shader_object(GL_VERTEX_SHADER));
+    _fragment_shader.reset(new scm::gl::shader_object(GL_FRAGMENT_SHADER));
 
     // load shader code from files
     if (!_vertex_shader->set_source_code_from_file("./../../../src/app_glut_tests/shader/texture_vertex_program.glsl")) {
@@ -473,7 +482,7 @@ void draw_string(scm::font::face::style_type style,
 {
     using namespace scm::font;
 
-    gl::texture_2d_rect* cur_style_tex;
+    scm::gl::texture_2d_rect* cur_style_tex;
 
     switch (style) {
         case face::regular:
@@ -546,11 +555,11 @@ void draw_string(scm::font::face::style_type style,
         }
 
         // draw shadow first
-        glColor4f(0, 0, 0, 1);
-        draw_quad(current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing,
-                  current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
-                  cur_glyph._tex_lower_left,
-                  cur_glyph._tex_upper_right);
+        //glColor4f(0, 0, 0, 1);
+        //draw_quad(current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing,
+        //          current_pos + math::vec2i_t(1,-1) + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
+        //          cur_glyph._tex_lower_left,
+        //          cur_glyph._tex_upper_right);
 
         // draw glyph
         glColor4f(1, 1, 1, 1);
@@ -590,7 +599,7 @@ void display()
     static unsigned         _accum_count    = 0;
 
     static scm::time::high_res_timer _timer;
-    static gl::time_query            _gl_timer;
+    static scm::gl::time_query            _gl_timer;
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
@@ -668,18 +677,19 @@ void display()
 
     //draw_font_image();
 
+    // mjM hallo Welt! To ro  :\  .\ []{}|||~!@#$%^&*()_+;:<>/|'"~` 0123456789
     draw_string(scm::font::face::regular,
                 math::vec2i_t(20, winy - 40),
-                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
     draw_string(scm::font::face::italic,
                 math::vec2i_t(20, winy - 40 - _font_face.get_line_spacing()),
-                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
     draw_string(scm::font::face::bold,
                 math::vec2i_t(20, winy - 40 - 2 * _font_face.get_line_spacing()),
-                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
     draw_string(scm::font::face::bold_italic,
                 math::vec2i_t(20, winy - 40 - 3 * _font_face.get_line_spacing()),
-                "mjM hallo Welt! To ro  \n:\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
 
     _gl_timer.stop();
 
@@ -845,7 +855,7 @@ int main(int argc, char **argv)
     }
 
     // init the GL context
-    if (!gl::initialize()) {
+    if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;
         return (-1);
     }

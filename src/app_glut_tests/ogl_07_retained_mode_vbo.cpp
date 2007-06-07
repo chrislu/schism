@@ -4,7 +4,7 @@
 
 #include <boost/scoped_array.hpp>
 
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 #include <GL/glut.h>
 
 int winx = 1024;
@@ -29,7 +29,7 @@ bool init_gl()
 {
     // check for opengl verison 1.5 with
     // vertex buffer objects support
-    if (!gl::is_supported("GL_VERSION_1_5")) {
+    if (!scm::gl::is_supported("GL_VERSION_1_5")) {
         std::cout << "GL_VERSION_1_5 not supported" << std::endl;
         return (false);
     }
@@ -185,7 +185,7 @@ void display()
     //glShadeModel(GL_FLAT);
 
     // push current modelview matrix
-    //glPushMatrix();
+    glPushMatrix();
 
         // translate the next drawn triangle back a litte so it can be seen
         glTranslatef(0,0,-5.0f);
@@ -194,7 +194,7 @@ void display()
         //draw_animated_cube_vertex_buffer_object();
 
     // restore previously saved modelview matrix
-    //glPopMatrix();
+    glPopMatrix();
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
     glutCreateWindow("OpenGL - red triangle");
 
     // init the GL context
-    if (!gl::initialize()) {
+    if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;
         return (-1);
     }

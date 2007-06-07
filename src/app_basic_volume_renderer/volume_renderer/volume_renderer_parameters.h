@@ -3,9 +3,9 @@
 #define VOLUME_RENDERER_PARAMETERS_H_INCLUDED
 
 // includes, project
-#include <scm_core/math/math.h>
-#include <ogl/textures/texture_1d.h>
-#include <ogl/textures/texture_3d.h>
+#include <scm/core/math/math.h>
+#include <scm/ogl/textures/texture_1d.h>
+#include <scm/ogl/textures/texture_3d.h>
 
 namespace gl
 {
@@ -29,8 +29,8 @@ namespace gl
 
         float                   _step_size;
 
-        gl::texture_1d          _color_alpha_texture;
-        gl::texture_3d          _volume_texture;
+        scm::gl::texture_1d          _color_alpha_texture;
+        scm::gl::texture_3d          _volume_texture;
 
         unsigned int            _geom_depth_texture_id;
 

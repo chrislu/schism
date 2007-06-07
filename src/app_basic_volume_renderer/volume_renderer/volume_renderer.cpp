@@ -1,10 +1,10 @@
 
 #include "volume_renderer.h"
 
-#include <scm_core/math/math.h>
-#include <scm_core/math/math_gl.h>
+#include <scm/core/math/math.h>
+#include <scm/core/math/math_gl.h>
 
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 
 #include <volume_renderer/volume_renderer_parameters.h>
 

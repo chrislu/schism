@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#include <scm_core/core/ptr_types.h>
-#include <scm_core/math/math.h>
+#include <scm/core/ptr_types.h>
+#include <scm/core/math/math.h>
 
 namespace scm
 {

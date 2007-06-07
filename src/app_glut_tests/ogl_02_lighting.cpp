@@ -2,12 +2,12 @@
 #include <iostream>
 #include <cassert>
 
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 #include <GL/glut.h>
 
-#include <ogl/manipulators/trackball_manipulator.h>
+#include <scm/ogl/manipulators/trackball_manipulator.h>
 
-gl::trackball_manipulator _trackball_manip;
+scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 1024;
 int winy = 640;
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     glutCreateWindow("OpenGL - red triangle");
 
     // init the GL context
-    if (!gl::initialize()) {
+    if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;
         return (-1);
     }

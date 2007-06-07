@@ -7,9 +7,9 @@
 #include <boost/static_assert.hpp>
 #include <boost/scoped_array.hpp>
 
-#include <scm_core/math/math.h>
-#include <scm_core/math/math_clamp_scal.h>
-#include <scm_core/math/math_indices.h>
+#include <scm/core/math/math.h>
+#include <scm/core/math/math_clamp_scal.h>
+#include <scm/core/math/math_indices.h>
 
 #include <data_analysis/regular_grid_data_properties.h>
 #include <data_analysis/regular_grid_data_properties_write_accessor.h>

@@ -7,10 +7,10 @@
 // includes, project
 #include <volume_renderer/volume_renderer.h>
 
-#include <ogl/shader_objects/program_object.h>
-#include <ogl/shader_objects/shader_object.h>
+#include <scm/ogl/shader_objects/program_object.h>
+#include <scm/ogl/shader_objects/shader_object.h>
 
-#include <ogl/utilities/volume_textured_unit_cube.h>
+#include <scm/ogl/utilities/volume_textured_unit_cube.h>
 
 namespace gl
 {
@@ -29,17 +29,17 @@ namespace gl
         bool                    shutdown();
 
     private:
-        gl::program_object      _program_obj_front_pass;
-        gl::shader_object       _vert_shader_obj_front_pass;
-        gl::shader_object       _frag_shader_obj_front_pass;
+        scm::gl::program_object      _program_obj_front_pass;
+        scm::gl::shader_object       _vert_shader_obj_front_pass;
+        scm::gl::shader_object       _frag_shader_obj_front_pass;
 
-        gl::program_object      _program_obj_back_pass;
-        gl::shader_object       _vert_shader_obj_back_pass;
-        gl::shader_object       _frag_shader_obj_back_pass;
+        scm::gl::program_object      _program_obj_back_pass;
+        scm::gl::shader_object       _vert_shader_obj_back_pass;
+        scm::gl::shader_object       _frag_shader_obj_back_pass;
 
-        gl::program_object      _program_obj_cp;
-        gl::shader_object       _vert_shader_obj_cp;
-        gl::shader_object       _frag_shader_obj_cp;
+        scm::gl::program_object      _program_obj_cp;
+        scm::gl::shader_object       _vert_shader_obj_cp;
+        scm::gl::shader_object       _frag_shader_obj_cp;
 
         bool                    _do_inside_pass;
 

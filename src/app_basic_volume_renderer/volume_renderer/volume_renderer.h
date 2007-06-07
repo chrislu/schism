@@ -2,12 +2,12 @@
 #ifndef VOLUME_RENDERER_H_INCLUDED
 #define VOLUME_RENDERER_H_INCLUDED
 
-#include <scm_core/math/math.h>
+#include <scm/core/math/math.h>
 
 // includes, project
 
-#include <ogl/utilities/volume_textured_unit_cube.h>
-#include <ogl/utilities/volume_crossplanes.h>
+#include <scm/ogl/utilities/volume_textured_unit_cube.h>
+#include <scm/ogl/utilities/volume_crossplanes.h>
 
 namespace gl
 {
@@ -27,8 +27,8 @@ namespace gl
         void                    draw_bounding_volume(const gl::volume_renderer_parameters&);
 
     protected:
-        gl::volume_textured_unit_cube   _cube;
-        gl::volume_crossplanes          _planes;
+        scm::gl::volume_textured_unit_cube   _cube;
+        scm::gl::volume_crossplanes          _planes;
 
     private:
         // declared - never defined

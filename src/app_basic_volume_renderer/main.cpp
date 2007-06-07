@@ -7,26 +7,26 @@
 #include <string>
 #include <limits>
 
-#include <scm_core/utilities/boost_warning_disable.h>
+#include <scm/core/utilities/boost_warning_disable.h>
 
 #include <boost/program_options.hpp>
 #include <boost/scoped_ptr.hpp>
 
 // gl
-#include <ogl/gl.h>
+#include <scm/ogl/gl.h>
 #include <GL/glut.h>
-#include <ogl/utilities/error_checker.h>
+#include <scm/ogl/utilities/error_checker.h>
 #include <GL/glu.h>
 
-#include <ogl/manipulators/trackball_manipulator.h>
-#include <ogl/time/time_query.h>
+#include <scm/ogl/manipulators/trackball_manipulator.h>
+#include <scm/ogl/time/time_query.h>
 
-#include <scm_core/time/high_res_timer.h>
+#include <scm/core/time/high_res_timer.h>
 
 #include <volume_renderer/volume_renderer_raycast_glsl.h>
 
-#include <scm_core/core.h>
-#include <scm_core/math/math.h>
+#include <scm/core.h>
+#include <scm/core/math/math.h>
 
 #include <volume.h>
 
@@ -35,7 +35,7 @@ boost::scoped_ptr<gl::volume_renderer_raycast_glsl> _volrend_raycast;
 static const float ui_float_increment = 0.1f;
 static       bool  use_stencil_test   = false;
 
-gl::trackball_manipulator _trackball_manip;
+scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 0;
 int winy = 0;
@@ -96,7 +96,7 @@ void render_volume()
 
 bool init_geometry_textures()
 {
-    gl::error_checker error_check;
+    scm::gl::error_checker error_check;
 
     // color buffer texture
     glGenTextures(1, &fbo_color_id);
@@ -275,7 +275,7 @@ bool init_gl()
 {
     // check for opengl verison 2.0 with
     // opengl shading language support
-    if (!gl::is_supported("GL_VERSION_2_0")) {
+    if (!scm::gl::is_supported("GL_VERSION_2_0")) {
         std::cout << "OpenGL 2.0 not available" << std::endl;
         std::cout << "GL_VERSION_2_0 not supported" << std::endl;
         return (false);
@@ -286,7 +286,7 @@ bool init_gl()
         std::cout << (char*)glGetString(GL_VERSION) << std::endl;
     }
 
-    if (!gl::is_supported("GL_EXT_framebuffer_object")) {
+    if (!scm::gl::is_supported("GL_EXT_framebuffer_object")) {
         std::cout << "GL_EXT_framebuffer_object not supported" << std::endl;
         return (false);
     }
@@ -294,19 +294,19 @@ bool init_gl()
         std::cout << "GL_EXT_framebuffer_object supported" << std::endl;
     }
 
-    if (!gl::is_supported("GL_ARB_texture_rectangle")) {
+    if (!scm::gl::is_supported("GL_ARB_texture_rectangle")) {
         std::cout << "GL_ARB_texture_rectangle not supported" << std::endl;
         return (false);
     }
     else {
         std::cout << "GL_ARB_texture_rectangle supported" << std::endl;
     }
-    if (!gl::time_query::is_supported()) {
-        std::cout << "gl::time_query not supported" << std::endl;
+    if (!scm::gl::time_query::is_supported()) {
+        std::cout << "scm::gl::time_query not supported" << std::endl;
         return (false);
     }
     else {
-        std::cout << "gl::time_query available" << std::endl;
+        std::cout << "scm::gl::time_query available" << std::endl;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -381,7 +381,7 @@ void shutdown_gl()
 void display()
 {
     static scm::time::high_res_timer    _timer;
-    static gl::time_query               _gl_timer;
+    static scm::gl::time_query               _gl_timer;
     static double                       _accum_time     = 0.0;
     static double                       _gl_accum_time  = 0.0;
     static unsigned                     _accum_count    = 0;
@@ -467,7 +467,7 @@ void display()
     _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
-    if (_accum_time > 1000000.0) {
+    if (_accum_time > 1000.0) {
         std::stringstream   output;
 
         output.precision(2);
@@ -643,7 +643,7 @@ int main(int argc, char **argv)
         return (-1);
     }
     // init the GL context
-    if (!gl::initialize()) {
+    if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;
         return (-1);
     }
@@ -666,4 +666,4 @@ int main(int argc, char **argv)
 }
 
 
-#include <scm_core/utilities/boost_warning_enable.h>
+#include <scm/core/utilities/boost_warning_enable.h>

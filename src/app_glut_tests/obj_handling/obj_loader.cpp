@@ -1,7 +1,7 @@
 
 #include "obj_loader.h"
 
-#include <scm_core/platform/platform.h>
+#include <scm/core/platform/platform.h>
 
 #if    SCM_COMPILER     == SCM_COMPILER_MSVC \
     && SCM_COMPILER_VER >= 1400
