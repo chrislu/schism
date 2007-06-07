@@ -1,87 +1,92 @@
-PROJECT(lib_scm_core)
+PROJECT(scm_core)
 
-SET(SRC_DIR "${GLOBAL_SRC_DIR}/lib_scm_core")
+SET(SRC_DIR "${GLOBAL_SRC_DIR}/schism/scm/core")
 
-SET(LIBRARY_OUTPUT_PATH     ${SCHISM_LIBRARY_DIR})
+SET(LIBRARY_OUTPUT_PATH                         ${SCHISM_LIBRARY_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/scm_core/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/scm_core/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/scm_core/*.inl)
+FILE(GLOB SOURCE_FILES_SCM                      ${GLOBAL_SRC_DIR}/schism/scm/*.cpp)
+FILE(GLOB HEADER_FILES_SCM                      ${GLOBAL_SRC_DIR}/schism/scm/*.h)
+FILE(GLOB INLINE_FILES_SCM                      ${GLOBAL_SRC_DIR}/schism/scm/*.inl)
 
-FILE(GLOB SOURCE_FILES_CONSOLE          ${SRC_DIR}/scm_core/console/*.cpp)
-FILE(GLOB HEADER_FILES_CONSOLE          ${SRC_DIR}/scm_core/console/*.h)
-FILE(GLOB INLINE_FILES_CONSOLE          ${SRC_DIR}/scm_core/console/*.inl)
-FILE(GLOB SOURCE_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.cpp)
-FILE(GLOB HEADER_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.h)
-FILE(GLOB INLINE_FILES_CONSOLE_DETAIL   ${SRC_DIR}/scm_core/console/detail/*.inl)
+FILE(GLOB SOURCE_FILES                          ${SRC_DIR}/*.cpp)
+FILE(GLOB HEADER_FILES                          ${SRC_DIR}/*.h)
+FILE(GLOB INLINE_FILES                          ${SRC_DIR}/*.inl)
 
-FILE(GLOB SOURCE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.cpp)
-FILE(GLOB HEADER_FILES_CORE             ${SRC_DIR}/scm_core/core/*.h)
-FILE(GLOB INLINE_FILES_CORE             ${SRC_DIR}/scm_core/core/*.inl)
-FILE(GLOB SOURCE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.cpp)
-FILE(GLOB HEADER_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.h)
-FILE(GLOB INLINE_FILES_CORE_DETAIL      ${SRC_DIR}/scm_core/core/detail/*.inl)
+FILE(GLOB SOURCE_FILES_CONSOLE                  ${SRC_DIR}/console/*.cpp)
+FILE(GLOB HEADER_FILES_CONSOLE                  ${SRC_DIR}/console/*.h)
+FILE(GLOB INLINE_FILES_CONSOLE                  ${SRC_DIR}/console/*.inl)
+FILE(GLOB SOURCE_FILES_CONSOLE_DETAIL           ${SRC_DIR}/console/detail/*.cpp)
+FILE(GLOB HEADER_FILES_CONSOLE_DETAIL           ${SRC_DIR}/console/detail/*.h)
+FILE(GLOB INLINE_FILES_CONSOLE_DETAIL           ${SRC_DIR}/console/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_FONT             ${SRC_DIR}/scm_core/font/*.cpp)
-FILE(GLOB HEADER_FILES_FONT             ${SRC_DIR}/scm_core/font/*.h)
-FILE(GLOB INLINE_FILES_FONT             ${SRC_DIR}/scm_core/font/*.inl)
-FILE(GLOB SOURCE_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.cpp)
-FILE(GLOB HEADER_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.h)
-FILE(GLOB INLINE_FILES_FONT_DETAIL      ${SRC_DIR}/scm_core/font/detail/*.inl)
+FILE(GLOB SOURCE_FILES_ROOT                     ${SRC_DIR}/root/*.cpp)
+FILE(GLOB HEADER_FILES_ROOT                     ${SRC_DIR}/root/*.h)
+FILE(GLOB INLINE_FILES_ROOT                     ${SRC_DIR}/root/*.inl)
+FILE(GLOB SOURCE_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.cpp)
+FILE(GLOB HEADER_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.h)
+FILE(GLOB INLINE_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.cpp)
-FILE(GLOB HEADER_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.h)
-FILE(GLOB INLINE_FILES_EXCEPTION        ${SRC_DIR}/scm_core/exception/*.inl)
+FILE(GLOB SOURCE_FILES_FONT                     ${SRC_DIR}/font/*.cpp)
+FILE(GLOB HEADER_FILES_FONT                     ${SRC_DIR}/font/*.h)
+FILE(GLOB INLINE_FILES_FONT                     ${SRC_DIR}/font/*.inl)
+FILE(GLOB SOURCE_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.cpp)
+FILE(GLOB HEADER_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.h)
+FILE(GLOB INLINE_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_MATH             ${SRC_DIR}/scm_core/math/*.cpp)
-FILE(GLOB HEADER_FILES_MATH             ${SRC_DIR}/scm_core/math/*.h)
-FILE(GLOB INLINE_FILES_MATH             ${SRC_DIR}/scm_core/math/*.inl)
+FILE(GLOB SOURCE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.cpp)
+FILE(GLOB HEADER_FILES_EXCEPTION                ${SRC_DIR}/exception/*.h)
+FILE(GLOB INLINE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.inl)
 
-FILE(GLOB SOURCE_FILES_PLATFORM                 ${SRC_DIR}/scm_core/platform/*.cpp)
-FILE(GLOB HEADER_FILES_PLATFORM                 ${SRC_DIR}/scm_core/platform/*.h)
-FILE(GLOB INLINE_FILES_PLATFORM                 ${SRC_DIR}/scm_core/platform/*.inl)
-FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/scm_core/platform/graphics/*.cpp)
-FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/scm_core/platform/graphics/*.h)
-FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/scm_core/platform/graphics/*.inl)
-FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.cpp)
-FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.h)
-FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/scm_core/platform/graphics/detail/*.inl)
+FILE(GLOB SOURCE_FILES_MATH                     ${SRC_DIR}/math/*.cpp)
+FILE(GLOB HEADER_FILES_MATH                     ${SRC_DIR}/math/*.h)
+FILE(GLOB INLINE_FILES_MATH                     ${SRC_DIR}/math/*.inl)
 
-FILE(GLOB SOURCE_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.cpp)
-FILE(GLOB HEADER_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.h)
-FILE(GLOB INLINE_FILES_RESOURCE                 ${SRC_DIR}/scm_core/resource/*.inl)
-FILE(GLOB SOURCE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.cpp)
-FILE(GLOB HEADER_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.h)
-FILE(GLOB INLINE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/scm_core/resource/detail/*.inl)
+FILE(GLOB SOURCE_FILES_PLATFORM                 ${SRC_DIR}/platform/*.cpp)
+FILE(GLOB HEADER_FILES_PLATFORM                 ${SRC_DIR}/platform/*.h)
+FILE(GLOB INLINE_FILES_PLATFORM                 ${SRC_DIR}/platform/*.inl)
+FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/platform/graphics/*.cpp)
+FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/platform/graphics/*.h)
+FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS        ${SRC_DIR}/platform/graphics/*.inl)
+FILE(GLOB SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/platform/graphics/detail/*.cpp)
+FILE(GLOB HEADER_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/platform/graphics/detail/*.h)
+FILE(GLOB INLINE_FILES_PLATFORM_GRAPHICS_DETAIL ${SRC_DIR}/platform/graphics/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.cpp)
-FILE(GLOB HEADER_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.h)
-FILE(GLOB INLINE_FILES_SCRIPT           ${SRC_DIR}/scm_core/script/*.inl)
-FILE(GLOB SOURCE_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.cpp)
-FILE(GLOB HEADER_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.h)
-FILE(GLOB INLINE_FILES_SCRIPT_DETAIL    ${SRC_DIR}/scm_core/script/detail/*.inl)
+FILE(GLOB SOURCE_FILES_RESOURCE                 ${SRC_DIR}/resource/*.cpp)
+FILE(GLOB HEADER_FILES_RESOURCE                 ${SRC_DIR}/resource/*.h)
+FILE(GLOB INLINE_FILES_RESOURCE                 ${SRC_DIR}/resource/*.inl)
+FILE(GLOB SOURCE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/resource/detail/*.cpp)
+FILE(GLOB HEADER_FILES_RESOURCE_DETAIL          ${SRC_DIR}/resource/detail/*.h)
+FILE(GLOB INLINE_FILES_RESOURCE_DETAIL          ${SRC_DIR}/resource/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_TIME             ${SRC_DIR}/scm_core/time/*.cpp)
-FILE(GLOB HEADER_FILES_TIME             ${SRC_DIR}/scm_core/time/*.h)
-FILE(GLOB INLINE_FILES_TIME             ${SRC_DIR}/scm_core/time/*.inl)
-FILE(GLOB SOURCE_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.cpp)
-FILE(GLOB HEADER_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.h)
-FILE(GLOB INLINE_FILES_TIME_DETAIL      ${SRC_DIR}/scm_core/time/detail/*.inl)
+FILE(GLOB SOURCE_FILES_SCRIPT                   ${SRC_DIR}/script/*.cpp)
+FILE(GLOB HEADER_FILES_SCRIPT                   ${SRC_DIR}/script/*.h)
+FILE(GLOB INLINE_FILES_SCRIPT                   ${SRC_DIR}/script/*.inl)
+FILE(GLOB SOURCE_FILES_SCRIPT_DETAIL            ${SRC_DIR}/script/detail/*.cpp)
+FILE(GLOB HEADER_FILES_SCRIPT_DETAIL            ${SRC_DIR}/script/detail/*.h)
+FILE(GLOB INLINE_FILES_SCRIPT_DETAIL            ${SRC_DIR}/script/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.cpp)
-FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.h)
-FILE(GLOB INLINE_FILES_UTILITIES        ${SRC_DIR}/scm_core/utilities/*.inl)
+FILE(GLOB SOURCE_FILES_TIME                     ${SRC_DIR}/time/*.cpp)
+FILE(GLOB HEADER_FILES_TIME                     ${SRC_DIR}/time/*.h)
+FILE(GLOB INLINE_FILES_TIME                     ${SRC_DIR}/time/*.inl)
+FILE(GLOB SOURCE_FILES_TIME_DETAIL              ${SRC_DIR}/time/detail/*.cpp)
+FILE(GLOB HEADER_FILES_TIME_DETAIL              ${SRC_DIR}/time/detail/*.h)
+FILE(GLOB INLINE_FILES_TIME_DETAIL              ${SRC_DIR}/time/detail/*.inl)
+
+FILE(GLOB SOURCE_FILES_UTILITIES                ${SRC_DIR}/utilities/*.cpp)
+FILE(GLOB HEADER_FILES_UTILITIES                ${SRC_DIR}/utilities/*.h)
+FILE(GLOB INLINE_FILES_UTILITIES                ${SRC_DIR}/utilities/*.inl)
 
 
 # define source groups
 SET(SOURCE_GROUP_DELIMITER "/")
 
+SOURCE_GROUP(scm                                    FILES ${SOURCE_FILES_SCM}                       ${HEADER_FILES_SCM}                         ${INLINE_FILES_SCM})
 SOURCE_GROUP(source_files                           FILES ${SOURCE_FILES}                           ${HEADER_FILES}                             ${INLINE_FILES})
 SOURCE_GROUP(source_files/console                   FILES ${SOURCE_FILES_CONSOLE}                   ${HEADER_FILES_CONSOLE}                     ${INLINE_FILES_CONSOLE})
 SOURCE_GROUP(source_files/console/detail            FILES ${SOURCE_FILES_CONSOLE_DETAIL}            ${HEADER_FILES_CONSOLE_DETAIL}              ${INLINE_FILES_CONSOLE_DETAIL})
-SOURCE_GROUP(source_files/core                      FILES ${SOURCE_FILES_CORE}                      ${HEADER_FILES_CORE}                        ${INLINE_FILES_CORE})
-SOURCE_GROUP(source_files/core/detail               FILES ${SOURCE_FILES_CORE_DETAIL}               ${HEADER_FILES_CORE_DETAIL}                 ${INLINE_FILES_CORE_DETAIL})
+SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
+SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
 SOURCE_GROUP(source_files/font                      FILES ${SOURCE_FILES_FONT}                      ${HEADER_FILES_FONT}                        ${INLINE_FILES_FONT})
 SOURCE_GROUP(source_files/font/detail               FILES ${SOURCE_FILES_FONT_DETAIL}               ${HEADER_FILES_FONT_DETAIL}                 ${INLINE_FILES_FONT_DETAIL})
 SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTION}                 ${HEADER_FILES_EXCEPTION}                   ${INLINE_FILES_EXCEPTION})
@@ -100,10 +105,11 @@ SOURCE_GROUP(source_files/utilities                 FILES ${SOURCE_FILES_UTILITI
 # combine source file lists
 SET(SOURCE_FILES
     ${SOURCE_FILES}
+    ${SOURCE_FILES_SCM}
     ${SOURCE_FILES_CONSOLE}
     ${SOURCE_FILES_CONSOLE_DETAIL}
-    ${SOURCE_FILES_CORE}
-    ${SOURCE_FILES_CORE_DETAIL}
+    ${SOURCE_FILES_ROOT}
+    ${SOURCE_FILES_ROOT_DETAIL}
     ${SOURCE_FILES_EXCEPTION}
     ${SOURCE_FILES_FONT}
     ${SOURCE_FILES_FONT_DETAIL}
@@ -119,11 +125,12 @@ SET(SOURCE_FILES
 )
 
 SET(HEADER_FILES
-    ${HEADER_FILES}                
+    ${HEADER_FILES}
+    ${HEADER_FILES_SCM}
     ${HEADER_FILES_CONSOLE}
     ${HEADER_FILES_CONSOLE_DETAIL}
-    ${HEADER_FILES_CORE}
-    ${HEADER_FILES_CORE_DETAIL}
+    ${HEADER_FILES_ROOT}
+    ${HEADER_FILES_ROOT_DETAIL}
     ${HEADER_FILES_EXCEPTION}
     ${HEADER_FILES_FONT}
     ${HEADER_FILES_FONT_DETAIL}
@@ -140,10 +147,11 @@ SET(HEADER_FILES
 
 SET(INLINE_FILES
     ${INLINE_FILES}
+    ${INLINE_FILES_SCM}
     ${INLINE_FILES_CONSOLE}
     ${INLINE_FILES_CONSOLE_DETAIL}
-    ${INLINE_FILES_CORE}
-    ${INLINE_FILES_CORE_DETAIL}
+    ${INLINE_FILES_ROOT}
+    ${INLINE_FILES_ROOT_DETAIL}
     ${INLINE_FILES_EXCEPTION}
     ${INLINE_FILES_FONT}
     ${INLINE_FILES_FONT_DETAIL}
@@ -187,7 +195,7 @@ ENDIF (WIN32)
 
 # set include directories
 INCLUDE_DIRECTORIES(
-    ${GLOBAL_SRC_DIR}/lib_scm_core
+    ${GLOBAL_SRC_DIR}/schism
 )
 # set include directories for windows external dependencies
 IF (WIN32)
@@ -211,14 +219,14 @@ IF (WIN32)
 ENDIF (WIN32)
 
 # add preprocessor defines
-ADD_DEFINITIONS(-DSCM_CORE_BUILD)
+ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_core=\(\))
 
 # add/create library
-ADD_LIBRARY(lib_scm_core SHARED ${SOURCE_FILES})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
 # link libraries
 IF (WIN32)
-    TARGET_LINK_LIBRARIES(lib_scm_core
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         freetype2
         liblua
         libluabind
@@ -232,7 +240,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF (UNIX)
-    TARGET_LINK_LIBRARIES(lib_scm_core
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         #lua
     )
 ENDIF (UNIX)

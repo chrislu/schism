@@ -105,8 +105,7 @@ ENDIF (WIN32)
 # set include directories
 INCLUDE_DIRECTORIES(
     ${GLOBAL_SRC_DIR}/app_basic_volume_renderer
-    ${GLOBAL_SRC_DIR}/lib_ogl
-    ${GLOBAL_SRC_DIR}/lib_scm_core
+    ${GLOBAL_SRC_DIR}/schism
 )
 # set include directories for windows external dependencies
 IF (WIN32)
@@ -128,15 +127,15 @@ IF (WIN32)
 ENDIF (WIN32)
 
 # add/create library
-ADD_EXECUTABLE(app_basic_volume_renderer ${SOURCE_FILES})
+ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 
 # link libraries
-TARGET_LINK_LIBRARIES(app_basic_volume_renderer
-    lib_ogl
-    lib_scm_core
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+    scm_ogl
+    scm_core
 )
 IF (WIN32)
-    TARGET_LINK_LIBRARIES(app_basic_volume_renderer
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         glew32
         glut32
         optimized boost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
@@ -146,7 +145,7 @@ IF (WIN32)
     )
 ENDIF (WIN32)
 IF (UNIX)
-    TARGET_LINK_LIBRARIES(app_basic_volume_renderer
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         GLEW
         glut
         boost_filesystem
@@ -154,7 +153,7 @@ IF (UNIX)
     )
 ENDIF (UNIX)
 
-ADD_DEPENDENCIES(app_basic_volume_renderer
-    lib_ogl
-    lib_scm_core
+ADD_DEPENDENCIES(${PROJECT_NAME}
+    scm_ogl
+    scm_core
 )

@@ -101,7 +101,6 @@ SUBDIRS(
     app_basic_volume_renderer
     app_geometry_correction
     app_glut_tests
-    lib_ogl
-    lib_scm_core
+    schism
 )
 

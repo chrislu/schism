@@ -1,38 +1,38 @@
 
-PROJECT(lib_ogl)
+PROJECT(scm_ogl)
 
-SET(SRC_DIR "${GLOBAL_SRC_DIR}/lib_ogl")
+SET(SRC_DIR "${GLOBAL_SRC_DIR}/schism/scm/ogl")
 
-SET(LIBRARY_OUTPUT_PATH     ${SCHISM_LIBRARY_DIR})
+SET(LIBRARY_OUTPUT_PATH                 ${SCHISM_LIBRARY_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/ogl/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/ogl/*.inl)
+FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/*.cpp)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
+FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
 
-FILE(GLOB SOURCE_FILES_FONT             ${SRC_DIR}/ogl/font/*.cpp)
-FILE(GLOB HEADER_FILES_FONT             ${SRC_DIR}/ogl/font/*.h)
+FILE(GLOB SOURCE_FILES_FONT             ${SRC_DIR}/font/*.cpp)
+FILE(GLOB HEADER_FILES_FONT             ${SRC_DIR}/font/*.h)
 
-FILE(GLOB SOURCE_FILES_FB_OBJECT        ${SRC_DIR}/ogl/framebuffer_object/*.cpp)
-FILE(GLOB HEADER_FILES_FB_OBJECT        ${SRC_DIR}/ogl/framebuffer_object/*.h)
+FILE(GLOB SOURCE_FILES_FB_OBJECT        ${SRC_DIR}/framebuffer_object/*.cpp)
+FILE(GLOB HEADER_FILES_FB_OBJECT        ${SRC_DIR}/framebuffer_object/*.h)
 
-FILE(GLOB SOURCE_FILES_MANIPULATORS     ${SRC_DIR}/ogl/manipulators/*.cpp)
-FILE(GLOB HEADER_FILES_MANIPULATORS     ${SRC_DIR}/ogl/manipulators/*.h)
+FILE(GLOB SOURCE_FILES_MANIPULATORS     ${SRC_DIR}/manipulators/*.cpp)
+FILE(GLOB HEADER_FILES_MANIPULATORS     ${SRC_DIR}/manipulators/*.h)
 
-FILE(GLOB SOURCE_FILES_SHADER_OBJECTS   ${SRC_DIR}/ogl/shader_objects/*.cpp)
-FILE(GLOB HEADER_FILES_SHADER_OBJECTS   ${SRC_DIR}/ogl/shader_objects/*.h)
+FILE(GLOB SOURCE_FILES_SHADER_OBJECTS   ${SRC_DIR}/shader_objects/*.cpp)
+FILE(GLOB HEADER_FILES_SHADER_OBJECTS   ${SRC_DIR}/shader_objects/*.h)
 
-FILE(GLOB SOURCE_FILES_TEXTURES         ${SRC_DIR}/ogl/textures/*.cpp)
-FILE(GLOB HEADER_FILES_TEXTURES         ${SRC_DIR}/ogl/textures/*.h)
+FILE(GLOB SOURCE_FILES_TEXTURES         ${SRC_DIR}/textures/*.cpp)
+FILE(GLOB HEADER_FILES_TEXTURES         ${SRC_DIR}/textures/*.h)
 
-FILE(GLOB SOURCE_FILES_TIME             ${SRC_DIR}/ogl/time/*.cpp)
-FILE(GLOB HEADER_FILES_TIME             ${SRC_DIR}/ogl/time/*.h)
+FILE(GLOB SOURCE_FILES_TIME             ${SRC_DIR}/time/*.cpp)
+FILE(GLOB HEADER_FILES_TIME             ${SRC_DIR}/time/*.h)
 
-FILE(GLOB SOURCE_FILES_UTILITIES        ${SRC_DIR}/ogl/utilities/*.cpp)
-FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/ogl/utilities/*.h)
+FILE(GLOB SOURCE_FILES_UTILITIES        ${SRC_DIR}/utilities/*.cpp)
+FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/utilities/*.h)
 
-FILE(GLOB HEADER_FILES_MATH             ${SRC_DIR}/ogl/math/*.h)
-FILE(GLOB INLINE_FILES_MATH             ${SRC_DIR}/ogl/math/*.inl)
+FILE(GLOB HEADER_FILES_MATH             ${SRC_DIR}/math/*.h)
+FILE(GLOB INLINE_FILES_MATH             ${SRC_DIR}/math/*.inl)
 
 # define source grous
 SET(SOURCE_GROUP_DELIMITER "/")
@@ -85,8 +85,7 @@ ENDIF (WIN32)
 
 # set include and lib directories
 INCLUDE_DIRECTORIES(
-    ${GLOBAL_SRC_DIR}/lib_ogl
-    ${GLOBAL_SRC_DIR}/lib_scm_core
+    ${GLOBAL_SRC_DIR}/schism
 )
 # set include directories for windows external dependencies
 IF (WIN32)
@@ -96,9 +95,41 @@ IF (WIN32)
     )
 ENDIF (WIN32)
 
-# add/create library
-ADD_LIBRARY(lib_ogl STATIC ${SOURCE_FILES})
+# set library directories
+LINK_DIRECTORIES(
+    ${GLOBAL_LIB_DIR}/${SCHISM_PLATFORM}
+)
+# set library directories for windows external dependencies
+IF (WIN32)
+    LINK_DIRECTORIES(
+        ${GLOBAL_EXT_DIR}/lib
+    )
+ENDIF (WIN32)
 
-ADD_DEPENDENCIES(lib_ogl
-    lib_scm_core
+# add preprocessor defines
+ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_ogl=\(\))
+
+# add/create library
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+
+# link libraries
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+    scm_core
+)
+IF (WIN32)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+        glew32
+        glut32
+        opengl32
+    )
+ENDIF (WIN32)
+IF (UNIX)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+        GLEW
+        glut
+    )
+ENDIF (UNIX)
+
+ADD_DEPENDENCIES(${PROJECT_NAME}
+    scm_core
 )
