@@ -2,23 +2,10 @@
 #ifndef PLATFORM_H_INCLUDED
 #define PLATFORM_H_INCLUDED
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/if.hpp>
-#include <boost/preprocessor/control/iif.hpp>
-#include <boost/preprocessor/comparison/equal.hpp>
-#include <boost/preprocessor/comparison/not_equal.hpp>
-#include <boost/preprocessor/list/adt.hpp>
-#include <boost/preprocessor/facilities/expand.hpp>
-#include <boost/preprocessor/control/expr_iif.hpp>
-#include <boost/preprocessor/control/expr_if.hpp>
-#include <boost/preprocessor/logical/not.hpp>
-#include <boost/preprocessor/detail/is_nullary.hpp>
-#include <boost/preprocessor/detail/is_unary.hpp>
-#include <boost/preprocessor/detail/is_binary.hpp>
-#include <boost/preprocessor/logical/compl.hpp>
-
 #include <scm/core/platform/config.h>
+
+#include <boost/preprocessor.hpp>
+#include <boost/preprocessor/detail/is_nullary.hpp>
 
 #define SCM_PLATFORM_WINDOWS        1
 #define SCM_PLATFORM_LINUX          2
