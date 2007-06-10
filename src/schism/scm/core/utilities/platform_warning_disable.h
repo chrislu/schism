@@ -24,5 +24,3 @@
 
 #endif //    SCM_COMPILER     == SCM_COMPILER_MSVC
        // && SCM_COMPILER_VER >= 1400
-
-

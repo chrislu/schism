@@ -20,6 +20,8 @@ public:
 public:
     virtual ~resource_base();
 
+    bool                    operator==(const resource_base& rhs) const;
+
 protected:
     resource_base();
 
@@ -49,6 +51,8 @@ protected:
 
     res_desc                _descriptor;
 
+    template <class des_t>
+    friend std::size_t hash_value(const resource<des_t>&);
 }; // class resource
 
 

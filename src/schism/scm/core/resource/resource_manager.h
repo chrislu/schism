@@ -21,7 +21,7 @@ namespace res {
 class resource_pointer_base;
 
 class __scm_export(core) resource_manager_base : public core::system,
-                                           public boost::enable_shared_from_this<resource_manager_base>
+                                                 public boost::enable_shared_from_this<resource_manager_base>
 {
 protected:
     typedef boost::shared_ptr<resource_base>    res_ptr_type;
@@ -34,23 +34,21 @@ public:
     virtual ~resource_manager_base();
 
     using core::system::initialize;
-    virtual bool                shutdown();
+    virtual bool                        shutdown();
 
-    bool                        is_loaded(const resource_pointer_base& /*inst*/)   const;
-    bool                        is_loaded(const resource_base::hash_type /*hash*/) const;
+    virtual bool                        is_loaded(const resource_pointer_base& /*inst*/)   const;
+    virtual bool                        is_loaded(const resource_base::hash_type /*hash*/) const;
 
-    resource_pointer_base       retrieve_instance(const resource_base::hash_type /*hash*/);
-
-    void                        register_instance(const resource_pointer_base& /*inst*/);
-    void                        release_instance(const resource_pointer_base&  /*inst*/);
+    void                                register_instance(const resource_pointer_base& /*inst*/);
+    void                                release_instance(const resource_pointer_base&  /*inst*/);
 
 protected:
-    resource_pointer_base       insert_instance(const resource_base::hash_type /*hash*/,
-                                                const res_ptr_type&            /*ptr*/);
+    void                                insert_instance_values(const resource_base::hash_type /*hash*/,
+                                                               const res_ptr_type&            /*ptr*/);
 
-    void                        clear_resources();
+    void                                clear_resources();
 
-    resource_container          _resources;
+    resource_container                  _resources;
 
 private:
 
@@ -68,13 +66,16 @@ public:
     resource_manager();
     virtual ~resource_manager();
 
-    bool                                is_loaded(const resource_descriptor_type& /*desc*/) const;
+    virtual bool                        is_loaded(const resource_descriptor_type& /*desc*/) const;
 
-    resource_pointer<res_type>          retrieve_instance(const resource_descriptor_type& /*desc*/);
-    resource_pointer<res_type>          create_instance(const resource_descriptor_type&   /*desc*/);
+    virtual resource_pointer<res_type>  retrieve_instance(const resource_base::hash_type /*hash*/);
+    virtual resource_pointer<res_type>  retrieve_instance(const resource_descriptor_type& /*desc*/);
+    virtual resource_pointer<res_type>  create_instance(const resource_descriptor_type&   /*desc*/);
 
-    res_type&                           to_resource(resource_pointer_base&        /*ref*/) const;
-    resource_pointer<res_type>&         to_resource_ptr(resource_pointer_base&    /*ref*/) const;
+    res_type&                           to_resource(resource_pointer_base&           /*ref*/) const;
+    const res_type&                     to_resource(const resource_pointer_base&     /*ref*/) const;
+    resource_pointer<res_type>&         to_resource_ptr(resource_pointer_base&       /*ref*/) const;
+    const resource_pointer<res_type>&   to_resource_ptr(const resource_pointer_base& /*ref*/) const;
 
 protected:
 

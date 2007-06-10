@@ -3,20 +3,30 @@
 
 #include <boost/bind.hpp>
 
-#include <scm/core/console/console_system.h>
-
 using namespace scm::con;
 
-console_output_listener::console_output_listener(console_system& con)
-    : _console(con),
-      _log_threshold(con::info)
+console_output_listener::console_output_listener()
+  : _log_threshold(con::info)
 {
-    _connection = _console._out_stream.connect_output_listener(boost::bind(&console_output_listener::update, this, _1, _2));
 }
 
 console_output_listener::~console_output_listener()
 {
-    _console._out_stream.disconnect_output_listener(_connection);
+    disconnect();
+}
+
+bool console_output_listener::connect(console_out_stream& con)
+{
+    _connection = con.connect_output_listener(boost::bind(&console_output_listener::update, this, _1, _2));
+
+    return (_connection.connected());
+}
+
+bool console_output_listener::disconnect()
+{
+    _connection.disconnect();
+
+    return (!_connection.connected());
 }
 
 void console_output_listener::set_log_threshold(int threshold)

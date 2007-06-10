@@ -17,6 +17,38 @@ namespace font {
 
 class face_loader;
 
+class __scm_export(core) face_style
+{
+protected:
+    typedef std::map<unsigned, glyph>               character_glyph_mapping;
+    typedef boost::multi_array<char, 2>             kerning_table;
+
+public:
+    face_style();
+    virtual ~face_style();
+
+    const glyph&                    get_glyph(unsigned char /*ind*/) const;
+    unsigned                        get_line_spacing() const;
+    int                             get_kerning(unsigned char /*left*/,
+                                                unsigned char /*right*/) const;
+
+    int                             get_underline_position() const;
+    int                             get_underline_thickness() const;
+
+    void                            clear();
+
+protected:
+    character_glyph_mapping         _glyph_mapping;
+    kerning_table                   _kerning_table;
+    int                             _underline_position;
+    unsigned                        _underline_thickness;
+    unsigned                        _line_spacing;
+
+private:
+    friend class face_loader;
+
+}; // class face_style
+
 class __scm_export(core) face
 {
 public:
@@ -28,14 +60,6 @@ public:
     } style_type;
 
 protected:
-    typedef std::map<unsigned, glyph>               character_glyph_mapping;
-    typedef boost::multi_array<char, 2>             kerning_table;
-
-    typedef struct {
-        character_glyph_mapping     _glyph_mapping;
-        kerning_table               _kerning_table;
-    } face_style;
-
     typedef std::map<style_type, face_style>        face_style_mapping;
 
 public:
@@ -45,23 +69,25 @@ public:
     const std::string&              get_name() const;
     unsigned                        get_size() const;
 
-    int                             get_line_spacing() const;
-
     bool                            has_style(style_type /*style*/) const;
+
+
+    const face_style&               get_face_style(style_type /*style*/ = regular) const;
 
     const glyph&                    get_glyph(unsigned char /*ind*/,
                                               style_type    /*style*/ = regular) const;
+    unsigned                        get_line_spacing(style_type /*style*/ = regular) const;
     int                             get_kerning(unsigned char /*left*/,
                                                 unsigned char /*right*/,
                                                 style_type    /*style*/ = regular) const;
+    int                             get_underline_position(style_type    /*style*/ = regular) const;
+    int                             get_underline_thickness(style_type    /*style*/ = regular) const;
 
 protected:
-    const face_style&               get_face_style(style_type /*style*/) const;
 
 private:
     std::string                     _name;
     unsigned                        _size_at_72dpi;
-    unsigned                        _line_spacing;
 
     void                            clear();
 

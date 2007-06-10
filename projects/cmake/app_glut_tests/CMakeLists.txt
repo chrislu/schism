@@ -6,7 +6,7 @@ SET(SRC_DIR "${GLOBAL_SRC_DIR}/app_glut_tests")
 SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_10_freetype_font_rendering.cpp)
+FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_11_console_output.cpp)
 FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
 FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
 

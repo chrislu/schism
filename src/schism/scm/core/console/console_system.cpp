@@ -51,6 +51,16 @@ bool console_system::process_input()
     return (true);
 }
 
+console_out_stream& console_system::out_stream()
+{
+    return (_out_stream);
+}
+
+const console_out_stream& console_system::out_stream() const
+{
+    return (_out_stream);
+}
+
 void console_system::add_input_history(const std::string& inp)
 {
     _input_history.push_back(inp);

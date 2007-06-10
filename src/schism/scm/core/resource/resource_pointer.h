@@ -28,7 +28,8 @@ public:
     resource_pointer_base(const resource_pointer_base& /*res*/);
     virtual ~resource_pointer_base();
 
-    const resource_pointer_base&    operator=(const resource_pointer_base& /*rhs*/);
+    const resource_pointer_base&    operator=(const resource_pointer_base&  /*rhs*/);
+    bool                            operator==(const resource_pointer_base& /*rhs*/) const;
 
                                     operator bool() const;
     bool                            operator !() const;
@@ -59,9 +60,13 @@ public:
     resource_pointer(const resource_pointer& /*res*/);
     virtual ~resource_pointer();
 
-    res_type&                 get();
+    res_type&                       get();
+    const res_type&                 get() const;
 
 private:
+    explicit resource_pointer(const resource_ptr&  /*res*/,
+                              const manager_ptr&   /*mgr*/);
+    template<class res_type> friend class resource_manager;
 
 }; // class resource_pointer
 

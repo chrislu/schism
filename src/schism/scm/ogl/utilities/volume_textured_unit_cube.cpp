@@ -1,6 +1,7 @@
 
 
 #include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 #include "volume_textured_unit_cube.h"
 
@@ -25,7 +26,7 @@ bool volume_textured_unit_cube::initialize()
         return (true);
     }
 
-    if (!gl::is_supported("GL_VERSION_1_5")) {
+    if (!scm::ogl.get().is_supported("GL_VERSION_1_5")) {
         return (false);
     }
 

@@ -63,7 +63,7 @@ scm::font::face     _font_face;
 bool init_font_rendering()
 {
     // soon to be parameters
-    std::string     _font_file_name         = std::string("fonts/segoeui.ttf");//consola.ttf");//vgafix.fon");//cour.ttf");//calibri.ttf");//
+    std::string     _font_file_name         = std::string("consola.ttf");//segoeui.ttf");//vgafix.fon");//cour.ttf");//calibri.ttf");//
     unsigned        _font_size              = 12;
     unsigned        _display_dpi_resolution = 96;
 
@@ -75,7 +75,8 @@ bool init_font_rendering()
     glFinish();
     _timer.start();
 
-    scm::font::face_loader    _face_loader("./../../../res/");
+    scm::font::face_loader    _face_loader;
+    _face_loader.set_font_resource_path("./../../../res/fonts/");
 
     if (!_face_loader.load(_font_face, _font_file_name, _font_size, _display_dpi_resolution)) {
         scm::console.get() << scm::con::log_level(scm::con::error)
@@ -252,7 +253,7 @@ bool init_gl()
 {
     // check for opengl verison 2.0 with
     // opengl shading language support
-    if (!scm::gl::is_supported("GL_VERSION_2_0")) {
+    if (!scm::ogl.get().is_supported("GL_VERSION_2_0")) {
         std::cout << "GL_VERSION_2_0 not supported" << std::endl;
         return (false);
     }

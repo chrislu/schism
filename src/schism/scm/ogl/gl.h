@@ -2,12 +2,8 @@
 #ifndef SCM_GL_H_INCLUDED
 #define SCM_GL_H_INCLUDED
 
-//#ifdef _WIN32
-//#include <windows.h>
-//#endif
+#include <scm/core/platform/config.h>
 #include <GL/glew.h>
-
-#include <string>
 
 #include <scm/core/platform/platform.h>
 
@@ -16,8 +12,6 @@ namespace gl {
 
 bool __scm_export(ogl) initialize();
 bool __scm_export(ogl) shutdown();
-
-bool __scm_export(ogl) is_supported(const std::string&);
 
 } // namespace gl
 } // namespace scm

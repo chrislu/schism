@@ -6,8 +6,7 @@
 
 using namespace scm::con;
 
-console_output_listener_stdout::console_output_listener_stdout(console_system& con)
-    : console_output_listener(con)
+console_output_listener_stdout::console_output_listener_stdout()
 {
 }
 

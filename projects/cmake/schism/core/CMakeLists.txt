@@ -27,6 +27,10 @@ FILE(GLOB SOURCE_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.cpp)
 FILE(GLOB HEADER_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.h)
 FILE(GLOB INLINE_FILES_ROOT_DETAIL              ${SRC_DIR}/root/detail/*.inl)
 
+FILE(GLOB SOURCE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.cpp)
+FILE(GLOB HEADER_FILES_EXCEPTION                ${SRC_DIR}/exception/*.h)
+FILE(GLOB INLINE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.inl)
+
 FILE(GLOB SOURCE_FILES_FONT                     ${SRC_DIR}/font/*.cpp)
 FILE(GLOB HEADER_FILES_FONT                     ${SRC_DIR}/font/*.h)
 FILE(GLOB INLINE_FILES_FONT                     ${SRC_DIR}/font/*.inl)
@@ -34,9 +38,12 @@ FILE(GLOB SOURCE_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.cpp)
 FILE(GLOB HEADER_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.h)
 FILE(GLOB INLINE_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.inl)
 
-FILE(GLOB SOURCE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.cpp)
-FILE(GLOB HEADER_FILES_EXCEPTION                ${SRC_DIR}/exception/*.h)
-FILE(GLOB INLINE_FILES_EXCEPTION                ${SRC_DIR}/exception/*.inl)
+FILE(GLOB SOURCE_FILES_GUI						${SRC_DIR}/gui/*.cpp)
+FILE(GLOB HEADER_FILES_GUI						${SRC_DIR}/gui/*.h)
+FILE(GLOB INLINE_FILES_GUI						${SRC_DIR}/gui/*.inl)
+FILE(GLOB SOURCE_FILES_GUI_DETAIL				${SRC_DIR}/gui/detail/*.cpp)
+FILE(GLOB HEADER_FILES_GUI_DETAIL				${SRC_DIR}/gui/detail/*.h)
+FILE(GLOB INLINE_FILES_GUI_DETAIL				${SRC_DIR}/gui/detail/*.inl)
 
 FILE(GLOB SOURCE_FILES_MATH                     ${SRC_DIR}/math/*.cpp)
 FILE(GLOB HEADER_FILES_MATH                     ${SRC_DIR}/math/*.h)
@@ -85,17 +92,19 @@ SOURCE_GROUP(scm                                    FILES ${SOURCE_FILES_SCM}   
 SOURCE_GROUP(source_files                           FILES ${SOURCE_FILES}                           ${HEADER_FILES}                             ${INLINE_FILES})
 SOURCE_GROUP(source_files/console                   FILES ${SOURCE_FILES_CONSOLE}                   ${HEADER_FILES_CONSOLE}                     ${INLINE_FILES_CONSOLE})
 SOURCE_GROUP(source_files/console/detail            FILES ${SOURCE_FILES_CONSOLE_DETAIL}            ${HEADER_FILES_CONSOLE_DETAIL}              ${INLINE_FILES_CONSOLE_DETAIL})
-SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
-SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
+SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTION}                 ${HEADER_FILES_EXCEPTION}                   ${INLINE_FILES_EXCEPTION})
 SOURCE_GROUP(source_files/font                      FILES ${SOURCE_FILES_FONT}                      ${HEADER_FILES_FONT}                        ${INLINE_FILES_FONT})
 SOURCE_GROUP(source_files/font/detail               FILES ${SOURCE_FILES_FONT_DETAIL}               ${HEADER_FILES_FONT_DETAIL}                 ${INLINE_FILES_FONT_DETAIL})
-SOURCE_GROUP(source_files/exception                 FILES ${SOURCE_FILES_EXCEPTION}                 ${HEADER_FILES_EXCEPTION}                   ${INLINE_FILES_EXCEPTION})
+SOURCE_GROUP(source_files/gui						FILES ${SOURCE_FILES_GUI}                       ${HEADER_FILES_GUI}                         ${INLINE_FILES_GUI})
+SOURCE_GROUP(source_files/gui/detail				FILES ${SOURCE_FILES_GUI_DETAIL}                ${HEADER_FILES_GUI_DETAIL}                  ${INLINE_FILES_GUI_DETAIL})
 SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH}                        ${INLINE_FILES_MATH})
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM}                    ${INLINE_FILES_PLATFORM})
 SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS}           ${INLINE_FILES_PLATFORM_GRAPHICS})
 SOURCE_GROUP(source_files/platform/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}    ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL})
 SOURCE_GROUP(source_files/resource                  FILES ${SOURCE_FILES_RESOURCE}                  ${HEADER_FILES_RESOURCE}                    ${INLINE_FILES_RESOURCE})
 SOURCE_GROUP(source_files/resource/detail           FILES ${SOURCE_FILES_RESOURCE_DETAIL}           ${HEADER_FILES_RESOURCE_DETAIL}             ${INLINE_FILES_RESOURCE_DETAIL})
+SOURCE_GROUP(source_files/root                      FILES ${SOURCE_FILES_ROOT}                      ${HEADER_FILES_ROOT}                        ${INLINE_FILES_ROOT})
+SOURCE_GROUP(source_files/root/detail               FILES ${SOURCE_FILES_ROOT_DETAIL}               ${HEADER_FILES_ROOT_DETAIL}                 ${INLINE_FILES_ROOT_DETAIL})
 SOURCE_GROUP(source_files/script                    FILES ${SOURCE_FILES_SCRIPT}                    ${HEADER_FILES_SCRIPT}                      ${INLINE_FILES_SCRIPT})
 SOURCE_GROUP(source_files/script/detail             FILES ${SOURCE_FILES_SCRIPT_DETAIL}             ${HEADER_FILES_SCRIPT_DETAIL}               ${INLINE_FILES_SCRIPT_DETAIL})
 SOURCE_GROUP(source_files/time                      FILES ${SOURCE_FILES_TIME}                      ${HEADER_FILES_TIME}                        ${INLINE_FILES_TIME})
@@ -108,14 +117,16 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_SCM}
     ${SOURCE_FILES_CONSOLE}
     ${SOURCE_FILES_CONSOLE_DETAIL}
-    ${SOURCE_FILES_ROOT}
-    ${SOURCE_FILES_ROOT_DETAIL}
     ${SOURCE_FILES_EXCEPTION}
     ${SOURCE_FILES_FONT}
     ${SOURCE_FILES_FONT_DETAIL}
+    ${SOURCE_FILES_GUI}
+    ${SOURCE_FILES_GUI_DETAIL}
     ${SOURCE_FILES_MATH}
     ${SOURCE_FILES_RESOURCE}
     ${SOURCE_FILES_RESOURCE_DETAIL}
+    ${SOURCE_FILES_ROOT}
+    ${SOURCE_FILES_ROOT_DETAIL}
     ${SOURCE_FILES_PLATFORM}
     ${SOURCE_FILES_PLATFORM_GRAPHICS}
     ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}
@@ -129,14 +140,16 @@ SET(HEADER_FILES
     ${HEADER_FILES_SCM}
     ${HEADER_FILES_CONSOLE}
     ${HEADER_FILES_CONSOLE_DETAIL}
-    ${HEADER_FILES_ROOT}
-    ${HEADER_FILES_ROOT_DETAIL}
     ${HEADER_FILES_EXCEPTION}
     ${HEADER_FILES_FONT}
     ${HEADER_FILES_FONT_DETAIL}
+    ${HEADER_FILES_GUI}
+    ${HEADER_FILES_GUI_DETAIL}
     ${HEADER_FILES_MATH}
     ${HEADER_FILES_RESOURCE}
     ${HEADER_FILES_RESOURCE_DETAIL}
+    ${HEADER_FILES_ROOT}
+    ${HEADER_FILES_ROOT_DETAIL}
     ${HEADER_FILES_PLATFORM}
     ${HEADER_FILES_PLATFORM_GRAPHICS}
     ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL}
@@ -150,14 +163,16 @@ SET(INLINE_FILES
     ${INLINE_FILES_SCM}
     ${INLINE_FILES_CONSOLE}
     ${INLINE_FILES_CONSOLE_DETAIL}
-    ${INLINE_FILES_ROOT}
-    ${INLINE_FILES_ROOT_DETAIL}
     ${INLINE_FILES_EXCEPTION}
     ${INLINE_FILES_FONT}
     ${INLINE_FILES_FONT_DETAIL}
+    ${INLINE_FILES_GUI}
+    ${INLINE_FILES_GUI_DETAIL}
     ${INLINE_FILES_MATH}
     ${INLINE_FILES_RESOURCE}
     ${INLINE_FILES_RESOURCE_DETAIL}
+    ${INLINE_FILES_ROOT}
+    ${INLINE_FILES_ROOT_DETAIL}
     ${INLINE_FILES_PLATFORM}
     ${INLINE_FILES_PLATFORM_GRAPHICS}
     ${INLINE_FILES_PLATFORM_GRAPHICS_DETAIL}

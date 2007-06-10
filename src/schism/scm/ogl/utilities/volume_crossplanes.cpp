@@ -1,7 +1,7 @@
 
 #include "volume_crossplanes.h"
 
-#include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 #include <scm/core/math/math.h>
 

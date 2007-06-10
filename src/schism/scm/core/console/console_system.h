@@ -34,6 +34,10 @@ public:
     void                                add_input(const std::string&);
     bool                                process_input();
 
+    console_out_stream&                 out_stream();
+    const console_out_stream&           out_stream() const;
+
+
 protected:
     console_out_stream                  _out_stream;
     std::stringstream                   _input_buffer;

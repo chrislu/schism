@@ -2,6 +2,7 @@
 #ifndef ROOT_SYSTEM_H_INCLUDED
 #define ROOT_SYSTEM_H_INCLUDED
 
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>
@@ -48,16 +49,21 @@ public:
 
     std::string                     get_version_string() const;
 
-    // subsystems
-    core::system&                   get_subsystem(const std::string& /*sys_name*/);
     con::console_output_listener&   get_std_console_listener();
 
-    // resource managers
-    void                            register_resource_manager(res::resource_manager_base*const /*man*/,
-                                                              std::size_t                      /*id*/);
-    void                            unregister_resource_manager(std::size_t /*id*/);
-    res::resource_manager_base&     get_resource_manager(std::size_t /*id*/);
+    // subsystems
+    void                            register_subsystem(const std::string& /*sys_name*/,
+                                                       scm::core::system* /*sys_ptr*/);
+    void                            unregister_subsystem(const std::string& /*sys_name*/);
+    core::system&                   get_subsystem(const std::string& /*sys_name*/);
 
+    // resource managers
+    void                            register_resource_manager(const std::string&               /*name*/,
+                                                              res::resource_manager_base*const /*man*/);
+    void                            unregister_resource_manager(std::size_t /*hash_val*/);
+    void                            unregister_resource_manager(const std::string& /*name*/);
+    res::resource_manager_base&     get_resource_manager(std::size_t /*hash_val*/);
+    res::resource_manager_base&     get_resource_manager(const std::string& /*name*/);
 
 protected:
     scoped_ptr<con::console_system>                     _console;
@@ -71,12 +77,8 @@ protected:
     system_container                _subsystems;
     system_assoc_container          _subsystems_named;
 
-    void                            register_subsystem(const std::string& /*sys_name*/,
-                                                       scm::core::system* /*sys_ptr*/);
-    void                            unregister_subsystem(const std::string& /*sys_name*/);
-    void                            unregister_subsystems();
-
     bool                            initialize_subsystems();
+    void                            unregister_subsystems();
     void                            shutdown_subsystems();
 
     // resource managers

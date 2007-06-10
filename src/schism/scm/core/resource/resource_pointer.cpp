@@ -3,6 +3,7 @@
 
 #include <cassert>
 
+#include <scm/core/resource/resource.h>
 #include <scm/core/resource/resource_manager.h>
 
 namespace std
@@ -34,6 +35,7 @@ resource_pointer_base::resource_pointer_base(const resource_pointer_base::resour
   : _resource(res),
     _manager(mgr)
 {
+    register_instance();
 }
 
 resource_pointer_base::~resource_pointer_base()
@@ -51,6 +53,18 @@ const resource_pointer_base& resource_pointer_base::operator=(const resource_poi
     register_instance();
 
     return (*this);
+}
+
+bool resource_pointer_base::operator==(const resource_pointer_base& rhs) const
+{
+    boost::shared_ptr<resource_base> l = _resource.lock();
+    boost::shared_ptr<resource_base> r = rhs._resource.lock();
+    
+    if (l && r) {
+        return (*l == *r);
+    }
+
+    return (false);
 }
 
 resource_pointer_base::operator bool() const

@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 #include <scm/ogl/shader_objects/shader_object.h>
 
 using namespace scm::gl;

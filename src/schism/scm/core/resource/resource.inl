@@ -1,8 +1,16 @@
 
+#include <boost/functional/hash.hpp>
+
 namespace scm {
 namespace res {
 
 inline std::size_t hash_value(const resource_base& ref)
+{
+    return (ref.hash_value());
+}
+
+template<class res_desc>
+inline std::size_t hash_value(const resource<res_desc>& ref)
 {
     return (ref.hash_value());
 }

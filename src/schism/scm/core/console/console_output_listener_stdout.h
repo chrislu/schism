@@ -13,7 +13,7 @@ namespace con {
 class __scm_export(core) console_output_listener_stdout : public console_output_listener
 {
 public:
-    console_output_listener_stdout(console_system& con);
+    console_output_listener_stdout();
     virtual ~console_output_listener_stdout();
 
 protected:

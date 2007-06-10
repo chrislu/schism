@@ -5,7 +5,7 @@
 
 #include <IL/il.h>
 
-#include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 bool init_image_loader()
 {

@@ -9,9 +9,55 @@
 
 using namespace scm::font;
 
+// face_style
+face_style::face_style()
+{
+}
+
+face_style::~face_style()
+{
+    clear();
+}
+
+const glyph& face_style::get_glyph(unsigned char ind) const
+{
+    character_glyph_mapping::const_iterator glyph_it = _glyph_mapping.find(ind);
+
+    assert(glyph_it != _glyph_mapping.end());
+
+    return (glyph_it->second);
+}
+
+unsigned face_style::get_line_spacing() const
+{
+    return (_line_spacing);
+}
+
+int face_style::get_kerning(unsigned char left,
+                            unsigned char right) const
+{
+    return (_kerning_table[left][right]);
+}
+
+void face_style::clear()
+{
+    _glyph_mapping.clear();
+    _kerning_table.resize(boost::extents[0][0]);
+}
+
+int face_style::get_underline_position() const
+{
+    return (_underline_position);
+}
+
+int face_style::get_underline_thickness() const
+{
+    return (_underline_thickness);
+}
+
+// face
 face::face()
-  : _size_at_72dpi(0),
-    _line_spacing(0)
+  : _size_at_72dpi(0)
 {
 }
 
@@ -41,9 +87,11 @@ unsigned face::get_size() const
     return (_size_at_72dpi);
 }
 
-int face::get_line_spacing() const
+unsigned face::get_line_spacing(style_type style) const
 {
-    return (_line_spacing);
+    const face_style&   fstyle = get_face_style(style);
+
+    return (fstyle.get_line_spacing());
 }
 
 const glyph& face::get_glyph(unsigned char ind,
@@ -51,11 +99,7 @@ const glyph& face::get_glyph(unsigned char ind,
 {
     const face_style&   fstyle = get_face_style(style);
 
-    character_glyph_mapping::const_iterator glyph_it = fstyle._glyph_mapping.find(ind);
-
-    assert(glyph_it != fstyle._glyph_mapping.end());
-
-    return (glyph_it->second);
+    return (fstyle.get_glyph(ind));
 }
 
 int face::get_kerning(unsigned char    left,
@@ -64,10 +108,24 @@ int face::get_kerning(unsigned char    left,
 {
     const face_style&   fstyle = get_face_style(style);
 
-    return (fstyle._kerning_table[left][right]);
+    return (fstyle.get_kerning(left, right));
 }
 
-const face::face_style& face::get_face_style(style_type style) const
+int face::get_underline_position(style_type style) const
+{
+    const face_style&   fstyle = get_face_style(style);
+
+    return (fstyle.get_underline_position());
+}
+
+int face::get_underline_thickness(style_type style) const
+{
+    const face_style&   fstyle = get_face_style(style);
+
+    return (fstyle.get_underline_thickness());
+}
+
+const face_style& face::get_face_style(style_type style) const
 {
     face_style_mapping::const_iterator style_it = _glyph_mappings.find(style);
 
@@ -96,5 +154,4 @@ void face::clear()
     _glyph_mappings.clear();
     _name.assign("");
     _size_at_72dpi = 0;
-    _line_spacing  = 0;
 }

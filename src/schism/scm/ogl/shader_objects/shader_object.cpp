@@ -6,7 +6,7 @@
 #include <fstream>
 #include <boost/scoped_array.hpp>
 
-#include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 using namespace scm::gl;
 

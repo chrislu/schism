@@ -2,6 +2,8 @@
 #ifndef TIME_TYPES_H_INCLUDED
 #define TIME_TYPES_H_INCLUDED
 
+#include <scm/core/platform/config.h>
+
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 

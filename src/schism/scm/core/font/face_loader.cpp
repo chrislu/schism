@@ -19,14 +19,52 @@
 
 using namespace scm::font;
 
-face_loader::face_loader(const std::string& res_path)
-  : _resources_path(res_path)
+face_loader::face_loader()
 {
 }
 
 face_loader::~face_loader()
 {
     free_texture_resources();
+}
+
+void face_loader::set_font_resource_path(const std::string& res_path)
+{
+    _resources_path = res_path;
+}
+
+bool face_loader::check_font_file(const std::string& in_file_name,
+                                  std::string& out_file_path) const
+{
+    using namespace boost::filesystem;
+
+    path        font_file   = path(in_file_name);
+
+    if (!exists(font_file)) {
+        font_file = path(_resources_path) / font_file;
+
+        if (!exists(font_file)) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "face_loader::check_font_file(): "
+                               << "unable to find specified font file directly ('" << in_file_name << "') "
+                               << "or relative to resource path ('" << font_file.string() << "')"
+                               << std::endl;
+            return (false);
+        }
+    }
+
+    if (is_directory(font_file)) {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "face_loader::check_font_file(): "
+                           << "specified file name ('" << in_file_name << "') "
+                           << "is not a file"
+                           << std::endl;
+        return (false);
+    }
+
+    out_file_path = font_file.file_string();
+
+    return (true);
 }
 
 bool face_loader::load(face&              font_face,
@@ -39,31 +77,16 @@ bool face_loader::load(face&              font_face,
 
     using namespace boost::filesystem;
 
-    path        font_file   = path(file_name);
+    std::string font_file_name;
 
-    if (!exists(font_file)) {
-        font_file = path(_resources_path) / font_file;
-
-        if (!exists(font_file)) {
-            scm::console.get() << scm::con::log_level(scm::con::error)
-                               << "face_loader::load(): "
-                               << "unable to find specified font file directly ('" << file_name << "') "
-                               << "or relative to resource path ('" << font_file.string() << "')"
-                               << std::endl;
-
-            return (false);
-        }
-    }
-
-    if (is_directory(font_file)) {
-        scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load(): "
-                           << "specified file name ('" << file_name << "') "
-                           << "is not a file"
-                           << std::endl;
-
+    if (!check_font_file(file_name, font_file_name)) {
         return (false);
     }
+
+    path        font_file = path(font_file_name);
+
+    unsigned    font_size   = size;
+    unsigned    display_res = disp_res;
 
     // find font styles ({name}i|b|z|bi.{ext})
     typedef std::map<face::style_type, std::string> styles_container;
@@ -74,6 +97,16 @@ bool face_loader::load(face&              font_face,
     // load font styles
     styles_container::const_iterator style_it;
 
+    font_size = available_72dpi_size(font_file.file_string(),
+                                     size,
+                                     disp_res);
+
+    if (font_size == 0) {
+        return (false);
+    }
+
+    unsigned font_size_at_disp_res = font_size = (72 * font_size + disp_res / 2) / disp_res;
+
     for (style_it  = styles.begin();
          style_it != styles.end();
          ++style_it) {
@@ -81,7 +114,7 @@ bool face_loader::load(face&              font_face,
         if (!load_style(style_it->first,
                         style_it->second,
                         font_face,
-                        size,
+                        font_size_at_disp_res,
                         disp_res)) {
 
             scm::console.get() << scm::con::log_level(scm::con::error)
@@ -98,6 +131,7 @@ bool face_loader::load(face&              font_face,
     }
 
     font_face._name             = font_file.file_string();
+    font_face._size_at_72dpi    = font_size;
 
     return (true);
 }
@@ -108,12 +142,13 @@ bool face_loader::load_style(face::style_type   style,
                              unsigned           size,
                              unsigned           disp_res)
 {
-    unsigned    font_size   = size;
-    unsigned    display_res = disp_res;
 
-    face::kerning_table&            cur_kerning_table = font_face._glyph_mappings[style]._kerning_table;
-    face::character_glyph_mapping&  cur_glyph_mapping = font_face._glyph_mappings[style]._glyph_mapping;
-    texture_type&                   cur_texture       = _face_style_textures[style];
+    face_style::kerning_table&              cur_kerning_table = font_face._glyph_mappings[style]._kerning_table;
+    face_style::character_glyph_mapping&    cur_glyph_mapping = font_face._glyph_mappings[style]._glyph_mapping;
+    texture_type&                           cur_texture       = _face_style_textures[style];
+    int&                                    cur_uline_pos     = font_face._glyph_mappings[style]._underline_position;
+    unsigned&                               cur_uline_thick   = font_face._glyph_mappings[style]._underline_thickness;
+    unsigned&                               cur_line_spacing  = font_face._glyph_mappings[style]._line_spacing;
 
     detail::ft_library  ft_lib;
     detail::ft_face     ft_font;
@@ -136,63 +171,10 @@ bool face_loader::load_style(face::style_type   style,
         return (false);
     }
 
-    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
-
-        font_face._size_at_72dpi = (font_size * disp_res + 36) / 72;
-    }
-    else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
-
-        std::set<int> available_sizes;
-
-        for (int i = 0; i < ft_font.get_face()->num_fixed_sizes; ++i) {
-            available_sizes.insert(ft_font.get_face()->available_sizes[i].height);
-        }
-
-        if (available_sizes.empty()) {
-            scm::console.get() << scm::con::log_level(scm::con::error)
-                               << "face_loader::load_style(): "
-                               << "specified font file ('" << file_name << "') "
-                               << "contains fixed size font but fails to report available sizes"
-                               << std::endl;
-
-            return (false);
-        }
-
-        // scale size to our current display resolution
-        font_size = (disp_res * font_size + 36) / 72;
-
-        // now find closest matching size
-        std::set<int>::const_iterator lower_bound = available_sizes.lower_bound(font_size); // first >=
-        std::set<int>::const_iterator upper_bound = available_sizes.upper_bound(font_size); // first >
-
-        if (   upper_bound == available_sizes.end()) {
-            font_size = *available_sizes.rbegin();
-        }
-        else {
-            font_size = *lower_bound;
-        }
-
-        font_face._size_at_72dpi = font_size;
-        // ok bitmap fonts are in pixel sizes (i.e. 72dpi)
-        // so scale the pixel size to our display resolution
-        // for the following functions
-
-        font_size = (72 * font_size + disp_res / 2) / disp_res;
-    }
-    else {
+    if (FT_Set_Char_Size(ft_font.get_face(), 0, size << 6, 0, disp_res) != 0) {
         scm::console.get() << scm::con::log_level(scm::con::error)
                            << "face_loader::load_style(): "
-                           << "specified font file ('" << file_name << "') "
-                           << "contains unsupported face type"
-                           << std::endl;
-
-        return (false);
-    }
-
-    if (FT_Set_Char_Size(ft_font.get_face(), 0, font_size << 6, 0, disp_res) != 0) {
-        scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load_style(): "
-                           << "unable to set character size ('" << font_size << "') "
+                           << "unable to set character size ('" << size << "') "
                            << std::endl;
 
         return (false);
@@ -213,7 +195,10 @@ bool face_loader::load_style(face::style_type   style,
         font_bbox_y = math::vec2f_t(ft_font.get_face()->bbox.yMin * y_scale,
                                     ft_font.get_face()->bbox.yMax * y_scale);
 
-        font_face._line_spacing  = static_cast<int>(math::ceil(ft_font.get_face()->height * y_scale));
+        cur_line_spacing         = static_cast<unsigned>(math::ceil(ft_font.get_face()->height * y_scale));
+
+        cur_uline_pos            = static_cast<int>(math::round(ft_font.get_face()->underline_position * y_scale));
+        cur_uline_thick          = static_cast<unsigned>(math::round(ft_font.get_face()->underline_thickness * y_scale));
 
     }
     else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
@@ -223,7 +208,9 @@ bool face_loader::load_style(face::style_type   style,
         font_bbox_y = math::vec2f_t(0.0f,
                                     static_cast<float>(ft_font.get_face()->size->metrics.height >> 6));
 
-        font_face._line_spacing  = static_cast<int>(font_bbox_y.y);
+        cur_line_spacing         = static_cast<int>(font_bbox_y.y);
+        cur_uline_pos            = -1;
+        cur_uline_thick          = 1;
     }
 
     font_glyph_bbox_size  = math::vec2i_t(static_cast<int>(math::ceil(font_bbox_x.y) - math::floor(font_bbox_x.x)),
@@ -373,15 +360,15 @@ void face_loader::find_font_styles(const std::string& font_file,
     path            font_file_dir  = font_file_path.branch_path();
 
     // search for italic style
-    path            font_file_italic =  font_file_dir
-                                      / (font_file_base + std::string("i") + font_file_ext);
+    path    font_file_italic = font_file_dir
+                             / (font_file_base + std::string("i") + font_file_ext);
     if (exists(font_file_italic) && !is_directory(font_file_italic)) {
         styles.insert(val_type(face::italic, font_file_italic.string()));
     }
 
     // search for bold style
-    path            font_file_bold =    font_file_dir
-                                      / (font_file_base + std::string("b") + font_file_ext);
+    path    font_file_bold = font_file_dir
+                           / (font_file_base + std::string("b") + font_file_ext);
     if (exists(font_file_bold) && !is_directory(font_file_bold)) {
         styles.insert(val_type(face::bold, font_file_bold.string()));
     }
@@ -394,8 +381,8 @@ void face_loader::find_font_styles(const std::string& font_file,
     }
 
     // search for bold italic style (z or bi name addition)
-    path            font_file_bold_italic = font_file_dir
-                                      / (font_file_base + std::string("z") + font_file_ext);
+    path    font_file_bold_italic = font_file_dir
+                                  / (font_file_base + std::string("z") + font_file_ext);
     if (exists(font_file_bold_italic) && !is_directory(font_file_bold_italic)) {
         styles.insert(val_type(face::bold_italic, font_file_bold_italic.string()));
     }
@@ -406,6 +393,89 @@ void face_loader::find_font_styles(const std::string& font_file,
             styles.insert(val_type(face::bold_italic, font_file_bold_italic.string()));
         }
     }
+}
+
+unsigned face_loader::available_72dpi_size(const std::string& file_name,
+                                           unsigned           size,
+                                           unsigned           disp_res) const
+{
+    using namespace boost::filesystem;
+
+    std::string font_file_name;
+
+    if (!check_font_file(file_name, font_file_name)) {
+        return (false);
+    }
+
+    path        font_file = path(font_file_name);
+
+    unsigned    font_size   = size;
+    unsigned    display_res = disp_res;
+
+    detail::ft_library  ft_lib;
+    detail::ft_face     ft_font;
+
+    if (!ft_lib.open()) {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "face_loader::available_72dpi_size(): "
+                           << "unable to initialize freetype library"
+                           << std::endl;
+        return (0);
+    }
+
+    if (!ft_font.open_face(ft_lib, font_file.file_string())) {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "face_loader::available_72dpi_size(): "
+                           << "unable to load font file ('" << font_file.file_string() << "')"
+                           << std::endl;
+        return (0);
+    }
+
+    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
+
+        font_size = (font_size * disp_res + 36) / 72;
+    }
+    else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+
+        std::set<int> available_sizes;
+
+        for (int i = 0; i < ft_font.get_face()->num_fixed_sizes; ++i) {
+            available_sizes.insert(ft_font.get_face()->available_sizes[i].height);
+        }
+
+        if (available_sizes.empty()) {
+            scm::console.get() << scm::con::log_level(scm::con::error)
+                               << "face_loader::available_72dpi_size(): "
+                               << "specified font file ('" << font_file.file_string() << "') "
+                               << "contains fixed size font but fails to report available sizes"
+                               << std::endl;
+            return (0);
+        }
+
+        // scale size to our current display resolution
+        font_size = (disp_res * font_size + 36) / 72;
+
+        // now find closest matching size
+        std::set<int>::const_iterator lower_bound = available_sizes.lower_bound(font_size); // first >=
+        std::set<int>::const_iterator upper_bound = available_sizes.upper_bound(font_size); // first >
+
+        if (   upper_bound == available_sizes.end()) {
+            font_size = *available_sizes.rbegin();
+        }
+        else {
+            font_size = *lower_bound;
+        }
+    }
+    else {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "face_loader::available_72dpi_size(): "
+                           << "specified font file ('" << font_file.file_string() << "') "
+                           << "contains unsupported face type"
+                           << std::endl;
+        return (0);
+    }
+
+    return (font_size);
 }
 
 const face_loader::texture_type& face_loader::get_current_face_texture(face::style_type style) const

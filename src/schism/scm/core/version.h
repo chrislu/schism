@@ -24,6 +24,14 @@ static const std::string    VERSION_BUILD_TAG   = std::string("debug");
 static const std::string    VERSION_BUILD_TAG   = std::string("release");
 #endif
 
+#if SCM_ARCHITECTURE_TYPE == SCM_ARCHITECTURE_32
+static const std::string    VERSION_ARCH_TAG   = std::string("x86");
+#elif   SCM_ARCHITECTURE_TYPE == SCM_ARCHITECTURE_64
+static const std::string    VERSION_ARCH_TAG   = std::string("x64");
+#else
+#error "unable to detect architechture type"
+#endif
+
 // name candidates:
 //   - lux aeterna
 

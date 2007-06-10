@@ -2,7 +2,7 @@
 #ifndef ERROR_CHECKER_H_INCLUDED
 #define ERROR_CHECKER_H_INCLUDED
 
-#include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 #include <string>
 

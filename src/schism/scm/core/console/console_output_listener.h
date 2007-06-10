@@ -10,14 +10,15 @@
 namespace scm {
 namespace con {
 
-class console_system;
-
 class __scm_export(core) console_output_listener
 {
 public:
-    console_output_listener(console_system& con);
+    console_output_listener();
     virtual ~console_output_listener();
 
+
+    bool                                connect(console_out_stream& con);
+    bool                                disconnect();
 
     void                                set_log_threshold(int               /*threshold*/);
 
@@ -28,7 +29,6 @@ protected:
     int                                 _log_threshold;
 
 private:
-    console_system&                     _console;
     console_out_stream::connection_type _connection;
 
 }; // class console_output_listener

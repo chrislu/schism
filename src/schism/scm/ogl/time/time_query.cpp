@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <scm/ogl/gl.h>
+#include <scm/ogl.h>
 
 using namespace scm::gl;
 
@@ -39,5 +40,5 @@ void time_query::collect_result()
 
 bool time_query::is_supported()
 {
-    return (gl::is_supported("GL_EXT_timer_query"));
+    return (scm::ogl.get().is_supported("GL_EXT_timer_query"));
 }

@@ -2,7 +2,6 @@
 #ifndef PLATFORM_H_INCLUDED
 #define PLATFORM_H_INCLUDED
 
-#include <scm/core/platform/config.h>
 
 #include <boost/preprocessor.hpp>
 #include <boost/preprocessor/detail/is_nullary.hpp>
@@ -30,11 +29,11 @@
                                     (__GNUC_MINOR__*10) + \
                                     __GNUC_PATCHLEVEL__)
 #else
-    #pragma error "unknown compiler"
+#error "unknown compiler"
 #endif
 
 // platform
-#if defined(__WIN32__) || defined(_WIN32)
+#if defined(__WIN32__) || defined(_WIN32) || defined(_WIN64)
     #define SCM_PLATFORM            SCM_PLATFORM_WINDOWS
 #elif defined(__APPLE_CC__)
     #define SCM_PLATFORM            SCM_PLATFORM_APPLE
@@ -50,8 +49,7 @@
 #endif
 
 // compiler messages
-#define TO_STR_(x)                  #x
-#define TO_STR(x)                   TO_STR_(x)
+#define TO_STR(x)                   BOOST_PP_STRINGIZE(x)
 #define todo(msg)                   message(__FILE__ "(" TO_STR(__LINE__) "): " "todo: " #msg)
 #define fix_me(msg)                 message(__FILE__ "(" TO_STR(__LINE__) "): " "fix_me: " #msg)
 #define warn(msg)                   message(__FILE__ "(" TO_STR(__LINE__) "): " "warning: " #msg)
@@ -66,7 +64,7 @@
 
         #define __scm_private(lib)
     #else
-        #pragma error "unsupported compiler"
+        #error "unsupported compiler"
     #endif
 
     #ifdef _DEBUG
@@ -94,5 +92,7 @@
         #define SCM_DEBUG   0
     #endif
 #endif
+
+#include <scm/core/platform/config.h>
 
 #endif // namespace PLATFORM_H_INCLUDED

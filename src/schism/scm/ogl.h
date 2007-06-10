@@ -1,14 +1,17 @@
 
-#ifndef OGL_H_INCLUDED
-#define OGL_H_INCLUDED
+#ifndef SCM_OGL_H_INCLUDED
+#define SCM_OGL_H_INCLUDED
 
-#include <ogl/gl.h>
+#include <scm/core/core_system_singleton.h>
+#include <scm/ogl/system/opengl_system.h>
+#include <scm/core/platform/platform.h>
+
+#include <scm/ogl/gl.h>
 
 namespace scm {
-namespace gl
-{
 
-} // namespace gl
+extern __scm_export(ogl) core::core_system_singleton<gl::opengl_system>::type  ogl;
+
 } // namespace scm
 
-#endif // OGL_H_INCLUDED
+#endif // SCM_OGL_H_INCLUDED

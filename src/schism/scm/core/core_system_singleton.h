@@ -26,8 +26,8 @@ private:
         instance_t_*const            get_ptr() const;
         instance_t_*const            operator->() const;
 
-    private:
         void                         set_instance(instance_t_*const) const;
+    private:
         mutable instance_t_*         _instance;
 
         // only system root has access to the write functions

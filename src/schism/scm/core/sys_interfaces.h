@@ -19,6 +19,8 @@ public:
     virtual bool            initialize()    = 0;
     virtual bool            shutdown()      = 0;
 
+    bool                    is_initialized() const { return (_initialized); }
+
 protected:
     bool                    _initialized;
 

@@ -184,6 +184,7 @@ int main(int argc, char **argv)
     glutInitWindowSize(winx, winy);
     glutCreateWindow("OpenGL - red triangle");
 
+
     // init the GL context
     if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;

@@ -36,13 +36,15 @@ protected:
     typedef std::map<face::style_type, texture_type>    face_texture_mapping;
 
 public:
-    face_loader(const std::string& /*res_path*/ = std::string(""));
+    face_loader();
     virtual ~face_loader();
 
-    bool                    load(face&              /*font_face*/,
+    virtual bool            load(face&              /*font_face*/,
                                  const std::string& /*file_name*/,
                                  unsigned           /*size*/     = 12,
                                  unsigned           /*disp_res*/ = 72);
+
+    void                    set_font_resource_path(const std::string& /*res_path*/);
 
     const texture_type&     get_current_face_texture(face::style_type /*style*/) const;
     void                    free_texture_resources();
@@ -53,6 +55,11 @@ protected:
 
     void                    find_font_styles(const std::string&                       /*font_file*/,
                                              std::map<face::style_type, std::string>& /*styles*/) const;
+    bool                    check_font_file(const std::string& /*in_file_name*/,
+                                            std::string&       /*out_file_path*/) const;
+    unsigned                available_72dpi_size(const std::string& /*file_name*/,
+                                                 unsigned           /*size*/,
+                                                 unsigned           /*disp_res*/) const;
     bool                    load_style(face::style_type   /*style*/,
                                        const std::string& /*file_name*/,
                                        face&              /*font_face*/,

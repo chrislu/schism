@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/functional/hash.hpp>
 
 // external singletons
 #include <scm/console.h>
@@ -27,6 +28,10 @@ core::core_system_singleton<con::console_system>::type      console     = core::
 core::core_system_singleton<time::time_system>::type        timing      = core::core_system_singleton<time::time_system>::type();
 
 } // namespace scm
+
+namespace {
+
+} // namespace
 
 using namespace scm::core;
 
@@ -52,11 +57,15 @@ bool root_system::initialize()
     console.set_instance(_console.get());
     register_subsystem("console", _console.get());
 
-    _console_listener.reset(new scm::con::console_output_listener_stdout(*_console.get()));
+    _console_listener.reset(new scm::con::console_output_listener_stdout());
+    _console_listener->connect(console.get().out_stream());
 
     console.get() << con::log_level(con::output)
                   << get_version_string()
                   << std::endl;
+
+    console.get() << con::log_level(con::info)
+                  << "initializing scm::core library:"  << std::endl;
 
     // timing
     _timing.reset(new time::time_system());
@@ -75,17 +84,24 @@ bool root_system::initialize()
     setup_global_system_singletons();
 
     console.get() << con::log_level(con::info)
-                  << "initialization successful"  << std::endl;
+                  << "successfully initialized scm::core library"  << std::endl;
     _initialized = true;
     return (true);
 }
 
 bool root_system::shutdown()
 {
-    // reset global singleton access
-    reset_global_system_singletons();
+    console.get() << con::log_level(con::info)
+                  << "shutting down scm::core library:"  << std::endl;
 
     shutdown_subsystems();
+
+    console.get() << con::log_level(con::info)
+                  << "successfully shut down scm::core library"  << std::endl
+                  << "bye, bye sick, sad world..."  << std::endl;
+
+    // reset global singleton access
+    reset_global_system_singletons();
 
     _initialized = false;
     return (true);
@@ -101,6 +117,7 @@ std::string root_system::get_version_string() const
              lexical_cast<std::string>(VERSION_MAJOR) + std::string(".") +
              lexical_cast<std::string>(VERSION_MINOR) + std::string(".") +
              lexical_cast<std::string>(VERSION_REVISION) + std::string("_") +
+             VERSION_ARCH_TAG + std::string("_") +
              VERSION_TAG + std::string("_") +
              VERSION_BUILD_TAG + std::string(") '") +
              VERSION_NAME  + std::string("'");
@@ -234,15 +251,17 @@ void root_system::shutdown_subsystems()
 }
 
 // resource managers
-void root_system::register_resource_manager(scm::res::resource_manager_base*const man,
-                                            std::size_t                           id)
+void root_system::register_resource_manager(const std::string&                    name,
+                                            scm::res::resource_manager_base*const man)
 {
-    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    std::size_t hash_val = boost::hash_value(name);
+
+    resource_manager_container::iterator man_it = _resource_managers.find(hash_val);
     
     if (man_it != _resource_managers.end()) {
         console.get() << con::log_level(con::warning)
                       << "root_system::register_resource_manager(): "
-                      << "resource manager (id = '" << id << "') allready registered: "
+                      << "resource manager (name = '" << hash_val << "', hash_value = '" << hash_val << "') allready registered: "
                       << "overriding present instance" << std::endl;
         
         man_it->second->shutdown();
@@ -250,12 +269,12 @@ void root_system::register_resource_manager(scm::res::resource_manager_base*cons
         _resource_managers.erase(man_it);
     }
 
-    _resource_managers.insert(resource_manager_container::value_type(id, man));
+    _resource_managers.insert(resource_manager_container::value_type(hash_val, man));
 }
 
-void root_system::unregister_resource_manager(std::size_t id)
+void root_system::unregister_resource_manager(std::size_t hash_val)
 {
-    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    resource_manager_container::iterator man_it = _resource_managers.find(hash_val);
     
     if (man_it != _resource_managers.end()) {
         
@@ -266,9 +285,14 @@ void root_system::unregister_resource_manager(std::size_t id)
     }
 }
 
-scm::res::resource_manager_base& root_system::get_resource_manager(std::size_t id)
+void root_system::unregister_resource_manager(const std::string& name)
 {
-    resource_manager_container::iterator man_it = _resource_managers.find(id);
+    unregister_resource_manager(boost::hash_value(name));
+}
+
+scm::res::resource_manager_base& root_system::get_resource_manager(std::size_t hash_val)
+{
+    resource_manager_container::iterator man_it = _resource_managers.find(hash_val);
     
     if (man_it != _resource_managers.end()) {
         
@@ -280,13 +304,18 @@ scm::res::resource_manager_base& root_system::get_resource_manager(std::size_t i
         std::stringstream output;
 
         output << "root_system::get_resource_manager(): "
-               << "resource manager (id = '" << id << "') not found" << std::endl;
+               << "resource manager (id = '" << hash_val << "') not found" << std::endl;
 
         console.get() << con::log_level(con::error)
                       << output.str();
 
         throw scm::core::system_exception(output.str());
     }
+}
+
+scm::res::resource_manager_base& root_system::get_resource_manager(const std::string& name)
+{
+    return (get_resource_manager(boost::hash_value(name)));
 }
 
 void root_system::unregister_resource_managers()

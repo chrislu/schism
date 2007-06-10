@@ -6,7 +6,7 @@
 #include <scm/core/time/timer_interface.h>
 
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -34,6 +34,6 @@ private:
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // TIME_QUERY_H_INCLUDED
