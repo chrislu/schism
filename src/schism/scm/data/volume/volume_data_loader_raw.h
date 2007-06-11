@@ -18,7 +18,11 @@ public:
     volume_data_loader_raw();
     virtual ~volume_data_loader_raw();
 
-    bool                open_file(const std::string& filename);
+    virtual bool        open_file(const std::string& filename);
+    virtual bool        open_file(const std::string& filename,
+                                  const math::vec3ui_t& dim,
+                                  unsigned num_chan,
+                                  unsigned byte_per_chan);
 
     virtual bool        read_sub_volume(const math::vec<unsigned, 3>& offset,
                                         const math::vec<unsigned, 3>& dimensions,

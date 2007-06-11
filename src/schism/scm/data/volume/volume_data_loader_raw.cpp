@@ -72,22 +72,38 @@ volume_data_loader_raw::~volume_data_loader_raw()
 
 bool volume_data_loader_raw::open_file(const std::string& filename)
 {
+    math::vec3ui_t  dim;
+    unsigned        num_chan;
+    unsigned        bpc;
+
     using namespace boost::filesystem;
     path                file_path(filename, native);
     std::string         file_name       = file_path.leaf();
     std::string         file_extension  = extension(file_path);
 
-        
-    if (!parse_raw_file_name(file_name, _dimensions.x, _dimensions.y, _dimensions.z, _num_channels, _byte_per_channel)) {
+    if (!parse_raw_file_name(file_name,
+                             dim.x,
+                             dim.y,
+                             dim.z,
+                             num_chan,
+                             bpc)) {
         return (false);
     }
 
-    if ((_byte_per_channel % 8) != 0) {
+    if ((bpc % 8) != 0) {
         return (false);
     }
-    _byte_per_channel = _byte_per_channel / 8;
-    _num_channels = 1;
+    bpc = bpc / 8;
+    num_chan = 1;
 
+    return (open_file(filename, dim, num_chan, bpc));
+}
+
+bool volume_data_loader_raw::open_file(const std::string& filename,
+                                       const math::vec3ui_t& dim,
+                                       unsigned num_chan,
+                                       unsigned byte_per_chan)
+{
     if (_file.is_open())
         _file.close();
 
@@ -97,6 +113,10 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
         return (false);
     }
 
+    _vol_desc._data_dimensions       = dim;
+    _vol_desc._data_byte_per_channel = byte_per_chan;
+    _vol_desc._data_num_channels     = num_chan;
+
     // check if filesize checks out with given dimensions
     std::size_t len;
 
@@ -104,11 +124,11 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
     len = _file.tellg();
     _file.seekg (0, std::ios::beg);
 
-    if (len !=   _dimensions.x
-               * _dimensions.y
-               * _dimensions.z
-               * _num_channels
-               * _byte_per_channel) {
+    if (len !=   _vol_desc._data_dimensions.x
+               * _vol_desc._data_dimensions.y
+               * _vol_desc._data_dimensions.z
+               * _vol_desc._data_num_channels
+               * _vol_desc._data_byte_per_channel) {
         return (false);
     }
 
@@ -124,13 +144,13 @@ bool volume_data_loader_raw::read_sub_volume(const math::vec<unsigned, 3>& offse
     }
 
     // for now only ubyte and one channel data!
-    if (_num_channels > 1 || _byte_per_channel > 1) {
+    if (_vol_desc._data_num_channels > 1 || _vol_desc._data_byte_per_channel > 1) {
         return (false);
     }
 
-    if (   (offset.x + dimensions.x > _dimensions.x)
-        || (offset.y + dimensions.y > _dimensions.y)
-        || (offset.z + dimensions.z > _dimensions.z)) {
+    if (   (offset.x + dimensions.x > _vol_desc._data_dimensions.x)
+        || (offset.y + dimensions.y > _vol_desc._data_dimensions.y)
+        || (offset.z + dimensions.z > _vol_desc._data_dimensions.z)) {
         return (false);
     }
 

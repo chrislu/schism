@@ -32,6 +32,9 @@ FILE(GLOB INLINE_FILES_VOLUME                   ${SRC_DIR}/volume/*.inl)
 
 FILE(GLOB HEADER_FILES_VOLUME_VOXGEO            ${SRC_DIR}/volume/voxel_geo_vol/*.h)
 
+FILE(GLOB SOURCE_FILES_VOLUME_SCM_VOL           ${SRC_DIR}/volume/scm_vol/*.cpp)
+FILE(GLOB HEADER_FILES_VOLUME_SCM_VOL           ${SRC_DIR}/volume/scm_vol/*.h)
+
 # define source grous
 SET(SOURCE_GROUP_DELIMITER "/")
 
@@ -42,6 +45,7 @@ SOURCE_GROUP(source_files/analysis/transfer_function    FILES ${SOURCE_FILES_ANA
 SOURCE_GROUP(source_files/analysis/processing           FILES ${SOURCE_FILES_ANALYSIS_PROC}         ${HEADER_FILES_ANALYSIS_PROC}       ${INLINE_FILES_ANALYSIS_PROC})
 SOURCE_GROUP(source_files/volume                        FILES ${SOURCE_FILES_VOLUME}                ${HEADER_FILES_VOLUME}              ${INLINE_FILES_VOLUME})
 SOURCE_GROUP(source_files/volume/voxel_geo              FILES                                       ${HEADER_FILES_VOLUME_VOXGEO})
+SOURCE_GROUP(source_files/volume/scm_vol                FILES ${SOURCE_FILES_VOLUME_SCM_VOL}        ${HEADER_FILES_VOLUME_SCM_VOL})
 
 # combine source file lists
 SET(SOURCE_FILES
@@ -51,6 +55,7 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_ANALYSIS_TRAFU}
     ${SOURCE_FILES_ANALYSIS_PROC}
     ${SOURCE_FILES_VOLUME}
+    ${SOURCE_FILES_VOLUME_SCM_VOL}
 )
 
 SET(HEADER_FILES
@@ -61,6 +66,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_ANALYSIS_PROC}
     ${HEADER_FILES_VOLUME}
     ${HEADER_FILES_VOLUME_VOXGEO}
+    ${HEADER_FILES_VOLUME_SCM_VOL}
 )
 
 SET(INLINE_FILES

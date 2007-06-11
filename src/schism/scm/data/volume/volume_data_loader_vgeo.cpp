@@ -1,10 +1,10 @@
 
 #include "volume_data_loader_vgeo.h"
 
+
 #include <boost/scoped_ptr.hpp>
 
 #include <scm/core/platform/system_info.h>
-
 #include <scm/data/volume/voxel_geo_vol/vv_shm.h>
 
 
@@ -93,12 +93,20 @@ bool volume_data_loader_vgeo::open_file(const std::string& filename)
         return (false);
     }
 
-    _dimensions.x = vgeo_vol_hdr->xsize;
-    _dimensions.y = vgeo_vol_hdr->ysize;
-    _dimensions.z = vgeo_vol_hdr->zsize;
+    _vol_desc._data_dimensions.x = vgeo_vol_hdr->xsize;
+    _vol_desc._data_dimensions.y = vgeo_vol_hdr->ysize;
+    _vol_desc._data_dimensions.z = vgeo_vol_hdr->zsize;
 
-    _num_channels       = 1;
-    _byte_per_channel   = 1;
+    _vol_desc._data_num_channels       = 1;
+    _vol_desc._data_byte_per_channel   = 1;
+
+    _vol_desc._volume_origin.x = vgeo_vol_hdr->xoffset;
+    _vol_desc._volume_origin.y = vgeo_vol_hdr->yoffset;
+    _vol_desc._volume_origin.z = vgeo_vol_hdr->zoffset;
+
+    _vol_desc._volume_aspect.x = vgeo_vol_hdr->xcal;
+    _vol_desc._volume_aspect.y = vgeo_vol_hdr->ycal;
+    _vol_desc._volume_aspect.z = vgeo_vol_hdr->zcal;
 
     _data_start_offset  = sizeof(VV_volume);
 
@@ -114,13 +122,13 @@ bool volume_data_loader_vgeo::read_sub_volume(const math::vec<unsigned, 3>& offs
     }
 
     // for now only ubyte and one channel data!
-    if (_num_channels > 1 || _byte_per_channel > 1) {
+    if (_vol_desc._data_num_channels > 1 || _vol_desc._data_byte_per_channel > 1) {
         return (false);
     }
 
-    if (   (offset.x + dimensions.x > _dimensions.x)
-        || (offset.y + dimensions.y > _dimensions.y)
-        || (offset.z + dimensions.z > _dimensions.z)) {
+    if (   (offset.x + dimensions.x > _vol_desc._data_dimensions.x)
+        || (offset.y + dimensions.y > _vol_desc._data_dimensions.y)
+        || (offset.z + dimensions.z > _vol_desc._data_dimensions.z)) {
         return (false);
     }
 

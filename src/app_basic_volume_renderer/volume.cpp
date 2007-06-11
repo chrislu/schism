@@ -10,11 +10,14 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 #include <scm/core/utilities/boost_warning_enable.h>
 
+#include <scm/data/volume/scm_vol/scm_vol.h>
 #include <scm/data/volume/volume_data_loader.h>
 #include <scm/data/volume/volume_data_loader_raw.h>
 #include <scm/data/volume/volume_data_loader_vgeo.h>
+#include <scm/data/volume/volume_data_loader_svol.h>
 
 #include <scm/data/analysis/transfer_function/build_lookup_table.h>
 
@@ -40,6 +43,8 @@ bool open_volume_file(const std::string& filename)
     path                    file_path(filename, native);
     std::string             file_name       = file_path.leaf();
     std::string             file_extension  = extension(file_path);
+    
+    boost::algorithm::to_lower(file_extension);
 
     unsigned                voxel_components;
 
@@ -48,6 +53,9 @@ bool open_volume_file(const std::string& filename)
     }
     else if (file_extension == ".vol") {
         vol_loader.reset(new scm::data::volume_data_loader_vgeo());
+    }
+    else if (file_extension == ".svol") {
+        vol_loader.reset(new scm::data::volume_data_loader_svol());
     }
     else {
         return (false);
@@ -59,7 +67,7 @@ bool open_volume_file(const std::string& filename)
 
     math::vec<unsigned, 3> data_dimensions;
 
-    data_dimensions = vol_loader->get_dataset_dimensions();
+    data_dimensions = vol_loader->get_volume_descriptor()._data_dimensions;
 
     // get max gl 3d tex dim
     int gl_max_3dtex_dim;

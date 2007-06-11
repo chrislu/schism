@@ -51,7 +51,7 @@ vec4 do_shading(in vec3 sample_pos, in vec4 inp)
     vec4 ret;
 
     ret = color_lookup(inp);
-#if 1
+#if 0
     // calculate gradient dependent on current transfer function
     // using central differences
     vec3 grad;

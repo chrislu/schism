@@ -6,6 +6,8 @@
 
 #include <scm/core/math/math.h>
 
+#include <scm/data/volume/scm_vol/scm_vol.h>
+
 #include <scm/data/analysis/regular_grid_data_3d.h>
 #include <scm/data/analysis/regular_grid_data_3d_write_accessor.h>
 
@@ -25,7 +27,8 @@ public:
     virtual void        close_file();
     virtual bool        is_file_open() const;
     
-    virtual const math::vec<unsigned, 3>& get_dataset_dimensions() const;
+    virtual const volume_descriptor&    get_volume_descriptor() const;
+    //virtual const math::vec3ui_t& get_dataset_dimensions() const;
 
     virtual bool        read_sub_volume(const math::vec<unsigned, 3>& offset,
                                         const math::vec<unsigned, 3>& dimensions,
@@ -39,10 +42,11 @@ protected:
 
     std::ifstream           _file;
 
-    math::vec<unsigned, 3>  _dimensions;
+    volume_descriptor       _vol_desc;
+    //math::vec3ui_t          _dimensions;
 
-    unsigned                _num_channels;
-    unsigned                _byte_per_channel;
+    //unsigned                _num_channels;
+    //unsigned                _byte_per_channel;
 
     unsigned                _data_start_offset;
 
