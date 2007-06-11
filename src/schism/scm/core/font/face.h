@@ -6,6 +6,8 @@
 #include <string>
 
 #include <boost/multi_array.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <scm/core/font/glyph.h>
 
@@ -49,7 +51,7 @@ private:
 
 }; // class face_style
 
-class __scm_export(core) face
+class __scm_export(core) face : public boost::noncopyable
 {
 public:
     typedef enum {
@@ -95,6 +97,8 @@ private:
 
     friend class face_loader;
 }; // class face
+
+typedef boost::shared_ptr<scm::font::face>     face_ptr;
 
 } // namespace font
 } // namespace scm

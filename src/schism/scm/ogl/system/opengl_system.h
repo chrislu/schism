@@ -6,11 +6,9 @@
 #include <string>
 
 #include <scm/core/utilities/boost_warning_disable.h>
-#include <boost/shared_ptr.hpp>
 #include <scm/core/utilities/boost_warning_enable.h>
 
 #include <scm/core/sys_interfaces.h>
-#include <scm/ogl/font/font_resource_manager.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -32,10 +30,7 @@ public:
 
     bool                    is_supported(const std::string& /*ext*/) const;
 
-    font_resource_manager&  get_font_manager();
-    
 protected:
-    boost::shared_ptr<font_resource_manager>    _font_manager;
 
 private:
 

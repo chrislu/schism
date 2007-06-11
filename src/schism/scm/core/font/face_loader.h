@@ -39,7 +39,7 @@ public:
     face_loader();
     virtual ~face_loader();
 
-    virtual bool            load(face&              /*font_face*/,
+    bool                    load(face&              /*font_face*/,
                                  const std::string& /*file_name*/,
                                  unsigned           /*size*/     = 12,
                                  unsigned           /*disp_res*/ = 72);

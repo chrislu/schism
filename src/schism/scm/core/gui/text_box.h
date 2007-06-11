@@ -2,8 +2,12 @@
 #ifndef SCM_GUI_TEXT_BOX_H_INCLUDED
 #define SCM_GUI_TEXT_BOX_H_INCLUDED
 
+#include <list>
 #include <string>
 
+#include <boost/scoped_ptr.hpp>
+
+#include <scm/core/font/face.h>
 #include <scm/core/gui/gui.h>
 #include <scm/core/gui/frame.h>
 
@@ -13,26 +17,66 @@
 namespace scm {
 namespace gui {
 
+class font_renderer;
+
 class __scm_export(core) text_box : public frame
 {
+protected:
+    typedef struct {
+        std::string                 _text;
+        math::vec4f_t               _color;
+        font::face::style_type      _style;
+        bool                        _underline;
+    } line_fragment;
+    typedef struct {
+        std::list<line_fragment>    _fragments;
+        text_hor_alignment          _alignment;
+    } line;
+
 public:
     text_box();
     virtual ~text_box();
 
-    using frame::draw;
+    void                        orientation(text_orientation        /*ori*/);
+    text_orientation            orientation() const;
 
-    void                        text_orientation(gui::text_orientation   /*ori*/);
-    void                        text_flow(gui::text_flow                 /*flow*/);
-    void                        text_alignment(gui::text_alignment       /*align*/);
+    void                        flow(text_flow                      /*flow*/);
+    text_flow                   flow() const;
 
-    gui::text_orientation       text_orientation() const;
-    gui::text_flow              text_flow() const;
-    gui::text_alignment         text_alignment() const;
+    void                        hor_alignment(text_hor_alignment    /*align*/);
+    text_hor_alignment          hor_alignment() const;
+
+    void                        vert_alignment(text_vert_alignment  /*align*/);
+    text_vert_alignment         vert_alignment() const;
+
+    void                        font(const font::face_ptr& /*ptr*/);
+    const font::face_ptr&       font() const;
+
+
+    void                        append_string(const std::string&      /*txt*/,
+                                              bool                    /*unl*/ = false,
+                                              font::face::style_type  /*stl*/ = font::face::regular);
+    void                        append_string(const std::string&      /*txt*/,
+                                              const math::vec3f_t     /*col*/,
+                                              bool                    /*unl*/ = false,
+                                              font::face::style_type  /*stl*/ = font::face::regular);
+    void                        append_string(const std::string&      /*txt*/,
+                                              const math::vec4f_t     /*col*/,
+                                              bool                    /*unl*/ = false,
+                                              font::face::style_type  /*stl*/ = font::face::regular);
 
 protected:
-    gui::text_orientation       _text_orientation;
-    gui::text_flow              _text_flow;
-    gui::text_alignment         _text_alignment;
+    text_orientation            _orientation;
+    text_flow                   _flow;
+    text_hor_alignment          _hor_alignment;
+    text_vert_alignment         _vert_alignment;
+
+    boost::scoped_ptr<font_renderer> _font_renderer;
+
+    std::list<line>             _lines;
+
+
+    void                        draw_text() const;
 
 private:
 

@@ -4,7 +4,7 @@
 
 #include <volume_renderer/volume_renderer_parameters.h>
 
-#include <data_analysis/transfer_function/piecewise_function_1d.h>
+#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
 
 struct data_properties
 {
@@ -13,8 +13,8 @@ struct data_properties
 
     math::vec<unsigned, 3>                                          _dimensions;
 
-    scm::piecewise_function_1d<unsigned char, float>                _alpha_transfer;
-    scm::piecewise_function_1d<unsigned char, math::vec3f_t>        _color_transfer;
+    scm::data::piecewise_function_1d<unsigned char, float>          _alpha_transfer;
+    scm::data::piecewise_function_1d<unsigned char, math::vec3f_t>  _color_transfer;
 
 };
 

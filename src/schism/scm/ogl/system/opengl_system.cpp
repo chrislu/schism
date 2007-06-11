@@ -4,9 +4,9 @@
 #include <cassert>
 
 #include <scm/core.h>
+#include <scm/ogl/gl.h>
 
 namespace {
-static std::string      font_manager_name = std::string("gl_font_manager");
 } // namespace
 
 using namespace scm::gl;
@@ -36,9 +36,6 @@ bool opengl_system::initialize()
         return (false);
     }
 
-    _font_manager.reset(new font_resource_manager());
-
-    root.get().register_resource_manager(font_manager_name, _font_manager.get());
 
     _initialized = true;
     return (true);
@@ -46,7 +43,6 @@ bool opengl_system::initialize()
 
 bool opengl_system::shutdown()
 {
-    root.get().unregister_resource_manager(font_manager_name);
 
     _initialized = false;
     return (true);
@@ -55,11 +51,4 @@ bool opengl_system::shutdown()
 bool opengl_system::is_supported(const std::string& ext) const
 {
     return (glewIsSupported(ext.c_str()) == GL_TRUE ? true : false);
-}
-
-font_resource_manager& opengl_system::get_font_manager()
-{
-    assert(_font_manager.get() != 0);
-
-    return (*_font_manager.get());
 }

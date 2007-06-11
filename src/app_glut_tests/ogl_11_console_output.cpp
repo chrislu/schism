@@ -22,19 +22,23 @@
 #include <scm/ogl/time/time_query.h>
 #include <scm/ogl/utilities/error_checker.h>
 
-#include <scm/ogl/font/font_resource_manager.h>
-
 #include <scm/core/time/high_res_timer.h>
 
 #include <scm/core.h>
 #include <scm/core/core.h>
 #include <scm/core/utilities/foreach.h>
 
-#include <scm/ogl/font/font.h>
-#include <scm/ogl/font/font_renderer_2d.h>
-#include <scm/ogl/font/font_resource_loader.h>
+#include <scm/ogl/font/face.h>
+#include <scm/ogl/gui/font_renderer.h>
+#include <scm/ogl/font/face_loader.h>
 
 #include <image_handling/image_loader.h>
+
+// ogl gui
+//#include <scm/ogl/gui/text_box.h>
+#include <scm/ogl/gui/console_renderer.h>
+
+boost::scoped_ptr<scm::gl::gui::console_renderer>   _console_rend;
 
 boost::scoped_ptr<scm::gl::program_object>   _shader_program;
 boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
@@ -58,16 +62,38 @@ float dolly_sens = 10.0f;
 unsigned tex0_id = 0;
 unsigned tex1_id = 0;
 
-scm::gl::font_face          _font_face;
-scm::gl::font_renderer_2d   _font_renderer;
+typedef enum
+{
+    console_full    = 1,
+    console_brief   = 2,
+    console_hide    = 3
+} con_mode;
+
+con_mode _con_mode = console_brief;
+
+void con_mode_changed()
+{
+    if (_con_mode == console_full) {
+        _console_rend->position(math::vec2i_t(0, 0));
+        _console_rend->size(math::vec2i_t(winx, winy));
+    }
+    else if (_con_mode == console_brief) {
+        _console_rend->position(math::vec2i_t(0, winy - 100));
+        _console_rend->size(math::vec2i_t(winx, 100));
+    }
+    else if (_con_mode == console_hide) {
+    }
+
+}
 
 bool init_font_rendering()
 {
     //std::cout << "fmid " << scm::gl::gl_font_manager_id << std::endl;
     // soon to be parameters
     std::string     _font_file_name         = std::string("consola.ttf");//segoeui.ttf");//calibri.ttf");//vgafix.fon");//cour.ttf");//
-    unsigned        _font_size              = 11;
+    unsigned        _font_size              = 12;
     unsigned        _display_dpi_resolution = 96;
+    scm::gl::face_ptr          _font_face;
 
     scm::gl::error_checker _error_check;
 
@@ -76,7 +102,7 @@ bool init_font_rendering()
     glFinish();
     _timer.start();
 
-    scm::gl::font_resource_loader _face_loader;
+    scm::gl::face_loader _face_loader;
     _face_loader.set_font_resource_path("./../../../res/fonts/");
 
     _font_face = _face_loader.load(_font_file_name, _font_size, _display_dpi_resolution);
@@ -89,24 +115,17 @@ bool init_font_rendering()
 
         return (false);
     }
-    boost::hash<scm::gl::font_face_resource> has;
-    std::size_t h = has(_font_face.get());
-
-    scm::gl::font_face _font_face1 = _face_loader.load(_font_file_name, _font_size, _display_dpi_resolution);
-
-    if (_font_face == _font_face1) {
-        std::cout << "haha" << std::endl;
-    }
 
     glFinish();
 
     _timer.stop();
 
+    _console_rend.reset(new scm::gl::gui::console_renderer());
+    _console_rend->position(math::vec2i_t(0, 0));
+    _console_rend->size(math::vec2i_t(winx, winy));
+    _console_rend->font(_font_face);
 
-    std::cout << "reg " << _font_face.get().get_line_spacing(scm::font::face::regular) << std::endl;
-    std::cout << "itl " << _font_face.get().get_line_spacing(scm::font::face::italic) << std::endl;
-    std::cout << "bld " << _font_face.get().get_line_spacing(scm::font::face::bold) << std::endl;
-    std::cout << "bit " << _font_face.get().get_line_spacing(scm::font::face::bold_italic) << std::endl;
+    _console_rend->connect(scm::console.get().out_stream());
 
     std::stringstream output;
 
@@ -115,10 +134,6 @@ bool init_font_rendering()
            << "font setup time: " << scm::time::to_milliseconds(_timer.get_time()) << "msec" << std::endl;
 
     scm::console.get() << output.str();
-
-    _font_renderer.draw_shadow(true);
-    _font_renderer.active_font(_font_face);
-
 
     return (true);
 }
@@ -269,75 +284,12 @@ bool init_gl()
     glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, dif);
 
+    con_mode_changed();
+
     return (true);
 }
 
-void draw_font_image(scm::font::face::style_type style)
-{
-    const scm::gl::texture_2d_rect& cur_style_tex = _font_face.get().get_glyph_texture(style);
-
-    // retrieve current matrix mode
-    GLint  current_matrix_mode;
-    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
-
-    // setup orthogonal projection
-    // setup as 1:1 pixel mapping
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0, winx, 0, winy, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glColor3f(1, 1, 1);
-
-    // save states which we change in here
-    glPushAttrib(GL_LIGHTING_BIT);
-    glDisable(GL_LIGHTING);
-    glPushAttrib(GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_DEPTH_TEST);
-
-    // setup blending
-    glPushAttrib(GL_COLOR_BUFFER_BIT);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    cur_style_tex.bind();
-
-    // draw a quad in the size of the font texture
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(  0.0f, 0.0f);
-        glTexCoord2f(cur_style_tex.get_width(), 0.0f);
-        glVertex2f(  cur_style_tex.get_width(), 0.0f);
-        glTexCoord2f(cur_style_tex.get_width(), cur_style_tex.get_height());
-        glVertex2f(  cur_style_tex.get_width(), cur_style_tex.get_height());
-        glTexCoord2f(0.0f, cur_style_tex.get_height());
-        glVertex2f(  0.0f, cur_style_tex.get_height());
-    glEnd();
-
-    cur_style_tex.unbind();
-
-    // restore saved states
-    glPopAttrib();
-    glPopAttrib();
-    glPopAttrib();
-
-    // restore previous projection
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    
-    // restore saved matrix mode
-    glMatrixMode(current_matrix_mode);
-}
-
-void draw_string(scm::font::face::style_type style,
-                 bool underline,
-                 const math::vec2i_t& position,
-                 const std::string& stuff_that_matters)
+void draw_console()
 {
     // retrieve current matrix mode
     GLint  current_matrix_mode;
@@ -353,11 +305,10 @@ void draw_string(scm::font::face::style_type style,
     glPushMatrix();
     glLoadIdentity();
 
-    _font_renderer.draw_string(position,
-                               stuff_that_matters,
-                               math::vec3f_t(1.f),
-                               underline,
-                               style);
+    if (_con_mode != console_hide) {
+        _console_rend->draw();
+    }
+
 
     // restore previous projection
     glPopMatrix();
@@ -452,56 +403,8 @@ void display()
     // restore previously saved modelview matrix
     glPopMatrix();
 
-    //draw_font_image();
 
-    // mjM hallo Welt! To ro  :\  .\ []{}|||~!@#$%^&*()_+;:<>/|'"~` 0123456789
-    _font_renderer.use_kerning(true);
-    draw_string(scm::font::face::regular,
-                false,
-                math::vec2i_t(20, winy - 40),
-                "sick, sad world!");
-    draw_string(scm::font::face::italic,
-                false,
-                math::vec2i_t(20, winy - 40 - _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    draw_string(scm::font::face::bold,
-                false,
-                math::vec2i_t(20, winy - 40 - 2 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    draw_string(scm::font::face::bold_italic,
-                false,
-                math::vec2i_t(20, winy - 40 - 3 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    draw_string(scm::font::face::regular,
-                true,
-                math::vec2i_t(20, winy - 40 - 4 * _font_face.get().get_line_spacing()),
-                "sick, sad world!");
-
-
-    draw_string(scm::font::face::italic,
-                true,
-                math::vec2i_t(20, winy - 40 - 5 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    draw_string(scm::font::face::bold,
-                true,
-                math::vec2i_t(20, winy - 40 - 6 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    draw_string(scm::font::face::bold_italic,
-                true,
-                math::vec2i_t(20, winy - 40 - 7 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-
-
-    _font_renderer.use_kerning(true);
-    draw_string(scm::font::face::bold_italic,
-                false,
-                math::vec2i_t(20, winy - 40 - 8 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
-    _font_renderer.use_kerning(false);
-    draw_string(scm::font::face::bold_italic,
-                false,
-                math::vec2i_t(20, winy - 40 - 9 * _font_face.get().get_line_spacing()),
-                "mjM hallo Welt! To ro  :\\  .\\ []{}|||~!@#$%^&*()_+;:<>/|'\"~` 0123456789");
+    draw_console();
 
     _gl_timer.stop();
 
@@ -518,12 +421,12 @@ void display()
     _gl_accum_time += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
-    if (_accum_time > 1000.0) {
+    if (_accum_time > 100.0) {
         std::stringstream   output;
 
         output.precision(2);
-        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \t"
-                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec \t"
+        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec "
+                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec "
                              << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0)
                              << std::endl;
 
@@ -568,6 +471,8 @@ void resize(int w, int h)
 
     // restore saved matrix mode
     glMatrixMode(current_matrix_mode);
+
+    con_mode_changed();
 }
 
 void mousefunc(int button, int state, int x, int y)
@@ -623,6 +528,16 @@ void keyboard(unsigned char key, int x, int y)
     switch (key) {
         // ESC key
         case 27: shutdown_gl();exit(0); break;
+        case 'c':
+        case 'C':
+            if (_con_mode == console_full)
+                _con_mode = console_brief;
+            else if (_con_mode == console_brief)
+                _con_mode = console_hide;
+            else if (_con_mode == console_hide)
+                _con_mode = console_full;
+            con_mode_changed();
+            break;
         default:;
     }
 }

@@ -5,23 +5,30 @@
 namespace scm {
 namespace gui {
 
-typedef enum text_orientation_
+typedef enum
 {
-    horizontal,
-    vertival
+    orient_horizontal,
+    orient_vertival
 } text_orientation;
 
-typedef enum text_alignment_
+typedef enum
 {
-    left,
-    right,
-    center
-} text_alignment;
+    hor_align_left,
+    hor_align_right,
+    hor_align_center
+} text_hor_alignment;
 
-typedef enum text_flow_
+typedef enum
 {
-    top_to_bottom,
-    bottom_top_top
+    vert_align_bottom,
+    vert_align_top,
+    vert_align_center
+} text_vert_alignment;
+
+typedef enum
+{
+    flow_top_to_bottom,
+    flow_bottom_to_top
 } text_flow;
 
 } // namespace gui

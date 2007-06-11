@@ -5,16 +5,18 @@
 
 #include <iostream>
 
+#include <scm/core/utilities/boost_warning_disable.h>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <scm/core/utilities/boost_warning_enable.h>
 
-#include <volume_loader/volume_data_loader.h>
-#include <volume_loader/volume_data_loader_raw.h>
-#include <volume_loader/volume_data_loader_vgeo.h>
+#include <scm/data/volume/volume_data_loader.h>
+#include <scm/data/volume/volume_data_loader_raw.h>
+#include <scm/data/volume/volume_data_loader_vgeo.h>
 
-#include <data_analysis/transfer_function/build_lookup_table.h>
+#include <scm/data/analysis/transfer_function/build_lookup_table.h>
 
 #if _WIN32
 #include <windows.h>
@@ -34,7 +36,7 @@ bool open_volume_file(const std::string& filename)
   
     using namespace boost::filesystem;
    
-    boost::scoped_ptr<gl::volume_data_loader> vol_loader;    
+    boost::scoped_ptr<scm::data::volume_data_loader> vol_loader;    
     path                    file_path(filename, native);
     std::string             file_name       = file_path.leaf();
     std::string             file_extension  = extension(file_path);
@@ -42,10 +44,10 @@ bool open_volume_file(const std::string& filename)
     unsigned                voxel_components;
 
     if (file_extension == ".raw") {
-        vol_loader.reset(new gl::volume_data_loader_raw());
+        vol_loader.reset(new scm::data::volume_data_loader_raw());
     }
     else if (file_extension == ".vol") {
-        vol_loader.reset(new gl::volume_data_loader_vgeo());
+        vol_loader.reset(new scm::data::volume_data_loader_vgeo());
     }
     else {
         return (false);
@@ -73,7 +75,7 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim;
     _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim;
 
-    scm::regular_grid_data_3d<unsigned char> data;
+    scm::data::regular_grid_data_3d<unsigned char> data;
 
     if (!vol_loader->read_sub_volume(math::vec<unsigned, 3>(0, 0, 0), data_dimensions, data)) {
         return (false);
@@ -178,13 +180,34 @@ bool update_color_alpha_table()
 
     unsigned                            lut_texture_size = 512;
 
-    if (!scm::build_lookup_table(color_lut, _data_properties._color_transfer, lut_texture_size)) {
+    if (color_lut.get() == 0) {
+        try {
+            color_lut.reset(new math::vec3f_t[lut_texture_size]);
+        }
+        catch (std::bad_alloc&) {
+            std::cout << "error allocationg color lookuptable" << std::endl;
+            color_lut.reset();
+            return (false);
+        }
+    }
+    if (alpha_lut.get() == 0) {
+        try {
+            alpha_lut.reset(new float[lut_texture_size]);
+        }
+        catch (std::bad_alloc&) {
+            std::cout << "error allocationg alpha lookuptable" << std::endl;
+            alpha_lut.reset();
+            return (false);
+        }
+    }
+
+    if (!scm::data::build_lookup_table(color_lut, _data_properties._color_transfer, lut_texture_size)) {
         std::cout << "error during lookuptable generation" << std::endl;
         return (false);
     }
 
 
-    if (!scm::build_lookup_table(alpha_lut, _data_properties._alpha_transfer, lut_texture_size)) {
+    if (!scm::data::build_lookup_table(alpha_lut, _data_properties._alpha_transfer, lut_texture_size)) {
         std::cout << "error during lookuptable generation" << std::endl;
         return (false);
     }

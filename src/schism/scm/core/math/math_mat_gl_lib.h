@@ -2,7 +2,7 @@
 #ifndef SCM_MATH_MAT_GL_LIB_H_INCLUDED
 #define SCM_MATH_MAT_GL_LIB_H_INCLUDED
 
-#include <scm/ogl.h>
+#include <scm/ogl/gl.h>
 
 namespace math
 {

@@ -1,0 +1,17 @@
+
+#ifndef SCM_DATA_COLOR_TRANSFER_FUNCTION_1D_H_INCLUDED
+#define SCM_DATA_COLOR_TRANSFER_FUNCTION_1D_H_INCLUDED
+
+namespace scm {
+namespace data {
+
+template<typename val_type>
+class color_transfer_function_1d
+{
+
+}; // class color_transfer_function_1d
+
+} // namespace data
+} // namespace scm
+
+#endif // SCM_DATA_COLOR_TRANSFER_FUNCTION_1D_H_INCLUDED

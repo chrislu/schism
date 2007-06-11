@@ -135,7 +135,7 @@ const face_style& face::get_face_style(style_type style) const
         if (style_it == _glyph_mappings.end()) {
             std::stringstream output;
 
-            output << "face::get_glyph(): "
+            output << "scm::font::face::get_glyph(): "
                    << "unable to retrieve requested style (id = '" << style << "') "
                    << "fallback to regular style failed!" << std::endl;
 

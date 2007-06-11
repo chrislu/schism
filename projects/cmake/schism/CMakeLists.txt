@@ -1,7 +1,8 @@
 
 # Include subprojects
 SUBDIRS(
-    ogl
     core
+    ogl
+    data
 )
 

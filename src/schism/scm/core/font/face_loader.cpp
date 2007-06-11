@@ -45,7 +45,7 @@ bool face_loader::check_font_file(const std::string& in_file_name,
 
         if (!exists(font_file)) {
             scm::console.get() << scm::con::log_level(scm::con::error)
-                               << "face_loader::check_font_file(): "
+                               << "scm::font::face_loader::check_font_file(): "
                                << "unable to find specified font file directly ('" << in_file_name << "') "
                                << "or relative to resource path ('" << font_file.string() << "')"
                                << std::endl;
@@ -55,7 +55,7 @@ bool face_loader::check_font_file(const std::string& in_file_name,
 
     if (is_directory(font_file)) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::check_font_file(): "
+                           << "scm::font::face_loader::check_font_file(): "
                            << "specified file name ('" << in_file_name << "') "
                            << "is not a file"
                            << std::endl;
@@ -66,6 +66,7 @@ bool face_loader::check_font_file(const std::string& in_file_name,
 
     return (true);
 }
+
 
 bool face_loader::load(face&              font_face,
                        const std::string& file_name,
@@ -118,7 +119,7 @@ bool face_loader::load(face&              font_face,
                         disp_res)) {
 
             scm::console.get() << scm::con::log_level(scm::con::error)
-                               << "face_loader::load(): "
+                               << "scm::font::face_loader::load(): "
                                << "error loading face style (id ='" << style_it->first << "') "
                                << "using font file ('" << style_it->second << "')"
                                << std::endl;
@@ -155,7 +156,7 @@ bool face_loader::load_style(face::style_type   style,
 
     if (!ft_lib.open()) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load_style(): "
+                           << "scm::font::face_loader::load_style(): "
                            << "unable to initialize freetype library"
                            << std::endl;
 
@@ -164,7 +165,7 @@ bool face_loader::load_style(face::style_type   style,
 
     if (!ft_font.open_face(ft_lib, file_name)) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load_style(): "
+                           << "scm::font::face_loader::load_style(): "
                            << "unable to load font file ('" << file_name << "')"
                            << std::endl;
 
@@ -173,7 +174,7 @@ bool face_loader::load_style(face::style_type   style,
 
     if (FT_Set_Char_Size(ft_font.get_face(), 0, size << 6, 0, disp_res) != 0) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load_style(): "
+                           << "scm::font::face_loader::load_style(): "
                            << "unable to set character size ('" << size << "') "
                            << std::endl;
 
@@ -228,7 +229,7 @@ bool face_loader::load_style(face::style_type   style,
     catch (std::bad_alloc&) {
         cur_texture._data.reset();
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::load_style(): "
+                           << "scm::font::face_loader::load_style(): "
                            << "unable to allocate font texture memory of size ('"
                            << cur_texture._size.x * cur_texture._size.y << "byte')"
                            << std::endl;
@@ -417,7 +418,7 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
 
     if (!ft_lib.open()) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::available_72dpi_size(): "
+                           << "scm::font::face_loader::available_72dpi_size(): "
                            << "unable to initialize freetype library"
                            << std::endl;
         return (0);
@@ -425,7 +426,7 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
 
     if (!ft_font.open_face(ft_lib, font_file.file_string())) {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::available_72dpi_size(): "
+                           << "scm::font::face_loader::available_72dpi_size(): "
                            << "unable to load font file ('" << font_file.file_string() << "')"
                            << std::endl;
         return (0);
@@ -445,7 +446,7 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
 
         if (available_sizes.empty()) {
             scm::console.get() << scm::con::log_level(scm::con::error)
-                               << "face_loader::available_72dpi_size(): "
+                               << "scm::font::face_loader::available_72dpi_size(): "
                                << "specified font file ('" << font_file.file_string() << "') "
                                << "contains fixed size font but fails to report available sizes"
                                << std::endl;
@@ -468,7 +469,7 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
     }
     else {
         scm::console.get() << scm::con::log_level(scm::con::error)
-                           << "face_loader::available_72dpi_size(): "
+                           << "scm::font::face_loader::available_72dpi_size(): "
                            << "specified font file ('" << font_file.file_string() << "') "
                            << "contains unsupported face type"
                            << std::endl;
@@ -488,7 +489,7 @@ const face_loader::texture_type& face_loader::get_current_face_texture(face::sty
         if (tex_it == _face_style_textures.end()) {
             std::stringstream output;
 
-            output << "face_loader::get_current_face_texture(): "
+            output << "scm::font::face_loader::get_current_face_texture(): "
                    << "unable to retrieve texture for requested style (id = '" << style << "') "
                    << "fallback to regular style failed!" << std::endl;
 
