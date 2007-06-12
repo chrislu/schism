@@ -20,8 +20,13 @@
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
 #include <scm/ogl/time/time_query.h>
+#include <scm/ogl/gui/console_renderer.h>
 
 #include <scm/core/time/high_res_timer.h>
+
+#include <scm/ogl/font/face.h>
+#include <scm/ogl/gui/font_renderer.h>
+#include <scm/ogl/font/face_loader.h>
 
 #include <volume_renderer/volume_renderer_raycast_glsl.h>
 
@@ -31,6 +36,17 @@
 #include <volume.h>
 
 boost::scoped_ptr<gl::volume_renderer_raycast_glsl> _volrend_raycast;
+boost::scoped_ptr<scm::gl::gui::console_renderer>   _console_rend;
+
+typedef enum
+{
+    console_full    = 1,
+    console_brief   = 2,
+    console_hide    = 3
+} con_mode;
+
+con_mode _con_mode = console_brief;
+
 
 static const float ui_float_increment = 0.1f;
 static       bool  use_stencil_test   = false;
@@ -55,6 +71,71 @@ unsigned fbo_color_id = 0;
 
 static bool do_inside_pass = true;
 static bool draw_geometry  = true;
+
+void con_mode_changed()
+{
+    if (_con_mode == console_full) {
+        _console_rend->position(math::vec2i_t(0, 0));
+        _console_rend->size(math::vec2i_t(winx, winy));
+    }
+    else if (_con_mode == console_brief) {
+        _console_rend->position(math::vec2i_t(0, winy - 100));
+        _console_rend->size(math::vec2i_t(winx, 100));
+    }
+    else if (_con_mode == console_hide) {
+    }
+
+}
+
+bool init_font_rendering()
+{
+    //std::cout << "fmid " << scm::gl::gl_font_manager_id << std::endl;
+    // soon to be parameters
+    std::string     _font_file_name         = std::string("consola.ttf");//segoeui.ttf");//calibri.ttf");//vgafix.fon");//cour.ttf");//
+    unsigned        _font_size              = 10;
+    unsigned        _display_dpi_resolution = 96;
+    scm::gl::face_ptr          _font_face;
+
+    scm::time::high_res_timer _timer;
+
+    glFinish();
+    _timer.start();
+
+    scm::gl::face_loader _face_loader;
+    _face_loader.set_font_resource_path("./../../../res/fonts/");
+
+    _font_face = _face_loader.load(_font_file_name, _font_size, _display_dpi_resolution);
+    
+    if (!_font_face) {
+        scm::console.get() << scm::con::log_level(scm::con::error)
+                           << "<unnamed>::init_font_rendering(): "
+                           << "error opening font file"
+                           << std::endl;
+
+        return (false);
+    }
+
+    glFinish();
+
+    _timer.stop();
+
+    _console_rend.reset(new scm::gl::gui::console_renderer());
+    _console_rend->position(math::vec2i_t(0, 0));
+    _console_rend->size(math::vec2i_t(winx, winy));
+    _console_rend->font(_font_face);
+
+    _console_rend->connect(scm::console.get().out_stream());
+
+    std::stringstream output;
+
+    output.precision(2);
+    output << std::fixed
+           << "font setup time: " << scm::time::to_milliseconds(_timer.get_time()) << "msec" << std::endl;
+
+    scm::console.get() << output.str();
+
+    return (true);
+}
 
 void render_geometry()
 {
@@ -328,6 +409,10 @@ bool init_gl()
 
     _trackball_manip.dolly(2);
 
+    if (!init_font_rendering()) {
+        std::cout << "unable to create font texture" << std::endl;
+        return (false);
+    }
     if (!init_geometry_textures()) {
         std::cout << "unable to create geometry fbo due to renderbuffer texture creation errors" << std::endl;
         return (false);
@@ -367,6 +452,8 @@ bool init_gl()
     glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, dif);
 
+    con_mode_changed();
+
     return (true);
 }
 
@@ -376,6 +463,40 @@ void shutdown_gl()
     glDeleteFramebuffersEXT(1, &fbo_id);
     glDeleteTextures(1, &fbo_color_id);
     glDeleteTextures(1, &fbo_depth_id);
+
+    scm::gl::shutdown();
+    scm::shutdown();
+}
+
+void draw_console()
+{
+    // retrieve current matrix mode
+    GLint  current_matrix_mode;
+    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+    // setup orthogonal projection
+    // setup as 1:1 pixel mapping
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, winx, 0, winy, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    if (_con_mode != console_hide) {
+        _console_rend->draw();
+    }
+
+
+    // restore previous projection
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    
+    // restore saved matrix mode
+    glMatrixMode(current_matrix_mode);
 }
 
 void display()
@@ -457,6 +578,7 @@ void display()
 
     _gl_timer.stop();
 
+    draw_console();
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
     _timer.stop();
@@ -467,7 +589,7 @@ void display()
     _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
 
-    if (_accum_time > 1000.0) {
+    if (_accum_time > 200.0) {
         std::stringstream   output;
 
         output.precision(2);
@@ -537,6 +659,17 @@ void keyboard(unsigned char key, int x, int y)
                   break;
         case 'g':
         case 'G': draw_geometry = !draw_geometry;break;
+        case 'c':
+        case 'C':
+            if (_con_mode == console_full)
+                _con_mode = console_brief;
+            else if (_con_mode == console_brief)
+                _con_mode = console_hide;
+            else if (_con_mode == console_hide)
+                _con_mode = console_full;
+            con_mode_changed();
+            break;
+
         case 27:  shutdown_gl();
                   exit (0);
                   break;
