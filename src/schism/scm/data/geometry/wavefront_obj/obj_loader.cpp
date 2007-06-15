@@ -130,7 +130,7 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
         for (cur_obj_it = out_obj._objects.begin(); cur_obj_it != out_obj._objects.end(); ++cur_obj_it) {
             for (cur_grp_it = cur_obj_it->_groups.begin(); cur_grp_it != cur_obj_it->_groups.end(); ++cur_grp_it) {
                 if (cur_grp_it->_num_tri_faces != 0) {
-                    cur_grp_it->_tri_faces.reset(new triangle_face[cur_grp_it->_num_tri_faces]);
+                    cur_grp_it->_tri_faces.reset(new wavefront_object_triangle_face[cur_grp_it->_num_tri_faces]);
                 }
             }
         }
@@ -220,7 +220,7 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     }
                     primitive_definition_started = true;
 
-                    triangle_face& t = cur_grp_it->_tri_faces[next_face_index++];
+                    wavefront_object_triangle_face& t = cur_grp_it->_tri_faces[next_face_index++];
 
                     for (unsigned i = 0; i < 3; ++i) {
                         

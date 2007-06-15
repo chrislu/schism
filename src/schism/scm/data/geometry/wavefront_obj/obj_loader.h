@@ -6,10 +6,12 @@
 
 #include <scm/data/geometry/wavefront_obj/obj_file.h>
 
+#include <scm/core/platform/platform.h>
+
 namespace scm {
 namespace data {
     
-bool open_obj_file(const std::string& filename, wavefront_model& out_obj);
+bool __scm_export(data) open_obj_file(const std::string& filename, wavefront_model& /*out_obj*/);
 
 } // namespace data
 } // namespace scm

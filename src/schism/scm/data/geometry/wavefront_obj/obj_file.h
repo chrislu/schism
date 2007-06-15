@@ -13,7 +13,7 @@
 namespace scm {
 namespace data {
     
-struct triangle_face
+struct wavefront_object_triangle_face
 {
     unsigned    _vertices[3];
     unsigned    _normals[3];
@@ -25,7 +25,7 @@ struct wavefront_object_group
     wavefront_object_group() : _num_tri_faces(0) {}
 
     std::size_t                                 _num_tri_faces;
-    scm::core::shared_array<triangle_face>      _tri_faces;
+    scm::core::shared_array<wavefront_object_triangle_face>  _tri_faces;
 
     std::string                                 _name;
 

@@ -83,6 +83,8 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim;
     _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim;
 
+    //_volrend_params._aspect = _volrend_params._aspect / vol_loader->get_volume_descriptor()._volume_aspect;
+
     scm::data::regular_grid_data_3d<unsigned char> data;
 
     if (!vol_loader->read_sub_volume(math::vec<unsigned, 3>(0, 0, 0), data_dimensions, data)) {

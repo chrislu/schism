@@ -334,7 +334,7 @@ void display()
 
     //glFlush();
     //glFinish();
-    _timer.stop();
+    //_timer.stop();
 
     _timer.start();
     _gl_timer.start();

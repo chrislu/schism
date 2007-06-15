@@ -233,8 +233,10 @@ IF (WIN32)
     )
 ENDIF (WIN32)
 
-# add preprocessor defines
-ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_core=\(\))
+IF (WIN32)
+    # add preprocessor defines
+    ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_core=\(\))
+ENDIF (WIN32)
 
 # add/create library
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -256,6 +258,8 @@ ENDIF (WIN32)
 
 IF (UNIX)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-        #lua
+        boost_date_time
+        lua
+        rt
     )
 ENDIF (UNIX)

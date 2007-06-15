@@ -3,16 +3,36 @@
 #include <iostream>
 
 #include <boost/scoped_array.hpp>
+#include <boost/functional/hash.hpp>
 
+#include <boost/mpl/vector.hpp>
+#include <boost/mpl/push_back.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/accumulate.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/mpl/plus.hpp>
+#include <boost/mpl/arithmetic.hpp>
+#include <boost/mpl/deref.hpp>
+#include <boost/mpl/same_as.hpp>
+
+#include <boost/assign/std/vector.hpp>
+
+#include <scm/core.h>
+#include <scm/ogl.h>
 #include <scm/ogl/gl.h>
+#include <scm/ogl/utilities/error_checker.h>
 #include <GL/glut.h>
 
-#include <obj_handling/obj_file.h>
-#include <obj_handling/obj_loader.h>
+#include <scm/ogl/vertexbuffer_object/vertexbuffer_object.h>
+
+#include <scm/data/geometry/wavefront_obj/obj_file.h>
+#include <scm/data/geometry/wavefront_obj/obj_loader.h>
+#include <scm/data/geometry/wavefront_obj/obj_to_vertex_array.h>
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
 
 scm::gl::trackball_manipulator _trackball_manip;
+scm::gl::vertexbuffer_object   _obj_vbo;
 
 int winx = 1024;
 int winy = 640;
@@ -40,13 +60,68 @@ boost::scoped_array<unsigned short> indices;
 unsigned cube_vbo           = 0;
 unsigned cube_index_buffer  = 0;
 
-scm::wavefront_model obj_f;
+unsigned obj_vbo            = 0;
+unsigned obj_index_buffer   = 0;
+std::size_t obj_no = 0;
+std::size_t obj_to = 0;
+std::size_t obj_va_s = 0;
+std::size_t obj_ia_s = 0;
+
+scm::data::wavefront_model obj_f;
 
 bool init_gl()
 {
+    //using namespace scm::gl;
+    //using namespace boost::assign;
+
+    //scm::gl::vertex_layout::element_container elements;
+
+    //elements += vertex_element(1, "hallo");
+    //elements += vertex_element(2, "welt");
+
+
+    //using namespace boost;
+    //using namespace boost::mpl;
+    //typedef boost::mpl::vector<>    elements;
+    //typedef boost::mpl::push_back<elements, math::vec3f_t>::type new_elements1;
+    //typedef boost::mpl::push_back<new_elements1, math::vec3f_t>::type new_elements2;
+    //typedef boost::mpl::push_back<new_elements2, math::vec2f_t>::type new_elements3;
+    //typedef boost::mpl::vector<math::vec3f_t, math::vec3f_t, math::vec2f_t>    new_elements4;
+
+    //typedef accumulate<
+    //  new_elements4
+    //  , int_<0>
+    //  , plus<_, int_<sizeof(_2)> >
+    ////, if_< is_float<_2>,next<_1>,_1 >
+    //>::type size_of_stuff;
+
+
+    ////template <boost::mpl::vector<> >
+    ////struct elem_size
+    ////{
+    ////    static const size = 0;
+    ////};
+
+    ////template <boost::mpl::vector<> >
+    ////struct elem_size
+    ////{
+    ////    static const size = 0;
+    ////};
+
+
+    //using namespace boost;
+    //using namespace boost::mpl;
+
+    //BOOST_MPL_ASSERT(( is_same< deref<begin<new_elements4>::type>::type, math::vec3f_t > ));
+    //std::size_t a = sizeof(elements);
+    //std::size_t b = sizeof(deref<begin<new_elements3>::type>::type);
+    //std::size_t c = boost::mpl::size<elements>::value;
+    //std::size_t d = boost::mpl::size<new_elements3>::value;
+    //std::size_t e = size_of_stuff::value;//sizeof(math::vec2f_t);
+
     // check for opengl verison 1.5 with
     // vertex buffer objects support
-    if (!scm::gl::is_supported("GL_VERSION_1_5")) {
+    if (!scm::ogl.get().is_supported("GL_VERSION_1_5")) {
         std::cout << "GL_VERSION_1_5 not supported" << std::endl;
         return (false);
     }
@@ -91,6 +166,8 @@ bool init_gl()
     indices[12] = 0;
     indices[13] = 1;
 
+    scm::gl::error_checker  gl_err;
+
     // generate vbo for vertex data
     glGenBuffers(1, &cube_vbo);
     // bind vertex array vbo
@@ -98,7 +175,8 @@ bool init_gl()
     // fill vertex array vbo with data
     glBufferData(GL_ARRAY_BUFFER, 8*sizeof(vertex_format), vertices.get(), GL_STATIC_DRAW);
     
-    if (glGetError() != GL_NONE) {
+    if (!gl_err.ok()) {
+        std::cout << gl_err.get_error_string() << std::endl;
         return (false);
     }
 
@@ -109,7 +187,8 @@ bool init_gl()
     // fill index array vbo with data
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 14*sizeof(unsigned short), indices.get(), GL_STATIC_DRAW);
 
-    if (glGetError() != GL_NONE) {
+    if (!gl_err.ok()) {
+        std::cout << gl_err.get_error_string() << std::endl;
         return (false);
     }
 
@@ -118,7 +197,7 @@ bool init_gl()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-    if (!scm::open_obj_file("./../../../res/objects/some_objects.obj", obj_f)) {
+    if (!scm::data::open_obj_file("c:/horizon_n2.obj", obj_f)) {//c:/horizon_n.obj"./../../../res/objects/some_objects.obj""./../../../res/objects/some_objects.obj", obj_f)) {
         std::cout << "failed to parse obj" << std::endl;
     }
     else {
@@ -126,7 +205,94 @@ bool init_gl()
 
     }
 
-    system("pause");
+    //system("pause");
+
+    boost::shared_array<float>          obj_va;
+    boost::shared_array<scm::core::uint32_t> obj_ia;
+
+    scm::data::generate_vertex_buffer(obj_f,
+                                      obj_va,
+                                      obj_va_s,
+                                      obj_no,
+                                      obj_to,
+                                      obj_ia,
+                                      obj_ia_s);
+
+    std::cout << "num faces: " << (obj_ia_s / 3) << std::endl;
+
+
+    using namespace scm::gl;
+    using namespace boost::assign;
+
+
+    vertex_layout::element_container vert_elem;
+
+    vert_elem += vertex_element(vertex_element::position,
+                                vertex_element::dt_vec3f);
+    vert_elem += vertex_element(vertex_element::normal,
+                                vertex_element::dt_vec3f);
+
+    vertex_layout      vert_lo(vert_elem);
+    element_layout     elem_lo(element_layout::triangles,
+                               element_layout::dt_uint);
+
+    if (!_obj_vbo.vertex_data(obj_va_s,
+                              vert_lo,
+                              obj_va.get())) {
+        std::cout << "error uploading vertex data" << std::endl;
+        return (false);
+    }
+
+     if (!_obj_vbo.element_data(obj_ia_s,
+                                elem_lo,
+                                obj_ia.get())) {
+        std::cout << "error uploading element data" << std::endl;
+        return (false);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+    // generate vbo for vertex data
+    glGenBuffers(1, &obj_vbo);
+    // bind vertex array vbo
+    glBindBuffer(GL_ARRAY_BUFFER, obj_vbo);
+    // fill vertex array vbo with data
+    glBufferData(GL_ARRAY_BUFFER, obj_va_s*(3+3)*sizeof(float), obj_va.get(), GL_STATIC_DRAW);
+    
+    if (!gl_err.ok()) {
+        std::cout << gl_err.get_error_string() << std::endl;
+        return (false);
+    }
+
+    // generate vbo for index data
+    glGenBuffers(1, &obj_index_buffer);
+    // bind index array vbo
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_index_buffer);
+    // fill index array vbo with data
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_ia_s*sizeof(unsigned), obj_ia.get(), GL_STATIC_DRAW);
+
+    if (!gl_err.ok()) {
+        std::cout << gl_err.get_error_string() << std::endl;
+        return (false);
+    }
+
+    // unbind all buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#endif
+    obj_va.reset();
+    obj_ia.reset();
 
     float dif[4]    = {0.7, 0.7, 0.7, 1};
     float spc[4]    = {0.2, 0.7, 0.9, 1};
@@ -165,8 +331,8 @@ void draw_wavefront_obj_immediate_mode()
 
     glColor3f(0.2f, 0.5f, 0.2f);
 
-    scm::wavefront_model::object_container::iterator     cur_obj_it;
-    scm::wavefront_object::group_container::iterator     cur_grp_it;
+    scm::data::wavefront_model::object_container::iterator     cur_obj_it;
+    scm::data::wavefront_object::group_container::iterator     cur_grp_it;
 
     glPushMatrix();
         glBegin(GL_TRIANGLES);
@@ -183,6 +349,57 @@ void draw_wavefront_obj_immediate_mode()
         }
         glEnd();
     glPopMatrix();
+
+    // restore saved polygon mode
+    glPolygonMode(GL_FRONT, current_poly_mode[0]);
+    glPolygonMode(GL_BACK,  current_poly_mode[1]);
+
+}
+
+void draw_wavefront_obj_vertex_buffer_object()
+{
+    // retrieve current polygon mode
+    GLint current_poly_mode[2];
+    glGetIntegerv(GL_POLYGON_MODE, current_poly_mode);
+    // set polygon mode to wireframe rendering
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glShadeModel(GL_SMOOTH);
+
+    glColor3f(0.2f, 0.5f, 0.2f);
+
+    _obj_vbo.bind();
+    glPushMatrix();
+        _obj_vbo.draw_elements();
+    glPopMatrix();
+    _obj_vbo.unbind();
+
+    //// bind vertex array buffer object
+    //glBindBuffer(GL_ARRAY_BUFFER, obj_vbo);
+    //// declare vertex array pointers
+    //glVertexPointer(3, GL_FLOAT, 0, NULL);
+    //// declare texture coord pointer starting with offset of 3 float
+    //// values from the beginning of the interleaved array
+    //glNormalPointer(GL_FLOAT, 0, (GLvoid*)(NULL + obj_no*sizeof(float)));
+
+    //// enable vertex array pointers in client state
+    //glEnableClientState(GL_VERTEX_ARRAY);
+    //glEnableClientState(GL_NORMAL_ARRAY);
+
+    //// bind index array buffer object
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_index_buffer);
+
+    //glPushMatrix();
+    //    // draw vertex array using the index array
+    //    glDrawElements(GL_TRIANGLES, obj_ia_s, GL_UNSIGNED_INT, NULL);
+    //glPopMatrix();
+
+    //// disable vertex array pointers
+    //glDisableClientState(GL_NORMAL_ARRAY);
+    //glDisableClientState(GL_VERTEX_ARRAY);
+
+    //// unbind all buffers
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // restore saved polygon mode
     glPolygonMode(GL_FRONT, current_poly_mode[0]);
@@ -279,7 +496,8 @@ void display()
         // apply camera transform
         _trackball_manip.apply_transform();
 
-        draw_wavefront_obj_immediate_mode();
+        //draw_wavefront_obj_immediate_mode();
+        draw_wavefront_obj_vertex_buffer_object();
         //draw_animated_cube_immediate_mode();
         //draw_animated_cube_vertex_buffer_object();
 
@@ -383,6 +601,11 @@ int main(int argc, char **argv)
     glutInitWindowSize(winx, winy);
     glutCreateWindow("OpenGL - red triangle");
 
+    // init the GL context
+    if (!scm::initialize()) {
+        std::cout << "error initializing scm library" << std::endl;
+        return (-1);
+    }
     // init the GL context
     if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;

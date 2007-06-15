@@ -56,12 +56,12 @@ date time_system::get_universal_date()
     return (boost::gregorian::day_clock::universal_day());
 }
 
-inline time_stamp time_system::get_time_stamp()
+time_stamp time_system::get_time_stamp()
 {
     return (detail::high_res_time_stamp::now());
 }
 
-inline time_duration time_system::get_elapsed_duration(time_stamp start,
+time_duration time_system::get_elapsed_duration(time_stamp start,
                                                        time_stamp end)
 {
     // look to wrap arounds

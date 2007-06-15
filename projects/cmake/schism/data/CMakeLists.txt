@@ -124,8 +124,10 @@ IF (WIN32)
     )
 ENDIF (WIN32)
 
-# add preprocessor defines
-ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_data=\(\))
+IF (WIN32)
+    # add preprocessor defines
+    ADD_DEFINITIONS(-DSCM_BUILD_LIBRARY_data=\(\))
+ENDIF (WIN32)
 
 # add/create library
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -136,6 +138,8 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 )
 IF (WIN32)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+        optimized libboost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
+        debug libboost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
     )
 ENDIF (WIN32)
 IF (UNIX)

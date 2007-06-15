@@ -31,11 +31,11 @@ void time_query::stop()
 
 void time_query::collect_result()
 {
-    static scm::core::uint64_t dur = 0;
+    static GLuint64EXT dur = 0;
 
     glGetQueryObjectui64vEXT(_id, GL_QUERY_RESULT, &dur);
 
-    _duration = scm::time::nanosec(dur);
+    _duration = scm::time::nanosec(static_cast<scm::core::uint64_t>(dur));
 }
 
 bool time_query::is_supported()

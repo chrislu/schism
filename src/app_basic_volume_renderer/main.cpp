@@ -507,7 +507,6 @@ void display()
     static double                       _gl_accum_time  = 0.0;
     static unsigned                     _accum_count    = 0;
 
-    _timer.start();
     _gl_timer.start();
 
     // clear the color and depth buffer
@@ -581,9 +580,11 @@ void display()
     draw_console();
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
-    _timer.stop();
 
     _gl_timer.collect_result();
+
+    _timer.stop();
+    _timer.start();
 
     _accum_time         += scm::time::to_milliseconds(_timer.get_time());
     _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
@@ -593,8 +594,8 @@ void display()
         std::stringstream   output;
 
         output.precision(2);
-        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec \t"
-                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec \t"
+        output << std::fixed << "frame_time: " << _accum_time / static_cast<double>(_accum_count) << "msec "
+                             << "gl time: " << _gl_accum_time / static_cast<double>(_accum_count) << "msec "
                              << "fps: " << static_cast<double>(_accum_count) / (_accum_time / 1000.0)
                              << std::endl;
 
