@@ -173,6 +173,8 @@ void main()
             src = texture3D(_volume, sample_pos);
             col = do_shading(sample_pos, src);
 
+            //col.rgb = src.rgb;
+
             // compositing
             float omda_sa = (1.0 - dst.a)*col.a;
             dst.rgb += omda_sa*col.rgb;

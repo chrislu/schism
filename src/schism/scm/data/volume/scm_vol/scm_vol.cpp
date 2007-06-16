@@ -1,7 +1,8 @@
 
 #include "scm_vol.h"
 
-using namespace scm::data;
+namespace scm {
+namespace data {
 
 volume_descriptor::volume_descriptor()
   : _version(1),
@@ -111,3 +112,7 @@ std::istream& scm::data::operator>>(std::istream& i, volume_descriptor& desc)
     i.setstate(std::ios_base::goodbit);
     return (i);
 }
+
+} // namespace data
+} // namespace scm
+

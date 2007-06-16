@@ -37,7 +37,7 @@ public:
     std::string         _name;
 
     const unsigned      _version;
-}; // class scm_vol_descriptor
+}; // class volume_descriptor
 
 __scm_export(data) std::ostream& operator<<(std::ostream& /*os*/, const volume_descriptor& /*desc*/);
 __scm_export(data) std::istream& operator>>(std::istream& /*i*/, volume_descriptor& /*desc*/);

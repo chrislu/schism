@@ -29,8 +29,9 @@ namespace gl
 
         float                   _step_size;
 
-        scm::gl::texture_1d          _color_alpha_texture;
-        scm::gl::texture_3d          _volume_texture;
+        scm::gl::texture_1d     _color_alpha_texture;
+        scm::gl::texture_3d     _volume_texture;
+        scm::gl::texture_3d     _uncertainty_volume_texture;
 
         unsigned int            _geom_depth_texture_id;
 

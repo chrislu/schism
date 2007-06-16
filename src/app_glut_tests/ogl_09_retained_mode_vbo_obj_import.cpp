@@ -23,6 +23,8 @@
 #include <scm/ogl/utilities/error_checker.h>
 #include <GL/glut.h>
 
+#include <scm/ogl/shader_objects/program_object.h>
+#include <scm/ogl/shader_objects/shader_object.h>
 #include <scm/ogl/vertexbuffer_object/vertexbuffer_object.h>
 
 #include <scm/data/geometry/wavefront_obj/obj_file.h>
@@ -53,6 +55,11 @@ struct vertex_format
     float       pos[3];
 };
 
+boost::scoped_ptr<scm::gl::program_object>   _shader_program;
+boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
+boost::scoped_ptr<scm::gl::shader_object>    _fragment_shader;
+
+
 boost::scoped_array<vertex_format>  vertices;
 boost::scoped_array<unsigned short> indices;
 
@@ -60,65 +67,11 @@ boost::scoped_array<unsigned short> indices;
 unsigned cube_vbo           = 0;
 unsigned cube_index_buffer  = 0;
 
-unsigned obj_vbo            = 0;
-unsigned obj_index_buffer   = 0;
-std::size_t obj_no = 0;
-std::size_t obj_to = 0;
-std::size_t obj_va_s = 0;
-std::size_t obj_ia_s = 0;
-
 scm::data::wavefront_model obj_f;
+
 
 bool init_gl()
 {
-    //using namespace scm::gl;
-    //using namespace boost::assign;
-
-    //scm::gl::vertex_layout::element_container elements;
-
-    //elements += vertex_element(1, "hallo");
-    //elements += vertex_element(2, "welt");
-
-
-    //using namespace boost;
-    //using namespace boost::mpl;
-    //typedef boost::mpl::vector<>    elements;
-    //typedef boost::mpl::push_back<elements, math::vec3f_t>::type new_elements1;
-    //typedef boost::mpl::push_back<new_elements1, math::vec3f_t>::type new_elements2;
-    //typedef boost::mpl::push_back<new_elements2, math::vec2f_t>::type new_elements3;
-    //typedef boost::mpl::vector<math::vec3f_t, math::vec3f_t, math::vec2f_t>    new_elements4;
-
-    //typedef accumulate<
-    //  new_elements4
-    //  , int_<0>
-    //  , plus<_, int_<sizeof(_2)> >
-    ////, if_< is_float<_2>,next<_1>,_1 >
-    //>::type size_of_stuff;
-
-
-    ////template <boost::mpl::vector<> >
-    ////struct elem_size
-    ////{
-    ////    static const size = 0;
-    ////};
-
-    ////template <boost::mpl::vector<> >
-    ////struct elem_size
-    ////{
-    ////    static const size = 0;
-    ////};
-
-
-    //using namespace boost;
-    //using namespace boost::mpl;
-
-    //BOOST_MPL_ASSERT(( is_same< deref<begin<new_elements4>::type>::type, math::vec3f_t > ));
-    //std::size_t a = sizeof(elements);
-    //std::size_t b = sizeof(deref<begin<new_elements3>::type>::type);
-    //std::size_t c = boost::mpl::size<elements>::value;
-    //std::size_t d = boost::mpl::size<new_elements3>::value;
-    //std::size_t e = size_of_stuff::value;//sizeof(math::vec2f_t);
-
     // check for opengl verison 1.5 with
     // vertex buffer objects support
     if (!scm::ogl.get().is_supported("GL_VERSION_1_5")) {
@@ -196,8 +149,55 @@ bool init_gl()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+    _shader_program.reset(new scm::gl::program_object());
+    _vertex_shader.reset(new scm::gl::shader_object(GL_VERTEX_SHADER));
+    _fragment_shader.reset(new scm::gl::shader_object(GL_FRAGMENT_SHADER));
 
-    if (!scm::data::open_obj_file("c:/horizon_n2.obj", obj_f)) {//c:/horizon_n.obj"./../../../res/objects/some_objects.obj""./../../../res/objects/some_objects.obj", obj_f)) {
+    // load shader code from files
+    if (!_vertex_shader->set_source_code_from_file("./../../../src/app_glut_tests/shader/two_sided_vert.glsl")) {
+        std::cout << "Error loadong vertex shader:" << std::endl;
+        return (false);
+    }
+    if (!_fragment_shader->set_source_code_from_file("./../../../src/app_glut_tests/shader/two_sided_frag.glsl")) {
+        std::cout << "Error loadong frament shader:" << std::endl;
+        return (false);
+    }
+
+    // compile shaders
+    if (!_vertex_shader->compile()) {
+        std::cout << "Error compiling vertex shader - compiler output:" << std::endl;
+        std::cout << _vertex_shader->get_compiler_output() << std::endl;
+        return (false);
+    }
+    if (!_fragment_shader->compile()) {
+        std::cout << "Error compiling fragment shader - compiler output:" << std::endl;
+        std::cout << _fragment_shader->get_compiler_output() << std::endl;
+        return (false);
+    }
+
+    // attatch shaders to program object
+    if (!_shader_program->attach_shader(*_vertex_shader)) {
+        std::cout << "unable to attach vertex shader to program object:" << std::endl;
+        return (false);
+    }
+    if (!_shader_program->attach_shader(*_fragment_shader)) {
+        std::cout << "unable to attach fragment shader to program object:" << std::endl;
+        return (false);
+    }
+
+    // link program object
+    if (!_shader_program->link()) {
+        std::cout << "Error linking program - linker output:" << std::endl;
+        std::cout << _shader_program->get_linker_output() << std::endl;
+       return (false);
+    }
+
+    std::size_t obj_no = 0;
+    std::size_t obj_to = 0;
+    std::size_t obj_va_s = 0;
+    std::size_t obj_ia_s = 0;
+
+    if (!scm::data::open_obj_file("D:/_devel/data/wfarm/done/knut_data/horizon_n2.obj", obj_f)) {//"./../../../res/objects/some_objects.obj"D:/_devel/data/wfarm/horizon_n2.objc:/horizon_n.obj"./../../../res/objects/some_objects.obj""./../../../res/objects/some_objects.obj", obj_f)) {
         std::cout << "failed to parse obj" << std::endl;
     }
     else {
@@ -250,47 +250,6 @@ bool init_gl()
         return (false);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-    // generate vbo for vertex data
-    glGenBuffers(1, &obj_vbo);
-    // bind vertex array vbo
-    glBindBuffer(GL_ARRAY_BUFFER, obj_vbo);
-    // fill vertex array vbo with data
-    glBufferData(GL_ARRAY_BUFFER, obj_va_s*(3+3)*sizeof(float), obj_va.get(), GL_STATIC_DRAW);
-    
-    if (!gl_err.ok()) {
-        std::cout << gl_err.get_error_string() << std::endl;
-        return (false);
-    }
-
-    // generate vbo for index data
-    glGenBuffers(1, &obj_index_buffer);
-    // bind index array vbo
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_index_buffer);
-    // fill index array vbo with data
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_ia_s*sizeof(unsigned), obj_ia.get(), GL_STATIC_DRAW);
-
-    if (!gl_err.ok()) {
-        std::cout << gl_err.get_error_string() << std::endl;
-        return (false);
-    }
-
-    // unbind all buffers
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-#endif
     obj_va.reset();
     obj_ia.reset();
 
@@ -366,6 +325,7 @@ void draw_wavefront_obj_vertex_buffer_object()
     glShadeModel(GL_SMOOTH);
 
     glColor3f(0.2f, 0.5f, 0.2f);
+    _shader_program->bind();
 
     _obj_vbo.bind();
     glPushMatrix();
@@ -373,34 +333,7 @@ void draw_wavefront_obj_vertex_buffer_object()
     glPopMatrix();
     _obj_vbo.unbind();
 
-    //// bind vertex array buffer object
-    //glBindBuffer(GL_ARRAY_BUFFER, obj_vbo);
-    //// declare vertex array pointers
-    //glVertexPointer(3, GL_FLOAT, 0, NULL);
-    //// declare texture coord pointer starting with offset of 3 float
-    //// values from the beginning of the interleaved array
-    //glNormalPointer(GL_FLOAT, 0, (GLvoid*)(NULL + obj_no*sizeof(float)));
-
-    //// enable vertex array pointers in client state
-    //glEnableClientState(GL_VERTEX_ARRAY);
-    //glEnableClientState(GL_NORMAL_ARRAY);
-
-    //// bind index array buffer object
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_index_buffer);
-
-    //glPushMatrix();
-    //    // draw vertex array using the index array
-    //    glDrawElements(GL_TRIANGLES, obj_ia_s, GL_UNSIGNED_INT, NULL);
-    //glPopMatrix();
-
-    //// disable vertex array pointers
-    //glDisableClientState(GL_NORMAL_ARRAY);
-    //glDisableClientState(GL_VERTEX_ARRAY);
-
-    //// unbind all buffers
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    _shader_program->unbind();
     // restore saved polygon mode
     glPolygonMode(GL_FRONT, current_poly_mode[0]);
     glPolygonMode(GL_BACK,  current_poly_mode[1]);

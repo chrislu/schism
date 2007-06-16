@@ -2,12 +2,22 @@
 #ifndef APP_BVR_GEOMETRY_H_INCLUDED
 #define APP_BVR_GEOMETRY_H_INCLUDED
 
-extern unsigned obj_vbo;
-extern unsigned obj_index_buffer;
-extern std::size_t obj_no;
-extern std::size_t obj_to;
-extern std::size_t obj_va_s;
-extern std::size_t obj_ia_s;
+#include <vector>
+#include <boost/shared_ptr.hpp>
 
+#include <scm/data/geometry/scm_geom/scm_geom.h>
+#include <scm/ogl/vertexbuffer_object/vertexbuffer_object.h>
+
+struct geometry
+{
+    scm::data::geometry_descriptor                  _desc;
+    boost::shared_ptr<scm::gl::vertexbuffer_object> _vbo;
+
+}; // geometry
+
+extern std::vector<geometry>        _geometries;
+
+bool open_geometry_file(const std::string& filename);
+bool open_geometry();
 
 #endif // APP_BVR_GEOMETRY_H_INCLUDED

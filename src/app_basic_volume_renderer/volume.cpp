@@ -83,13 +83,15 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._aspect.y = (float)data_dimensions.y/(float)max_dim;
     _volrend_params._aspect.z = (float)data_dimensions.z/(float)max_dim;
 
-    //_volrend_params._aspect = _volrend_params._aspect / vol_loader->get_volume_descriptor()._volume_aspect;
+    //_volrend_params._aspect = _volrend_params._aspect * vol_loader->get_volume_descriptor()._volume_aspect;
 
     scm::data::regular_grid_data_3d<unsigned char> data;
 
     if (!vol_loader->read_sub_volume(math::vec<unsigned, 3>(0, 0, 0), data_dimensions, data)) {
         return (false);
     }
+    _data_properties._vol_desc  = vol_loader->get_volume_descriptor();
+    _data_properties._vol_scale = math::vec3f_t(float(max_dim));
 
     vol_loader->close_file();
 
@@ -153,11 +155,14 @@ bool open_volume_file(const std::string& filename)
     //_data_properties._alpha_transfer.add_point(100, 1.0f);
     _data_properties._alpha_transfer.add_point(255, 1.0f);
 #else
-    _data_properties._alpha_transfer.add_point(0,   1.0f);
-    _data_properties._alpha_transfer.add_point(100,  0.0f);
+    _data_properties._alpha_transfer.add_point(0,   0.5f);
+    //_data_properties._alpha_transfer.add_point(60,  0.00f);
+    //_data_properties._alpha_transfer.add_point(128, 0.0f);
+    //_data_properties._alpha_transfer.add_point(195, 0.00f);
+    _data_properties._alpha_transfer.add_point(100,  0.00f);
     _data_properties._alpha_transfer.add_point(128, 0.0f);
-    _data_properties._alpha_transfer.add_point(160, 0.0f);
-    _data_properties._alpha_transfer.add_point(255, 1.0f);
+    _data_properties._alpha_transfer.add_point(160, 0.00f);
+    _data_properties._alpha_transfer.add_point(255, 0.5f);
 #endif
 
     _data_properties._color_transfer.clear();
@@ -178,6 +183,115 @@ bool open_volume_file(const std::string& filename)
     _volrend_params._voxel_size.y   = 1.0f / float(_data_properties._dimensions.y);
     _volrend_params._voxel_size.z   = 1.0f / float(_data_properties._dimensions.z);
 
+    std::cout << "end loading file: " << filename << std::endl;
+
+    return (true);
+}
+
+bool open_unc_volume_file(const std::string& filename)
+{
+    std::cout << "start loading file: " << filename << std::endl;
+  
+    using namespace boost::filesystem;
+   
+    boost::scoped_ptr<scm::data::volume_data_loader> vol_loader;    
+    path                    file_path(filename, native);
+    std::string             file_name       = file_path.leaf();
+    std::string             file_extension  = extension(file_path);
+    
+    boost::algorithm::to_lower(file_extension);
+
+    unsigned                voxel_components;
+
+    if (file_extension == ".raw") {
+        vol_loader.reset(new scm::data::volume_data_loader_raw());
+    }
+    else if (file_extension == ".vol") {
+        vol_loader.reset(new scm::data::volume_data_loader_vgeo());
+    }
+    else if (file_extension == ".svol") {
+        vol_loader.reset(new scm::data::volume_data_loader_svol());
+    }
+    else {
+        return (false);
+    }
+
+    if (!vol_loader->open_file(filename)) {
+        return (false);
+    }
+
+    math::vec<unsigned, 3> data_dimensions;
+
+    data_dimensions = vol_loader->get_volume_descriptor()._data_dimensions;
+
+    // get max gl 3d tex dim
+    int gl_max_3dtex_dim;
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, & gl_max_3dtex_dim);
+
+    data_dimensions.x = math::clamp(data_dimensions.x, 0u, (unsigned int)gl_max_3dtex_dim);
+    data_dimensions.y = math::clamp(data_dimensions.y, 0u, (unsigned int)gl_max_3dtex_dim);
+    data_dimensions.z = math::clamp(data_dimensions.z, 0u, (unsigned int)gl_max_3dtex_dim);
+
+    //_volrend_params._aspect = _volrend_params._aspect * vol_loader->get_volume_descriptor()._volume_aspect;
+
+    scm::data::regular_grid_data_3d<unsigned char> data;
+
+    if (!vol_loader->read_sub_volume(math::vec<unsigned, 3>(0, 0, 0), data_dimensions, data)) {
+        return (false);
+    }
+
+    vol_loader->close_file();
+
+    _data_properties._dimensions = data_dimensions;
+    voxel_components = 1;
+
+    // analysis! -> histogram etc...
+
+    //std::cout << "start histogram calculation" << std::endl;
+    //if (!scm::histogram_1d_calculator<unsigned char>::calculate(_data_properties._histogram, data)) {
+    //    std::cout << "error during histogram calculation" << std::endl;
+    //    return (false);
+    //}
+    //std::cout << "end histogram calculation" << std::endl;
+
+    // load opengl texture
+    GLenum internal_format;
+    GLenum source_format;
+
+    switch (voxel_components) {
+        case 1:internal_format = GL_LUMINANCE; source_format = GL_LUMINANCE; break;
+        case 2:internal_format = GL_LUMINANCE_ALPHA; source_format = GL_LUMINANCE_ALPHA; break;
+        case 3:internal_format = GL_RGB; source_format = GL_RGB; break;
+        case 4:internal_format = GL_RGBA; source_format = GL_RGBA; break;
+        default: return (false);
+    }
+
+    if (!_volrend_params._uncertainty_volume_texture.tex_image( 0,
+                             internal_format,
+                             _data_properties._dimensions.x,
+                             _data_properties._dimensions.y,
+                             _data_properties._dimensions.z,
+                             source_format,
+                             GL_UNSIGNED_BYTE,
+                             data.get_data().get())) {
+
+        std::cout << "end texture upload - FAILED reason: ";
+        scm::gl::error_checker ech;
+        std::cout << ech.get_error_string(_volrend_params._uncertainty_volume_texture.get_last_error()) << std::endl;
+        return (false);
+    }
+
+    std::cout << "end texture upload" << std::endl;
+
+    _volrend_params._uncertainty_volume_texture.bind();
+    _volrend_params._uncertainty_volume_texture.tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_NEAREST); // 
+    _volrend_params._uncertainty_volume_texture.tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST); // 
+    _volrend_params._uncertainty_volume_texture.tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    _volrend_params._uncertainty_volume_texture.tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    _volrend_params._uncertainty_volume_texture.tex_parameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    _volrend_params._uncertainty_volume_texture.unbind();
+
+    
     std::cout << "end loading file: " << filename << std::endl;
 
     return (true);
@@ -293,7 +407,7 @@ bool open_volume()
     //
     ofn.lpstrFile[0] = '\0';
     ofn.nMaxFile = sizeof(szFile);
-    ofn.lpstrFilter = "all files (*.*)\0*.*\0raw volume files (*.raw)\0*.raw\0voxel geo volume files (*.vol)\0*.vol\0";
+    ofn.lpstrFilter = "all files (*.*)\0*.*\0schism volume files (*.svol)\0*.svol\0raw volume files (*.raw)\0*.raw\0voxel geo volume files (*.vol)\0*.vol\0";
     ofn.nFilterIndex = 2;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
@@ -304,6 +418,46 @@ bool open_volume()
 
     if (GetOpenFileName(&ofn)==TRUE) {
         if (!open_volume_file(std::string(ofn.lpstrFile)))
+            return (false);
+    }
+    else {
+        return (false);
+    }
+#else
+    if (!open_volume_file(std::string("/mnt/data/_devel/data/vrgeo/wfarm_200_w512_h439_d512_c1_b8.raw"))) {
+        return (false);
+    } 
+#endif
+    return (true);
+}
+
+bool open_unc_volume()
+{
+#if _WIN32
+    OPENFILENAME ofn;       // common dialog box structure
+    char szFile[MAX_PATH];  // buffer for file name
+
+    // Initialize OPENFILENAME
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.lpstrFile = szFile;
+    //
+    // Set lpstrFile[0] to '\0' so that GetOpenFileName does not 
+    // use the contents of szFile to initialize itself.
+    //
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = "all files (*.*)\0*.*\0schism volume files (*.svol)\0*.svol\0raw volume files (*.raw)\0*.raw\0voxel geo volume files (*.vol)\0*.vol\0";
+    ofn.nFilterIndex = 2;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    // Display the Open dialog box. 
+
+    if (GetOpenFileName(&ofn)==TRUE) {
+        if (!open_unc_volume_file(std::string(ofn.lpstrFile)))
             return (false);
     }
     else {

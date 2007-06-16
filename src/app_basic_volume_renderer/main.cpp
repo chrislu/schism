@@ -16,11 +16,14 @@
 #include <scm/ogl/gl.h>
 #include <GL/glut.h>
 #include <scm/ogl/utilities/error_checker.h>
-#include <GL/glu.h>
+#include <scm/ogl/utilities/axes_compass.h>
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
 #include <scm/ogl/time/time_query.h>
 #include <scm/ogl/gui/console_renderer.h>
+
+#include <scm/ogl/shader_objects/program_object.h>
+#include <scm/ogl/shader_objects/shader_object.h>
 
 #include <scm/core/time/high_res_timer.h>
 
@@ -32,11 +35,17 @@
 
 #include <scm/core.h>
 #include <scm/core/math/math.h>
+#include <scm/core/utilities/foreach.h>
 
 #include <volume.h>
+#include <geometry.h>
 
 boost::scoped_ptr<gl::volume_renderer_raycast_glsl> _volrend_raycast;
 boost::scoped_ptr<scm::gl::gui::console_renderer>   _console_rend;
+
+boost::scoped_ptr<scm::gl::program_object>   _shader_program;
+boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
+boost::scoped_ptr<scm::gl::shader_object>    _fragment_shader;
 
 typedef enum
 {
@@ -50,6 +59,7 @@ con_mode _con_mode = console_brief;
 
 static const float ui_float_increment = 0.1f;
 static       bool  use_stencil_test   = false;
+static       int   use_vcal           = 0;
 
 scm::gl::trackball_manipulator _trackball_manip;
 
@@ -142,30 +152,74 @@ void render_geometry()
     glPushAttrib(GL_LIGHTING_BIT);
     
     glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_NORMALIZE);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_NORMALIZE);
 
     //glDisable(GL_COLOR_MATERIAL);
+    glActiveTexture(GL_TEXTURE0);
+    _volrend_params._uncertainty_volume_texture.bind();
+
+
+    _shader_program->bind();
+
+    math::mat_glf_t modelview;
+    math::get_gl_matrix(GL_MODELVIEW_MATRIX, modelview);
+
+    math::mat_glf_t vertex_vol_aspect_scale = math::mat4x4f_identity;
+
+    vertex_vol_aspect_scale.scale(
+        _volrend_params._aspect.x,
+        _volrend_params._aspect.y,
+        _volrend_params._aspect.z);
 
     glColor3f(0.6f, 0.6f, 0.6f);
     glPushMatrix();
-        //glTranslatef(0.5f, 0.5f, 0.5f);
-        glPushMatrix();
-            glScalef(0.3, 0.3, 0.3);
-            glTranslatef(-0.4, -0.2, 0.4);
-            glRotatef(90, 1, 0, 0);
-            glutSolidSphere(1.0, 20, 20);
-            glTranslatef(0.8, 0.6, -0.9);
-            glutSolidCube(1.0);
-        glPopMatrix();
-        glPushMatrix();
-            glTranslatef(0.5, 0.5, 0.5);
-            glutSolidCube(1.0);
-        glPopMatrix();
+
+    foreach(const geometry& geom, _geometries) {
+
+        math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4x4f_identity;
+        math::mat_glf_t vertex_to_volume_transform            = vertex_vol_aspect_scale;
+
+        vertex_to_volume_unit_transform.scale(
+            1.0f /(_data_properties._vol_desc._volume_aspect.x *float(_data_properties._vol_desc._data_dimensions.x)),
+            1.0f /(_data_properties._vol_desc._volume_aspect.y *float(_data_properties._vol_desc._data_dimensions.y)),
+            1.0f /(_data_properties._vol_desc._volume_aspect.z *float(_data_properties._vol_desc._data_dimensions.z)));
+        
+        vertex_to_volume_unit_transform.translate(
+            - _data_properties._vol_desc._volume_origin.x,
+            - _data_properties._vol_desc._volume_origin.y,
+            - _data_properties._vol_desc._volume_origin.z);
+        
+        vertex_to_volume_unit_transform.translate(
+            geom._desc._geometry_origin.x,
+            geom._desc._geometry_origin.y,
+            geom._desc._geometry_origin.z);
+        
+        vertex_to_volume_unit_transform.scale(
+            geom._desc._geometry_scale.x,
+            geom._desc._geometry_scale.y,
+            geom._desc._geometry_scale.z);
+
+        vertex_to_volume_transform *= vertex_to_volume_unit_transform;
+        math::mat_glf_t norm_mat =  modelview * vertex_to_volume_transform;
+        norm_mat =  math::transpose(math::inverse(norm_mat));
+        
+        _shader_program->set_uniform_1i("_unc_texture", 0);
+        _shader_program->set_uniform_matrix_4fv("_vert2unit", 1, false, vertex_to_volume_unit_transform.mat_array);
+        _shader_program->set_uniform_matrix_4fv("_vert2vol",  1, false, vertex_to_volume_transform.mat_array);
+        _shader_program->set_uniform_matrix_4fv("_vert2vol_it",  1, false, norm_mat.mat_array);
+
+        glColor3f(0.6f, 0.6f, 0.6f);
+            geom._vbo->bind();
+            geom._vbo->draw_elements();
+            geom._vbo->unbind();
+    }
     glPopMatrix();
+    _shader_program->unbind();
+    _volrend_params._volume_texture.unbind();
 
     glDisable(GL_LIGHT0);
-    glDisable(GL_LIGHTING);
+    //glDisable(GL_LIGHTING);
 
     glPopAttrib();
 }
@@ -435,6 +489,50 @@ bool init_gl()
         return (false);
     }
 
+    _shader_program.reset(new scm::gl::program_object());
+    _vertex_shader.reset(new scm::gl::shader_object(GL_VERTEX_SHADER));
+    _fragment_shader.reset(new scm::gl::shader_object(GL_FRAGMENT_SHADER));
+
+    // load shader code from files
+    if (!_vertex_shader->set_source_code_from_file("./../../../src/app_basic_volume_renderer/shader/two_sided_vert.glsl")) {
+        std::cout << "Error loadong vertex shader:" << std::endl;
+        return (false);
+    }
+    if (!_fragment_shader->set_source_code_from_file("./../../../src/app_basic_volume_renderer/shader/two_sided_frag.glsl")) {
+        std::cout << "Error loadong frament shader:" << std::endl;
+        return (false);
+    }
+
+    // compile shaders
+    if (!_vertex_shader->compile()) {
+        std::cout << "Error compiling vertex shader - compiler output:" << std::endl;
+        std::cout << _vertex_shader->get_compiler_output() << std::endl;
+        return (false);
+    }
+    if (!_fragment_shader->compile()) {
+        std::cout << "Error compiling fragment shader - compiler output:" << std::endl;
+        std::cout << _fragment_shader->get_compiler_output() << std::endl;
+        return (false);
+    }
+
+    // attatch shaders to program object
+    if (!_shader_program->attach_shader(*_vertex_shader)) {
+        std::cout << "unable to attach vertex shader to program object:" << std::endl;
+        return (false);
+    }
+    if (!_shader_program->attach_shader(*_fragment_shader)) {
+        std::cout << "unable to attach fragment shader to program object:" << std::endl;
+        return (false);
+    }
+
+    // link program object
+    if (!_shader_program->link()) {
+        std::cout << "Error linking program - linker output:" << std::endl;
+        std::cout << _shader_program->get_linker_output() << std::endl;
+       return (false);
+    }
+
+
     float dif[4]    = {0.9, 0.9, 0.9, 1};
     float spc[4]    = {0.2, 0.7, 0.9, 1};
     float amb[4]    = {0.4, 0.4, 0.4, 1};
@@ -499,6 +597,61 @@ void draw_console()
     glMatrixMode(current_matrix_mode);
 }
 
+void fill_background()
+{
+    // retrieve current matrix mode
+    GLint  current_matrix_mode;
+    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+    // save polygon and depth buffer bit
+    // to restore culling and depth mask settings later
+    glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_BLEND);
+
+    // disable depth writes
+    glDepthMask(false);
+
+    // push current projection matrix
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    // set ortho projection
+    glLoadIdentity();
+    glOrtho(0, 1, 0, 1, -1, 1);
+
+    // switch back to modelview matrix\
+    // and push current matrix
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
+        // reset current matrix to identity
+        glLoadIdentity();
+
+        glBegin(GL_QUADS);
+            glColor3f(0.26f, 0.3f, 0.4f);
+            glVertex2f(0,0);
+            glVertex2f(1,0);
+            glColor3f(0.6f, 0.7f ,0.75f);
+            glVertex2f(1,1);
+            glVertex2f(0,1);
+        glEnd();
+
+
+    // restore the saved modelview matrix
+    glPopMatrix();
+    // restore the saved projection matrix
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    // restore the saved polygon and depth buffer bits
+    // to reset the culling and depth mask settings
+    glPopAttrib();
+    
+    // restore saved matrix mode
+    glMatrixMode(current_matrix_mode);
+}
+
 void display()
 {
     static scm::time::high_res_timer    _timer;
@@ -506,6 +659,7 @@ void display()
     static double                       _accum_time     = 0.0;
     static double                       _gl_accum_time  = 0.0;
     static unsigned                     _accum_count    = 0;
+    static scm::gl::axes_compass             compass;
 
     _gl_timer.start();
 
@@ -514,7 +668,8 @@ void display()
         glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT |*/ GL_STENCIL_BUFFER_BIT);
     }
     else {
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT |*/ GL_STENCIL_BUFFER_BIT);
+        fill_background();
     }
 
     // push current modelview matrix
@@ -525,8 +680,9 @@ void display()
         
         // geometry pass
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo_id);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        //render_geometry();
+        glClear(GL_DEPTH_BUFFER_BIT/* | GL_COLOR_BUFFER_BIT*/);
+        fill_background();
+        render_geometry();
         //_volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
@@ -572,6 +728,7 @@ void display()
         }
 
     // restore previously saved modelview matrix
+    compass.render();
     glPopMatrix();
     //phong_shader->unbind();
 
@@ -638,8 +795,14 @@ void keyboard(unsigned char key, int x, int y)
 
     switch (key) {
         // ESC key
+        case 'a':
+        case 'A': use_vcal = (use_vcal == 2 ? 0 : use_vcal + 1); std::cout << "vcal " << use_vcal << std::endl;break;
         case 'o':
         case 'O': open_volume(); break;
+        case 'u':
+        case 'U': open_unc_volume(); break;
+        case 'g':
+        case 'G': open_geometry();break;
         case 'X': alt_pressed != 0 ? _volrend_params._point_of_interest.x += ui_float_increment
                                    : _volrend_params._extend.x += ui_float_increment;break;
         case 'x': alt_pressed != 0 ? _volrend_params._point_of_interest.x -= ui_float_increment
@@ -658,8 +821,8 @@ void keyboard(unsigned char key, int x, int y)
         case 'I': do_inside_pass = !do_inside_pass;
                   _volrend_raycast->do_inside_pass(do_inside_pass);
                   break;
-        case 'g':
-        case 'G': draw_geometry = !draw_geometry;break;
+        case 'd':
+        case 'D': draw_geometry = !draw_geometry;break;
         case 'c':
         case 'C':
             if (_con_mode == console_full)

@@ -49,15 +49,15 @@ bool volume_data_loader::read_sub_volume_data(const math::vec<unsigned, 3>& offs
     unsigned offset_src;
     unsigned offset_dst;
 
-    for (unsigned int slice = 0; slice < dimensions.z; slice++) {
-        for (unsigned int line = 0; line < dimensions.y; line++) {
+    for (unsigned int slice = 0; slice < dimensions.z; ++slice) {
+        for (unsigned int line = 0; line < dimensions.y; ++line) {
             offset_src =  offset.x
                         + _vol_desc._data_dimensions.x * (offset.y + line)
                         + _vol_desc._data_dimensions.x * _vol_desc._data_dimensions.y * (offset.z + slice);
             offset_src *= _vol_desc._data_byte_per_channel * _vol_desc._data_num_channels;
 
             offset_dst =  dimensions.x * line
-                        + dimensions.x * dimensions.y * slice;
+                        + dimensions.x * dimensions.y * slice; //(dimensions.z - slice - 1);
             offset_dst *= _vol_desc._data_byte_per_channel * _vol_desc._data_num_channels;
 
             _file.seekg(offset_src + _data_start_offset, std::ios_base::beg);

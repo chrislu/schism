@@ -125,7 +125,7 @@ namespace gl
             glScalef(params._aspect.x,
                      params._aspect.y,
                      params._aspect.z);
-            glTranslatef(-0.5f, -0.5f, -0.5f);
+            //glTranslatef(-0.5f, -0.5f, -0.5f);
 
             _cube.render(GL_FRONT_AND_BACK);
 

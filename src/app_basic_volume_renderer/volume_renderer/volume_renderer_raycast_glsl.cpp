@@ -174,9 +174,9 @@ namespace gl
         texture_transform.scale((math::vec3f_t(1.0f) / params._aspect));
         texture_transform.translate(params._point_of_interest + math::vec3f_t(-0.5f));
         texture_transform.scale(params._aspect);
-        texture_transform.translate(math::vec3f_t(+0.5f));
+        //texture_transform.translate(math::vec3f_t(+0.5f));
         texture_transform.scale(params._extend);
-        texture_transform.translate(math::vec3f_t(-0.5f));
+        //texture_transform.translate(math::vec3f_t(-0.5f));
 
 
         glMatrixMode(GL_TEXTURE);
@@ -206,7 +206,9 @@ namespace gl
         glScalef(params._aspect.x,
                  params._aspect.y,
                  params._aspect.z);
-        glTranslatef(-0.5f, -0.5f, -0.5f);
+        //glTranslatef(0.5f, 0.5f, 0.5f);
+        //glScalef(1,1,-1);
+        //glTranslatef(-0.5f, -0.5f, -0.5f);
 
 
         math::vec3f_t   neutral_cross_plane_pos = math::vec3f_t(-1);
