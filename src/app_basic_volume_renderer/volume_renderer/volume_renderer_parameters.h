@@ -22,6 +22,7 @@ namespace gl
 
         math::vec3f_t           _point_of_interest;
         math::vec3f_t           _extend;
+        math::vec3f_t           _cp_pos;
         math::vec3f_t           _aspect;
         math::vec3f_t           _voxel_size;
         
@@ -34,6 +35,9 @@ namespace gl
         scm::gl::texture_3d     _uncertainty_volume_texture;
 
         unsigned int            _geom_depth_texture_id;
+
+        float _anim_speed;
+        float _last_frame_time;
 
     private:
     }; // class volume_renderer_parameters

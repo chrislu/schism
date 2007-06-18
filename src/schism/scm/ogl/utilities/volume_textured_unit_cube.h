@@ -24,6 +24,8 @@ public:
     void                render(int) const;
 
 protected:
+    bool                _initialized;
+
 private:
     void                clean_up();
 

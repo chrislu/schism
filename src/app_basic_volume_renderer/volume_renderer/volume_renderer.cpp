@@ -11,6 +11,7 @@
 namespace gl
 {
     volume_renderer::volume_renderer()
+        : _initialized(false)
     {
     }
 
@@ -20,9 +21,7 @@ namespace gl
 
     bool volume_renderer::initialize()
     {
-        static bool initialized = false;
-
-        if (initialized) {
+        if (_initialized) {
             return (true);
         }
 
@@ -34,7 +33,7 @@ namespace gl
             return (false);
         }
 
-        initialized = true;
+        _initialized = true;
 
         return (true);
     }
@@ -55,7 +54,7 @@ namespace gl
                 glScalef(params._aspect.x,
                          params._aspect.y,
                          params._aspect.z);
-                glTranslatef(-0.5f, -0.5f, -0.5f);
+                //glTranslatef(-0.5f, -0.5f, -0.5f);
                 glColor3f(0, 0, 0.7f);
                 _cube.render(GL_FRONT);
             glPopMatrix();
@@ -72,7 +71,7 @@ namespace gl
                 glScalef(params._aspect.x,
                          params._aspect.y,
                          params._aspect.z);
-                glTranslatef(-0.5f, -0.5f, -0.5f);
+                //glTranslatef(-0.5f, -0.5f, -0.5f);
                 glColor3f(0, 0.7f, 0);
                 _cube.render(GL_FRONT);
             glPopMatrix();
@@ -83,7 +82,7 @@ namespace gl
                 glScalef(params._aspect.x,
                          params._aspect.y,
                          params._aspect.z);
-                glTranslatef(-0.5f, -0.5f, -0.5f);
+                //glTranslatef(-0.5f, -0.5f, -0.5f);
                 glColor3f(0, 0, 0.7f);
                 _cube.render(GL_BACK);
             glPopMatrix();
@@ -100,7 +99,7 @@ namespace gl
                 glScalef(params._aspect.x,
                          params._aspect.y,
                          params._aspect.z);
-                glTranslatef(-0.5f, -0.5f, -0.5f);
+                //glTranslatef(-0.5f, -0.5f, -0.5f);
                 glColor3f(0, 0.7f, 0);
                 _cube.render(GL_BACK);
             glPopMatrix();

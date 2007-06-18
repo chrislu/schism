@@ -29,6 +29,7 @@ namespace gl
     protected:
         scm::gl::volume_textured_unit_cube   _cube;
         scm::gl::volume_crossplanes          _planes;
+        bool                                 _initialized;
 
     private:
         // declared - never defined

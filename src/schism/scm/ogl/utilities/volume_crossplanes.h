@@ -27,6 +27,8 @@ public:
     float               get_slice_z() const { return (_slice_z); }
 
 protected:
+    bool                _initialized;
+
 private:
     void                clean_up();
 

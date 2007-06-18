@@ -32,6 +32,7 @@
 #include <scm/ogl/font/face_loader.h>
 
 #include <volume_renderer/volume_renderer_raycast_glsl.h>
+#include <volume_renderer/volume_renderer_crossplanes_glsl.h>
 
 #include <scm/core.h>
 #include <scm/core/math/math.h>
@@ -41,6 +42,8 @@
 #include <geometry.h>
 
 boost::scoped_ptr<gl::volume_renderer_raycast_glsl> _volrend_raycast;
+boost::scoped_ptr<gl::volume_renderer_crossplanes_glsl> _volrend_cross_planes;
+
 boost::scoped_ptr<scm::gl::gui::console_renderer>   _console_rend;
 
 boost::scoped_ptr<scm::gl::program_object>   _shader_program;
@@ -61,6 +64,8 @@ static const float ui_float_increment = 0.1f;
 static       bool  use_stencil_test   = false;
 static       int   use_vcal           = 0;
 
+bool _anim_enabled = false;
+float _anim_step = 1.0f;
 scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 0;
@@ -96,7 +101,7 @@ void con_mode_changed()
     }
 
 }
-
+std::vector<math::vec3f_t> colors;
 bool init_font_rendering()
 {
     //std::cout << "fmid " << scm::gl::gl_font_manager_id << std::endl;
@@ -149,13 +154,46 @@ bool init_font_rendering()
 
 void render_geometry()
 {
+    static float anim_steps = 0.0f;
+
+    anim_steps = anim_steps + _volrend_params._anim_speed * _volrend_params._last_frame_time / 1000.0f;
+
+    float anim_step;
+    if (_anim_enabled) {
+        anim_step = math::cos(anim_steps * 2.0f * math::pi_f) * 0.5f + 0.5f;
+    }
+    else {
+        anim_step = _anim_step;//params._anim_step;
+    }
+
     glPushAttrib(GL_LIGHTING_BIT);
     
     glEnable(GL_LIGHT0);
-    //glEnable(GL_LIGHTING);
-    //glEnable(GL_NORMALIZE);
+    
+#if 0
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glDisable(GL_COLOR_MATERIAL);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glPushMatrix();
+        glTranslatef(0.5f, 0.5f, 0.5f);
+        glPushMatrix();
+            glScalef(0.3, 0.3, 0.3);
+            glTranslatef(-0.4, -0.2, 0.4);
+            glRotatef(90, 1, 0, 0);
+            glutSolidSphere(1.0, 20, 20);
+            glTranslatef(0.8, 0.6, -0.9);
+            //glutSolidCube(1.0);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0.5, 0.5, 0.5);
+            glutSolidCube(1.0);
+        glPopMatrix();
+    glPopMatrix();
+#else
+    _volrend_cross_planes->frame(_volrend_params);
 
-    //glDisable(GL_COLOR_MATERIAL);
+
     glActiveTexture(GL_TEXTURE0);
     _volrend_params._uncertainty_volume_texture.bind();
 
@@ -175,8 +213,12 @@ void render_geometry()
     glColor3f(0.6f, 0.6f, 0.6f);
     glPushMatrix();
 
+    unsigned c = 0;
+
     foreach(const geometry& geom, _geometries) {
 
+        glColor3f(colors[c].x, colors[c].y, colors[c].z);
+        ++c;
         math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4x4f_identity;
         math::mat_glf_t vertex_to_volume_transform            = vertex_vol_aspect_scale;
 
@@ -205,11 +247,11 @@ void render_geometry()
         norm_mat =  math::transpose(math::inverse(norm_mat));
         
         _shader_program->set_uniform_1i("_unc_texture", 0);
+        _shader_program->set_uniform_1f("_anim_step", anim_step);
         _shader_program->set_uniform_matrix_4fv("_vert2unit", 1, false, vertex_to_volume_unit_transform.mat_array);
         _shader_program->set_uniform_matrix_4fv("_vert2vol",  1, false, vertex_to_volume_transform.mat_array);
         _shader_program->set_uniform_matrix_4fv("_vert2vol_it",  1, false, norm_mat.mat_array);
 
-        glColor3f(0.6f, 0.6f, 0.6f);
             geom._vbo->bind();
             geom._vbo->draw_elements();
             geom._vbo->unbind();
@@ -217,7 +259,7 @@ void render_geometry()
     glPopMatrix();
     _shader_program->unbind();
     _volrend_params._volume_texture.unbind();
-
+#endif
     glDisable(GL_LIGHT0);
     //glDisable(GL_LIGHTING);
 
@@ -444,6 +486,25 @@ bool init_gl()
         std::cout << "scm::gl::time_query available" << std::endl;
     }
 
+    colors.push_back(math::vec3f_t(.3f));
+    colors.push_back(math::vec3f_t(.0f, .6f, .0f));
+    colors.push_back(math::vec3f_t(.8f, .6f, .0f));
+    colors.push_back(math::vec3f_t(.8f, .0f, .6f));
+    colors.push_back(math::vec3f_t(.3f, .6f, .8f));
+    colors.push_back(math::vec3f_t(.3f, .6f, .3f));
+    colors.push_back(math::vec3f_t(.3f, .6f, .0f));
+    colors.push_back(math::vec3f_t(.6f, .3f, .0f));
+    colors.push_back(math::vec3f_t(.0f, .3f, .0f));
+    colors.push_back(math::vec3f_t(.6f, .2f, .3f));
+    colors.push_back(math::vec3f_t(.6f, .0f, .3f));
+    colors.push_back(math::vec3f_t(.8f));
+    colors.push_back(math::vec3f_t(.0f, .0f, .6f));
+    colors.push_back(math::vec3f_t(.6f, .0f, .0f));
+    colors.push_back(math::vec3f_t(.6f));
+    colors.push_back(math::vec3f_t(.0f, .0f, .3f));
+    colors.push_back(math::vec3f_t(.3f, .0f, .0f));
+    colors.push_back(math::vec3f_t(.6f, .3f, .6f));
+
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
@@ -481,6 +542,12 @@ bool init_gl()
     _volrend_params._geom_depth_texture_id  = fbo_depth_id;//fbo_color_id;//
     _volrend_params._screen_dimensions      = math::vec2f_t(winx, winy);
 
+    _volrend_cross_planes.reset(new gl::volume_renderer_crossplanes_glsl());
+
+    if (!_volrend_cross_planes->initialize()) {
+        std::cout << "unable to initialize crossplane volume renderer" << std::endl;
+        return (false);
+    }
 
     _volrend_raycast.reset(new gl::volume_renderer_raycast_glsl());
 
@@ -551,6 +618,8 @@ bool init_gl()
     glMaterialfv(GL_FRONT, GL_DIFFUSE, dif);
 
     con_mode_changed();
+    _volrend_params._point_of_interest  = math::vec3f_t(.75f, .5f, .5f);
+    _volrend_params._extend             = math::vec3f_t(.5f, 1.f, 1.f);
 
     return (true);
 }
@@ -686,6 +755,7 @@ void display()
         //_volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT );
             glFrontFace(GL_CCW);
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
@@ -743,6 +813,8 @@ void display()
     _timer.stop();
     _timer.start();
 
+    _volrend_params._last_frame_time = scm::time::to_milliseconds(_timer.get_time());
+
     _accum_time         += scm::time::to_milliseconds(_timer.get_time());
     _gl_accum_time      += scm::time::to_milliseconds(_gl_timer.get_time());
     ++_accum_count;
@@ -795,14 +867,20 @@ void keyboard(unsigned char key, int x, int y)
 
     switch (key) {
         // ESC key
-        case 'a':
-        case 'A': use_vcal = (use_vcal == 2 ? 0 : use_vcal + 1); std::cout << "vcal " << use_vcal << std::endl;break;
+        case 'a': _anim_step += 0.1f;break;
+        case 'A': _anim_enabled = !_anim_enabled;break;
         case 'o':
         case 'O': open_volume(); break;
         case 'u':
         case 'U': open_unc_volume(); break;
         case 'g':
         case 'G': open_geometry();break;
+        case 'q': _volrend_params._cp_pos.x += ui_float_increment * _volrend_params._aspect.x;break;
+        case 'Q': _volrend_params._cp_pos.x -= ui_float_increment * _volrend_params._aspect.x;break;
+        case 'w': _volrend_params._cp_pos.y += ui_float_increment * _volrend_params._aspect.y;break;
+        case 'W': _volrend_params._cp_pos.y -= ui_float_increment * _volrend_params._aspect.y;break;
+        case 'e': _volrend_params._cp_pos.z += ui_float_increment * _volrend_params._aspect.z;break;
+        case 'E': _volrend_params._cp_pos.z -= ui_float_increment * _volrend_params._aspect.z;break;
         case 'X': alt_pressed != 0 ? _volrend_params._point_of_interest.x += ui_float_increment
                                    : _volrend_params._extend.x += ui_float_increment;break;
         case 'x': alt_pressed != 0 ? _volrend_params._point_of_interest.x -= ui_float_increment
@@ -823,6 +901,8 @@ void keyboard(unsigned char key, int x, int y)
                   break;
         case 'd':
         case 'D': draw_geometry = !draw_geometry;break;
+        case 'p':
+        case 'P':system("pause");break;
         case 'c':
         case 'C':
             if (_con_mode == console_full)

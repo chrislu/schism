@@ -168,7 +168,6 @@ namespace gl
 
     void volume_renderer_raycast_glsl::frame(const gl::volume_renderer_parameters& params)
     {
-
         math::mat_glf_t texture_transform = math::mat4x4f_identity;
 
         texture_transform.scale((math::vec3f_t(1.0f) / params._aspect));

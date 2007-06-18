@@ -7,7 +7,11 @@ namespace gl
         : _step_size(32.0f),
           _point_of_interest(0.5f),
           _extend(1.0f),
-          _aspect(1.0f)
+          _aspect(1.0f),
+          _cp_pos(0.5f, 0.75f, 0.25f),
+          _anim_speed(.5f),
+          _last_frame_time(0.0f)
+
     {
     }
     
@@ -20,8 +24,8 @@ namespace gl
           _screen_dimensions(prop._screen_dimensions),
           _volume_texture(prop._volume_texture),
           _color_alpha_texture(prop._color_alpha_texture),
-          _geom_depth_texture_id(prop._geom_depth_texture_id)
-
+          _geom_depth_texture_id(prop._geom_depth_texture_id),
+          _cp_pos(prop._cp_pos)
     {
     }
 
@@ -40,6 +44,7 @@ namespace gl
         _volume_texture             = rhs._volume_texture;
         _color_alpha_texture        = rhs._color_alpha_texture;
         _geom_depth_texture_id      = rhs._geom_depth_texture_id;
+        _cp_pos                     = rhs._cp_pos;
 
         return (*this);
     }

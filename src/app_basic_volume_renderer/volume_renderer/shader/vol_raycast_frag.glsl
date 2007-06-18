@@ -51,6 +51,8 @@ vec4 do_shading(in vec3 sample_pos, in vec4 inp)
     vec4 ret;
 
     ret = color_lookup(inp);
+    //ret.rgb = pow(ret.rgb, vec3(10.0));
+    //ret.a = 1.0 - pow(1.0 - ret.a, 10.0);
 #if 0
     // calculate gradient dependent on current transfer function
     // using central differences
@@ -172,6 +174,7 @@ void main()
             // get sample
             src = texture3D(_volume, sample_pos);
             col = do_shading(sample_pos, src);
+            //col.a = 1.0 - pow(1.0 - col.a, 0.1);
 
             //col.rgb = src.rgb;
 

@@ -9,7 +9,8 @@ using namespace scm::gl;
 
 volume_textured_unit_cube::volume_textured_unit_cube()
     : _vertices_vbo(0),
-      _indices_vbo(0)
+      _indices_vbo(0),
+      _initialized(false)
 {
 }
 
@@ -20,9 +21,7 @@ volume_textured_unit_cube::~volume_textured_unit_cube()
 
 bool volume_textured_unit_cube::initialize()
 {
-    static bool initialized = false;
-
-    if (initialized) {
+    if (_initialized) {
         return (true);
     }
 
@@ -173,7 +172,7 @@ bool volume_textured_unit_cube::initialize()
         return (false);
     }
 
-    initialized = true;
+    _initialized = true;
     
     delete [] vertices;
     delete [] indices;

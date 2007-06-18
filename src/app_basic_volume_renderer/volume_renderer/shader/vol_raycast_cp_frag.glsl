@@ -11,5 +11,5 @@ vec4 do_shading(in vec4 inp)
 
 void main()
 {
-    gl_FragColor = do_shading(texture3D(_volume, gl_TexCoord[0].xyz));
+    gl_FragColor = vec4(do_shading(texture3D(_volume, gl_TexCoord[0].xyz)).rgb, 1.0);
 }

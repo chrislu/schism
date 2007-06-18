@@ -15,7 +15,8 @@ volume_crossplanes::volume_crossplanes()
       _slice_y(0.25f),
       _slice_y_enabled(true),
       _slice_z(0.25f),
-      _slice_z_enabled(true)
+      _slice_z_enabled(true),
+      _initialized(false)
 {
 }
 
@@ -53,9 +54,7 @@ void volume_crossplanes::set_slice_z(float z)
 
 bool volume_crossplanes::initialize()
 {
-    static bool initialized = false;
-
-    if (initialized)
+    if (_initialized)
         return (true);
 
     _planes_dlist = glGenLists(1);
@@ -64,7 +63,7 @@ bool volume_crossplanes::initialize()
         return (false);
     }
 
-    initialized = true;
+    _initialized = true;
     return (true);
 }
 
