@@ -197,7 +197,7 @@ bool init_gl()
     std::size_t obj_va_s = 0;
     std::size_t obj_ia_s = 0;
 
-    if (!scm::data::open_obj_file("D:/_devel/data/wfarm/done/knut_data/horizon_n2.obj", obj_f)) {//"./../../../res/objects/some_objects.obj"D:/_devel/data/wfarm/horizon_n2.objc:/horizon_n.obj"./../../../res/objects/some_objects.obj""./../../../res/objects/some_objects.obj", obj_f)) {
+    if (!scm::data::open_obj_file("C:/___VRGeo_data/done/knut_data/horizon_n2.obj", obj_f)) {//"./../../../res/objects/some_objects.obj"D:/_devel/data/wfarm/horizon_n2.objc:/horizon_n.obj"./../../../res/objects/some_objects.obj""./../../../res/objects/some_objects.obj", obj_f)) {
         std::cout << "failed to parse obj" << std::endl;
     }
     else {
