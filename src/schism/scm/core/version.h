@@ -34,6 +34,7 @@ static const std::string    VERSION_ARCH_TAG   = std::string("x64");
 
 // name candidates:
 //   - lux aeterna
+//   - metal, it comes from hell
 
 } // namespace core
 } // namespace scm

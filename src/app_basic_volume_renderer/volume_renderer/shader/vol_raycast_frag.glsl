@@ -1,4 +1,7 @@
 
+#pragma optimize(on)
+#pragma debug(off)
+
 #extension ARB_texture_rectangle : require
 #extension ARB_texture_rectangle : enable
 
