@@ -6,7 +6,8 @@
 #include <scm/ogl/gl.h>
 #include <scm/ogl.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 time_query::time_query()
     : _id(0)
@@ -42,3 +43,6 @@ bool time_query::is_supported()
 {
     return (scm::ogl.get().is_supported("GL_EXT_timer_query"));
 }
+
+} // namespace gl
+} // namespace scm

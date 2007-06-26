@@ -7,7 +7,8 @@
 #include <scm/console.h>
 #include <scm/core/time/detail/highres_time_stamp.h>
 
-using namespace scm::time;
+namespace scm {
+namespace time {
 
 time_system::time_system()
 {
@@ -72,3 +73,6 @@ time_duration time_system::get_elapsed_duration(time_stamp start,
     
     return (nanosec(static_cast<time_stamp>(dur)));
 }
+
+} // namespace time
+} // namespace scm

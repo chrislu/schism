@@ -3,7 +3,8 @@
 
 #include <scm/core/ptr_types.h>
 
-using namespace scm::con;
+namespace scm {
+namespace con {
 
 console_out_stream::console_out_stream()
 {
@@ -52,3 +53,6 @@ void console_out_stream::emit_stream_updated_signal()
 
     _output_stream_updated_signal(line, *this);
 }
+
+} // namespace con
+} // namespace scm

@@ -6,8 +6,8 @@
 namespace {
 } // namespace
 
-using namespace scm;
-using namespace scm::gui;
+namespace scm {
+namespace gui {
 
 font_renderer::font_renderer()
   : _shadow_color(0.f),
@@ -101,3 +101,6 @@ void font_renderer::draw_string(const math::vec2i_t&         pos,
 {
     return (draw_string(pos, txt, math::vec4f_t(col, 1.f), unl, stl));
 }
+
+} // namespace gui
+} // namespace scm

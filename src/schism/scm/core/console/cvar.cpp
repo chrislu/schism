@@ -4,7 +4,8 @@
 #include <limits>
 #include <boost/lexical_cast.hpp>
 
-using namespace scm::con;
+namespace scm {
+namespace con {
 
 cvar::cvar()
     : _current_type(CVAR_T_UNASSIGNED),
@@ -76,3 +77,6 @@ std::ostream& scm::con::operator << (std::ostream& os, const cvar& var) {
     }
     return (os);
 }
+
+} // namespace con
+} // namespace scm

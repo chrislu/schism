@@ -1,8 +1,8 @@
 
 #include "frame.h"
 
-using namespace scm;
-using namespace scm::gui;
+namespace scm {
+namespace gui {
 
 frame::frame()
   : _content_margins(0),
@@ -44,3 +44,6 @@ const math::vec4i_t& frame::content_margins() const
 {
     return (_content_margins);
 }
+
+} // namespace gui
+} // namespace scm

@@ -1,7 +1,8 @@
 
 #include "error_checker.h"
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 error_checker::error_checker() : _error(GL_NO_ERROR)
 {
@@ -44,3 +45,6 @@ std::string error_checker::get_error_string(const GLenum error)
 
     return (error_string);
 }
+
+} // namespace gl
+} // namespace scm

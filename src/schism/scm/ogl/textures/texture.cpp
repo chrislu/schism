@@ -1,7 +1,8 @@
 
 #include "texture.h"
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 texture::texture(const GLenum target)
     : _texture_id(0),
@@ -58,3 +59,6 @@ void texture::generate_texture_id()
 {
     glGenTextures(1, &_texture_id);
 }
+
+} // namespace gl
+} // namespace scm

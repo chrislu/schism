@@ -30,9 +30,9 @@ void draw_quad(const math::vec2i_t& lower_left,
 
 } // namespace
 
-using namespace scm;
-using namespace scm::gl;
-using namespace scm::gl::gui;
+namespace scm {
+namespace gl {
+namespace gui {
 
 font_renderer::font_renderer()
 {
@@ -136,3 +136,7 @@ void font_renderer::draw_string(const math::vec2i_t&         pos,
     glPopAttrib();
 
 }
+
+} // namespace gui
+} // namespace gl
+} // namespace scm

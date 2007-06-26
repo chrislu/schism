@@ -3,7 +3,8 @@
 
 #include <scm/core/resource/resource_pointer.h>
 
-using namespace scm::res;
+namespace scm {
+namespace res {
 
 resource_manager_base::resource_manager_base()
 {
@@ -112,3 +113,6 @@ void resource_manager_base::clear_resources()
 
     _resources.clear();
 }
+
+} // namespace res
+} // namespace scm

@@ -8,8 +8,8 @@
 #include <scm/core/utilities/foreach.h>
 #include <scm/core/gui/font_renderer.h>
 
-using namespace scm;
-using namespace scm::gui;
+namespace scm {
+namespace gui {
 
 text_box::text_box()
   : _orientation(orient_horizontal),
@@ -186,3 +186,6 @@ void text_box::draw_text() const
         // break if cur_line > max_lines
     }
 }
+
+} // namespace gui
+} // namespace scm

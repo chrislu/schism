@@ -3,7 +3,8 @@
 
 #include <scm/core/time/time_system.h>
 
-using namespace scm::time;
+namespace scm {
+namespace time {
 
 high_res_timer::high_res_timer()
     : _start(0)
@@ -25,3 +26,6 @@ void high_res_timer::stop()
     _duration = time_system::get_elapsed_duration(_start, 
                                                   time_system::get_time_stamp());
 }
+
+} // namespace time
+} // namespace scm

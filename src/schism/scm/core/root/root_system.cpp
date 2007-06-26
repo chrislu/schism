@@ -33,7 +33,8 @@ namespace {
 
 } // namespace
 
-using namespace scm::core;
+namespace scm {
+namespace core {
 
 root_system::root_system()
 {
@@ -332,3 +333,6 @@ void root_system::unregister_resource_managers()
 
     _resource_managers.clear();
 }
+
+} // namespace core
+} // namespace scm

@@ -1,8 +1,8 @@
 
 #include "draw_area.h"
 
-using namespace scm;
-using namespace scm::gui;
+namespace scm {
+namespace gui {
 
 draw_area::draw_area()
   : _position(0),
@@ -48,3 +48,6 @@ float draw_area::opacity() const
 {
     return (_opacity);
 }
+
+} // namespace gui
+} // namespace scm

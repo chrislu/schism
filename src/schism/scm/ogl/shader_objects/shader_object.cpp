@@ -8,7 +8,8 @@
 
 #include <scm/ogl.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 shader_object::shader_object(unsigned int t)
     : _type(t),
@@ -141,3 +142,6 @@ bool shader_object::get_source_from_file(const std::string& filename, std::strin
 
     return (true);
 }
+
+} // namespace gl
+} // namespace scm

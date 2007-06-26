@@ -21,7 +21,6 @@ namespace scm {
 namespace con {
 namespace detail {
 
-
 void cvar_export_lua_binding(lua_State* l_state)
 {
     using namespace luabind;

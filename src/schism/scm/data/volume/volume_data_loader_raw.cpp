@@ -59,7 +59,8 @@ bool parse_raw_file_name(const std::string& filename,
 
 } // namespace
 
-using namespace scm::data;
+namespace scm {
+namespace data {
 
 volume_data_loader_raw::volume_data_loader_raw()
     : volume_data_loader()
@@ -172,3 +173,6 @@ bool volume_data_loader_raw::read_sub_volume(const math::vec<unsigned, 3>& offse
 
     return (true);
 }
+
+} // namespace data
+} // namespace scm

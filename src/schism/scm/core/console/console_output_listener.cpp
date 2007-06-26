@@ -3,7 +3,8 @@
 
 #include <boost/bind.hpp>
 
-using namespace scm::con;
+namespace scm {
+namespace con {
 
 console_output_listener::console_output_listener()
   : _log_threshold(con::info)
@@ -33,3 +34,6 @@ void console_output_listener::set_log_threshold(int threshold)
 {
     _log_threshold = threshold;
 }
+
+} // namespace con
+} // namespace scm

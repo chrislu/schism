@@ -5,7 +5,8 @@
 #include <exception>
 #include <new>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 bool volume_generator_checkerboard::generate_float_volume(unsigned dim_x,
                                                           unsigned dim_y,
@@ -45,3 +46,6 @@ bool volume_generator_checkerboard::generate_float_volume(unsigned dim_x,
 
     return (true);
 }
+
+} // namespace gl
+} // namespace scm

@@ -9,7 +9,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-using namespace scm::font::detail;
+namespace scm {
+namespace font {
+namespace detail {
 
 ft_library::ft_library(){}
 
@@ -43,3 +45,7 @@ ft_face::~ft_face()
 {
     FT_Done_Face(_face);
 }
+
+} // namespace detail
+} // namespace font
+} // namespace scm

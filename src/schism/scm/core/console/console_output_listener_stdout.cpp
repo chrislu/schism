@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 
-using namespace scm::con;
+namespace scm {
+namespace con {
 
 console_output_listener_stdout::console_output_listener_stdout()
 {
@@ -21,3 +22,6 @@ void console_output_listener_stdout::update(const std::string&          update_b
         std::cout << update_buffer;
     }
 }
+
+} // namespace con
+} // namespace scm

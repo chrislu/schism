@@ -1,7 +1,8 @@
 
 #include "volume_data_loader.h"
 
-using namespace scm::data;
+namespace scm {
+namespace data {
 
 volume_data_loader::volume_data_loader()
   : _data_start_offset(0)
@@ -67,3 +68,6 @@ bool volume_data_loader::read_sub_volume_data(const math::vec<unsigned, 3>& offs
 
     return (true);                                             
 }
+
+} // namespace data
+} // namespace scm

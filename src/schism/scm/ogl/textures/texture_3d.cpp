@@ -3,7 +3,8 @@
 
 #include <scm/ogl/utilities/error_checker.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 texture_3d::texture_3d()
     : texture(GL_TEXTURE_3D),
@@ -82,3 +83,6 @@ bool texture_3d::tex_image(GLint     mip_level,
 
     return (true);
 }
+
+} // namespace gl
+} // namespace scm

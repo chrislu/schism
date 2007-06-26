@@ -17,7 +17,8 @@
 #include <scm/core/font/face.h>
 #include <scm/core/font/detail/freetype_types.h>
 
-using namespace scm::font;
+namespace scm {
+namespace font {
 
 face_loader::face_loader()
 {
@@ -515,3 +516,6 @@ void face_loader::free_texture_resources()
 
     _face_style_textures.clear();
 }
+
+} // namespace font
+} // namespace scm

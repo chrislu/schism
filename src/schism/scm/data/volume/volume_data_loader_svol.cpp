@@ -12,7 +12,8 @@
 
 #include <scm/data/volume/scm_vol/scm_vol.h>
 
-using namespace scm::data;
+namespace scm {
+namespace data {
 
 volume_data_loader_svol::volume_data_loader_svol()
 {
@@ -54,3 +55,6 @@ bool volume_data_loader_svol::open_file(const std::string& filename)
                                               _vol_desc._data_num_channels,
                                               _vol_desc._data_byte_per_channel));
 }
+
+} // namespace data
+} // namespace scm

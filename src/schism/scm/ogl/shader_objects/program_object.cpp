@@ -6,7 +6,8 @@
 #include <scm/ogl.h>
 #include <scm/ogl/shader_objects/shader_object.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 program_object::program_object()
     : _prog(0)
@@ -265,3 +266,6 @@ int program_object::get_uniform_location(const std::string& param_name) const
 {
     return (glGetUniformLocation(_prog, param_name.c_str()));
 }
+
+} // namespace gl
+} // namespace scm

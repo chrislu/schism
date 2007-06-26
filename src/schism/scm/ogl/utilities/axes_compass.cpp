@@ -6,7 +6,8 @@
 #include <scm/core/math/math.h>
 #include <scm/core/math/math_gl.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 axes_compass::axes_compass()
 {
@@ -83,3 +84,6 @@ void axes_compass::render() const
 
     glViewport(cur_viewport[0], cur_viewport[1], cur_viewport[2], cur_viewport[3]);
 }
+
+} // namespace gl
+} // namespace scm

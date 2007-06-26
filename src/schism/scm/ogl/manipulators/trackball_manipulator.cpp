@@ -4,7 +4,8 @@
 #include <scm/ogl/gl.h>
 #include <scm/core/math/math.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 // trackball_manipulator implementation
 trackball_manipulator::trackball_manipulator() : _radius(1.f), _dolly(0.f) {
@@ -87,4 +88,8 @@ const math::mat4x4f_t trackball_manipulator::get_transform_matrix() const
     tmp_ret *= _matrix;
 
     return (tmp_ret);
-    }
+}
+
+} // namespace gl
+} // namespace scm
+

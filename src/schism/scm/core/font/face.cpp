@@ -7,7 +7,8 @@
 #include <scm/console.h>
 #include <scm/core/exception/system_exception.h>
 
-using namespace scm::font;
+namespace scm {
+namespace font {
 
 // face_style
 face_style::face_style()
@@ -155,3 +156,6 @@ void face::clear()
     _name.assign("");
     _size_at_72dpi = 0;
 }
+
+} // namespace font
+} // namespace scm

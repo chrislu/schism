@@ -16,8 +16,8 @@ namespace std
 } // namespace std
 
 
-using namespace scm::res;
-
+namespace scm {
+namespace res {
 
 resource_pointer_base::resource_pointer_base()
 {
@@ -100,3 +100,6 @@ void resource_pointer_base::release_instance()
         m->release_instance(*this);
     }
 }
+
+} // namespace res
+} // namespace scm

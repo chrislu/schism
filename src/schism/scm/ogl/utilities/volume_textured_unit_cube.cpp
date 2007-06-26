@@ -5,7 +5,8 @@
 
 #include "volume_textured_unit_cube.h"
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 volume_textured_unit_cube::volume_textured_unit_cube()
     : _vertices_vbo(0),
@@ -230,3 +231,6 @@ void volume_textured_unit_cube::clean_up()
     glDeleteBuffers(1, &_vertices_vbo);
     glDeleteBuffers(1, &_indices_vbo);
 }
+
+} // namespace gl
+} // namespace scm

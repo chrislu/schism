@@ -9,7 +9,8 @@
 namespace {
 } // namespace
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 opengl_system::opengl_system()
 {
@@ -52,3 +53,6 @@ bool opengl_system::is_supported(const std::string& ext) const
 {
     return (glewIsSupported(ext.c_str()) == GL_TRUE ? true : false);
 }
+
+} // namespace gl
+} // namespace scm

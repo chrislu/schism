@@ -4,8 +4,8 @@
 #include <scm/core.h>
 #include <scm/core/exception/system_exception.h>
 
-using namespace scm;
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 // gl_font_face
 face::face()
@@ -52,3 +52,6 @@ void face::cleanup_textures()
     //}
     _style_textures.clear();
 }
+
+} // namespace gl
+} // namespace scm

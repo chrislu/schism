@@ -1,7 +1,8 @@
 
 #include "texture_2d.h"
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 texture_2d::texture_2d()
     : texture(GL_TEXTURE_2D),
@@ -70,3 +71,6 @@ bool texture_2d::tex_image(GLint     mip_level,
 
     return (true);
 }
+
+} // namespace gl
+} // namespace scm

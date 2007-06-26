@@ -5,7 +5,8 @@
 
 #include <scm/core/math/math.h>
 
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 volume_crossplanes::volume_crossplanes()
     : _planes_dlist(0),
@@ -139,3 +140,6 @@ void volume_crossplanes::render() const
 void volume_crossplanes::clean_up()
 {
 }
+
+} // namespace gl
+} // namespace scm

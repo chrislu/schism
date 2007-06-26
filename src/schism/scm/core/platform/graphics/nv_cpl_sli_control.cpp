@@ -17,7 +17,8 @@ namespace
     static scm::platform::detail::nv_cpl_data_control nv_cpl_data_ctrl;
 } // namespace
 
-using namespace scm::platform;
+namespace scm {
+namespace platform {
 
 bool nv_cpl_sli_control::open()
 {
@@ -89,3 +90,5 @@ bool nv_cpl_sli_control::set_current_sli_mode(sli_mode_t mode)
     return (nv_cpl_data_ctrl._set_data_int(NVCPL_API_SLI_MULTI_GPU_RENDERING_MODE, mode));
 }      
 
+} // namespace platform
+} // namespace scm

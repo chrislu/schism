@@ -14,8 +14,9 @@ namespace
     static HINSTANCE    nv_cpl_lib;
 } // namespace
 
-using namespace scm::platform::detail;
-
+namespace scm {
+namespace platform {
+namespace detail {
 
 bool nv_cpl_data_control::initialize_cpl_control()
 {
@@ -57,3 +58,6 @@ void nv_cpl_data_control::close_cpl_control()
 #endif
 }
 
+} // namespace detail
+} // namespace platform
+} // namespace scm

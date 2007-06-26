@@ -8,7 +8,8 @@
 #include <scm/data/volume/voxel_geo_vol/vv_shm.h>
 
 
-using namespace scm::data;
+namespace scm {
+namespace data {
 
 static boost::scoped_ptr<VV_volume>  vgeo_vol_hdr;
 
@@ -150,3 +151,6 @@ bool volume_data_loader_vgeo::read_sub_volume(const math::vec<unsigned, 3>& offs
 
     return (true);
 }
+
+} // namespace data
+} // namespace scm

@@ -3,7 +3,8 @@
 
 #include <scm/console.h>
 
-using namespace scm::con;
+namespace scm {
+namespace con {
 
 #pragma todo(make _input_history_max_length variable)
 
@@ -69,3 +70,6 @@ void console_system::add_input_history(const std::string& inp)
         _input_history.pop_front();
     }
 }
+
+} // namespace con
+} // namespace scm

@@ -12,8 +12,8 @@
 #include <scm/ogl/gl.h>
 #include <scm/ogl/utilities/error_checker.h>
 
-using namespace scm;
-using namespace scm::gl;
+namespace scm {
+namespace gl {
 
 face_loader::face_loader()
 {
@@ -98,3 +98,6 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
 
     return (font_face);
 }
+
+} // namespace gl
+} // namespace scm
