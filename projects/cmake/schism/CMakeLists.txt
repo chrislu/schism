@@ -4,5 +4,6 @@ SUBDIRS(
     core
     ogl
     data
+    input
 )
 

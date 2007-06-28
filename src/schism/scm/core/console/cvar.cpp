@@ -68,8 +68,11 @@ bool cvar::equals(const cvar& rhs) const
             && _string_data  == rhs._string_data);
 }
 
+} // namespace con
+} // namespace scm
+
 std::ostream& scm::con::operator << (std::ostream& os, const cvar& var) {
-    
+
     switch (var._current_type) {
         case cvar::CVAR_T_NUMBER:       os << var._number_data << " (cvar_type: number)"; break;
         case cvar::CVAR_T_STRING:       os << var._string_data << " (cvar_type: string)"; break;
@@ -77,6 +80,3 @@ std::ostream& scm::con::operator << (std::ostream& os, const cvar& var) {
     }
     return (os);
 }
-
-} // namespace con
-} // namespace scm
