@@ -1,6 +1,8 @@
 
 #include "tracker.h"
 
+#include <scm/input/tracking/target.h>
+
 namespace scm {
 namespace inp {
 

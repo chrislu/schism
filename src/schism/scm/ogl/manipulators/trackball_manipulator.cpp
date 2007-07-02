@@ -79,7 +79,7 @@ void trackball_manipulator::apply_transform() const {
     glMultMatrixf(&_matrix);
 }
 
-const math::mat4x4f_t trackball_manipulator::get_transform_matrix() const
+const math::mat4f_t trackball_manipulator::get_transform_matrix() const
 {
     math::mat_glf_t tmp_ret;
 

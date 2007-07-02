@@ -19,19 +19,25 @@ namespace inp {
 class __scm_export(input) art_dtrack : public tracker
 {
 public:
-    art_dtrack();
+    art_dtrack(std::size_t /*listening_port*/ = 5000,
+               std::size_t /*timeout*/        = 1000000);
     virtual ~art_dtrack();
 
     bool                        initialize();
-    void                        update();
+    void                        update(target_container& /*targets*/);
     bool                        shutdown();
+
+    std::size_t                  listening_port() const;
+    std::size_t                  timeout() const;
 
 protected:
 
 private:
-    const boost::scoped_ptr<DTrack>   _dtrack;
-    std::size_t                 _listening_port;
-    std::size_t                 _timeout;
+    const boost::scoped_ptr<DTrack> _dtrack;
+    std::size_t                     _listening_port;
+    std::size_t                     _timeout;
+
+    bool                            _initialized;
 
 }; // class art_dtrack
 

@@ -1,20 +1,9 @@
 
 
 #include <iostream>
+#include <map>
 
 #include <boost/scoped_array.hpp>
-#include <boost/functional/hash.hpp>
-
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/push_back.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/accumulate.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/arithmetic.hpp>
-#include <boost/mpl/deref.hpp>
-#include <boost/mpl/same_as.hpp>
-
 #include <boost/assign/std/vector.hpp>
 
 #include <scm/core.h>
@@ -32,6 +21,9 @@
 #include <scm/data/geometry/wavefront_obj/obj_to_vertex_array.h>
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
+
+#include <scm/input/tracking/art_dtrack.h>
+#include <scm/input/tracking/target.h>
 
 scm::gl::trackball_manipulator _trackball_manip;
 scm::gl::vertexbuffer_object   _obj_vbo;
@@ -62,6 +54,10 @@ boost::scoped_ptr<scm::gl::shader_object>    _fragment_shader;
 
 boost::scoped_array<vertex_format>  vertices;
 boost::scoped_array<unsigned short> indices;
+
+boost::scoped_ptr<scm::inp::art_dtrack> _dtrack;
+
+scm::inp::tracker::target_container     _targets;
 
 // vbo ids
 unsigned cube_vbo           = 0;
@@ -218,6 +214,20 @@ bool init_gl()
     glMaterialf(GL_FRONT, GL_SHININESS, 128.0f);
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambm);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, difm);
+
+
+    _dtrack.reset(new scm::inp::art_dtrack());
+
+    std::cout << "initializing art_dtrack" << std::endl;
+    if (!_dtrack->initialize()) {
+        return (false);
+    }
+    else {
+        std::cout << " - successfullty initialized art_dtrack" << std::endl;
+    }
+
+    _targets.insert(scm::inp::tracker::target_container::value_type(6, scm::inp::target(6)));
+
     return (true);
 }
 
@@ -334,17 +344,42 @@ void mousemotion(int x, int y)
     inity = ny;
     initx = nx;
 }
+
+void shutdown_gl()
+{
+    _dtrack->shutdown();
+
+    scm::gl::shutdown();
+    scm::shutdown();
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
         // ESC key
-        case 27: exit (0); break;
+        case 27: shutdown_gl();exit (0); break;
         default:;
     }
 }
 
 void idle()
 {
+    _dtrack->update(_targets);
+
+    scm::inp::tracker::target_container::const_iterator target_it = _targets.find(6);
+
+    if (target_it != _targets.end()) {
+        std::cout << target_it->second.transform().m00 << " " << target_it->second.transform().m04 << " " << target_it->second.transform().m08 << " " << target_it->second.transform().m12 << std::endl;
+        std::cout << target_it->second.transform().m01 << " " << target_it->second.transform().m05 << " " << target_it->second.transform().m09 << " " << target_it->second.transform().m13 << std::endl;
+        std::cout << target_it->second.transform().m02 << " " << target_it->second.transform().m06 << " " << target_it->second.transform().m10 << " " << target_it->second.transform().m14 << std::endl;
+        std::cout << target_it->second.transform().m03 << " " << target_it->second.transform().m07 << " " << target_it->second.transform().m11 << " " << target_it->second.transform().m15 << std::endl;
+    }
+
+    //Sleep(200);
+
+    std::cout << std::endl;
+
+
     // animate
     anim_angl += 0.5f;
 

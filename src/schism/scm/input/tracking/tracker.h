@@ -2,8 +2,9 @@
 #ifndef SCM_INPUT_TRACKER_H_INCLUDED
 #define SCM_INPUT_TRACKING_H_INCLUDED
 
+#include <cstddef>
 #include <string>
-#include <list>
+#include <map>
 
 //#include <scm/input/tracking/target.h>
 
@@ -18,20 +19,19 @@ class target;
 class __scm_export(input) tracker
 {
 public:
-    typedef std::list<target>   target_container;
+    typedef std::map<std::size_t, target>   target_container;
 
 public:
     tracker(const std::string& name);
     virtual ~tracker();
 
-    virtual bool        initialize() = 0;
-    virtual void        update()     = 0;
-    virtual bool        shutdown()   = 0;
+    virtual bool        initialize()                          = 0;
+    virtual void        update(target_container& /*targets*/) = 0;
+    virtual bool        shutdown()                            = 0;
 
     const std::string&  name() const;
 
 protected:
-    target_container    _targets;
 
 private:
     std::string         _name;

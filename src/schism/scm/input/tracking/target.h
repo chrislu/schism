@@ -15,16 +15,16 @@ namespace inp {
 class __scm_export(input) target
 {
 public:
-    target();
+    target(std::size_t /*id*/);
     target(const target& /*ref*/);
     virtual ~target();
 
     const target&               operator=(const target&  /*rhs*/);
     void                        swap(target& /*ref*/);
 
-
     std::size_t                 id() const;
     const math::mat4f_t&        transform() const;
+    void                        transform(const math::mat4f_t& /*trans*/);
 
 protected:
     std::size_t                 _id;

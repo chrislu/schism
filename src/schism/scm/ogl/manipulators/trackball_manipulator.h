@@ -28,7 +28,7 @@ public:
 
     void apply_transform() const;
 
-    const math::mat4x4f_t get_transform_matrix() const;
+    const math::mat4f_t get_transform_matrix() const;
 
 private:
     float project_to_sphere(float x, float y) const;

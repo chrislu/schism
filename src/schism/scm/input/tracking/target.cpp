@@ -4,7 +4,9 @@
 namespace scm {
 namespace inp {
 
-target::target()
+target::target(std::size_t id)
+  : _id(id),
+    _transform(1.0f)
 {
 }
 
@@ -40,6 +42,11 @@ std::size_t target::id() const
 const math::mat4f_t& target::transform() const
 {
     return (_transform);
+}
+
+void target::transform(const math::mat4f_t& trans)
+{
+    _transform  = trans;
 }
 
 } // namespace inp
