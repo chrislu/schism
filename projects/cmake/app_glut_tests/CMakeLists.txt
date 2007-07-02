@@ -6,7 +6,7 @@ SET(SRC_DIR "${GLOBAL_SRC_DIR}/app_glut_tests")
 SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_09_retained_mode_vbo_obj_import.cpp)
+FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_12_art_tracking.cpp)
 FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
 FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
 
@@ -112,4 +112,5 @@ ADD_DEPENDENCIES(${PROJECT_NAME}
     scm_ogl
     scm_core
     scm_data
+    scm_input
 )
