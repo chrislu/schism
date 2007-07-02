@@ -310,9 +310,10 @@ void display()
 
     // restore previously saved modelview matrix
     glPopMatrix();
-    // push current modelview matrix
+    glLineWidth(5.0f);
+    // push current modelview 
     glPushMatrix();
-        glTranslatef(0, 0, -5.0);
+        glTranslatef(0, 1, 0);
         //glScalef(3,3,3);
             glBegin(GL_LINES);
             glColor3f( 1, 0, 0);
@@ -444,9 +445,10 @@ void idle()
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        float d = view_pos.y;
+        //float d = view_pos.y;
 
         view_pos = math::inverse(scm::_world_to_screen_transform) * view_pos;
+        float d = math::abs(view_pos.y);
 
         glFrustum((view_pos.x - scm::_screen._screen_world_dim.x / 2.0f) * scm::_znear / d,
                   (view_pos.x + scm::_screen._screen_world_dim.x / 2.0f) * scm::_znear / d,
@@ -460,6 +462,17 @@ void idle()
 
         // restore saved matrix mode
         glMatrixMode(current_matrix_mode);
+        glLoadIdentity();
+        math::mat4f_t head = math::mat4f_identity;// target_it->second.transform();
+
+        head.m12 = target_it->second.transform().m12 / 1000.0f;
+        head.m13 = target_it->second.transform().m13 / 1000.0f;
+        head.m14 = target_it->second.transform().m14 / 1000.0f;
+
+        head = math::inverse(scm::_tracking_to_world_transform) * head;
+        head = math::inverse(head);
+
+        glMultMatrixf(head.mat_array);
 
 
         std::cout << std::endl;
