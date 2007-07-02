@@ -25,6 +25,8 @@
 #include <scm/input/tracking/art_dtrack.h>
 #include <scm/input/tracking/target.h>
 
+#include <scm/core/math/math.h>
+
 scm::gl::trackball_manipulator _trackball_manip;
 scm::gl::vertexbuffer_object   _obj_vbo;
 
@@ -46,6 +48,24 @@ struct vertex_format
     float       tex[3];
     float       pos[3];
 };
+
+namespace scm {
+
+struct screen
+{
+    math::vec2f_t       _screen_world_dim;              // in meters
+    math::vec3f_t       _screen_lower_left_location;    // in world coordinates
+}; // struct screen
+
+math::mat4f_t           _tracking_to_world_transform;
+math::mat4f_t           _world_to_screen_transform;
+
+screen                  _screen;
+
+float                   _znear = 0.5f;  // 50cm
+float                   _zfar  = 10.0f; // 10m
+
+} // namespace scm
 
 boost::scoped_ptr<scm::gl::program_object>   _shader_program;
 boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
@@ -200,9 +220,6 @@ bool init_gl()
     float spcm[4]    = {0.2, 0.7, 0.9, 1};
     float ambm[4]    = {0.1, 0.1, 0.1, 1};
 
-    // setup light 0
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHTING);
 
     glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
     glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
@@ -227,6 +244,22 @@ bool init_gl()
     }
 
     _targets.insert(scm::inp::tracker::target_container::value_type(6, scm::inp::target(6)));
+
+    scm::_screen._screen_world_dim              = math::vec2f_t(3.0f, 2.0f);
+    scm::_screen._screen_lower_left_location    = math::vec3f_t(-scm::_screen._screen_world_dim.x/2.0f,
+                                                                 2.4f,
+                                                                 0.45f);
+
+    scm::_tracking_to_world_transform           = math::mat4f_identity;
+    scm::_tracking_to_world_transform.m12       = 0.0f;     // x off
+    scm::_tracking_to_world_transform.m13       = 0.0f;     // y off
+    scm::_tracking_to_world_transform.m14       = -0.72f;    // z off 72cm
+
+    scm::_world_to_screen_transform             = math::mat4f_identity;
+    scm::_world_to_screen_transform.m12         = scm::_screen._screen_lower_left_location.x + scm::_screen._screen_world_dim.x / 2.0f;
+    scm::_world_to_screen_transform.m13         = scm::_screen._screen_lower_left_location.y;
+    scm::_world_to_screen_transform.m14         = scm::_screen._screen_lower_left_location.z + scm::_screen._screen_world_dim.y / 2.0f;
+
 
     return (true);
 }
@@ -269,12 +302,34 @@ void display()
     glPushMatrix();
 
         // apply camera transform
-        _trackball_manip.apply_transform();
+        //_trackball_manip.apply_transform();
 
-        draw_wavefront_obj_vertex_buffer_object();
+        glTranslatef(0, 0, -10);
+
+        //draw_wavefront_obj_vertex_buffer_object();
 
     // restore previously saved modelview matrix
     glPopMatrix();
+    // push current modelview matrix
+    glPushMatrix();
+        glTranslatef(0, 0, -5.0);
+        //glScalef(3,3,3);
+            glBegin(GL_LINES);
+            glColor3f( 1, 0, 0);
+            glVertex3f(0, 0, 0);
+            glVertex3f(1, 0, 0);
+
+            glColor3f( 0, 1, 0);
+            glVertex3f(0, 0, 0);
+            glVertex3f(0, 1, 0);
+
+            glColor3f( 0, 0, 1);
+            glVertex3f(0, 0, 0);
+            glVertex3f(0, 0, 1);
+            glEnd();
+    // restore previously saved modelview matrix
+    glPopMatrix();
+
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
@@ -369,10 +424,46 @@ void idle()
     scm::inp::tracker::target_container::const_iterator target_it = _targets.find(6);
 
     if (target_it != _targets.end()) {
-        std::cout << target_it->second.transform().m00 << " " << target_it->second.transform().m04 << " " << target_it->second.transform().m08 << " " << target_it->second.transform().m12 << std::endl;
-        std::cout << target_it->second.transform().m01 << " " << target_it->second.transform().m05 << " " << target_it->second.transform().m09 << " " << target_it->second.transform().m13 << std::endl;
-        std::cout << target_it->second.transform().m02 << " " << target_it->second.transform().m06 << " " << target_it->second.transform().m10 << " " << target_it->second.transform().m14 << std::endl;
-        std::cout << target_it->second.transform().m03 << " " << target_it->second.transform().m07 << " " << target_it->second.transform().m11 << " " << target_it->second.transform().m15 << std::endl;
+        //std::cout << target_it->second.transform().m00 << " " << target_it->second.transform().m04 << " " << target_it->second.transform().m08 << " " << target_it->second.transform().m12 << std::endl;
+        //std::cout << target_it->second.transform().m01 << " " << target_it->second.transform().m05 << " " << target_it->second.transform().m09 << " " << target_it->second.transform().m13 << std::endl;
+        //std::cout << target_it->second.transform().m02 << " " << target_it->second.transform().m06 << " " << target_it->second.transform().m10 << " " << target_it->second.transform().m14 << std::endl;
+        //std::cout << target_it->second.transform().m03 << " " << target_it->second.transform().m07 << " " << target_it->second.transform().m11 << " " << target_it->second.transform().m15 << std::endl;
+
+        math::vec4f_t   view_pos(target_it->second.transform().m12 / 1000.0f,
+                                 target_it->second.transform().m13 / 1000.0f,
+                                 target_it->second.transform().m14 / 1000.0f,
+                                 1.0);
+
+        view_pos = math::inverse(scm::_tracking_to_world_transform) * view_pos;
+
+        // retrieve current matrix mode
+        GLint  current_matrix_mode;
+        glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+        // reset the projection matrix
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        float d = view_pos.y;
+
+        view_pos = math::inverse(scm::_world_to_screen_transform) * view_pos;
+
+        glFrustum((view_pos.x - scm::_screen._screen_world_dim.x / 2.0f) * scm::_znear / d,
+                  (view_pos.x + scm::_screen._screen_world_dim.x / 2.0f) * scm::_znear / d,
+                  (view_pos.z - scm::_screen._screen_world_dim.y / 2.0f) * scm::_znear / d,
+                  (view_pos.z + scm::_screen._screen_world_dim.y / 2.0f) * scm::_znear / d,
+                  scm::_znear,
+                  scm::_zfar);
+
+        //gluPerspective(60.f, float(w)/float(h), 0.1f, 100.f);
+
+
+        // restore saved matrix mode
+        glMatrixMode(current_matrix_mode);
+
+
+        std::cout << std::endl;
+
     }
 
     //Sleep(200);

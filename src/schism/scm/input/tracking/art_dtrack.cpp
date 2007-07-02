@@ -77,8 +77,6 @@ bool art_dtrack::initialize()
         console.get() << con::log_level(con::warning)
                       << "art_dtrack::initialize(): "
                       << "unable to enable cameras and calculation (error: '" << error_dtrack << "')" << std::endl;
-
-        //return (false);
     }
 
     _initialized = true;
