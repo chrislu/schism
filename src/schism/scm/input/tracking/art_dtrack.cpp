@@ -8,6 +8,7 @@
 #include <scm/console.h>
 
 #include <scm/core/math/math.h>
+#include <scm/core/math/math_gl.h>
 #include <scm/core/utilities/foreach.h>
 
 #include <scm/input/tracking/target.h>
@@ -148,15 +149,30 @@ void art_dtrack::update(target_container& targets)
     const unsigned              max_bodies = math::min(max_tracked_bodies, boost::numeric_cast<unsigned>(num_tracked_bodies));
     target_container::iterator  target_it;
 
+    math::mat_glf_t  track_to_opengl = math::mat4f_identity;
+    track_to_opengl.rotate(-90.0f, 1, 0, 0);
+
+
     for (unsigned i = 0; i < max_bodies; ++i) {
         target_it = targets.find(bodies[i].id + 1);
         //console.get() << con::log_level(con::error) << bodies[i].id << std::endl;
 
         if (target_it != targets.end()) {
-            target_it->second.transform(math::mat4f_t(bodies[i].rot[0], bodies[i].rot[1], bodies[i].rot[2], 0.0f,   // 1st column
-                                                      bodies[i].rot[3], bodies[i].rot[4], bodies[i].rot[5], 0.0f,   // 2nd column
-                                                      bodies[i].rot[6], bodies[i].rot[7], bodies[i].rot[8], 0.0f,   // 3rd column
-                                                      bodies[i].loc[0], bodies[i].loc[1], bodies[i].loc[2], 1.0f)); // 4th column
+            math::vec4f_t   pos   = math::vec4f_t(bodies[i].loc[0], bodies[i].loc[1],  bodies[i].loc[2], 1.0f);
+            math::mat4f_t   ori   = math::mat_glf_t(bodies[i].rot[0], bodies[i].rot[1], bodies[i].rot[2], 0.0f,   // 1st column
+                                                    bodies[i].rot[3], bodies[i].rot[4], bodies[i].rot[5], 0.0f,   // 2nd column
+                                                    bodies[i].rot[6], bodies[i].rot[7], bodies[i].rot[8], 0.0f,   // 3rd column
+                                                    0.0f,             0.0f,             0.0f,             1.0f);  // 4th column
+
+            pos = track_to_opengl * pos;
+            ori = track_to_opengl * ori;
+
+            ori.m12 = pos.x;
+            ori.m13 = pos.y;
+            ori.m14 = pos.z;
+            ori.m15 = pos.w;
+
+            target_it->second.transform(ori);
         }
     }
 }
