@@ -43,12 +43,6 @@ bool rb_down = false;
 float dolly_sens = 10.0f;
 float anim_angl = 0.0f;
 
-struct vertex_format
-{
-    float       tex[3];
-    float       pos[3];
-};
-
 namespace scm {
 
 struct screen
@@ -93,9 +87,6 @@ boost::scoped_ptr<scm::gl::program_object>   _shader_program;
 boost::scoped_ptr<scm::gl::shader_object>    _vertex_shader;
 boost::scoped_ptr<scm::gl::shader_object>    _fragment_shader;
 
-
-boost::scoped_array<vertex_format>  vertices;
-boost::scoped_array<unsigned short> indices;
 
 boost::scoped_ptr<scm::inp::art_dtrack> _dtrack;
 
@@ -400,6 +391,61 @@ void render_scene()
     draw_pick_ray();
 }
 
+void setup_eye_viewport(const scm::eye_config& eye)
+{
+    glViewport(eye._viewport.x,
+               eye._viewport.y,
+               eye._viewport.z,
+               eye._viewport.w);
+}
+
+void setup_eye_projection(const scm::eye_config& eye)
+{
+    // retrieve current matrix mode
+    GLint  current_matrix_mode;
+    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+    // reset the projection matrix
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    math::vec4f_t view_pos = math::inverse(scm::_screen_to_world_transform) * eye._position;
+
+    glFrustum((-(scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+              ( (scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+              (-(scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
+              ( (scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
+              scm::_znear,
+              scm::_zfar);
+               
+    // restore saved matrix mode
+    glMatrixMode(current_matrix_mode);
+}
+
+void setup_eye_translation(const scm::eye_config& eye)
+{
+    // retrieve current matrix mode
+    GLint  current_matrix_mode;
+    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    math::mat4f_t head      = math::mat4f_identity;
+
+    head.m12 = eye._position.x;
+    head.m13 = eye._position.y;
+    head.m14 = eye._position.z;
+
+    head = math::inverse(head);
+
+    glMultMatrixf(head.mat_array);
+
+    // restore saved matrix mode
+    glMatrixMode(current_matrix_mode);
+
+}
+
 void display()
 {
     // clear the color and depth buffer
@@ -412,35 +458,9 @@ void display()
 #if 1
     // left eye
     {
-        glViewport(scm::left_eye._viewport.x,
-                   scm::left_eye._viewport.y,
-                   scm::left_eye._viewport.z,
-                   scm::left_eye._viewport.w);
-        // reset the projection matrix
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-
-        math::vec4f_t view_pos = math::inverse(scm::_screen_to_world_transform) * scm::left_eye._position;
-
-        glFrustum((-(scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
-                  ( (scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
-                  (-(scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
-                  ( (scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
-                  scm::_znear,
-                  scm::_zfar);
-                   
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
-        math::mat4f_t head      = math::mat4f_identity;
-
-        head.m12 = scm::left_eye._position.x;
-        head.m13 = scm::left_eye._position.y;
-        head.m14 = scm::left_eye._position.z;
-
-        head = math::inverse(head);
-
-        glMultMatrixf(head.mat_array);
+        setup_eye_viewport(scm::left_eye);
+        setup_eye_projection(scm::left_eye);
+        setup_eye_translation(scm::left_eye);
 
         render_scene();
     }
@@ -448,36 +468,9 @@ void display()
 #if 1
     // right eye
     {
-        glViewport(scm::right_eye._viewport.x,
-                   scm::right_eye._viewport.y,
-                   scm::right_eye._viewport.z,
-                   scm::right_eye._viewport.w);
-
-        // reset the projection matrix
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-
-        math::vec4f_t view_pos = math::inverse(scm::_screen_to_world_transform) * scm::right_eye._position;
-
-        glFrustum((-(scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
-                  ( (scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
-                  (-(scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
-                  ( (scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
-                  scm::_znear,
-                  scm::_zfar);
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
-        math::mat4f_t head      = math::mat4f_identity;
-
-        head.m12 = scm::right_eye._position.x;
-        head.m13 = scm::right_eye._position.y;
-        head.m14 = scm::right_eye._position.z;
-
-        head = math::inverse(head);
-
-        glMultMatrixf(head.mat_array);
+        setup_eye_viewport(scm::right_eye);
+        setup_eye_projection(scm::right_eye);
+        setup_eye_translation(scm::right_eye);
 
         render_scene();
     }

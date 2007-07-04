@@ -377,6 +377,10 @@ void draw_geometry_color_buffer()
     GLint  current_matrix_mode;
     glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
 
+    // save polygon and depth buffer bit
+    // to restore culling and depth mask settings later
+    glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
+
     glDisable(GL_LIGHTING);
     glDisable(GL_BLEND);
 
@@ -443,7 +447,11 @@ void draw_geometry_color_buffer()
     // restore the saved projection matrix
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    
+
+    // restore the saved polygon and depth buffer bits
+    // to reset the culling and depth mask settings
+    glPopAttrib();
+
     // restore saved matrix mode
     glMatrixMode(current_matrix_mode);
 }
@@ -752,7 +760,7 @@ void display()
         glClear(GL_DEPTH_BUFFER_BIT/* | GL_COLOR_BUFFER_BIT*/);
         fill_background();
         render_geometry();
-        //_volrend_raycast->draw_outlines(_volrend_params);
+        _volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
         //glClear(GL_DEPTH_BUFFER_BIT );
