@@ -60,6 +60,7 @@ struct screen
 struct eye_config
 {
     math::vec4f_t       _position;
+    math::mat4f_t       _orientation;
 
     math::vec4f_t       _viewport;
 }; // struct eye_config
@@ -76,7 +77,7 @@ math::mat4f_t   picker_to_world;
 eye_config  left_eye;
 eye_config  right_eye;
 
-float       eye_separation = 0.065f;
+float       eye_separation = 0.065f;//0.0f;//
 
 math::mat4f_t           _tracking_to_world_transform;
 math::mat4f_t           _screen_to_world_transform;
@@ -337,6 +338,7 @@ void draw_wavefront_obj_vertex_buffer_object()
 
 void draw_pick_ray()
 {
+    _shader_program->bind();
     // push current modelview matrix
     glPushMatrix();
 
@@ -348,10 +350,12 @@ void draw_pick_ray()
 
 
     glRotatef(180.0f, 1, 0, 0);
-    glutSolidCone(0.05, 10.0, 4, 1);
+    glutSolidCone(0.01, 10.0, 25, 1);
+    //glutSolid(0.01, 10.0, 25, 1);
 
     // restore previously saved modelview matrix
     glPopMatrix();
+    _shader_program->unbind();
 }
 
 void render_scene()
@@ -418,13 +422,13 @@ void display()
 
         math::vec4f_t view_pos = math::inverse(scm::_screen_to_world_transform) * scm::left_eye._position;
 
-        glFrustum((view_pos.x - scm::_screen._world_dim.x / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.x + scm::_screen._world_dim.x / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.y - scm::_screen._world_dim.y / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.y + scm::_screen._world_dim.y / 2.0f) * scm::_znear / view_pos.z,
+        glFrustum((-(scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+                  ( (scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+                  (-(scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
+                  ( (scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
                   scm::_znear,
                   scm::_zfar);
-
+                   
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         
@@ -455,10 +459,10 @@ void display()
 
         math::vec4f_t view_pos = math::inverse(scm::_screen_to_world_transform) * scm::right_eye._position;
 
-        glFrustum((view_pos.x - scm::_screen._world_dim.x / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.x + scm::_screen._world_dim.x / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.y - scm::_screen._world_dim.y / 2.0f) * scm::_znear / view_pos.z,
-                  (view_pos.y + scm::_screen._world_dim.y / 2.0f) * scm::_znear / view_pos.z,
+        glFrustum((-(scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+                  ( (scm::_screen._world_dim.x / 2.0f) - view_pos.x) * (scm::_znear / view_pos.z),
+                  (-(scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
+                  ( (scm::_screen._world_dim.y / 2.0f) - view_pos.y) * (scm::_znear / view_pos.z),
                   scm::_znear,
                   scm::_zfar);
 
