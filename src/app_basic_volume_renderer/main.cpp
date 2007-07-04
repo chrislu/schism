@@ -203,7 +203,7 @@ void render_geometry()
     math::mat_glf_t modelview;
     math::get_gl_matrix(GL_MODELVIEW_MATRIX, modelview);
 
-    math::mat_glf_t vertex_vol_aspect_scale = math::mat4x4f_identity;
+    math::mat_glf_t vertex_vol_aspect_scale = math::mat4f_identity;
 
     vertex_vol_aspect_scale.scale(
         _volrend_params._aspect.x,
@@ -219,7 +219,7 @@ void render_geometry()
 
         glColor3f(colors[c].x, colors[c].y, colors[c].z);
         ++c;
-        math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4x4f_identity;
+        math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4f_identity;
         math::mat_glf_t vertex_to_volume_transform            = vertex_vol_aspect_scale;
 
         vertex_to_volume_unit_transform.scale(
