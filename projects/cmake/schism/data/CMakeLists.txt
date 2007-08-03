@@ -146,8 +146,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 )
 IF (WIN32)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-        optimized libboost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug libboost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
+        optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}   debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 ENDIF (WIN32)
 IF (UNIX)

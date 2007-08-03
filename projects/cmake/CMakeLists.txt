@@ -15,7 +15,10 @@ SET(SCHISM_VERSION "${schism_MAJOR_VERSION}.${schism_MINOR_VERSION}.${schism_BUI
 
 #-----------------------------------------------------------------------------
 # Setup external library strings
-SET(SCHISM_BOOST_VERSION "1_34")
+SET(SCHISM_BOOST_VERSION            "1_34_1")
+SET(SCHISM_BOOST_COMPILER_VERSION   "vc80")
+SET(SCHISM_BOOST_LIB_POSTFIX_REL    "${SCHISM_BOOST_COMPILER_VERSION}-mt-${SCHISM_BOOST_VERSION}")
+SET(SCHISM_BOOST_LIB_POSTFIX_DBG    "${SCHISM_BOOST_COMPILER_VERSION}-mt-gd-${SCHISM_BOOST_VERSION}")
 
 #-----------------------------------------------------------------------------
 # Setup some CMake build options
@@ -97,7 +100,7 @@ IF (WIN32)
         ADD_DEFINITIONS(-D_SCL_SECURE_NO_DEPRECATE)
         ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
         
-        SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /D_SECURE_SCL=0")
+        #SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /D_SECURE_SCL=0")
     ENDIF (MSVC80)
 ENDIF (WIN32)
 

@@ -247,12 +247,9 @@ IF (WIN32)
         freetype2
         liblua
         libluabind
-        optimized libboost_signals-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug libboost_signals-vc80-mt-gd-${SCHISM_BOOST_VERSION}
-        optimized libboost_date_time-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug libboost_date_time-vc80-mt-gd-${SCHISM_BOOST_VERSION}
-        optimized libboost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug libboost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
+        optimized libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}      debug libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}    debug libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}   debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 ENDIF (WIN32)
 

@@ -91,10 +91,8 @@ IF (WIN32)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         glew32
         glut32
-        optimized boost_filesystem-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug boost_filesystem-vc80-mt-gd-${SCHISM_BOOST_VERSION}
-        optimized libboost_program_options-vc80-mt-${SCHISM_BOOST_VERSION}
-        debug libboost_program_options-vc80-mt-gd-${SCHISM_BOOST_VERSION}
+        optimized boost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}          debug boost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_REL}  debug libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 ENDIF (WIN32)
 IF (UNIX)
