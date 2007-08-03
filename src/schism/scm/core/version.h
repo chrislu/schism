@@ -32,9 +32,24 @@ static const std::string    VERSION_ARCH_TAG   = std::string("x64");
 #error "unable to detect architechture type"
 #endif
 
-// name candidates:
+// gone names
+//   - 
+
+// new name candidates:
 //   - lux aeterna
 //   - metal, it comes from hell
+//   - evil men in the gardens of paradise
+//   - on the side of the demons
+//   - safe humaity from damnation by bringing the love of god
+//   - round them up and execute them - publicly
+//   - ...and justice for all
+//   - to live is to die
+//   - delusional machines
+//   - what is the universe gonna come up with next
+//   - the shape of things to come
+//   - we're no here
+//   - hope is emo
+
 
 } // namespace core
 } // namespace scm
