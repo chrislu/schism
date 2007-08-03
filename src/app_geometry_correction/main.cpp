@@ -6,6 +6,7 @@
 #include <boost/program_options.hpp>
 #include <boost/scoped_ptr.hpp>
 
+#include <scm/core.h>
 #include <scm/ogl/gl.h>
 #include <GL/glut.h>
 
@@ -329,7 +330,7 @@ bool init_gl()
 {
     // check for opengl verison 2.0 with
     // opengl shading language support
-    if (!scm::gl::is_supported("GL_VERSION_2_0")) {
+    if (!scm::ogl.get().is_supported("GL_VERSION_2_0")) {
         std::cout << "OpenGL 2.0 not available" << std::endl;
         std::cout << "GL_VERSION_2_0 not supported" << std::endl;
         return (false);
@@ -340,7 +341,7 @@ bool init_gl()
         std::cout << (char*)glGetString(GL_VERSION) << std::endl;
     }
 
-    if (!scm::gl::is_supported("GL_EXT_framebuffer_object")) {
+    if (!scm::ogl.get().is_supported("GL_EXT_framebuffer_object")) {
         std::cout << "GL_EXT_framebuffer_object not supported" << std::endl;
         return (false);
     }
@@ -348,7 +349,7 @@ bool init_gl()
         std::cout << "GL_EXT_framebuffer_object supported" << std::endl;
     }
 
-    if (!scm::gl::is_supported("GL_ARB_texture_rectangle")) {
+    if (!scm::ogl.get().is_supported("GL_ARB_texture_rectangle")) {
         std::cout << "GL_ARB_texture_rectangle not supported" << std::endl;
         return (false);
     }
@@ -688,6 +689,11 @@ int main(int argc, char **argv)
     glutInitWindowSize(winx, winy);
     glutCreateWindow("simple_glut");
 
+    // init the GL context
+    if (!scm::initialize()) {
+        std::cout << "error initializing scm library" << std::endl;
+        return (-1);
+    }
     // init the GL context
     if (!scm::gl::initialize()) {
         std::cout << "error initializing gl library" << std::endl;

@@ -517,8 +517,8 @@ bool init_gl()
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    glClearColor(0.2f,0.2f,0.2f,1);
-    //glClearColor(0.0f,0.0f,0.0f,1);
+    //glClearColor(0.2f,0.2f,0.2f,1);
+    glClearColor(0.0f,0.0f,0.0f,1);
     //glClearColor(1.0f,1.0f,1.0f,1.0f);
 
     // setup depth testing
@@ -742,11 +742,11 @@ void display()
 
     // clear the color and depth buffer
     if (draw_geometry) {
-        glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT |*/ GL_STENCIL_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT | */ GL_STENCIL_BUFFER_BIT);
     }
     else {
         glClear(GL_DEPTH_BUFFER_BIT | /*GL_COLOR_BUFFER_BIT |*/ GL_STENCIL_BUFFER_BIT);
-        fill_background();
+        //fill_background();
     }
 
     // push current modelview matrix
@@ -757,10 +757,10 @@ void display()
         
         // geometry pass
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo_id);
-        glClear(GL_DEPTH_BUFFER_BIT/* | GL_COLOR_BUFFER_BIT*/);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         fill_background();
         render_geometry();
-        _volrend_raycast->draw_outlines(_volrend_params);
+        //_volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
         //glClear(GL_DEPTH_BUFFER_BIT );

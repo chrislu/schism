@@ -25,7 +25,7 @@ void main()
 
     //unc_color = mix(green, red, 1.0 - texture3D(_unc_texture, (_vert2unit * gl_Vertex).xyz).r);//gl_Color.rgb;//
     unc_color = mix(green, red, _anim_step * (1.0 - clamp(pow(texture3D(_unc_texture, (_vert2unit * gl_Vertex).xyz).r, 2.0), 0.0, 1.0)));
-
+    //gl_Color.rgb;//
     gl_Position = gl_ModelViewProjectionMatrix * _vert2vol * gl_Vertex;
 }
 
