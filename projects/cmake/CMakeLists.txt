@@ -114,6 +114,7 @@ SUBDIRS(
     app_basic_volume_renderer
     app_geometry_correction
     app_glut_tests
+    app_qt4_tests
     app_volume_converter
     schism
 )
