@@ -11,7 +11,9 @@
 
 namespace
 {
+#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS // #ifdef _WIN32
     static HINSTANCE    nv_cpl_lib;
+#endif
 } // namespace
 
 namespace scm {

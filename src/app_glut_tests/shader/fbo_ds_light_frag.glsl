@@ -28,25 +28,26 @@ vec3 backproject_depth(const in float depth)
 
     vec4 eye_space_pos  = _projection_inverse * clip_space_pos;
 
-    //return (clip_space_pos.xyz / clip_space_pos.w);
     return (eye_space_pos.xyz / eye_space_pos.w);
 }
 
 
 void main()
 {
+    // fetch data from gbuffers
     vec3 position       = backproject_depth(texture2DRect(_depth, gl_FragCoord.xy).x);
     vec3 view_dir       = -normalize(position);
     vec3 normal         = texture2DRect(_normal, gl_FragCoord.xy).xyz;
     vec4 diff_gloss     = texture2DRect(_color_gloss, gl_FragCoord.xy);
 
+    // lighting calculation
     vec3 l = normalize(gl_LightSource[0].position.xyz); // parallel light assumed 
     vec3 h = normalize(l + view_dir);
 
     vec3 res =  diff_gloss.xyz * gl_LightSource[0].diffuse.xyz * max(0.0, dot(normal, l))
               + diff_gloss.a * gl_LightSource[0].specular.xyz * pow(max(0.0, dot(normal, h)), 128.0);
-         
-    gl_FragColor = vec4(res, 1.0);
 
-//    gl_FragColor = vec4(diff_gloss);
+
+    //output
+    gl_FragColor = vec4(res, 1.0);
 }

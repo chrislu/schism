@@ -15,7 +15,7 @@ class core_system_singleton
 private:
     // nested class definition
     template <class instance_t_>
-    class core_system_singleton_ : boost::noncopyable
+    class core_system_singleton_ // : boost::noncopyable
     {
     public:
         explicit core_system_singleton_();

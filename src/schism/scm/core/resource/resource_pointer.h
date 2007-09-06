@@ -66,7 +66,7 @@ public:
 private:
     explicit resource_pointer(const resource_ptr&  /*res*/,
                               const manager_ptr&   /*mgr*/);
-    template<class res_type> friend class resource_manager;
+    template<class res_type_> friend class resource_manager;
 
 }; // class resource_pointer
 

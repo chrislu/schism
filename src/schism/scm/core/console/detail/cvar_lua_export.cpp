@@ -3,6 +3,8 @@
 
 #include "cvar_lua_export.h"
 
+#if 0
+
 #include <string>
 
 extern "C"
@@ -69,5 +71,7 @@ void cvar_export_lua_binding(lua_State* l_state)
 } // namespace detail
 } // namespace con
 } // namespace scm
+
+#endif
 
 #include <scm/core/utilities/luabind_warning_enable.h>
