@@ -6,9 +6,12 @@ SET(SRC_DIR "${GLOBAL_SRC_DIR}/app_glut_tests")
 SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_12_art_tracking.cpp)
+FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_13_deferred_shading.cpp)
 FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
 FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+
+FILE(GLOB SOURCE_FILES_DSHADING         ${SRC_DIR}/deferred_shading/*.cpp)
+FILE(GLOB HEADER_FILES_DSHADING         ${SRC_DIR}/deferred_shading/*.h)
 
 FILE(GLOB SOURCE_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.cpp)
 FILE(GLOB HEADER_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.h)
@@ -24,27 +27,26 @@ FILE(GLOB SHADER_FILES                  ${SRC_DIR}/shader/*.glsl)
 SET(SOURCE_GROUP_DELIMITER "/")
 
 SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
+SOURCE_GROUP(source_files/deferred_shading  FILES ${SOURCE_FILES_DSHADING}          ${HEADER_FILES_DSHADING})
 SOURCE_GROUP(source_files/image_handling    FILES ${SOURCE_FILES_IMAGE_HANDLING}    ${HEADER_FILES_IMAGE_HANDLING}      ${INLINE_FILES_IMAGE_HANDLING})
-SOURCE_GROUP(source_files/obj_handling      FILES ${SOURCE_FILES_OBJ_HANDLING}      ${HEADER_FILES_OBJ_HANDLING}        ${INLINE_FILES_OBJ_HANDLING})
 SOURCE_GROUP(source_files/shader_files      FILES ${SHADER_FILES})
 
 # combine source file lists
 SET(SOURCE_FILES
     ${SOURCE_FILES}
+    ${SOURCE_FILES_DSHADING}
     ${SOURCE_FILES_IMAGE_HANDLING}
-    ${SOURCE_FILES_OBJ_HANDLING}
 )
 
 SET(HEADER_FILES
     ${HEADER_FILES}
+    ${HEADER_FILES_DSHADING}
     ${HEADER_FILES_IMAGE_HANDLING}
-    ${HEADER_FILES_OBJ_HANDLING}
 )
 
 SET(INLINE_FILES
     ${INLINE_FILES}
     ${INLINE_FILES_IMAGE_HANDLING}
-    ${INLINE_FILES_OBJ_HANDLING}
 )
 
 SET(SHADER_FILES
