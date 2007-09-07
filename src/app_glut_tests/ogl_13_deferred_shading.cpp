@@ -62,9 +62,9 @@ bool init_gl()
 
     std::cout << (char*)glGetString(GL_VERSION) << std::endl;
 
-    int max_samples = 0;
-    glGetIntegerv(GL_MAX_SAMPLES_EXT, &max_samples);
-    std::cout << "max. samples for multisample fbo: " << max_samples << std::endl;
+//    int max_samples = 0;
+//    glGetIntegerv(GL_MAX_SAMPLES_EXT, &max_samples);
+//    std::cout << "max. samples for multisample fbo: " << max_samples << std::endl;
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glPixelStorei(GL_PACK_ALIGNMENT,1);
