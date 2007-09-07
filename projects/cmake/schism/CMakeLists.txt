@@ -3,7 +3,7 @@
 SUBDIRS(
     core
     ogl
-    data
-    input
+#    data
+#    input
 )
 
