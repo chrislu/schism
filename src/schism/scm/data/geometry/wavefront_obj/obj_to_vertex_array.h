@@ -20,8 +20,8 @@ bool __scm_export(data) generate_vertex_buffer(const wavefront_model&           
                                                std::size_t&                         /*vert_array_count*/,
                                                std::size_t&                         /*normals_offset*/,
                                                std::size_t&                         /*texcoords_offset*/,
-                                               boost::shared_array<core::uint32_t>& /*out_trilist_index_array*/,
-                                               std::size_t&                         /*index_array_count*/,
+                                               std::vector<boost::shared_array<core::uint32_t> >& /*out_trilist_index_arrays*/,
+                                               std::vector<std::size_t&>                         /*index_array_counts*/,
                                                bool                                 /*interleave_arrays*/ = false);
 
 } // namespace data

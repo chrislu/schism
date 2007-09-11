@@ -18,6 +18,5 @@ void main()
 
     // outpt data into the gbuffers
     gl_FragData[0] = diff_gloss;
-
     gl_FragData[1] = vec4(gl_FrontFacing ? normalize(normal) : -normalize(normal), 0.0);
 }

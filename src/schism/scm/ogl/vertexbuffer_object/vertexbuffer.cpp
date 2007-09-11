@@ -1,5 +1,5 @@
 
-#include "vertexbuffer_object.h"
+#include "vertexbuffer.h"
 
 #include <cassert>
 
@@ -12,22 +12,20 @@ namespace {
 namespace scm {
 namespace gl {
 
-vertexbuffer_object::vertexbuffer_object()
-  : _num_vertices(0),
-    _num_indices(0)
+vertexbuffer::vertexbuffer()
+  : _num_vertices(0)
 {
 }
 
-vertexbuffer_object::~vertexbuffer_object()
+vertexbuffer::~vertexbuffer()
 {
     clear();
 }
 
-void vertexbuffer_object::bind() const
+void vertexbuffer::bind() const
 {
     ////// ATTENTION no interlaced support yet!!!!!!!
     _vertices.bind();
-    _indices.bind();
 
     for (unsigned i = 0; i < _vertex_layout.num_elements(); ++i) {
 
@@ -68,15 +66,7 @@ void vertexbuffer_object::bind() const
     }
 }
 
-void vertexbuffer_object::draw_elements() const
-{
-    glDrawElements(_element_layout._primitive_type,
-                   static_cast<GLsizei>(_num_indices),
-                   _element_layout._type,
-                   NULL);
-}
-
-void vertexbuffer_object::unbind() const
+void vertexbuffer::unbind() const
 {
     for (unsigned i = 0; i < _vertex_layout.num_elements(); ++i) {
 
@@ -103,13 +93,12 @@ void vertexbuffer_object::unbind() const
     }
 
     _vertices.unbind();
-    _indices.unbind();
 }
 
-bool vertexbuffer_object::vertex_data(std::size_t           num_vertices,
-                                      const vertex_layout&  layout,
-                                      const void*const      data,
-                                      unsigned              usage_type)
+bool vertexbuffer::vertex_data(std::size_t           num_vertices,
+                               const vertex_layout&  layout,
+                               const void*const      data,
+                               unsigned              usage_type)
 {
     if (!_vertices.reset()) {
         return (false);
@@ -127,57 +116,23 @@ bool vertexbuffer_object::vertex_data(std::size_t           num_vertices,
     return (true);
 }
 
-bool vertexbuffer_object::element_data(std::size_t            num_indices,
-                                       const element_layout&  layout,
-                                       const void*const       data,
-                                       unsigned               usage_type)
-{
-    if (!_indices.reset()) {
-        return (false);
-    }
-
-    if (!_indices.buffer_data(num_indices * sizeof(unsigned),//layout._size,
-                              data,
-                              usage_type)) {
-        return (false);
-    }
-
-    _element_layout = layout;
-    _num_indices    = num_indices;
-
-    return (true);
-}
-
-void vertexbuffer_object::clear()
+void vertexbuffer::clear()
 {
     _vertices.clear();
-    _indices.clear();
 
-    _element_layout = element_layout();
     _vertex_layout  = vertex_layout();
 
     _num_vertices   = 0;
-    _num_indices    = 0;
 }
 
-std::size_t vertexbuffer_object::num_vertices() const
+std::size_t vertexbuffer::num_vertices() const
 {
     return (_num_vertices);
 }
 
-std::size_t vertexbuffer_object::num_indices() const
-{
-    return (_num_indices);
-}
-
-const vertex_layout& vertexbuffer_object::get_vertex_layout() const
+const vertex_layout& vertexbuffer::get_vertex_layout() const
 {
     return (_vertex_layout);
-}
-
-const element_layout& vertexbuffer_object::get_element_layout() const
-{
-    return (_element_layout);
 }
 
 } // namespace gl
