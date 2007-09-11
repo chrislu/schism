@@ -12,10 +12,12 @@
 #include <GL/glut.h>
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
+#include <scm/core/utilities/foreach.h>
 
 #include <image_handling/image_loader.h>
 
 #include <deferred_shading/deferred_shader.h>
+#include <deferred_shading/geometry.h>
 
 boost::scoped_ptr<scm::deferred_shader>     _deferred_shader;
 
@@ -157,6 +159,7 @@ void draw_stuff()
         // apply camera transform
         _trackball_manip.apply_transform();
 
+#if 0
         // activate texture unit 0
         glActiveTexture(GL_TEXTURE0);
         // enable texturing on unit 0
@@ -197,7 +200,13 @@ void draw_stuff()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_TEXTURE_2D);
-
+#else
+    foreach(const geometry& geom, _geometries) {
+        geom._vbo->bind();
+        geom._vbo->draw_elements();
+        geom._vbo->unbind();
+    }
+#endif
     // restore previously saved modelview matrix
     glPopMatrix();
 
@@ -301,6 +310,8 @@ void keyboard(unsigned char key, int x, int y)
     switch (key) {
         case 'd':
         case 'D': display_gbuffers = !display_gbuffers;break;
+        case 'o':
+        case 'O': open_geometry();break;
         // ESC key
         case 27: exit (0); break;
         default:;

@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -12,13 +13,23 @@
 
 namespace scm {
 namespace data {
-    
+
+struct wavefront_material
+{
+    float           _Ns;
+    float           _Ni;
+    math::vec3f_t   _Ka;
+    math::vec3f_t   _Kd;
+    math::vec3f_t   _Ks;
+    float           _d;
+}; // struct wavefront_material
+
 struct wavefront_object_triangle_face
 {
     unsigned    _vertices[3];
     unsigned    _normals[3];
     unsigned    _tex_coords[3];        
-};
+}; // struct wavefront_object_triangle_face
 
 struct wavefront_object_group
 {
@@ -28,14 +39,19 @@ struct wavefront_object_group
     scm::core::shared_array<wavefront_object_triangle_face>  _tri_faces;
 
     std::string                                 _name;
+    std::string                                 _material_name;
 
-}; // wavefront_object_group
+}; // struct wavefront_object_group
 
 struct wavefront_object
 {
     wavefront_object() {}
 
     typedef std::vector<wavefront_object_group> group_container;
+
+    group_container::iterator                   add_new_group();
+    group_container::iterator                   add_new_group(const std::string& /*name*/);
+
     group_container                             _groups;
 
     std::string                                 _name;
@@ -47,7 +63,12 @@ struct wavefront_model
                         _num_normals(0),
                         _num_tex_coords(0) {}
 
-    typedef std::vector<wavefront_object>       object_container;
+    typedef std::vector<wavefront_object>               object_container;
+    typedef std::map<std::string, wavefront_material>   material_container;
+
+    object_container::iterator                  add_new_object();
+    object_container::iterator                  add_new_object(const std::string& /*name*/);
+
     object_container                            _objects;
 
     std::size_t                                 _num_vertices;
@@ -57,6 +78,8 @@ struct wavefront_model
     scm::core::shared_array<math::vec3f_t>      _vertices;
     scm::core::shared_array<math::vec3f_t>      _normals;
     scm::core::shared_array<math::vec2f_t>      _tex_coords;
+
+    material_container                          _materials;
 
 
 }; // struct wavefront_model

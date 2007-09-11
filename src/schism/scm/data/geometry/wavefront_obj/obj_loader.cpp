@@ -12,22 +12,126 @@
 #endif //    SCM_COMPILER     == SCM_COMPILER_MSVC
        // && SCM_COMPILER_VER >= 1400
 
-#include <scm/data/geometry/wavefront_obj/obj_file.h>
-
+#include <scm/core/utilities/boost_warning_disable.h>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <scm/core/utilities/boost_warning_enable.h>
 
+#include <iostream>
 #include <cassert>
 #include <fstream>
 #include <string>
 #include <strstream>
 #include <vector>
 
+
+#include <scm/data/geometry/wavefront_obj/obj_file.h>
+
 namespace scm {
 namespace data {
 
+bool load_material_lib(const std::string& filename, wavefront_model& out_obj)
+{
+    std::ifstream   mtl_file;
+
+    mtl_file.open(filename.c_str(), std::ios_base::in);
+
+    if (!mtl_file) {
+        return (false);
+    }
+
+    std::string     cur_line;
+
+    wavefront_model::material_container::iterator   cur_material;
+
+    while (std::getline(mtl_file, cur_line)) {
+        
+        std::istrstream line(cur_line.c_str());
+
+        char line_id;
+        line.get(line_id);
+
+        switch (line_id) {
+            case 'n': {
+                    std::string  tag;
+                    line.putback(line_id);
+                    line >> tag;
+
+                    // load material library
+                    if (tag == std::string("newmtl")) {
+                        std::string mat_name;
+                        line >> mat_name;
+
+                        if (out_obj._materials.find(mat_name) == out_obj._materials.end()) {
+                            std::pair<wavefront_model::material_container::iterator, bool> ret;
+                            ret = out_obj._materials.insert(wavefront_model::material_container::value_type(mat_name, wavefront_material()));
+
+                            cur_material = ret.first;
+                        }
+                    }
+                }
+                break;
+            case 'N': {
+                    line.get(line_id);
+                    switch (line_id) {
+                        case 's': {
+                                line >> cur_material->second._Ns;
+                            }
+                            break;
+                        case 'i': {
+                                line >> cur_material->second._Ni;
+                            }
+                            break;
+                    }
+                }
+                break;
+            case 'K': {
+                    line.get(line_id);
+                    switch (line_id) {
+                        case 'a': {
+                                line >> cur_material->second._Ka.x;
+                                line >> cur_material->second._Ka.y;
+                                line >> cur_material->second._Ka.z;
+                            }
+                            break;
+                        case 'd': {
+                                line >> cur_material->second._Kd.x;
+                                line >> cur_material->second._Kd.y;
+                                line >> cur_material->second._Kd.z;
+                            }
+                            break;
+                        case 's': {
+                                line >> cur_material->second._Ks.x;
+                                line >> cur_material->second._Ks.y;
+                                line >> cur_material->second._Ks.z;
+                            }
+                            break;
+                    }
+                }
+                break;
+            case 'd': {
+                    line >> cur_material->second._d;
+                }
+                break;
+            case '#':break;
+            default:;
+        }
+    }
+
+    mtl_file.close();
+
+    return (true);
+}
+
 bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
 {
+    using namespace boost::filesystem;
+
     std::ifstream   obj_file;
+
+    path                    file_path(filename, native);
+    std::string             file_name       = file_path.leaf();
+    std::string             file_extension  = extension(file_path);
 
     obj_file.open(filename.c_str(), std::ios_base::in);
 
@@ -41,34 +145,25 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     }
 
     std::string     cur_line;
-    bool            primitive_definition_started = false;
+    bool            group_definition_started        = false;
+    bool            object_definition_started       = false;
+    bool            grpmtl_defined                  = false;
 
-    wavefront_model::object_container::iterator     cur_obj_it;
-    wavefront_object::group_container::iterator     cur_grp_it;
+    wavefront_model::object_container::iterator     cur_obj_it = out_obj.add_new_object();;
+    wavefront_object::group_container::iterator     cur_grp_it = cur_obj_it->add_new_group();
 
     // first pass trough the file
     // collect data about file
     while (std::getline(obj_file, cur_line)) {
-        
-        std::string::const_iterator b = cur_line.begin();
-        std::string::const_iterator e = cur_line.end();
 
         std::istrstream line(cur_line.c_str());
 
         char line_id;
         line.get(line_id);
 
+
         switch (line_id) {
             case 'v': {
-                    if (primitive_definition_started || out_obj._objects.empty()) {
-                        // start new object
-                        out_obj._objects.push_back(wavefront_object());
-                        cur_obj_it = out_obj._objects.end() - 1;
-                        cur_obj_it->_name = std::string("object_") + boost::lexical_cast<std::string>(out_obj._objects.size() - 1);
-
-                        primitive_definition_started = false;
-                    }
-
                     line.get(line_id);
                     switch (line_id) {
                         case ' ': ++out_obj._num_vertices;break;
@@ -77,31 +172,87 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     }
                 }
                 break;
-            case 'g': {
-                    cur_obj_it->_groups.push_back(wavefront_object_group());
-                    cur_grp_it = cur_obj_it->_groups.end() - 1;
-
-                    primitive_definition_started = true;
-                    cur_grp_it->_name = std::string(b + 2, e);
+            case 'f': {
+                    ++(cur_grp_it->_num_tri_faces);
                 }
                 break;
             case 'o': {
-                    out_obj._objects.push_back(wavefront_object());
-                    cur_obj_it = out_obj._objects.end() - 1;
+                    std::string name;
+                    line >> name;
 
-                    primitive_definition_started = false;
-                    cur_obj_it->_name = std::string(b + 2, e);
+                    if (object_definition_started) {
+                        cur_obj_it = out_obj.add_new_object(name);
+                        cur_grp_it = cur_obj_it->add_new_group();
+                    }
+                    else {
+                        cur_obj_it->_name = name;
+                    }
+
+                    object_definition_started    = true;
+                    group_definition_started     = false;
                 }
                 break;
-            case 'f': {
-                    if (!primitive_definition_started) {
-                        // start new group in current object
-                        cur_obj_it->_groups.push_back(wavefront_object_group());
-                        cur_grp_it = cur_obj_it->_groups.end() - 1;
-                        cur_grp_it->_name = std::string("group_") + boost::lexical_cast<std::string>(cur_obj_it->_groups.size() - 1);
+            case 'g': {
+                    std::string name;
+                    line >> name;
+
+                    if (group_definition_started) {
+                        cur_grp_it = cur_obj_it->add_new_group(name);
                     }
-                    primitive_definition_started = true;
-                    ++cur_grp_it->_num_tri_faces;
+                    else {
+                        cur_grp_it->_name = name;
+                    }
+
+                    group_definition_started     = true;
+                }
+                break;
+            case 'm': {
+                    std::string  tag;
+                    line.putback(line_id);
+                    line >> tag;
+
+                    // load material library
+                    if (tag == std::string("mtllib")) {
+
+                        std::string matlib_file;
+                        line >> matlib_file;
+
+                        path matlib_file_name = file_path.branch_path() / matlib_file;
+
+                        if (!exists(matlib_file_name)) {
+                            std::cout << "does not exist" << std::endl;
+                        }
+
+                        if (!load_material_lib(matlib_file_name.file_string(), out_obj)) {
+                            out_obj._objects.clear();
+
+                            std::cout << "open_obj_file(): error loading materal lib ('"
+                                      << matlib_file_name.file_string() << "')"
+                                      << std::endl;
+
+                            return (false);
+                        }
+                    }
+                }
+                break;
+            case 'u': {
+                    std::string  tag;
+                    line.putback(line_id);
+                    line >> tag;
+
+                    if (tag == std::string("usemtl")) {
+                        if (grpmtl_defined) {
+                            cur_grp_it = cur_obj_it->add_new_group();
+                        }
+
+                        std::string mat_name;
+                        line >> mat_name;
+
+                        cur_grp_it->_material_name  =  mat_name;
+                        cur_grp_it->_name           += cur_grp_it->_material_name;
+
+                        grpmtl_defined = true;
+                    }
                 }
                 break;
             case '#':break;
@@ -149,7 +300,9 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     cur_obj_it = out_obj._objects.begin();
     cur_grp_it = cur_obj_it->_groups.begin();
 
-    primitive_definition_started = false;
+    group_definition_started    = false;
+    object_definition_started   = false;
+    grpmtl_defined              = false;
 
     obj_file.clear();
     obj_file.seekg(0);
@@ -162,12 +315,6 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
 
         switch (line_id) {
             case 'v': {
-                    if (primitive_definition_started) {
-                        // start of next object
-                        ++cur_obj_it;
-                        next_face_index = 0;
-                        primitive_definition_started = false;
-                    }
                     line.get(line_id);
                     switch (line_id) {
                         case ' ': {
@@ -193,33 +340,40 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     }
                 }
                 break;
-            case 'g': {
-                    if (!primitive_definition_started) {
+            case 'o': {
+                    if (object_definition_started) {
+                        ++cur_obj_it;
                         cur_grp_it = cur_obj_it->_groups.begin();
+                        next_face_index = 0;
                     }
-                    else {
-                        // start of next group in current object
-                        ++cur_grp_it;
-                    }
-                    primitive_definition_started = true;
+                    object_definition_started   = true;
+                    group_definition_started    = false;
                 }
                 break;
-            case 'o': {
-                    if (primitive_definition_started) {
-                        // start of next object
-                        ++cur_obj_it;
+            case 'g': {
+                    if (group_definition_started) {
+                        ++cur_grp_it;
                         next_face_index = 0;
-                        primitive_definition_started = false;
+                    }
+                    group_definition_started = true;
+                }
+                break;
+            case 'u': {
+                    std::string  tag;
+                    line.putback(line_id);
+                    line >> tag;
+
+                    if (tag == std::string("usemtl")) {
+                        if (grpmtl_defined) {
+                            ++cur_grp_it;
+                            next_face_index = 0;
+                        }
+
+                        grpmtl_defined = true;
                     }
                 }
                 break;
             case 'f': {
-                    if (!primitive_definition_started) {
-                        cur_grp_it = cur_obj_it->_groups.begin();
-                        next_face_index = 0;
-                    }
-                    primitive_definition_started = true;
-
                     wavefront_object_triangle_face& t = cur_grp_it->_tri_faces[next_face_index++];
 
                     for (unsigned i = 0; i < 3; ++i) {

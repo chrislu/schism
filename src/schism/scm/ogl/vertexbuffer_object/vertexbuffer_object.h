@@ -37,7 +37,7 @@ public:
                                              const element_layout&  /*layout*/,
                                              const void*const       /*data*/,
                                              unsigned               /*usage_type*/ = GL_STATIC_DRAW);
-                            
+
     std::size_t                 num_vertices() const;
     std::size_t                 num_indices() const;
 
