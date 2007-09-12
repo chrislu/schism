@@ -36,10 +36,109 @@ bool rb_down = false;
 float dolly_sens = 10.0f;
 
 bool display_gbuffers = false;
+unsigned display_buffer = 0;
 
 // texture objects ids
 unsigned tex0_id = 0;
 unsigned tex1_id = 0;
+
+static const unsigned light_num = 4;
+bool lights_state[light_num] = {true, false, false, false};
+
+
+void define_lights()
+{
+    float one[4]    = {1.0f, 1.0f, 1.0f, 1.0f};
+    float zro[4]    = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    float dif_sun[4]    = {0.2, 0.2, 0.2, 1};
+    float spc_sun[4]    = {0.2, 0.2, 0.2, 1};
+    float amb_sun[4]    = {0.01, 0.01, 0.01, 1};
+    float att_sun[4]    = {1.0, 0.0, 0.0, 1};//{1.0, 0.25, 0.125, 1};
+    float spot_sun[2]   = {64, 180};
+
+    float dif_torch[4]    = {0.25, 0.25, 0.2, 1};
+    float spc_torch[4]    = {0.3, 0.3, 0.2, 1};
+    float amb_torch[4]    = {0.005, 0.005, 0.005, 1};
+    float att_torch[4]    = {1.0, 0.0, 0.0, 1};//{0.9, 0.125, 0.025, 1};
+    float spot_torch[2]   = {96, 60};
+
+    math::mat_glf_t perf_to_gl = math::mat4f_identity;
+
+    perf_to_gl.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+
+    math::vec4f_t pos_sun1      = perf_to_gl * math::vec4f_t(-1.7, -5.0, 4.0, 0);
+    math::vec4f_t pos_sun2      = perf_to_gl * math::vec4f_t(1.7,  -5.0, 4.0, 0);
+
+    math::vec4f_t pos_torch1    = perf_to_gl * math::vec4f_t(3.0, -3.0, 1.0, 1.0);//1.6, -0.1, 2.6, 1.0);
+    math::vec4f_t pos_torch2    = perf_to_gl * math::vec4f_t(-3.0, -3.0, 1.0, 1.0);//-1.5, 0.25, 2.5, 1.0);
+
+    math::vec4f_t dir_sun1      = perf_to_gl * math::vec4f_t(1,-1,-1,0);
+    math::vec4f_t dir_sun2      = perf_to_gl * math::vec4f_t(-1,-1,-1,0);
+
+    math::vec4f_t dir_torch1    = perf_to_gl * math::vec4f_t(-3.0, 3.0, -1.0, 1.0);//-1, 0.7, -0.7, 0);
+    math::vec4f_t dir_torch2    = perf_to_gl * math::vec4f_t(3.0,  3.0, -1.0, 1.0);//1, -0.1, -0.4, 0);
+
+
+    // setup light 0 - sun 1
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spc_sun);
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  amb_sun);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  dif_sun);
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,  att_sun[0]);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION,    att_sun[1]);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att_sun[2]);
+    //glLightf(GL_LIGHT0, GL_SPOT_EXPONENT , spot_sun[0]);
+    //glLightf(GL_LIGHT0, GL_SPOT_CUTOFF,    spot_sun[1]);
+    //glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION , dir_sun1.vec_array);
+    glLightfv(GL_LIGHT0, GL_POSITION, pos_sun1.vec_array);
+
+
+    // setup light 0 - sun 2
+    glLightfv(GL_LIGHT1, GL_SPECULAR, spc_sun);
+    glLightfv(GL_LIGHT1, GL_AMBIENT,  amb_sun);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE,  dif_sun);
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION,  att_sun[0]);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION,    att_sun[1]);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_sun[2]);
+    //glLightf(GL_LIGHT1, GL_SPOT_EXPONENT , spot_sun[0]);
+    //glLightf(GL_LIGHT1, GL_SPOT_CUTOFF,    spot_sun[1]);
+    //glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION , dir_sun2.vec_array);
+    glLightfv(GL_LIGHT1, GL_POSITION, pos_sun2.vec_array);
+
+    // setup light 0 - torch 1
+    glLightfv(GL_LIGHT2, GL_SPECULAR, spc_torch);
+    glLightfv(GL_LIGHT2, GL_AMBIENT,  amb_torch);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE,  dif_torch);
+    glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION,  att_torch[0]);
+    glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION,    att_torch[1]);
+    glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, att_torch[2]);
+    glLightf(GL_LIGHT2, GL_SPOT_EXPONENT , spot_torch[0]);
+    glLightf(GL_LIGHT2, GL_SPOT_CUTOFF,    spot_torch[1]);
+    glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION , dir_torch1.vec_array);
+    glLightfv(GL_LIGHT2, GL_POSITION, pos_torch1.vec_array);
+
+    // setup light 0 - torch 2
+    glLightfv(GL_LIGHT3, GL_SPECULAR, spc_torch);
+    glLightfv(GL_LIGHT3, GL_AMBIENT,  amb_torch);
+    glLightfv(GL_LIGHT3, GL_DIFFUSE,  dif_torch);
+    glLightf(GL_LIGHT3, GL_CONSTANT_ATTENUATION,  att_torch[0]);
+    glLightf(GL_LIGHT3, GL_LINEAR_ATTENUATION,    att_torch[1]);
+    glLightf(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, att_torch[2]);
+    glLightf(GL_LIGHT3, GL_SPOT_EXPONENT , spot_torch[0]);
+    glLightf(GL_LIGHT3, GL_SPOT_CUTOFF,    spot_torch[1]);
+    glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION , dir_torch2.vec_array);
+    glLightfv(GL_LIGHT3, GL_POSITION, pos_torch2.vec_array);
+
+    for (unsigned l = 0; l < light_num; ++l) {
+        if (lights_state[l]) {
+            glEnable(GL_LIGHT0 + l);
+        }
+        else {
+            glDisable(GL_LIGHT0 + l);
+        }
+    }
+
+}
 
 bool init_gl()
 {
@@ -81,7 +180,7 @@ bool init_gl()
     // set polygonmode to fill front and back faces
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    _trackball_manip.dolly(1);
+    _trackball_manip.dolly(4.5);
 
     image ps_data;
 
@@ -122,25 +221,19 @@ bool init_gl()
     // delete image
     close_image(ps_data);
 
-    float one[4]    = {1.0f, 1.0f, 1.0f, 1.0f};
-    float zro[4]    = {0.0f, 0.0f, 0.0f, 1.0f};
+    //// setup light 0
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, one);//spc);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT,  amb);
+    //glLightfv(GL_LIGHT0, GL_DIFFUSE,  one);//dif);
+    //glLightfv(GL_LIGHT0, GL_POSITION, pos);
 
-    float dif[4]    = {0.7, 0.7, 0.7, 1};
-    float spc[4]    = {0.2, 0.7, 0.9, 1};
-    float amb[4]    = {0.1, 0.1, 0.1, 1};
-    float pos[4]    = {1,1,1,0};
+    //glEnable(GL_LIGHT0);
 
-    // setup light 0
-    glLightfv(GL_LIGHT0, GL_SPECULAR, one);//spc);
-    glLightfv(GL_LIGHT0, GL_AMBIENT,  amb);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  one);//dif);
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-
-    // define material parameters
-    glMaterialfv(GL_FRONT, GL_SPECULAR, spc);
-    glMaterialf(GL_FRONT, GL_SHININESS, 128.0f);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, dif);
+    //// define material parameters
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, spc);
+    //glMaterialf(GL_FRONT, GL_SHININESS, 128.0f);
+    //glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
+    //glMaterialfv(GL_FRONT, GL_DIFFUSE, dif);
 
 
     _deferred_shader.reset(new scm::deferred_shader(winx, winy));
@@ -161,6 +254,19 @@ void draw_stuff()
 
         // apply camera transform
         _trackball_manip.apply_transform();
+
+        define_lights();
+
+        math::mat_glf_t perf_to_gl = math::mat4f_identity;
+
+        perf_to_gl.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+
+        glTranslatef(0,-1,0);
+        glRotatef(7, 1, 0, 0);
+        glRotatef( 7, 0, 0, 1);
+        glRotatef(45, 0, 1, 0);
+        glTranslatef(-.5,0,-.5);
+        glMultMatrixf(perf_to_gl.mat_array);
 
 #if 0
         // activate texture unit 0
@@ -244,7 +350,13 @@ void display()
         _deferred_shader->display_buffers();
     }
     else {
-        _deferred_shader->shade();
+
+        if (display_buffer == 0) {
+            _deferred_shader->shade();
+        }
+        else {
+            _deferred_shader->display_buffer(display_buffer - 1);
+        }
     }
 
     // swap the back and front buffer, so that the drawn stuff can be seen
@@ -328,6 +440,15 @@ void keyboard(unsigned char key, int x, int y)
         case 'D': display_gbuffers = !display_gbuffers;break;
         case 'o':
         case 'O': open_geometry();break;
+        case '1': lights_state[0] = !lights_state[0];break;
+        case '2': lights_state[1] = !lights_state[1];break;
+        case '3': lights_state[2] = !lights_state[2];break;
+        case '4': lights_state[3] = !lights_state[3];break;
+        case 'q': display_buffer = 0;break;
+        case 'w': display_buffer = 1;break;
+        case 'e': display_buffer = 2;break;
+        case 'r': display_buffer = 3;break;
+        case 't': display_buffer = 4;break;
         // ESC key
         case 27: exit (0); break;
         default:;

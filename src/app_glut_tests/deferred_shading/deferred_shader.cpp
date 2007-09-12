@@ -224,6 +224,12 @@ void deferred_shader::end_fill_pass() const
 
 void deferred_shader::shade() const
 {
+    static int light_state[8];
+
+    for (unsigned l = 0; l < 8; ++l) {
+        light_state[l] = (glIsEnabled(GL_LIGHT0 + l) == GL_TRUE) ? 1 : 0;
+    }
+
     // save polygon and depth buffer bit
     // to restore culling and depth mask settings later
     glPushAttrib( GL_DEPTH_BUFFER_BIT
@@ -282,6 +288,7 @@ void deferred_shader::shade() const
         _dshading_program->set_uniform_1i("_color_gloss",           1);
         _dshading_program->set_uniform_1i("_specular_shininess",    2);
         _dshading_program->set_uniform_1i("_normal",                3);
+        _dshading_program->set_uniform_1iv("light_state", 8, light_state);
 
         math::vec2f_t viewdim = math::vec2f_t(float(_viewport_dim.x), float(_viewport_dim.y));
         _dshading_program->set_uniform_2fv("_viewport_dim", 1, viewdim.vec_array);
@@ -330,6 +337,18 @@ void deferred_shader::shade() const
     // restore the saved polygon and depth buffer bits
     // to reset the culling and depth mask settings
     glPopAttrib();
+}
+
+void deferred_shader::display_buffer(unsigned num) const
+{
+    using math::vec2ui_t;
+
+    switch (num) {
+        case 0: draw_texture(_framebuffer->depth_id(), _viewport_dim, vec2ui_t(0, 0), _viewport_dim);break;
+        case 1: draw_texture(_framebuffer->color_id(), _viewport_dim, vec2ui_t(0, 0), _viewport_dim);break;
+        case 2: draw_texture(_framebuffer->specular_id(), _viewport_dim, vec2ui_t(0, 0), _viewport_dim);break;
+        case 3: draw_texture(_framebuffer->normal_id(), _viewport_dim, vec2ui_t(0, 0), _viewport_dim);break;
+    };
 }
 
 void deferred_shader::display_buffers() const

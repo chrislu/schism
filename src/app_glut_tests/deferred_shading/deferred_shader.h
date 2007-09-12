@@ -24,6 +24,7 @@ public:
     void                    end_fill_pass() const;
 
     void                    shade() const;
+    void                    display_buffer(unsigned num) const;
     void                    display_buffers() const;
 
 protected:
