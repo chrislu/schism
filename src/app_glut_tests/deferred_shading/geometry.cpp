@@ -13,6 +13,7 @@
 #include <scm/data/geometry/wavefront_obj/obj_file.h>
 #include <scm/data/geometry/wavefront_obj/obj_loader.h>
 #include <scm/data/geometry/wavefront_obj/obj_to_vertex_array.h>
+#include <scm/core/utilities/foreach.h>
 
 #if _WIN32
 #include <windows.h>
@@ -69,32 +70,22 @@ bool open_geometry_file(const std::string& filename)
         std::cout << "done parsing obj file: " << obj_file_name << std::endl;
     }
 
-    std::size_t obj_no      = 0;
-    std::size_t obj_to      = 0;
-    std::size_t obj_va_s    = 0;
-    std::size_t obj_ia_s    = 0;
 
-    boost::shared_array<float>                  obj_va;
-    boost::shared_array<scm::core::uint32_t>    obj_ia;
+    scm::data::vertexbuffer_data        obj_vbuf;
+
 
     if (!scm::data::generate_vertex_buffer(obj_f,
-                                           obj_va,
-                                           obj_va_s,
-                                           obj_no,
-                                           obj_to,
-                                           obj_ia,
-                                           obj_ia_s)) {
+                                           obj_vbuf)) {
         std::cout << "failed to generate vertex buffer for: " << obj_file_name << std::endl;
         return (false);
     }
 
-    std::cout << "num faces: " << (obj_ia_s / 3) << std::endl;
-
-
     using namespace scm::gl;
     using namespace boost::assign;
 
-    boost::shared_ptr<vertexbuffer_object>  new_vbo(new vertexbuffer_object());
+    geometry    new_geometry;
+
+    new_geometry._vbo.reset(new vertexbuffer());
 
     vertex_layout::element_container vert_elem;
     vert_elem += vertex_element(vertex_element::position,
@@ -104,28 +95,38 @@ bool open_geometry_file(const std::string& filename)
 
     vertex_layout      vert_lo(vert_elem);
 
-    element_layout     elem_lo(element_layout::triangles,
-                               element_layout::dt_uint);
-
-    if (!new_vbo->vertex_data(obj_va_s,
-                              vert_lo,
-                              obj_va.get())) {
+    if (! new_geometry._vbo->vertex_data(obj_vbuf._vert_array_count,
+                                         vert_lo,
+                                         obj_vbuf._vert_array.get())) {
         std::cout << "error uploading vertex data" << std::endl;
         return (false);
     }
 
-    if (!new_vbo->element_data(obj_ia_s,
-                                elem_lo,
-                                obj_ia.get())) {
-        std::cout << "error uploading element data" << std::endl;
-        return (false);
+    element_layout     elem_lo(element_layout::triangles,
+                               element_layout::dt_uint);
+
+    std::size_t face_count = 0;
+    for (unsigned i = 0; i < obj_vbuf._index_arrays.size(); ++i) {
+        new_geometry._indices.push_back(geometry::index_buffer_container::value_type());
+        new_geometry._indices.back().reset(new indexbuffer());
+
+
+        if (!new_geometry._indices.back()->element_data(obj_vbuf._index_array_counts[i],
+                                           elem_lo,
+                                           obj_vbuf._index_arrays[i].get())) {
+            std::cout << "error uploading element data of indexbuffer number: " << i << std::endl;
+            return (false);
+        }
+
+        new_geometry._materials.push_back(obj_vbuf._materials[i]);
+
+        face_count += obj_vbuf._index_array_counts[i] / 3;
     }
 
+    std::cout << "num faces: " << face_count << std::endl;
 
-    geometry    new_geometry;
 
     new_geometry._desc = geom_desc;
-    new_geometry._vbo  = new_vbo;
 
     _geometries.push_back(new_geometry);
 

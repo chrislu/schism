@@ -3,8 +3,8 @@
 
 varying vec3 normal;
 
-uniform sampler2D _diff_gloss;
-uniform sampler2D _normal;
+//uniform sampler2D _diff_gloss;
+//uniform sampler2D _normal;
 
 void main() 
 {
@@ -17,6 +17,7 @@ void main()
     //normal = normalize(gl_NormalMatrix * normal);
 
     // outpt data into the gbuffers
-    gl_FragData[0] = diff_gloss;
-    gl_FragData[1] = vec4(gl_FrontFacing ? normalize(normal) : -normalize(normal), 0.0);
+    gl_FragData[0] = gl_FrontMaterial.diffuse;
+    gl_FragData[1] = vec4(gl_FrontMaterial.specular.xyz, gl_FrontMaterial.shininess);
+    gl_FragData[2] = vec4(gl_FrontFacing ? normalize(normal) : -normalize(normal), 0.0);
 }

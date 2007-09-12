@@ -17,6 +17,7 @@ public:
     unsigned        id() const          { return (_id); };
     unsigned        depth_id() const    { return (_depth_id); };
     unsigned        color_id() const    { return (_color_id); };
+    unsigned        specular_id() const { return (_specular_id); }
     unsigned        normal_id() const   { return (_normal_id); };
 
 protected:
@@ -25,6 +26,7 @@ private:
     unsigned        _id;
     unsigned        _depth_id;
     unsigned        _color_id;
+    unsigned        _specular_id;
     unsigned        _normal_id;
 
     bool            init_textures(unsigned /*width*/,

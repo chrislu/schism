@@ -6,6 +6,17 @@
 namespace scm {
 namespace data {
 
+wavefront_material::wavefront_material()
+  : _Ns(128.0f),
+    _Ni(1.0),
+    _Ka(0.125f, 0.125f, 0.125f, 1.0f),
+    _Kd(0.875f, 0.625f, 0.5f,   1.0f),
+    _Ks(0.25f,  0.25f,  0.25f,  1.0f),
+    _d(1.0f)
+{
+}
+
+
 wavefront_model::object_container::iterator wavefront_model::add_new_object()
 {
     std::string     object_name =   std::string("object_") 

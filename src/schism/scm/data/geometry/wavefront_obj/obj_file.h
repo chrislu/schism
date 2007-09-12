@@ -11,16 +11,21 @@
 #include <scm/core/ptr_types.h>
 #include <scm/core/math/math.h>
 
+#include <scm/core/platform/platform.h>
+#include <scm/core/utilities/platform_warning_disable.h>
+
 namespace scm {
 namespace data {
 
-struct wavefront_material
+struct __scm_export(data) wavefront_material
 {
+    wavefront_material();
+
     float           _Ns;
     float           _Ni;
-    math::vec3f_t   _Ka;
-    math::vec3f_t   _Kd;
-    math::vec3f_t   _Ks;
+    math::vec4f_t   _Ka;
+    math::vec4f_t   _Kd;
+    math::vec4f_t   _Ks;
     float           _d;
 }; // struct wavefront_material
 
@@ -86,5 +91,7 @@ struct wavefront_model
 
 } // namespace data
 } // namespace scm
+
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SCM_DATA_OBJ_FILE_H_INCLUDED

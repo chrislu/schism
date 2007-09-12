@@ -30,12 +30,7 @@ namespace scm {
 namespace data {
 
 bool generate_vertex_buffer(const wavefront_model&               in_obj,
-                            boost::shared_array<float>&          out_vert_array,
-                            std::size_t&                         vert_array_count,
-                            std::size_t&                         normals_offset,
-                            std::size_t&                         texcoords_offset,
-                            boost::shared_array<core::uint32_t>& out_trilist_index_array,
-                            std::size_t&                         index_array_count,
+                            vertexbuffer_data&                   out_data,
                             bool                                 interleave_arrays)
 {
     if (interleave_arrays) {
@@ -53,20 +48,41 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
 
     // first pass
     // find out the size of our new arrays and reorder the indices
+
+    out_data._index_arrays.reserve(in_obj._objects.size());
+    out_data._index_array_counts.reserve(in_obj._objects.size());
+
+    foreach (const wavefront_object& wf_obj, in_obj._objects) {
+        foreach (const wavefront_object_group& wf_obj_grp, wf_obj._groups) {
+            out_data._index_array_counts.push_back(3 * static_cast<unsigned>(wf_obj_grp._num_tri_faces));
+
+            wavefront_model::material_container::const_iterator mat = in_obj._materials.find(wf_obj_grp._material_name);
+
+            if (mat != in_obj._materials.end()) {
+                out_data._materials.push_back(mat->second);
+            }
+            else {
+                out_data._materials.push_back(wavefront_material());
+            }
+        }
+    }
+
+    vertexbuffer_data::index_counts_container::iterator     cur_index_count = out_data._index_array_counts.begin();
+
     unsigned new_index      = 0;
     unsigned iarray_index   = 0;
 
     foreach (const wavefront_object& wf_obj, in_obj._objects) {
         foreach (const wavefront_object_group& wf_obj_grp, wf_obj._groups) {
-            index_buf_size += 3 * static_cast<unsigned>(wf_obj_grp._num_tri_faces);
-        }
-    }
 
-    index_array_count   = index_buf_size;
-    out_trilist_index_array.reset(new core::uint32_t[index_buf_size]);
+            iarray_index   = 0;
 
-    foreach (const wavefront_object& wf_obj, in_obj._objects) {
-        foreach (const wavefront_object_group& wf_obj_grp, wf_obj._groups) {
+            // initialize index array
+            out_data._index_arrays.push_back(boost::shared_array<core::uint32_t>());
+            vertexbuffer_data::index_array_container::value_type& cur_index_array = out_data._index_arrays.back();
+
+            cur_index_array.reset(new core::uint32_t[*cur_index_count]);
+
             for (unsigned i = 0; i < wf_obj_grp._num_tri_faces; ++i) {
                 const wavefront_object_triangle_face& cur_face = wf_obj_grp._tri_faces[i];
 
@@ -79,16 +95,18 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
 
                     if (prev_it == indices.end()) {
                         indices.insert(index_value(cur_index, new_index));
-                        out_trilist_index_array[iarray_index] = new_index;
+                        cur_index_array[iarray_index] = new_index;
                         ++new_index;
                     }
                     else {
-                        out_trilist_index_array[iarray_index] = prev_it->second;
+                        cur_index_array[iarray_index] = prev_it->second;
                     }
 
                     ++iarray_index;
                 }
             }
+
+            ++cur_index_count;
         }
     }
 
@@ -96,23 +114,23 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
     // copy vertex data according to new indices
     std::size_t     array_size = 3 * indices.size();
     if (in_obj._num_normals != 0) {
-        array_size          += 3 * indices.size();
-        normals_offset      = 3 * indices.size();
+        array_size                 += 3 * indices.size();
+        out_data._normals_offset    = 3 * indices.size();
     }
     else {
-        normals_offset      = 0;
+        out_data._normals_offset    = 0;
     }
 
     if (in_obj._num_tex_coords != 0) {
-        array_size          += 2 * indices.size();
-        texcoords_offset    = normals_offset + 3 * indices.size();
+        array_size                 += 2 * indices.size();
+        out_data._texcoords_offset  = out_data._normals_offset + 3 * indices.size();
     }
     else {
-        texcoords_offset    = 0;
+        out_data._texcoords_offset  = 0;
     }
 
-    vert_array_count    = indices.size();
-    out_vert_array.reset(new float[array_size]);
+    out_data._vert_array_count      = indices.size();
+    out_data._vert_array.reset(new float[array_size]);
 
     unsigned varray_index = 0;
 
@@ -124,19 +142,19 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
 
         varray_index =  ind_it->second;
 
-        memcpy(out_vert_array.get() + varray_index * 3,
+        memcpy(out_data._vert_array.get() + varray_index * 3,
                in_obj._vertices[cur_index._v - 1].vec_array,
                3 * sizeof(float));
 
-        if (normals_offset) {
-            memcpy(out_vert_array.get() + varray_index * 3
-                                        + normals_offset,
+        if (out_data._normals_offset) {
+            memcpy(out_data._vert_array.get() + varray_index * 3
+                                              + out_data._normals_offset,
                    in_obj._normals[cur_index._n - 1].vec_array,
                    3 * sizeof(float));
         }
-        if (texcoords_offset) {
-            memcpy(out_vert_array.get() + varray_index * 2
-                                        + texcoords_offset,
+        if (out_data._texcoords_offset) {
+            memcpy(out_data._vert_array.get() + varray_index * 2
+                                              + out_data._texcoords_offset,
                    in_obj._tex_coords[cur_index._t - 1].vec_array,
                    2 * sizeof(float));
         }

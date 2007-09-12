@@ -13,6 +13,7 @@ ds_framebuffer::ds_framebuffer(unsigned width,
   : _id(0),
     _depth_id(0),
     _color_id(0),
+    _specular_id(0),
     _normal_id(0)
 {
     if (!init_textures(width, height)) {
@@ -56,6 +57,33 @@ bool ds_framebuffer::init_textures(unsigned width,
 
     if (!error_check.ok()) {
         std::cout << "error creating geometry fbo color renderbuffer texture: ";
+        std::cout << error_check.get_error_string() << std::endl;
+        return (false);
+    }
+    else {
+        std::cout << "successfully created geometry fbo color renderbuffer texture" << std::endl;
+    }
+
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+    // specular g-buffer
+    glGenTextures(1, &_specular_id);
+    if (_specular_id == 0) {
+        std::cout << "unable to generate geometry fbo specular renderbuffer texture" << std::endl;
+        return (false);
+    }
+
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, _specular_id);
+
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+    if (!error_check.ok()) {
+        std::cout << "error creating geometry fbo specular renderbuffer texture: ";
         std::cout << error_check.get_error_string() << std::endl;
         return (false);
     }
@@ -138,7 +166,8 @@ bool ds_framebuffer::init_fbo()
 
     // attach color textures
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, _color_id, 0);
-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_RECTANGLE_ARB, _normal_id, 0);
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_RECTANGLE_ARB, _specular_id, 0);
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL_TEXTURE_RECTANGLE_ARB, _normal_id, 0);
 
     unsigned fbo_status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
     if (fbo_status != GL_FRAMEBUFFER_COMPLETE_EXT) {

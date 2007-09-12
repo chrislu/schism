@@ -191,10 +191,11 @@ void deferred_shader::cleanup()
 void deferred_shader::start_fill_pass() const
 {
     static GLenum draw_buffers[] = {GL_COLOR_ATTACHMENT0_EXT,
-                                    GL_COLOR_ATTACHMENT1_EXT};
+                                    GL_COLOR_ATTACHMENT1_EXT,
+                                    GL_COLOR_ATTACHMENT2_EXT};
 
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _framebuffer->id());
-    glDrawBuffers(2, draw_buffers);
+    glDrawBuffers(3, draw_buffers);
 
     math::mat_glf_t projection;
 
@@ -209,8 +210,8 @@ void deferred_shader::start_fill_pass() const
     // set the sampler parameters to the particular texture unit number
 
     // WARNING, this assumption is only valid for this demo
-    _fbo_fill_program->set_uniform_1i("_diff_gloss", 0);
-    _fbo_fill_program->set_uniform_1i("_normal", 1);
+    //_fbo_fill_program->set_uniform_1i("_diff_gloss", 0);
+    //_fbo_fill_program->set_uniform_1i("_normal", 1);
 
 }
 
@@ -266,15 +267,21 @@ void deferred_shader::shade() const
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, _framebuffer->color_id());
 
         glActiveTexture(GL_TEXTURE2);
+        // enable and bind the color buffer texture rectangle
+        glEnable(GL_TEXTURE_RECTANGLE_ARB);
+        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, _framebuffer->specular_id());
+
+        glActiveTexture(GL_TEXTURE3);
         // enable and bind the normal buffer texture rectangle
         glEnable(GL_TEXTURE_RECTANGLE_ARB);
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, _framebuffer->normal_id());
 
         _dshading_program->bind();
 
-        _dshading_program->set_uniform_1i("_depth",       0);
-        _dshading_program->set_uniform_1i("_color_gloss", 1);
-        _dshading_program->set_uniform_1i("_normal",      2);
+        _dshading_program->set_uniform_1i("_depth",                 0);
+        _dshading_program->set_uniform_1i("_color_gloss",           1);
+        _dshading_program->set_uniform_1i("_specular_shininess",    2);
+        _dshading_program->set_uniform_1i("_normal",                3);
 
         math::vec2f_t viewdim = math::vec2f_t(float(_viewport_dim.x), float(_viewport_dim.y));
         _dshading_program->set_uniform_2fv("_viewport_dim", 1, viewdim.vec_array);
@@ -295,8 +302,12 @@ void deferred_shader::shade() const
         _dshading_program->unbind();
 
 
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE3);
         // unbind and disable the normal buffer texture rectangle
+        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+        glDisable(GL_TEXTURE_RECTANGLE_ARB);
+        glActiveTexture(GL_TEXTURE2);
+        // unbind and disable the specular buffer texture rectangle
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
         glDisable(GL_TEXTURE_RECTANGLE_ARB);
         glActiveTexture(GL_TEXTURE1);
@@ -327,9 +338,10 @@ void deferred_shader::display_buffers() const
 
     vec2ui_t out_dim = vec2ui_t(_viewport_dim.x/2, _viewport_dim.y/2);
 
-    draw_texture(_framebuffer->depth_id(),  _viewport_dim, vec2ui_t(0, 0),                  out_dim);
-    draw_texture(_framebuffer->color_id(),  _viewport_dim, vec2ui_t(_viewport_dim.x/2, 0),  out_dim);
-    draw_texture(_framebuffer->normal_id(), _viewport_dim, vec2ui_t(0, _viewport_dim.y/2),  out_dim);
+    draw_texture(_framebuffer->depth_id(),      _viewport_dim, vec2ui_t(0, 0),                                  out_dim);
+    draw_texture(_framebuffer->color_id(),      _viewport_dim, vec2ui_t(_viewport_dim.x/2, 0),                  out_dim);
+    draw_texture(_framebuffer->normal_id(),     _viewport_dim, vec2ui_t(0, _viewport_dim.y/2),                  out_dim);
+    draw_texture(_framebuffer->specular_id(),   _viewport_dim, vec2ui_t(_viewport_dim.x/2, _viewport_dim.y/2),  out_dim);
 }
 
 

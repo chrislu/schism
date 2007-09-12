@@ -122,15 +122,18 @@ bool init_gl()
     // delete image
     close_image(ps_data);
 
+    float one[4]    = {1.0f, 1.0f, 1.0f, 1.0f};
+    float zro[4]    = {0.0f, 0.0f, 0.0f, 1.0f};
+
     float dif[4]    = {0.7, 0.7, 0.7, 1};
     float spc[4]    = {0.2, 0.7, 0.9, 1};
     float amb[4]    = {0.1, 0.1, 0.1, 1};
     float pos[4]    = {1,1,1,0};
 
     // setup light 0
-    glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, one);//spc);
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  amb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  one);//dif);
     glLightfv(GL_LIGHT0, GL_POSITION, pos);
 
     // define material parameters
@@ -202,8 +205,21 @@ void draw_stuff()
         glDisable(GL_TEXTURE_2D);
 #else
     foreach(const geometry& geom, _geometries) {
+
         geom._vbo->bind();
-        geom._vbo->draw_elements();
+
+        for (unsigned db = 0; db < geom._indices.size(); ++db) {
+            geom._indices[db]->bind();
+
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   geom._materials[db]._Ka.vec_array);
+            glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   geom._materials[db]._Kd.vec_array);
+            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  geom._materials[db]._Ks.vec_array);
+            glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,  geom._materials[db]._Ns > 128.0f ? 128.0f : geom._materials[db]._Ns);
+
+            geom._indices[db]->draw_elements();
+            geom._indices[db]->unbind();
+        }
+
         geom._vbo->unbind();
     }
 #endif
@@ -251,7 +267,7 @@ void resize(int w, int h)
     // reset the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.f, float(w)/float(h), 0.1f, 100.f);
+    gluPerspective(60.f, float(w)/float(h), 1.0f, 10.f);
 
     // restore saved matrix mode
     glMatrixMode(current_matrix_mode);

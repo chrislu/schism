@@ -219,18 +219,12 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
 
                         path matlib_file_name = file_path.branch_path() / matlib_file;
 
-                        if (!exists(matlib_file_name)) {
-                            std::cout << "does not exist" << std::endl;
-                        }
-
                         if (!load_material_lib(matlib_file_name.file_string(), out_obj)) {
-                            out_obj._objects.clear();
+                            //out_obj._objects.clear();
 
-                            std::cout << "open_obj_file(): error loading materal lib ('"
+                            std::cout << "open_obj_file(): warning: loading materal lib ('"
                                       << matlib_file_name.file_string() << "')"
                                       << std::endl;
-
-                            return (false);
                         }
                     }
                 }
