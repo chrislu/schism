@@ -21,6 +21,8 @@ struct geometry
     index_buffer_container                          _indices;
     material_container                              _materials;
 
+    unsigned                                        _face_count;
+
 }; // geometry
 
 extern std::vector<geometry>        _geometries;

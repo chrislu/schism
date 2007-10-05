@@ -177,7 +177,7 @@ void main()
             // get sample
             src = texture3D(_volume, sample_pos);
             col = do_shading(sample_pos, src);
-            //col.a = 1.0 - pow(1.0 - col.a, 0.1);
+            col.a = 1.0 - pow(1.0 - col.a, (_step_size/(1.0/768.0)));
 
             //col.rgb = src.rgb;
 

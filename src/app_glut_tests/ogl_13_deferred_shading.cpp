@@ -12,6 +12,7 @@
 #include <GL/glut.h>
 
 #include <scm/ogl/manipulators/trackball_manipulator.h>
+#include <scm/ogl/time/time_query.h>
 #include <scm/core/utilities/foreach.h>
 
 #include <image_handling/image_loader.h>
@@ -25,6 +26,7 @@ scm::gl::trackball_manipulator _trackball_manip;
 
 int winx = 1024;
 int winy = 640;
+bool fullscreen = false;
 
 float initx = 0;
 float inity = 0;
@@ -41,6 +43,8 @@ unsigned display_buffer = 0;
 // texture objects ids
 unsigned tex0_id = 0;
 unsigned tex1_id = 0;
+
+const double    timer_screen_update = 500.0; // msec
 
 static const unsigned light_num = 4;
 bool lights_state[light_num] = {true, false, false, false};
@@ -171,7 +175,9 @@ bool init_gl()
     glPixelStorei(GL_PACK_ALIGNMENT,1);
 
     // set clear color, which is used to fill the background on glClear
-    glClearColor(0.2f,0.2f,0.2f,1);
+    //glClearColor(0.2f,0.2f,0.2f,1);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // setup depth testing
     glDepthFunc(GL_LESS);
@@ -182,44 +188,44 @@ bool init_gl()
 
     _trackball_manip.dolly(4.5);
 
-    image ps_data;
+    //image ps_data;
 
-    // load texture image
-    if (!open_image("./../../../res/textures/rock_decal_gloss_512.tga", ps_data)) {
-        return (false);
-    }
-    // generate texture object id
-    glGenTextures(1, &tex0_id);
-    if (tex0_id == 0) {
-        std::cout << "error creating texture object" << std::endl;
-        return (false);
-    }
-    // load image as texture to texture object
-    if (!load_2d_texture(tex0_id, ps_data, false)) {
-        std::cout << "error uploading texture" << std::endl;
-        return (false);
-    }
-    // delete image
-    close_image(ps_data);
+    //// load texture image
+    //if (!open_image("./../../../res/textures/rock_decal_gloss_512.tga", ps_data)) {
+    //    return (false);
+    //}
+    //// generate texture object id
+    //glGenTextures(1, &tex0_id);
+    //if (tex0_id == 0) {
+    //    std::cout << "error creating texture object" << std::endl;
+    //    return (false);
+    //}
+    //// load image as texture to texture object
+    //if (!load_2d_texture(tex0_id, ps_data, false)) {
+    //    std::cout << "error uploading texture" << std::endl;
+    //    return (false);
+    //}
+    //// delete image
+    //close_image(ps_data);
 
-    // load texture image
-    if (!open_image("./../../../res/textures/rock_normal_512.tga", ps_data)) {
-        std::cout << "error open_image " << std::endl;
-        return (false);
-    }
-    // generate texture object id
-    glGenTextures(1, &tex1_id);
-    if (tex1_id == 0) {
-        std::cout << "error creating texture object" << std::endl;
-        return (false);
-    }
-    // load image as texture to texture object
-    if (!load_2d_texture(tex1_id, ps_data, false)) {
-        std::cout << "error uploading texture" << std::endl;
-        return (false);
-    }
-    // delete image
-    close_image(ps_data);
+    //// load texture image
+    //if (!open_image("./../../../res/textures/rock_normal_512.tga", ps_data)) {
+    //    std::cout << "error open_image " << std::endl;
+    //    return (false);
+    //}
+    //// generate texture object id
+    //glGenTextures(1, &tex1_id);
+    //if (tex1_id == 0) {
+    //    std::cout << "error creating texture object" << std::endl;
+    //    return (false);
+    //}
+    //// load image as texture to texture object
+    //if (!load_2d_texture(tex1_id, ps_data, false)) {
+    //    std::cout << "error uploading texture" << std::endl;
+    //    return (false);
+    //}
+    //// delete image
+    //close_image(ps_data);
 
     //// setup light 0
     //glLightfv(GL_LIGHT0, GL_SPECULAR, one);//spc);
@@ -237,7 +243,36 @@ bool init_gl()
 
 
     _deferred_shader.reset(new scm::deferred_shader(winx, winy));
-    
+#if 1
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/carriage.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/door_left.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/door_right.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/hood.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/interior.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/trunk.sgeom")) {
+        return (false);
+    }
+    if (!open_geometry_file("E:/_devel/data/mfrd/Data/beetle/wheel_all.sgeom")) {
+        return (false);
+    }
+
+    unsigned fc = 0;
+    foreach(const geometry& geom, _geometries) {
+        fc += geom._face_count;
+    }
+
+    std::cout << "overall face count: " << fc << std::endl;
+#endif
     return (true);
 }
 
@@ -312,6 +347,11 @@ void draw_stuff()
 #else
     foreach(const geometry& geom, _geometries) {
 
+        glPushMatrix();
+        glTranslatef(geom._desc._geometry_origin.x,
+                     geom._desc._geometry_origin.y,
+                     geom._desc._geometry_origin.z);
+
         geom._vbo->bind();
 
         for (unsigned db = 0; db < geom._indices.size(); ++db) {
@@ -327,6 +367,7 @@ void draw_stuff()
         }
 
         geom._vbo->unbind();
+        glPopMatrix();
     }
 #endif
     // restore previously saved modelview matrix
@@ -336,31 +377,72 @@ void draw_stuff()
 
 void display()
 {
+    static scm::gl::time_query          _gl_timer_fill;
+    static scm::gl::time_query          _gl_timer_light;
+    static double                       _gl_accum_time_fill     = 0.0;
+    static double                       _gl_accum_time_light    = 0.0;
+    static double                       _accum_time             = 0.0;
+    static unsigned                     _accum_count            = 0;
+
+
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    _deferred_shader->start_fill_pass();
-        // clear the color and depth buffer
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    _gl_timer_fill.start(); {
 
-        draw_stuff();
-
-    _deferred_shader->end_fill_pass();
-
-    if (display_gbuffers) {
-        _deferred_shader->display_buffers();
+        _deferred_shader->start_fill_pass(); {
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            draw_stuff();
+        }
+        _deferred_shader->end_fill_pass();
     }
-    else {
+    _gl_timer_fill.stop();
 
-        if (display_buffer == 0) {
-            _deferred_shader->shade();
+
+    _gl_timer_light.start(); {
+
+        if (display_gbuffers) {
+            _deferred_shader->display_buffers();
         }
         else {
-            _deferred_shader->display_buffer(display_buffer - 1);
+
+            if (display_buffer == 0) {
+                _deferred_shader->shade();
+            }
+            else {
+                _deferred_shader->display_buffer(display_buffer - 1);
+            }
         }
     }
+    _gl_timer_light.stop();
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
+
+    _gl_timer_fill.collect_result();
+    _gl_timer_light.collect_result();
+
+    _gl_accum_time_fill     += scm::time::to_milliseconds(_gl_timer_fill.get_time());
+    _gl_accum_time_light    += scm::time::to_milliseconds(_gl_timer_light.get_time());
+
+    _accum_time             += (scm::time::to_milliseconds(_gl_timer_fill.get_time())
+                              + scm::time::to_milliseconds(_gl_timer_light.get_time()));
+    ++_accum_count;
+
+    if (_accum_time > timer_screen_update) {
+        std::stringstream   output;
+
+        output.precision(2);
+        output << std::fixed << "fill_pass: " << _gl_accum_time_fill / static_cast<double>(_accum_count) << "msec "
+                             << "light_pass: " << _gl_accum_time_light / static_cast<double>(_accum_count) << "msec "
+                             << std::endl;
+
+        std::cout << output.str();
+
+        _accum_time             = 0.0;
+        _gl_accum_time_fill     = 0.0;
+        _gl_accum_time_light    = 0.0;
+        _accum_count            = 0;
+    }
 }
 
 void resize(int w, int h)
@@ -379,7 +461,7 @@ void resize(int w, int h)
     // reset the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.f, float(w)/float(h), 1.0f, 10.f);
+    gluPerspective(60.f, float(w)/float(h), 1.5f, 10.f);
 
     // restore saved matrix mode
     glMatrixMode(current_matrix_mode);
@@ -460,7 +542,7 @@ int main(int argc, char **argv)
 {
     int width;
     int height;
-    bool fullscreen;
+    bool fs;
 
     try {
         boost::program_options::options_description  cmd_options("program options");
@@ -469,7 +551,7 @@ int main(int argc, char **argv)
             ("help", "show this help message")
             ("width", boost::program_options::value<int>(&width)->default_value(1024), "output width")
             ("height", boost::program_options::value<int>(&height)->default_value(640), "output height")
-            ("fullscreen", boost::program_options::value<bool>(&fullscreen)->default_value(false), "run in fullscreen mode");
+            ("fullscreen", boost::program_options::value<bool>(&fs)->default_value(false), "run in fullscreen mode");
 
         boost::program_options::variables_map       command_line;
         boost::program_options::parsed_options      parsed_cmd_line =  boost::program_options::parse_command_line(argc, argv, cmd_options);
@@ -483,6 +565,7 @@ int main(int argc, char **argv)
         }
         winx = width;
         winy = height;
+        fullscreen = fs;
     }
     catch (std::exception& e) {
         std::cout << e.what() << std::endl;

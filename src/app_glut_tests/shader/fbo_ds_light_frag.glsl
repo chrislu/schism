@@ -155,6 +155,10 @@ main()
     vec4 diff_gloss     = texture2DRect(_color_gloss, gl_FragCoord.xy);
     vec4 spec_shin      = texture2DRect(_specular_shininess, gl_FragCoord.xy);
 
+    if (diff_gloss.a == 0.0) {
+        discard;
+    }
+
 
     const vec3 N = normal; // normalize(normal); the normal is normalized for this fragment
   

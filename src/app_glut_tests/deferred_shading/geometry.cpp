@@ -126,7 +126,8 @@ bool open_geometry_file(const std::string& filename)
     std::cout << "num faces: " << face_count << std::endl;
 
 
-    new_geometry._desc = geom_desc;
+    new_geometry._desc          = geom_desc;
+    new_geometry._face_count    = face_count;
 
     _geometries.push_back(new_geometry);
 

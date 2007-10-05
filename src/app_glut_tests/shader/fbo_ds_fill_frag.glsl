@@ -9,7 +9,7 @@ varying vec3 normal;
 void main() 
 {
     // fetch color and gloss
-    vec4 diff_gloss = vec4(0.2, 0.5, 1.0, 1.0);//texture2D(_diff_gloss, gl_TexCoord[0].xy);
+    //vec4 diff_gloss = vec4(0.2, 0.5, 1.0, 1.0);//texture2D(_diff_gloss, gl_TexCoord[0].xy);
 
     // fetch normal
     // unpack normal from texture color

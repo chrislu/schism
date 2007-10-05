@@ -5,7 +5,7 @@ namespace gl
 {
     volume_renderer_parameters::volume_renderer_parameters()
         : _step_size(32.0f),
-          _point_of_interest(0.5f),
+          _point_of_interest(1.0f),
           _extend(1.0f),
           _aspect(1.0f),
           _cp_pos(0.5f, 0.75f, 0.25f),

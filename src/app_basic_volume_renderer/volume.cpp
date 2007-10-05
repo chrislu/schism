@@ -156,14 +156,16 @@ bool open_volume_file(const std::string& filename)
     _data_properties._alpha_transfer.add_point(255, 1.0f);
 #else
     _data_properties._alpha_transfer.add_point(0,   1.0f);
+    _data_properties._alpha_transfer.add_point(40,   0.8f);
     //_data_properties._alpha_transfer.add_point(75,  1.00f);
     //_data_properties._alpha_transfer.add_point(80,  0.00f);
     //_data_properties._alpha_transfer.add_point(128, 0.0f);
     //_data_properties._alpha_transfer.add_point(170, 0.00f);
     //_data_properties._alpha_transfer.add_point(175, 1.00f);
-    _data_properties._alpha_transfer.add_point(100,  0.00f);
+    _data_properties._alpha_transfer.add_point(80,  0.00f);
     _data_properties._alpha_transfer.add_point(128, 0.0f);
-    _data_properties._alpha_transfer.add_point(160, 0.00f);
+    _data_properties._alpha_transfer.add_point(180, 0.00f);
+    _data_properties._alpha_transfer.add_point(215, 0.8f);
     _data_properties._alpha_transfer.add_point(255, 1.0f);
 #endif
 
