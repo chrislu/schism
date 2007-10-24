@@ -39,6 +39,8 @@ bool rb_down = false;
 float dolly_sens = 10.0f;
 float gauss_kernel_7x7[49];
 
+bool        use_cuda_preprocessing = true;
+
 CUdevice    cuda_compute_device = -1;
 
 unsigned    pbo_in_data     = 0;
@@ -347,7 +349,9 @@ void display()
     glDisable(GL_LIGHT0);
     glDisable(GL_LIGHTING);
 
-    process_framebuffer_image();
+    if (use_cuda_preprocessing) {
+        process_framebuffer_image();
+    }
 
     // swap the back and front buffer, so that the drawn stuff can be seen
     glutSwapBuffers();
@@ -441,6 +445,8 @@ void mousemotion(int x, int y)
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
+        case 'c':
+        case 'C':use_cuda_preprocessing = !use_cuda_preprocessing; break;
         // ESC key
         case 27: shutdown_gl();
                  exit(0);
