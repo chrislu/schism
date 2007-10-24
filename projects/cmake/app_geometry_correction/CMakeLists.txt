@@ -7,25 +7,25 @@ SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h
+                                        ${SRC_DIR}/*.inl)
 
 FILE(GLOB SOURCE_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.cpp)
-FILE(GLOB HEADER_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.h)
-FILE(GLOB INLINE_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.inl)
+FILE(GLOB HEADER_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.h
+                                        ${SRC_DIR}/image_handling/*.inl)
 
 FILE(GLOB SOURCE_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.cpp)
-FILE(GLOB HEADER_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.h)
-FILE(GLOB INLINE_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.inl)
+FILE(GLOB HEADER_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.h
+                                        ${SRC_DIR}/obj_handling/*.inl)
 
 FILE(GLOB SHADER_FILES                  ${SRC_DIR}/shader/*.glsl)
 
 # define source groups
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
-SOURCE_GROUP(source_files/image_handling    FILES ${SOURCE_FILES_IMAGE_HANDLING}    ${HEADER_FILES_IMAGE_HANDLING}      ${INLINE_FILES_IMAGE_HANDLING})
-SOURCE_GROUP(source_files/obj_handling      FILES ${SOURCE_FILES_OBJ_HANDLING}      ${HEADER_FILES_OBJ_HANDLING}        ${INLINE_FILES_OBJ_HANDLING})
+SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES})
+SOURCE_GROUP(source_files/image_handling    FILES ${SOURCE_FILES_IMAGE_HANDLING}    ${HEADER_FILES_IMAGE_HANDLING})
+SOURCE_GROUP(source_files/obj_handling      FILES ${SOURCE_FILES_OBJ_HANDLING}      ${HEADER_FILES_OBJ_HANDLING})
 SOURCE_GROUP(source_files/shader_files      FILES ${SHADER_FILES})
 
 # combine source file lists
@@ -41,12 +41,6 @@ SET(HEADER_FILES
     ${HEADER_FILES_OBJ_HANDLING}
 )
 
-SET(INLINE_FILES
-    ${INLINE_FILES}
-    ${INLINE_FILES_IMAGE_HANDLING}
-    ${INLINE_FILES_OBJ_HANDLING}
-)
-
 SET(SHADER_FILES
     ${SHADER_FILES}
 )
@@ -54,7 +48,7 @@ SET(SHADER_FILES
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
     IF (MSVC)
-        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${INLINE_FILES} ${SHADER_FILES})
+        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES})
     ENDIF (MSVC)
 ENDIF (WIN32)
 

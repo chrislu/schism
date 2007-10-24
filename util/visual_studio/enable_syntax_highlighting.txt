@@ -1,0 +1,11 @@
+Visual Studio .Net 2005 / Visual Studio 8:
+
+1. If you don't have a usertype.dat file in your "Microsoft Visual Studio 8\Common7\IDE" folder:
+   - create it
+   - copy the contents of the particular usertyper files from this directory to the new file
+
+2. - Start Visual Studio 8.
+   - Select the menu "Tools->Options..."  Open "Text Editor" in the tree view on the left, and click on "File Extension"
+   - Type cu, glsl or any wanted file extension in the "Extension" box, and click "Add"
+
+3. - estart Visual Studio

@@ -7,12 +7,12 @@ SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                          ${SRC_DIR}/*.cpp)
-FILE(GLOB HEADER_FILES                          ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                          ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                          ${SRC_DIR}/*.h
+                                                ${SRC_DIR}/*.inl)
 
 FILE(GLOB SOURCE_FILES_VOLUME_RENDERER          ${SRC_DIR}/volume_renderer/*.cpp)
-FILE(GLOB HEADER_FILES_VOLUME_RENDERER          ${SRC_DIR}/volume_renderer/*.h)
-FILE(GLOB INLINE_FILES_VOLUME_RENDERER          ${SRC_DIR}/volume_renderer/*.inl)
+FILE(GLOB HEADER_FILES_VOLUME_RENDERER          ${SRC_DIR}/volume_renderer/*.h
+                                                ${SRC_DIR}/volume_renderer/*.inl)
 
 FILE(GLOB SHADER_FILES_VOLUME_RENDERER          ${SRC_DIR}/volume_renderer/shader/*.glsl)
 
@@ -21,9 +21,9 @@ FILE(GLOB SHADER_FILES                          ${SRC_DIR}/shader/*.glsl)
 # define source groups for visual studio project files
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files                                       FILES ${SOURCE_FILES}                           ${HEADER_FILES}                         ${INLINE_FILES})
+SOURCE_GROUP(source_files                                       FILES ${SOURCE_FILES}                           ${HEADER_FILES})
 SOURCE_GROUP(source_files/shader                                FILES ${SHADER_FILES})
-SOURCE_GROUP(source_files/volume_renderer                       FILES ${SOURCE_FILES_VOLUME_RENDERER}           ${HEADER_FILES_VOLUME_RENDERER}         ${INLINE_FILES_VOLUME_RENDERER})
+SOURCE_GROUP(source_files/volume_renderer                       FILES ${SOURCE_FILES_VOLUME_RENDERER}           ${HEADER_FILES_VOLUME_RENDERER})
 SOURCE_GROUP(source_files/volume_renderer/shader                FILES ${SHADER_FILES_VOLUME_RENDERER})
 
 # combine source file lists
@@ -37,11 +37,6 @@ SET(HEADER_FILES
     ${HEADER_FILES_VOLUME_RENDERER}
 )
 
-SET(INLINE_FILES
-    ${INLINE_FILES}
-    ${INLINE_FILES_VOLUME_RENDERER}
-)
-
 SET(SHADER_FILES
     ${SHADER_FILES}
     ${SHADER_FILES_VOLUME_RENDERER}
@@ -50,7 +45,7 @@ SET(SHADER_FILES
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
     IF (MSVC)
-        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${INLINE_FILES} ${SHADER_FILES})
+        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES})
     ENDIF (MSVC)
 ENDIF (WIN32)
 

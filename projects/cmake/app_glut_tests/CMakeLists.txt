@@ -7,28 +7,27 @@ SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/ogl_13_deferred_shading.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h ${SRC_DIR}/*.inl)
 
 FILE(GLOB SOURCE_FILES_DSHADING         ${SRC_DIR}/deferred_shading/*.cpp)
 FILE(GLOB HEADER_FILES_DSHADING         ${SRC_DIR}/deferred_shading/*.h)
 
 FILE(GLOB SOURCE_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.cpp)
-FILE(GLOB HEADER_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.h)
-FILE(GLOB INLINE_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.inl)
+FILE(GLOB HEADER_FILES_IMAGE_HANDLING   ${SRC_DIR}/image_handling/*.h
+                                        ${SRC_DIR}/image_handling/*.inl)
 
 FILE(GLOB SOURCE_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.cpp)
-FILE(GLOB HEADER_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.h)
-FILE(GLOB INLINE_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.inl)
+FILE(GLOB HEADER_FILES_OBJ_HANDLING     ${SRC_DIR}/obj_handling/*.h
+                                        ${SRC_DIR}/obj_handling/*.inl)
 
 FILE(GLOB SHADER_FILES                  ${SRC_DIR}/shader/*.glsl)
 
 # define source groups
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
+SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES})
 SOURCE_GROUP(source_files/deferred_shading  FILES ${SOURCE_FILES_DSHADING}          ${HEADER_FILES_DSHADING})
-SOURCE_GROUP(source_files/image_handling    FILES ${SOURCE_FILES_IMAGE_HANDLING}    ${HEADER_FILES_IMAGE_HANDLING}      ${INLINE_FILES_IMAGE_HANDLING})
+SOURCE_GROUP(source_files/image_handling    FILES ${SOURCE_FILES_IMAGE_HANDLING}    ${HEADER_FILES_IMAGE_HANDLING})
 SOURCE_GROUP(source_files/shader_files      FILES ${SHADER_FILES})
 
 # combine source file lists
@@ -42,11 +41,6 @@ SET(HEADER_FILES
     ${HEADER_FILES}
     ${HEADER_FILES_DSHADING}
     ${HEADER_FILES_IMAGE_HANDLING}
-)
-
-SET(INLINE_FILES
-    ${INLINE_FILES}
-    ${INLINE_FILES_IMAGE_HANDLING}
 )
 
 SET(SHADER_FILES

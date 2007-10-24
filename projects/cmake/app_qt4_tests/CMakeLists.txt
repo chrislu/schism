@@ -7,13 +7,13 @@ SET(EXECUTABLE_OUTPUT_PATH     ${SCHISM_EXECUTABLE_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h
+                                        ${SRC_DIR}/*.inl)
 
 # define source groups
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES}                     ${INLINE_FILES})
+SOURCE_GROUP(source_files                   FILES ${SOURCE_FILES}                   ${HEADER_FILES})
 
 # combine source file lists
 SET(SOURCE_FILES
@@ -24,14 +24,10 @@ SET(HEADER_FILES
     ${HEADER_FILES}
 )
 
-SET(INLINE_FILES
-    ${INLINE_FILES}
-)
-
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
     IF (MSVC)
-        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${INLINE_FILES} ${SHADER_FILES})
+        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES})
     ENDIF (MSVC)
 ENDIF (WIN32)
 

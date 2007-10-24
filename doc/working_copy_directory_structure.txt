@@ -1,28 +1,24 @@
 [*]root
  |
  |- [bin]
+ |- [doc]
  |- [ext]                             // external dependencies
  |   |
  |   |- [bin]
- |   |   |
- |   |   |- [{platform_name}]
- |   |       |
- |   |       |- [debug]
- |   |       |- [release]
- |   |
  |   |- [inc]
  |   |- [lib]
- |   |   |- [{platform_name}]
- |   |       |
- |   |       |- [debug]
- |   |       |- [release]
+ |   |   |
+ |   |   |- [debug]
+ |   |   |- [release]
  |   |
  |   |- _lib_versions.txt
  |
  |- [lib]
  |   |
- |   |- [debug]
- |   |- [release]
+ |   |- [{platform_name}]
+ |      |
+ |      |- [debug]
+ |      |- [release]
  |
  |- [projects]                      // project files different compilers or
  |   |                              // build environments

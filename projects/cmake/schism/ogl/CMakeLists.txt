@@ -7,8 +7,8 @@ SET(LIBRARY_OUTPUT_PATH                 ${SCHISM_LIBRARY_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h
+                                        ${SRC_DIR}/*.inl)
 
 FILE(GLOB SOURCE_FILES_BUFFER_OBJECT	${SRC_DIR}/buffer_object/*.cpp)
 FILE(GLOB HEADER_FILES_BUFFER_OBJECT	${SRC_DIR}/buffer_object/*.h)
@@ -43,19 +43,19 @@ FILE(GLOB HEADER_FILES_UTILITIES        ${SRC_DIR}/utilities/*.h)
 FILE(GLOB SOURCE_FILES_VB_OBJECT        ${SRC_DIR}/vertexbuffer_object/*.cpp)
 FILE(GLOB HEADER_FILES_VB_OBJECT        ${SRC_DIR}/vertexbuffer_object/*.h)
 
-FILE(GLOB HEADER_FILES_MATH             ${SRC_DIR}/math/*.h)
-FILE(GLOB INLINE_FILES_MATH             ${SRC_DIR}/math/*.inl)
+FILE(GLOB HEADER_FILES_MATH             ${SRC_DIR}/math/*.h
+                                        ${SRC_DIR}/math/*.inl)
 
 # define source grous
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files						FILES ${SOURCE_FILES}					${HEADER_FILES}                     ${INLINE_FILES})
+SOURCE_GROUP(source_files						FILES ${SOURCE_FILES}					${HEADER_FILES})
 SOURCE_GROUP(source_files/font					FILES ${SOURCE_FILES_FONT}              ${HEADER_FILES_FONT})
 SOURCE_GROUP(source_files/buffer_object			FILES ${SOURCE_FILES_BUFFER_OBJECT}		${HEADER_FILES_BUFFER_OBJECT})
 SOURCE_GROUP(source_files/framebuffer_object	FILES ${SOURCE_FILES_FB_OBJECT}         ${HEADER_FILES_FB_OBJECT})
 SOURCE_GROUP(source_files/gui					FILES ${SOURCE_FILES_GUI}				${HEADER_FILES_GUI})
 SOURCE_GROUP(source_files/manipulators			FILES ${SOURCE_FILES_MANIPULATORS}      ${HEADER_FILES_MANIPULATORS})
-SOURCE_GROUP(source_files/math					FILES                                   ${HEADER_FILES_MATH}                ${INLINE_FILES_MATH})
+SOURCE_GROUP(source_files/math					FILES                                   ${HEADER_FILES_MATH})
 SOURCE_GROUP(source_files/shader_objects		FILES ${SOURCE_FILES_SHADER_OBJECTS}    ${HEADER_FILES_SHADER_OBJECTS})
 SOURCE_GROUP(source_files/system				FILES ${SOURCE_FILES_SYSTEM}			${HEADER_FILES_SYSTEM})
 SOURCE_GROUP(source_files/textures				FILES ${SOURCE_FILES_TEXTURES}          ${HEADER_FILES_TEXTURES})
@@ -91,11 +91,6 @@ SET(HEADER_FILES
     ${HEADER_FILES_UTILITIES}
 )
 
-SET(INLINE_FILES
-    ${INLINE_FILES}
-    ${INLINE_FILES_MATH}
-)
-
 IF (WIN32)
 SET(SOURCE_FILES
     ${SOURCE_FILES}
@@ -112,7 +107,7 @@ ENDIF (WIN32)
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
     IF (MSVC)
-        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${INLINE_FILES})
+        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES})
     ENDIF (MSVC)
 ENDIF (WIN32)
 

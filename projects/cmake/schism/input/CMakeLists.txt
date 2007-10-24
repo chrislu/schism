@@ -7,25 +7,25 @@ SET(LIBRARY_OUTPUT_PATH                 ${SCHISM_LIBRARY_DIR})
 
 # source files
 FILE(GLOB SOURCE_FILES                  ${SRC_DIR}/*.cpp)
-FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h)
-FILE(GLOB INLINE_FILES                  ${SRC_DIR}/*.inl)
+FILE(GLOB HEADER_FILES                  ${SRC_DIR}/*.h
+                                        ${SRC_DIR}/*.inl)
 
 FILE(GLOB SOURCE_FILES_TRACKING         ${SRC_DIR}/tracking/*.cpp)
-FILE(GLOB HEADER_FILES_TRACKING         ${SRC_DIR}/tracking/*.h)
-FILE(GLOB INLINE_FILES_TRACKING         ${SRC_DIR}/tracking/*.inl)
+FILE(GLOB HEADER_FILES_TRACKING         ${SRC_DIR}/tracking/*.h
+                                        ${SRC_DIR}/tracking/*.inl)
 
 FILE(GLOB SOURCE_FILES_TRACKING_DETAIL  ${SRC_DIR}/tracking/detail/*.cpp)
-FILE(GLOB HEADER_FILES_TRACKING_DETAIL  ${SRC_DIR}/tracking/detail/*.h)
-FILE(GLOB INLINE_FILES_TRACKING_DETAIL  ${SRC_DIR}/tracking/detail*.inl)
+FILE(GLOB HEADER_FILES_TRACKING_DETAIL  ${SRC_DIR}/tracking/detail/*.h
+                                        ${SRC_DIR}/tracking/detail*.inl)
 
 
 
 # define source grous
 SET(SOURCE_GROUP_DELIMITER "/")
 
-SOURCE_GROUP(source_files						FILES ${SOURCE_FILES}					${HEADER_FILES}                     ${INLINE_FILES})
-SOURCE_GROUP(source_files/tracking              FILES ${SOURCE_FILES_TRACKING}          ${HEADER_FILES_TRACKING}            ${INLINE_FILES_TRACKING})
-SOURCE_GROUP(source_files/tracking/detail       FILES ${SOURCE_FILES_TRACKING_DETAIL}   ${HEADER_FILES_TRACKING_DETAIL}     ${INLINE_FILES_TRACKING_DETAIL})
+SOURCE_GROUP(source_files						FILES ${SOURCE_FILES}					${HEADER_FILES})
+SOURCE_GROUP(source_files/tracking              FILES ${SOURCE_FILES_TRACKING}          ${HEADER_FILES_TRACKING})
+SOURCE_GROUP(source_files/tracking/detail       FILES ${SOURCE_FILES_TRACKING_DETAIL}   ${HEADER_FILES_TRACKING_DETAIL})
 
 # combine source file lists
 SET(SOURCE_FILES
@@ -40,16 +40,10 @@ SET(HEADER_FILES
     ${HEADER_FILES_TRACKING_DETAIL}
 )
 
-SET(INLINE_FILES
-    ${INLINE_FILES}
-    ${INLINE_FILES_TRACKING}
-    ${INLINE_FILES_TRACKING_DETAIL}
-)
-
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
     IF (MSVC)
-        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES} ${INLINE_FILES})
+        SET (SOURCE_FILES ${SOURCE_FILES} ${HEADER_FILES})
     ENDIF (MSVC)
 ENDIF (WIN32)
 
