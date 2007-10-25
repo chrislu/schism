@@ -1,8 +1,0 @@
-Project Properties:
- - x86 project
-   * working dir:  ./../../../bin/win_x86/$(ConfigurationName)
-   * environmant:  PATH=%PATH%;./../../../lib/win_x86/$(ConfigurationName);./../../../ext/lib/$(ConfigurationName)
- - x64 project
-   * working dir:  ./../../../bin/win_x64/$(ConfigurationName)
-   * environmant:  PATH=%PATH%;./../../../lib/win_x64/$(ConfigurationName);./../../../ext/lib/$(ConfigurationName)
- 
