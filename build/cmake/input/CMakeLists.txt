@@ -1,7 +1,7 @@
 
 PROJECT(scm_input)
 
-SET(SRC_DIR "${GLOBAL_SRC_DIR}/schism/scm/input")
+SET(SRC_DIR "${SCHISM_SRC_DIR}/scm/input")
 
 SET(LIBRARY_OUTPUT_PATH                 ${SCHISM_LIBRARY_DIR})
 
@@ -49,7 +49,7 @@ ENDIF (WIN32)
 
 # set include and lib directories
 INCLUDE_DIRECTORIES(
-    ${GLOBAL_SRC_DIR}/schism
+    ${SCHISM_SRC_DIR}
 )
 # set include directories for windows external dependencies
 IF (WIN32)
@@ -61,7 +61,7 @@ ENDIF (WIN32)
 
 # set library directories
 LINK_DIRECTORIES(
-    ${GLOBAL_LIB_DIR}/${SCHISM_PLATFORM}
+    ${SCHISM_LIB_DIR}/${SCHISM_PLATFORM}
 )
 # set library directories for windows external dependencies
 IF (WIN32)

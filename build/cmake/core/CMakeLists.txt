@@ -1,13 +1,13 @@
 PROJECT(scm_core)
 
-SET(SRC_DIR "${GLOBAL_SRC_DIR}/schism/scm/core")
+SET(SRC_DIR "${SCHISM_SRC_DIR}/scm/core")
 
 SET(LIBRARY_OUTPUT_PATH                         ${SCHISM_LIBRARY_DIR})
 
 # source files
-FILE(GLOB SOURCE_FILES_SCM                      ${GLOBAL_SRC_DIR}/schism/scm/*.cpp)
-FILE(GLOB HEADER_FILES_SCM                      ${GLOBAL_SRC_DIR}/schism/scm/*.h
-                                                ${GLOBAL_SRC_DIR}/schism/scm/*.inl)
+FILE(GLOB SOURCE_FILES_SCM                      ${SCHISM_LIB_DIR}/schism/scm/*.cpp)
+FILE(GLOB HEADER_FILES_SCM                      ${SCHISM_LIB_DIR}/schism/scm/*.h
+                                                ${SCHISM_LIB_DIR}/schism/scm/*.inl)
 
 FILE(GLOB SOURCE_FILES                          ${SRC_DIR}/*.cpp)
 FILE(GLOB HEADER_FILES                          ${SRC_DIR}/*.h
@@ -182,7 +182,7 @@ ENDIF (WIN32)
 
 # set include directories
 INCLUDE_DIRECTORIES(
-    ${GLOBAL_SRC_DIR}/schism
+    ${SCHISM_SRC_DIR}
 )
 # set include directories for windows external dependencies
 IF (WIN32)
