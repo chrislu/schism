@@ -59,14 +59,6 @@ typedef enum
 
 con_mode _con_mode = console_brief;
 
-unsigned        _show_image     = 0;
-// 0 - final rendering
-// 1 - sc color image
-// 2 - sc depth image
-// 3 - fc stencil image
-// 4 - fc depth image
-// 5 - fc color image
-
 bool            _high_quality_volume = false;
 float           _near_plane          = 0.1;
 
@@ -177,184 +169,114 @@ void render_geometry()
     }
 
     glPushAttrib(GL_LIGHTING_BIT);
+    {
     
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        
 #if 0
-    glEnable(GL_LIGHTING);
-    glEnable(GL_NORMALIZE);
-    glDisable(GL_COLOR_MATERIAL);
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glPushMatrix();
-        glTranslatef(0.5f, 0.5f, 0.5f);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_NORMALIZE);
+        glDisable(GL_COLOR_MATERIAL);
+        glColor3f(0.6f, 0.6f, 0.6f);
         glPushMatrix();
-            glScalef(0.3, 0.3, 0.3);
-            glTranslatef(-0.4, -0.2, 0.4);
-            glRotatef(90, 1, 0, 0);
-            glutSolidSphere(1.0, 20, 20);
-            glTranslatef(0.8, 0.6, -0.9);
-            //glutSolidCube(1.0);
+            glTranslatef(0.5f, 0.5f, 0.5f);
+            glPushMatrix();
+                glScalef(0.3, 0.3, 0.3);
+                glTranslatef(-0.4, -0.2, 0.4);
+                glRotatef(90, 1, 0, 0);
+                glutSolidSphere(1.0, 20, 20);
+                glTranslatef(0.8, 0.6, -0.9);
+                //glutSolidCube(1.0);
+            glPopMatrix();
+            glPushMatrix();
+                glTranslatef(0.5, 0.5, 0.5);
+                glutSolidCube(1.0);
+            glPopMatrix();
         glPopMatrix();
-        glPushMatrix();
-            glTranslatef(0.5, 0.5, 0.5);
-            glutSolidCube(1.0);
-        glPopMatrix();
-    glPopMatrix();
-#else
+#endif
 
-    if (   _show_image == 0
-        || _show_image == 1
-        || _show_image == 2) {
         _volrend_cross_planes->frame(_volrend_params);
-    }
 
-#if 0
-    glActiveTexture(GL_TEXTURE0);
-    _volrend_params._uncertainty_volume_texture.bind();
+        glActiveTexture(GL_TEXTURE0);
+        _volrend_params._uncertainty_volume_texture.bind();
 
 
-    _shader_program->bind();
+        _shader_program->bind();
 
-    math::mat_glf_t modelview;
-    math::get_gl_matrix(GL_MODELVIEW_MATRIX, modelview);
+        math::mat_glf_t modelview;
+        math::get_gl_matrix(GL_MODELVIEW_MATRIX, modelview);
 
-    math::mat_glf_t vertex_vol_aspect_scale = math::mat4f_identity;
+        math::mat_glf_t vertex_vol_aspect_scale = math::mat4f_identity;
 
-    vertex_vol_aspect_scale.scale(
-        _volrend_params._aspect.x,
-        _volrend_params._aspect.y,
-        _volrend_params._aspect.z);
+        vertex_vol_aspect_scale.scale(
+            _volrend_params._aspect.x,
+            _volrend_params._aspect.y,
+            _volrend_params._aspect.z);
 
-    glColor3f(0.6f, 0.6f, 0.6f);
+        glColor3f(0.6f, 0.6f, 0.6f);
 
-#endif
-    glPushMatrix();
+        glPushMatrix();
 
-    unsigned c = 0;
+        unsigned c = 0;
 
-#if 0
-    foreach(const geometry& geom, _geometries) {
-        glColor3f(colors[c].x, colors[c].y, colors[c].z);
-        ++c;
-        math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4f_identity;
-        math::mat_glf_t vertex_to_volume_transform            = vertex_vol_aspect_scale;
 
-        vertex_to_volume_unit_transform.scale(
-            1.0f /(_data_properties._vol_desc._volume_aspect.x *float(_data_properties._vol_desc._data_dimensions.x)),
-            1.0f /(_data_properties._vol_desc._volume_aspect.y *float(_data_properties._vol_desc._data_dimensions.y)),
-            1.0f /(_data_properties._vol_desc._volume_aspect.z *float(_data_properties._vol_desc._data_dimensions.z)));
-        
-        vertex_to_volume_unit_transform.translate(
-            - _data_properties._vol_desc._volume_origin.x,
-            - _data_properties._vol_desc._volume_origin.y,
-            - _data_properties._vol_desc._volume_origin.z);
-        
-        vertex_to_volume_unit_transform.translate(
-            geom._desc._geometry_origin.x,
-            geom._desc._geometry_origin.y,
-            geom._desc._geometry_origin.z);
-        
-        vertex_to_volume_unit_transform.scale(
-            geom._desc._geometry_scale.x,
-            geom._desc._geometry_scale.y,
-            geom._desc._geometry_scale.z);
+        foreach(const geometry& geom, _geometries) {
+            glColor3f(colors[c].x, colors[c].y, colors[c].z);
+            ++c;
+            math::mat_glf_t vertex_to_volume_unit_transform       = math::mat4f_identity;
+            math::mat_glf_t vertex_to_volume_transform            = vertex_vol_aspect_scale;
 
-        vertex_to_volume_transform *= vertex_to_volume_unit_transform;
-        math::mat_glf_t norm_mat =  modelview * vertex_to_volume_transform;
-        norm_mat =  math::transpose(math::inverse(norm_mat));
-        
-        _shader_program->set_uniform_1i("_unc_texture", 0);
-        _shader_program->set_uniform_1f("_anim_step", anim_step);
-        _shader_program->set_uniform_matrix_4fv("_vert2unit", 1, false, vertex_to_volume_unit_transform.mat_array);
-        _shader_program->set_uniform_matrix_4fv("_vert2vol",  1, false, vertex_to_volume_transform.mat_array);
-        _shader_program->set_uniform_matrix_4fv("_vert2vol_it",  1, false, norm_mat.mat_array);
-#endif
+            vertex_to_volume_unit_transform.scale(
+                1.0f /(_data_properties._vol_desc._volume_aspect.x *float(_data_properties._vol_desc._data_dimensions.x)),
+                1.0f /(_data_properties._vol_desc._volume_aspect.y *float(_data_properties._vol_desc._data_dimensions.y)),
+                1.0f /(_data_properties._vol_desc._volume_aspect.z *float(_data_properties._vol_desc._data_dimensions.z)));
+            
+            vertex_to_volume_unit_transform.translate(
+                - _data_properties._vol_desc._volume_origin.x,
+                - _data_properties._vol_desc._volume_origin.y,
+                - _data_properties._vol_desc._volume_origin.z);
+            
+            vertex_to_volume_unit_transform.translate(
+                geom._desc._geometry_origin.x,
+                geom._desc._geometry_origin.y,
+                geom._desc._geometry_origin.z);
+            
+            vertex_to_volume_unit_transform.scale(
+                geom._desc._geometry_scale.x,
+                geom._desc._geometry_scale.y,
+                geom._desc._geometry_scale.z);
 
-    if (   _show_image == 0
-        || _show_image == 1
-        || _show_image == 2) {
-
-        const geometry& geom = _geometries[0];{
-
-            glEnable(GL_NORMALIZE);
-            glPushMatrix();
-            glTranslatef(.1,
-                         0,
-                         0.2);
-
-            glTranslatef(geom._desc._geometry_origin.x,
-                         geom._desc._geometry_origin.y,
-                         geom._desc._geometry_origin.z);
-
-            glScalef(0.7, 0.7, 0.7);
+            vertex_to_volume_transform *= vertex_to_volume_unit_transform;
+            math::mat_glf_t norm_mat =  modelview * vertex_to_volume_transform;
+            norm_mat =  math::transpose(math::inverse(norm_mat));
+            
+            _shader_program->set_uniform_1i("_unc_texture", 0);
+            _shader_program->set_uniform_1f("_anim_step", anim_step);
+            _shader_program->set_uniform_matrix_4fv("_vert2unit", 1, false, vertex_to_volume_unit_transform.mat_array);
+            _shader_program->set_uniform_matrix_4fv("_vert2vol",  1, false, vertex_to_volume_transform.mat_array);
+            _shader_program->set_uniform_matrix_4fv("_vert2vol_it",  1, false, norm_mat.mat_array);
 
             geom._vbo->bind();
 
             for (unsigned db = 0; db < geom._indices.size(); ++db) {
                 geom._indices[db]->bind();
-
-                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   geom._materials[db]._Ka.vec_array);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   geom._materials[db]._Kd.vec_array);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  geom._materials[db]._Ks.vec_array);
-                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,  geom._materials[db]._Ns > 128.0f ? 128.0f : geom._materials[db]._Ns);
-
                 geom._indices[db]->draw_elements();
                 geom._indices[db]->unbind();
             }
 
             geom._vbo->unbind();
-            glPopMatrix();
         }
+
+        glPopMatrix();
+
+        _shader_program->unbind();
+        _volrend_params._volume_texture.unbind();
+
+        glDisable(GL_LIGHT0);
+        //glDisable(GL_LIGHTING);
+
     }
-    if (   _show_image == 0
-        || _show_image == 3
-        || _show_image == 4
-        || _show_image == 5) {
-
-        const geometry& geom = _geometries[1];{
-
-            glEnable(GL_NORMALIZE);
-            glPushMatrix();
-            glTranslatef(.1,
-                         0,
-                         0.2);
-
-            glTranslatef(geom._desc._geometry_origin.x,
-                         geom._desc._geometry_origin.y,
-                         geom._desc._geometry_origin.z);
-
-            glScalef(0.7, 0.7, 0.7);
-
-            geom._vbo->bind();
-
-            for (unsigned db = 0; db < geom._indices.size(); ++db) {
-                geom._indices[db]->bind();
-
-                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   geom._materials[db]._Ka.vec_array);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   geom._materials[db]._Kd.vec_array);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  geom._materials[db]._Ks.vec_array);
-                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,  geom._materials[db]._Ns > 128.0f ? 128.0f : geom._materials[db]._Ns);
-
-                geom._indices[db]->draw_elements();
-                geom._indices[db]->unbind();
-            }
-
-            geom._vbo->unbind();
-            glPopMatrix();
-        }
-    }
-            //geom._vbo->bind();
-            //geom._vbo->draw_elements();
-            //geom._vbo->unbind();
-//    }
-    glPopMatrix();
-    _shader_program->unbind();
-    _volrend_params._volume_texture.unbind();
-#endif
-    glDisable(GL_LIGHT0);
-    //glDisable(GL_LIGHTING);
-
     glPopAttrib();
 }
 
@@ -720,23 +642,20 @@ bool init_gl()
     con_mode_changed();
     _volrend_params._point_of_interest  = math::vec3f_t(.5f, .5f, .5f);
     _volrend_params._extend             = math::vec3f_t(1.f, 1.f, 1.f);
-#if 1
-    if (!open_geometry_file("E:/_devel/data/wfarm/wells_inactive_only.sgeom")) {
-        return (false);
-    }
-    if (!open_geometry_file("E:/_devel/data/wfarm/wells_active_only.sgeom")) {
-        return (false);
-    }
 
+
+
+    return (true);
+}
+
+void output_face_count()
+{
     unsigned fc = 0;
     foreach(const geometry& geom, _geometries) {
         fc += geom._face_count;
     }
 
     std::cout << "overall face count: " << fc << std::endl;
-#endif
-
-    return (true);
 }
 
 void shutdown_gl()
@@ -889,55 +808,6 @@ void draw_texture_rect(unsigned tex_id,
     glMatrixMode(current_matrix_mode);
 }
 
-void draw_black_rect(const math::vec2ui_t tex_dim,
-                     const math::vec2ui_t& ll,
-                     const math::vec2ui_t& ur)
-{
-    // retrieve current matrix mode
-    GLint  current_matrix_mode;
-    glGetIntegerv(GL_MATRIX_MODE, &current_matrix_mode);
-
-    glPushAttrib(GL_VIEWPORT_BIT);
-
-    glViewport(ll.x, ll.y, ur.x, ur.y);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0, 1, 0, 1, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-
-    glDisable(GL_LIGHTING);
-
-    glColor3f(0, 0, 0);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(  0.0f, 0.0f);
-        glTexCoord2f(float(tex_dim.x), 0.0f);
-        glVertex2f(  1.0f, 0.0f);
-        glTexCoord2f(float(tex_dim.x), float(tex_dim.y));
-        glVertex2f(  1.0f, 1.0f);
-        glTexCoord2f(0.0f, float(tex_dim.y));
-        glVertex2f(  0.0f, 1.0f);
-    glEnd();
-
-
-
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    
-    glPopAttrib();
-
-    // restore saved matrix mode
-    glMatrixMode(current_matrix_mode);
-}
-
-
 void display()
 {
     static scm::time::high_res_timer    _timer;
@@ -948,10 +818,10 @@ void display()
     static scm::gl::axes_compass        compass;
 
     if (_high_quality_volume) {
-        _volrend_params._step_size = 2048;
+        _volrend_params._step_size = 1024;
     }
     else {
-        _volrend_params._step_size = 100;
+        _volrend_params._step_size = 256;
     }
 
     _gl_timer.start();
@@ -967,6 +837,7 @@ void display()
 
     // push current modelview matrix
     glPushMatrix();
+    {
 
         // apply camera transform
         _trackball_manip.apply_transform();
@@ -974,17 +845,19 @@ void display()
         // geometry pass
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo_id);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        //fill_background();
+        fill_background();
         render_geometry();
         //_volrend_raycast->draw_outlines(_volrend_params);
 
         glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
-        //glClear(GL_DEPTH_BUFFER_BIT );
+        {
+            //glClear(GL_DEPTH_BUFFER_BIT );
             glFrontFace(GL_CCW);
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
             glColorMask(false, false, false, false);
             _volrend_raycast->draw_bounding_volume(_volrend_params);
+        }
         glPopAttrib();
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -994,54 +867,40 @@ void display()
             draw_geometry_color_buffer();
         }
 
-        if (   _show_image == 3
-            || _show_image == 4
-            || _show_image == 5) {
-            glPushAttrib(GL_STENCIL_BUFFER_BIT);
+        glPushAttrib(GL_STENCIL_BUFFER_BIT);
+        {
+            if (use_stencil_test) {
+                int color_mask[4];
+                glGetIntegerv(GL_COLOR_WRITEMASK, color_mask);
 
-            int color_mask[4];
-            glGetIntegerv(GL_COLOR_WRITEMASK, color_mask);
+                // write geometry stencil 
+                glStencilFunc(GL_LESS, 1, 1);
+                glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
-            // write geometry stencil 
-            glStencilFunc(GL_LESS, 1, 1);
-            glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+                glColorMask(false, false, false, false);
+                glEnable(GL_STENCIL_TEST);
+                render_geometry();
+                glColorMask(color_mask[0], color_mask[1], color_mask[2], color_mask[3]);
 
-            glColorMask(false, false, false, false);
-            glEnable(GL_STENCIL_TEST);
-            render_geometry();
-            glColorMask(color_mask[0], color_mask[1], color_mask[2], color_mask[3]);
+                glStencilFunc(GL_LESS, 0, 1);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-            glStencilFunc(GL_LESS, 0, 1);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+                // volume pass
+                render_volume();
 
-            if (_show_image != 3) {
+                glDisable(GL_STENCIL_TEST);
+                glPopAttrib();
+            }
+            else {
                 // volume pass
                 render_volume();
             }
-            else {
-                //glClear(GL_COLOR_BUFFER_BIT);
-                draw_black_rect(_viewport_dim, math::vec2ui_t(0, 0), _viewport_dim);
-            }
-
-            glPopAttrib();
         }
-        else if (   _show_image == 0
-                 || _show_image == 1
-                 || _show_image == 2){
-            // volume pass
-            render_volume();
-        }
-
-
-        switch (_show_image) {
-            //case 1:
-            //case 5:draw_texture_rect(fbo_depth_id, _viewport_dim, vec2ui_t(0, 0), _viewport_dim);break;
-            case 2:
-            case 4:draw_texture_rect(fbo_depth_id, _viewport_dim, math::vec2ui_t(0, 0), _viewport_dim);break;
-        }
+        glPopAttrib();
 
     // restore previously saved modelview matrix
     //compass.render();
+    }
     glPopMatrix();
     //phong_shader->unbind();
 
@@ -1122,7 +981,7 @@ void keyboard(unsigned char key, int x, int y)
         case 'u':
         case 'U': open_unc_volume(); break;
         case 'g':
-        case 'G': open_geometry();break;
+        case 'G': open_geometry(); output_face_count(); break;
         case 'q': _volrend_params._cp_pos.x += ui_float_increment * _volrend_params._aspect.x;break;
         case 'Q': _volrend_params._cp_pos.x -= ui_float_increment * _volrend_params._aspect.x;break;
         case 'w': _volrend_params._cp_pos.y += ui_float_increment * _volrend_params._aspect.y;break;
@@ -1145,10 +1004,10 @@ void keyboard(unsigned char key, int x, int y)
         case '-': _near_plane -= 0.01f; resize(winx, winy);break;
         case 's':
         case 'S': use_stencil_test = !use_stencil_test;break;
-        //case 'i':
-        //case 'I': do_inside_pass = !do_inside_pass;
-        //          _volrend_raycast->do_inside_pass(do_inside_pass);
-        //          break;
+        case 'i':
+        case 'I': do_inside_pass = !do_inside_pass;
+                  _volrend_raycast->do_inside_pass(do_inside_pass);
+                  break;
         case 'd':
         case 'D': draw_geometry = !draw_geometry;break;
         case 'p':
@@ -1165,17 +1024,6 @@ void keyboard(unsigned char key, int x, int y)
                 _con_mode = console_full;
             con_mode_changed();
             break;
-        case 'i':
-        case 'I': if (_show_image == 5) _show_image = 0;
-                  else ++_show_image;
-                  //if (   _show_image == 0
-                  //    || _show_image == 2) {
-                  //    resize_n(winx, winy, 0.01f);
-                  //}
-                  //else {
-                  //    resize_n(winx, winy, 0.01f);
-                  //}
-                  break;
         case 27:  shutdown_gl();
                   exit (0);
                   break;
