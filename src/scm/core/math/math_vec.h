@@ -72,6 +72,9 @@ namespace math
     class vec<scm_scalar, 2>
     {
     public:
+        typedef scm_scalar          component_type;
+
+    public:
         vec() {}
         vec(const vec<scm_scalar, 2>& v) : x(v.x), y(v.y) {}
         explicit vec(const scm_scalar s) : x(s), y(s) {}
@@ -99,6 +102,9 @@ namespace math
     template<typename scm_scalar>
     class vec<scm_scalar, 3>
     {
+    public:
+        typedef scm_scalar          component_type;
+
     public:
         vec() {}
         vec(const vec<scm_scalar, 3>& v) : x(v.x), y(v.y), z(v.z) {}
@@ -128,6 +134,9 @@ namespace math
     template<typename scm_scalar>
     class vec<scm_scalar, 4>
     {
+    public:
+        typedef scm_scalar          component_type;
+
     public:
         vec() {}
         vec(const vec<scm_scalar, 4>& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
