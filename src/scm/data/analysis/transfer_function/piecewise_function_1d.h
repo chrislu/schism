@@ -12,50 +12,56 @@
 namespace scm {
 namespace data {
     
-template<typename val_type, typename scal_type>
+template<typename val_type,
+         typename res_type>
 class piecewise_function_1d
 {
 protected:
-    typedef std::map<val_type, scal_type, std::less<val_type> > function_point_container_t;
+    typedef std::map<val_type, res_type, std::less<val_type> >  function_point_container_t;
 
 public:
-    typedef val_type                                            point_type;
-    typedef scal_type                                           value_type;
-    typedef typename function_point_container_t::const_iterator const_point_iterator;
+    typedef val_type                                            value_type;
+    typedef res_type                                            result_type;
+    typedef typename function_point_container_t::value_type     stop_type;
+    typedef typename function_point_container_t::iterator       stop_iterator;
+    typedef typename function_point_container_t::const_iterator const_stop_iterator;
 
 public:
     piecewise_function_1d();
-    piecewise_function_1d(const piecewise_function_1d<val_type, scal_type>& ref) : _function(ref._function) {}
-    piecewise_function_1d<val_type, scal_type>& operator=(const piecewise_function_1d<val_type, scal_type>& rhs) {
+    piecewise_function_1d(const piecewise_function_1d<val_type, res_type>& ref) : _function(ref._function) {}
+    piecewise_function_1d<val_type, res_type>& operator=(const piecewise_function_1d<val_type, res_type>& rhs) {
         _function = rhs._function;
         return (*this);
     }
 
-    void                    add_point(val_type point, scal_type value, val_type epsilon = val_type(0));
-    void                    del_point(val_type point, val_type epsilon = val_type(0));
+    void                    add_stop(value_type point, result_type value, value_type epsilon = value_type(0));
+    void                    del_stop(value_type point, value_type epsilon = value_type(0));
 
     void                    clear();
     bool                    empty() const;
 
-    scal_type               operator[](float point) const;
+    result_type             operator[](float point) const;
 
-    unsigned                get_num_points() const;
-    const_point_iterator    get_points_begin() const;
-    const_point_iterator    get_points_end() const;
+    std::size_t             num_stops() const;
 
-    typename function_point_container_t::iterator           find_point(val_type point, val_type epsilon);
+    stop_iterator           stops_begin();
+    stop_iterator           stops_end();
+    const_stop_iterator     stops_begin() const;
+    const_stop_iterator     stops_end() const;
 
-    typename function_point_container_t::iterator           find_lesser_point(val_type point);
-    typename function_point_container_t::iterator           find_lequal_point(val_type point);
+    stop_iterator           find_stop(val_type point, val_type epsilon);
 
-    typename function_point_container_t::iterator           find_gequal_point(val_type point);
-    typename function_point_container_t::iterator           find_greater_point(val_type point);
+    stop_iterator           find_lesser_stop(val_type point);
+    stop_iterator           find_lequal_stop(val_type point);
 
-    typename function_point_container_t::const_iterator     find_lesser_point(val_type point) const;
-    typename function_point_container_t::const_iterator     find_lequal_point(val_type point) const;
+    stop_iterator           find_gequal_stop(val_type point);
+    stop_iterator           find_greater_stop(val_type point);
 
-    typename function_point_container_t::const_iterator     find_gequal_point(val_type point) const;
-    typename function_point_container_t::const_iterator     find_greater_point(val_type point) const;
+    const_stop_iterator     find_lesser_stop(val_type point) const;
+    const_stop_iterator     find_lequal_stop(val_type point) const;
+
+    const_stop_iterator     find_gequal_stop(val_type point) const;
+    const_stop_iterator     find_greater_stop(val_type point) const;
 
 protected:
     struct lesser_op
@@ -93,10 +99,9 @@ protected:
 protected:
     function_point_container_t              _function;
 
-
 private:
     //BOOST_STATIC_ASSERT(std::numeric_limits<val_type>::is_specialized);
-    //BOOST_STATIC_ASSERT(std::numeric_limits<scal_type>::is_specialized);
+    //BOOST_STATIC_ASSERT(std::numeric_limits<res_type>::is_specialized);
 }; // class piecewise_function_1d
 
 } // namespace data
