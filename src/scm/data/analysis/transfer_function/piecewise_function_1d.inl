@@ -3,6 +3,8 @@
 #include <cassert>
 #include <limits>
 
+#include <scm/core/math/math.h>
+
 namespace scm {
 namespace data {
 
@@ -10,6 +12,20 @@ template<typename val_type,
          typename res_type>
 piecewise_function_1d<val_type, res_type>::piecewise_function_1d()
 {
+}
+
+template<typename val_type,
+         typename res_type>
+void piecewise_function_1d<val_type, res_type>::add_stop(const stop_type& stop, value_type epsilon)
+{
+    add_stop(stop.first, stop.second, epsilon);
+}
+
+template<typename val_type,
+         typename res_type>
+void piecewise_function_1d<val_type, res_type>::del_stop(const stop_type& stop, value_type epsilon)
+{
+    del_stop(stop.first, epsilon);
 }
 
 template<typename val_type,

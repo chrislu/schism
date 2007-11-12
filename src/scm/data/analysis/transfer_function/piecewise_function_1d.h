@@ -22,7 +22,7 @@ protected:
 public:
     typedef val_type                                            value_type;
     typedef res_type                                            result_type;
-    typedef typename function_point_container_t::value_type     stop_type;
+    typedef std::pair<val_type, res_type>                       stop_type;
     typedef typename function_point_container_t::iterator       stop_iterator;
     typedef typename function_point_container_t::const_iterator const_stop_iterator;
 
@@ -34,6 +34,8 @@ public:
         return (*this);
     }
 
+    void                    add_stop(const stop_type& stop, value_type epsilon = value_type(0));
+    void                    del_stop(const stop_type& stop, value_type epsilon = value_type(0));
     void                    add_stop(value_type point, result_type value, value_type epsilon = value_type(0));
     void                    del_stop(value_type point, value_type epsilon = value_type(0));
 
