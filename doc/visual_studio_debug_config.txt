@@ -1,8 +1,8 @@
 Project Properties:
  - x86 project
    * working dir:  ./../../bin/win_x86/$(ConfigurationName)
-   * environmant:  PATH=%PATH%;./../../../../../schism/lib/win_x86/$(ConfigurationName);./../../../../../externals/lib/$(ConfigurationName)
+   * environment:  PATH=%PATH%;./../../../../../schism/lib/win_x86/$(ConfigurationName);./../../../../../externals/lib/$(ConfigurationName)
  - x64 project
    * working dir:  ./../../bin/win_x64/$(ConfigurationName)
-   * environmant:  PATH=%PATH%;./../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../../externals/lib/$(ConfigurationName)
+   * environment:  PATH=%PATH%;./../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../../externals/lib/$(ConfigurationName)
  

@@ -25,6 +25,7 @@ public:
     typedef std::pair<val_type, res_type>                       stop_type;
     typedef typename function_point_container_t::iterator       stop_iterator;
     typedef typename function_point_container_t::const_iterator const_stop_iterator;
+    typedef std::pair<typename stop_iterator, bool>             insert_return_type;
 
 public:
     piecewise_function_1d();
@@ -34,10 +35,10 @@ public:
         return (*this);
     }
 
-    void                    add_stop(const stop_type& stop, value_type epsilon = value_type(0));
-    void                    del_stop(const stop_type& stop, value_type epsilon = value_type(0));
-    void                    add_stop(value_type point, result_type value, value_type epsilon = value_type(0));
-    void                    del_stop(value_type point, value_type epsilon = value_type(0));
+    insert_return_type      add_stop(const stop_type& stop);
+    void                    del_stop(const stop_type& stop);
+    insert_return_type      add_stop(value_type point, result_type value);
+    void                    del_stop(value_type point);
 
     void                    clear();
     bool                    empty() const;
@@ -51,7 +52,7 @@ public:
     const_stop_iterator     stops_begin() const;
     const_stop_iterator     stops_end() const;
 
-    stop_iterator           find_stop(val_type point, val_type epsilon);
+    stop_iterator           find_stop(val_type point);
 
     stop_iterator           find_lesser_stop(val_type point);
     stop_iterator           find_lequal_stop(val_type point);

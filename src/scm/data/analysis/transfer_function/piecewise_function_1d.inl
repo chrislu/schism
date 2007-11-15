@@ -16,37 +16,32 @@ piecewise_function_1d<val_type, res_type>::piecewise_function_1d()
 
 template<typename val_type,
          typename res_type>
-void piecewise_function_1d<val_type, res_type>::add_stop(const stop_type& stop, value_type epsilon)
+typename piecewise_function_1d<val_type, res_type>::insert_return_type
+piecewise_function_1d<val_type, res_type>::add_stop(const stop_type& stop)
 {
-    add_stop(stop.first, stop.second, epsilon);
+    return (_function.insert(stop));
 }
 
 template<typename val_type,
          typename res_type>
-void piecewise_function_1d<val_type, res_type>::del_stop(const stop_type& stop, value_type epsilon)
+void piecewise_function_1d<val_type, res_type>::del_stop(const stop_type& stop)
 {
-    del_stop(stop.first, epsilon);
+    del_stop(stop.first);
 }
 
 template<typename val_type,
          typename res_type>
-void piecewise_function_1d<val_type, res_type>::add_stop(value_type point, result_type value, value_type epsilon)
+typename piecewise_function_1d<val_type, res_type>::insert_return_type
+piecewise_function_1d<val_type, res_type>::add_stop(value_type point, result_type value)
 {
-    stop_iterator existent_stop = find_stop(point, epsilon);
-
-    if (existent_stop == _function.end()) {
-        _function.insert(stop_type(point, value));
-    }
-    else {
-        existent_stop->second = value;
-    }
+    return (add_stop(stop_type(point, value)));
 }
 
 template<typename val_type,
          typename res_type>
-void piecewise_function_1d<val_type, res_type>::del_stop(value_type point, value_type epsilon)
+void piecewise_function_1d<val_type, res_type>::del_stop(value_type point)
 {
-    stop_iterator existent_stop = find_stop(point, epsilon);
+    stop_iterator existent_stop = find_stop(point);
 
     if (existent_stop != _function.end()) {
         _function.erase(existent_stop);
@@ -143,49 +138,9 @@ piecewise_function_1d<val_type, res_type>::stops_end()
 template<typename val_type,
          typename res_type>
 typename piecewise_function_1d<val_type, res_type>::stop_iterator
-piecewise_function_1d<val_type, res_type>::find_stop(value_type point, value_type epsilon)
+piecewise_function_1d<val_type, res_type>::find_stop(value_type point)
 {
-    stop_iterator result = _function.end();
-
-    if (epsilon == value_type(0)) {
-        result = _function.find(point);
-    }
-    else {
-        stop_iterator lequal     = find_lequal_stop(point);
-        stop_iterator greater    = find_greater_stop(point);
-
-        if (lequal == _function.end() || greater == _function.end()) {
-            if (lequal != greater) { // in case lequal == greater the container can only be empty
-                if (lequal != _function.end()) {
-                    if (math::abs(point - lequal->first) <= epsilon) {
-                        result = lequal;
-                    }
-                }
-                else { // greater != _function.end()
-                    if (math::abs(greater->first - point) <= epsilon) {
-                        result = greater;
-                    }
-                }
-            }
-        }
-        else { // lequal != _function.end() && greater != _function.end()
-            value_type g_eps = math::abs(greater->first - point);
-            value_type l_eps = math::abs(point - lequal->first);
-            
-            if (g_eps <= epsilon && l_eps <= epsilon) {
-                result = (g_eps < l_eps) ? greater : lequal;
-            }
-            else {
-                if (l_eps <= epsilon) {
-                    result = lequal;
-                }
-                else if (g_eps <= epsilon) {
-                    result = greater;
-                }
-            }
-        }
-    }
-    return (result);
+    return (_function.find(point));
 }
 
 template<typename val_type,
