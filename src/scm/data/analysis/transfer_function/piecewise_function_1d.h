@@ -2,9 +2,7 @@
 #ifndef SCM_DATA_PIECEWISE_FUNCTION_1D_H_INCLUDED
 #define SCM_DATA_PIECEWISE_FUNCTION_1D_H_INCLUDED
 
-#include <limits>
 #include <map>
-#include <set>
 
 #include <boost/static_assert.hpp>
 #include <boost/call_traits.hpp>
