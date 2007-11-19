@@ -4,8 +4,10 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -15,8 +17,11 @@ class shader_object;
 class __scm_export(ogl) program_object
 {
 public:
-    explicit program_object();
+    program_object();
+    program_object(const program_object& prog_obj);
     virtual ~program_object();
+
+    program_object& operator=(const program_object& rhs);
 
     bool                attach_shader(const gl::shader_object&);
     bool                link();
@@ -24,6 +29,7 @@ public:
     void                bind() const;
     void                unbind() const;
 
+    bool                ok() const {return (_ok); }
     const std::string&  get_linker_output() const { return (_linker_out); }
     const std::string&  get_valitation_output() const { return (_validate_out); }
 
@@ -55,15 +61,18 @@ protected:
 private:
     int                 get_uniform_location(const std::string&) const;
 
-    unsigned int        _prog;
-    std::string         _linker_out;
-    std::string         _validate_out;
+    boost::shared_ptr<unsigned int> _prog;
+
+    bool                            _ok;
+
+    std::string                     _linker_out;
+    std::string                     _validate_out;
 
 }; // class program_object
 
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // PROGRAM_OBJECT_H_INCLUDED

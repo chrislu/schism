@@ -6,7 +6,7 @@
 #include <string>
 
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -16,7 +16,7 @@ class program_object;
 class __scm_export(ogl) shader_object
 {
 public:
-    explicit shader_object(unsigned int);
+    shader_object(unsigned int);
     virtual ~shader_object();
 
     void                    add_defines(const std::string& /*def*/);
@@ -50,6 +50,6 @@ private:
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SHADER_OBJECT_H_INCLUDED

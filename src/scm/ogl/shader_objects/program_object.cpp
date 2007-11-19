@@ -10,21 +10,42 @@ namespace scm {
 namespace gl {
 
 program_object::program_object()
-    : _prog(0)
+  : _prog(new unsigned int),
+    _ok(false)
 {
-    _prog = glCreateProgram();
+    *_prog = glCreateProgram();
 
-    assert(_prog != 0);
+    assert(*_prog != 0);
+}
+
+program_object::program_object(const program_object& prog_obj)
+  : _prog(prog_obj._prog),
+    _ok(prog_obj._ok)
+{
 }
 
 program_object::~program_object()
 {
-    glDeleteProgram(_prog);
+    if (_prog.unique()) {
+        glDeleteProgram(*_prog);
+    }
+}
+
+program_object& program_object::operator=(const program_object& rhs)
+{
+    if (_prog.unique()) {
+        glDeleteProgram(*_prog);
+    }
+
+    _prog = rhs._prog;
+    _ok   = rhs._ok;
+
+    return (*this);
 }
 
 bool program_object::attach_shader(const shader_object& sobj)
 {
-    glAttachShader(_prog, sobj._obj);
+    glAttachShader(*_prog, sobj._obj);
 
     if (glGetError() != GL_NONE) {
         return (false);
@@ -37,53 +58,57 @@ bool program_object::link()
 {
     int link_state = 0;
 
-    glLinkProgram(_prog);
-    glGetProgramiv(_prog, GL_LINK_STATUS, &link_state);
+    glLinkProgram(*_prog);
+    glGetProgramiv(*_prog, GL_LINK_STATUS, &link_state);
 
     if (!link_state) {
         GLchar*   linker_info;
         int       info_len;
 
-        glGetProgramiv(_prog, GL_INFO_LOG_LENGTH, &info_len);
+        glGetProgramiv(*_prog, GL_INFO_LOG_LENGTH, &info_len);
         linker_info = new GLchar[info_len];
-        glGetProgramInfoLog(_prog, info_len, NULL, linker_info);
+        glGetProgramInfoLog(*_prog, info_len, NULL, linker_info);
 
         _linker_out = std::string(linker_info);
         delete [] linker_info;
 
-        return (false);
+        _ok = false;
     }
 
-    return (true);
+    _ok = true;
+
+    return (_ok);
 }
 
 bool program_object::validate()
 {
     int valid_state = 0;
 
-    glValidateProgram(_prog);
-    glGetProgramiv(_prog, GL_VALIDATE_STATUS, &valid_state);
+    glValidateProgram(*_prog);
+    glGetProgramiv(*_prog, GL_VALIDATE_STATUS, &valid_state);
 
     if (!valid_state) {
         GLchar*   valid_info;
         int       info_len;
 
-        glGetProgramiv(_prog, GL_INFO_LOG_LENGTH, &info_len);
+        glGetProgramiv(*_prog, GL_INFO_LOG_LENGTH, &info_len);
         valid_info = new GLchar[info_len];
-        glGetProgramInfoLog(_prog, info_len, NULL, valid_info);
+        glGetProgramInfoLog(*_prog, info_len, NULL, valid_info);
 
         _validate_out = std::string(valid_info);
         delete [] valid_info;
 
-        return (false);
+        _ok = false;
     }
 
-    return (true);
+    _ok = true;
+
+    return (_ok);
 }
 
 void program_object::bind() const
 {
-    glUseProgram(_prog);
+    glUseProgram(*_prog);
 }
 
 void program_object::unbind() const
@@ -264,7 +289,7 @@ void program_object::set_uniform_matrix_4fv(const std::string& param_name, unsig
 
 int program_object::get_uniform_location(const std::string& param_name) const
 {
-    return (glGetUniformLocation(_prog, param_name.c_str()));
+    return (glGetUniformLocation(*_prog, param_name.c_str()));
 }
 
 } // namespace gl
