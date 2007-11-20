@@ -14,11 +14,18 @@
 namespace scm {
 namespace data {
 
+struct aabbox
+{
+    math::vec3f_t                                   _min;
+    math::vec3f_t                                   _max;
+};
+
 struct vertexbuffer_data
 {
     typedef std::vector<std::size_t>                            index_counts_container;
     typedef std::vector<boost::shared_array<core::uint32_t> >   index_array_container;
     typedef std::vector<wavefront_material>                     material_container;
+    typedef std::vector<aabbox>                                 bbox_container;
 
     vertexbuffer_data() 
      :  _vert_array_count(0),
@@ -32,6 +39,7 @@ struct vertexbuffer_data
     index_array_container           _index_arrays;
     index_counts_container          _index_array_counts;
     material_container              _materials;
+    bbox_container                  _bboxes;
 }; // struct vertexbuffer_data
 
 // offsets are array offsets in the vertex array, NO byte offsets!

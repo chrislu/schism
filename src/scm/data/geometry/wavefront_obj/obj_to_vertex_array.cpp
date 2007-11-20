@@ -1,6 +1,7 @@
 
 #include "obj_to_vertex_array.h"
 
+#include <limits>
 #include <map>
 
 #include <scm/core/utilities/foreach.h>
@@ -80,8 +81,14 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
             // initialize index array
             out_data._index_arrays.push_back(boost::shared_array<core::uint32_t>());
             vertexbuffer_data::index_array_container::value_type& cur_index_array = out_data._index_arrays.back();
-
             cur_index_array.reset(new core::uint32_t[*cur_index_count]);
+
+            // initialize bbox
+            out_data._bboxes.push_back(aabbox());
+            vertexbuffer_data::bbox_container::value_type& cur_bbox = out_data._bboxes.back();
+
+            cur_bbox._min   = math::vec3f_t((std::numeric_limits<math::vec3f_t::component_type>::max)());
+            cur_bbox._max   = math::vec3f_t((std::numeric_limits<math::vec3f_t::component_type>::min)());
 
             for (unsigned i = 0; i < wf_obj_grp._num_tri_faces; ++i) {
                 const wavefront_object_triangle_face& cur_face = wf_obj_grp._tri_faces[i];
@@ -91,6 +98,15 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
                                               in_obj._num_tex_coords != 0 ? cur_face._tex_coords[k] : 0,
                                               in_obj._num_normals    != 0 ? cur_face._normals[k] : 0);
                     
+                    // update bounding box
+                    const math::vec3f_t& cur_vert = in_obj._vertices[cur_index._v];
+
+                    for (unsigned c = 0; c < 3; ++c) {
+                        cur_bbox._min.vec_array[c] = cur_vert.vec_array[c] < cur_bbox._min.vec_array[c] ? cur_vert.vec_array[c] : cur_bbox._min.vec_array[c];
+                        cur_bbox._max.vec_array[c] = cur_vert.vec_array[c] > cur_bbox._max.vec_array[c] ? cur_vert.vec_array[c] : cur_bbox._max.vec_array[c];
+                    }
+
+                    // check index mapping
                     index_mapping::const_iterator prev_it = indices.find(cur_index);
 
                     if (prev_it == indices.end()) {
