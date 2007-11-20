@@ -1,6 +1,8 @@
 
 #include "program_object_factory.h"
 
+#include <iostream>
+
 #include <boost/scoped_ptr.hpp>
 
 #include <scm/core/utilities/foreach.h>
@@ -20,7 +22,6 @@ program_object program_object_factory::create(const program_object_makefile& mak
 
     bool                compile_error = false;
     bool                attach_error  = false;
-    bool                link_error    = false;
 
     clear_error_output();
 
@@ -95,11 +96,14 @@ program_object program_object_factory::create(const program_object_makefile& mak
         }
     }
 
-    // program linking
-    if (!new_program_object.link()) {
-        _error_output +=  std::string("link error: \n")
-                        + new_program_object.get_linker_output()
-                        + std::string("\n");
+    if (!compile_error && !attach_error)
+    {
+        // program linking
+        if (!new_program_object.link()) {
+            _error_output +=  std::string("link error: \n")
+                            + new_program_object.get_linker_output()
+                            + std::string("\n");
+        }
     }
 
     return (new_program_object);
