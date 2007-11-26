@@ -47,7 +47,7 @@ void vertexbuffer::bind() const
                                 (GLvoid*)(NULL + _vertex_layout.offset(i) * _num_vertices));
                 glEnableClientState(GL_NORMAL_ARRAY);
                 break;
-            case vertex_element::tex_coord:;break;
+            case vertex_element::tex_coord:
                 if (elem._num != 0) assert (0);
 
                 glTexCoordPointer(static_cast<GLint>(elem._data_num_components),

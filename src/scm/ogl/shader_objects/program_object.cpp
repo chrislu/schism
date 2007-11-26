@@ -56,7 +56,8 @@ bool program_object::attach_shader(const shader_object& sobj)
 
 bool program_object::link()
 {
-    int link_state = 0;
+    int link_state  = 0;
+    _ok             = true;
 
     glLinkProgram(*_prog);
     glGetProgramiv(*_prog, GL_LINK_STATUS, &link_state);
@@ -75,14 +76,13 @@ bool program_object::link()
         _ok = false;
     }
 
-    _ok = true;
-
     return (_ok);
 }
 
 bool program_object::validate()
 {
     int valid_state = 0;
+    _ok             = true;
 
     glValidateProgram(*_prog);
     glGetProgramiv(*_prog, GL_VALIDATE_STATUS, &valid_state);
@@ -100,8 +100,6 @@ bool program_object::validate()
 
         _ok = false;
     }
-
-    _ok = true;
 
     return (_ok);
 }
