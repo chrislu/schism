@@ -99,7 +99,7 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
                                               in_obj._num_normals    != 0 ? cur_face._normals[k] : 0);
                     
                     // update bounding box
-                    const math::vec3f_t& cur_vert = in_obj._vertices[cur_index._v];
+                    const math::vec3f_t& cur_vert = in_obj._vertices[cur_index._v - 1];
 
                     for (unsigned c = 0; c < 3; ++c) {
                         cur_bbox._min.vec_array[c] = cur_vert.vec_array[c] < cur_bbox._min.vec_array[c] ? cur_vert.vec_array[c] : cur_bbox._min.vec_array[c];
