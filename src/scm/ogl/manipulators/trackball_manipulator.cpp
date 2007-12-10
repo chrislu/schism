@@ -90,6 +90,11 @@ const math::mat4f_t trackball_manipulator::get_transform_matrix() const
     return (tmp_ret);
 }
 
+float trackball_manipulator::dolly() const
+{
+    return (_dolly);
+}
+
 } // namespace gl
 } // namespace scm
 
