@@ -12,6 +12,7 @@ wavefront_material::wavefront_material()
     _Ka(0.125f, 0.125f, 0.125f, 1.0f),
     _Kd(0.875f, 0.625f, 0.5f,   1.0f),
     _Ks(0.25f,  0.25f,  0.25f,  1.0f),
+    _Tf(1.f,    1.f,    1.f,    1.0f),
     _d(1.0f)
 {
 }

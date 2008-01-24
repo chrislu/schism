@@ -85,6 +85,18 @@ bool load_material_lib(const std::string& filename, wavefront_model& out_obj)
                     }
                 }
                 break;
+						case 'T': {
+                    line.get(line_id);
+                    switch (line_id) {
+                        case 'f': {
+                                line >> cur_material->second._Tf.x;
+                                line >> cur_material->second._Tf.y;
+                                line >> cur_material->second._Tf.z;
+                            }
+                            break;
+                    }
+                }
+                break;
             case 'K': {
                     line.get(line_id);
                     switch (line_id) {
