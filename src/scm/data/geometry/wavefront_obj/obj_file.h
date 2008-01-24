@@ -26,7 +26,7 @@ struct __scm_export(data) wavefront_material
     math::vec4f_t   _Ka;
     math::vec4f_t   _Kd;
     math::vec4f_t   _Ks;
-		math::vec4f_t   _Tf;
+    math::vec4f_t   _Tf;
     float           _d;
 }; // struct wavefront_material
 

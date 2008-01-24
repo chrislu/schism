@@ -85,7 +85,7 @@ bool load_material_lib(const std::string& filename, wavefront_model& out_obj)
                     }
                 }
                 break;
-						case 'T': {
+            case 'T': {
                     line.get(line_id);
                     switch (line_id) {
                         case 'f': {
