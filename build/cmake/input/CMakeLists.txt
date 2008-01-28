@@ -57,6 +57,10 @@ IF (WIN32)
         ${GLOBAL_EXT_DIR}/inc
         ${GLOBAL_EXT_DIR}/inc/boost
     )
+ELSEIF (UNIX)
+    INCLUDE_DIRECTORIES(
+        /opt/boost/latest/inc
+    )
 ENDIF (WIN32)
 
 # set library directories
@@ -67,6 +71,10 @@ LINK_DIRECTORIES(
 IF (WIN32)
     LINK_DIRECTORIES(
         ${GLOBAL_EXT_DIR}/lib
+    )
+ELSEIF (UNIX)
+    LINK_DIRECTORIES(
+        /opt/boost/latest/lib
     )
 ENDIF (WIN32)
 

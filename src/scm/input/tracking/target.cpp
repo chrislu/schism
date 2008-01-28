@@ -1,6 +1,8 @@
 
 #include "target.h"
 
+#include <algorithm>
+
 namespace scm {
 namespace inp {
 

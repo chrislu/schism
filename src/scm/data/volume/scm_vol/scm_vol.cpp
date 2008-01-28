@@ -46,7 +46,7 @@ const volume_descriptor& volume_descriptor::operator=(const volume_descriptor& r
     return (*this);
 }
 
-std::ostream& scm::data::operator<<(std::ostream& os, const volume_descriptor& desc)
+std::ostream& operator<<(std::ostream& os, const volume_descriptor& desc)
 {
     os << "scm_vol " << desc._version << std::endl
        << desc._data_dimensions.x << " " << desc._data_dimensions.y << " " << desc._data_dimensions.z << std::endl
@@ -61,7 +61,7 @@ std::ostream& scm::data::operator<<(std::ostream& os, const volume_descriptor& d
     return (os);
 }
 
-std::istream& scm::data::operator>>(std::istream& i, volume_descriptor& desc)
+std::istream& operator>>(std::istream& i, volume_descriptor& desc)
 {
     std::string head;
 

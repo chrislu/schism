@@ -193,6 +193,10 @@ IF (WIN32)
         ${GLOBAL_EXT_DIR}/inc/lua
         ${GLOBAL_EXT_DIR}/inc/luabind
     )
+ELSEIF (UNIX)
+    INCLUDE_DIRECTORIES(
+        /opt/boost/latest/inc
+    )
 ENDIF (WIN32)
 
 # set library directories
@@ -202,6 +206,10 @@ LINK_DIRECTORIES(
 IF (WIN32)
     LINK_DIRECTORIES(
         ${GLOBAL_EXT_DIR}/lib
+    )
+ELSEIF (UNIX)
+    LINK_DIRECTORIES(
+        /opt/boost/latest/lib
     )
 ENDIF (WIN32)
 
@@ -230,8 +238,8 @@ IF (UNIX)
         boost_date_time
         lua
         rt
-        boost_signals
-        boost_date_time
-        boost_filesystem
+        boost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}
     )
 ENDIF (UNIX)
