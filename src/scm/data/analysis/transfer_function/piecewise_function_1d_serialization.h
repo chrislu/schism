@@ -129,7 +129,7 @@ std::istream& operator>>(std::istream& in_stream,
     in_flags_sav.restore();
 
     piecewise_function_1d<val_type, res_type>               tmp_func;
-    piecewise_function_1d<val_type, res_type>::stop_type    tmp_stop;
+    typename piecewise_function_1d<val_type, res_type>::stop_type    tmp_stop;
     std::istream::char_type                                 tmp_char;
 
     while (in_stream && !in_stream.eof()) {

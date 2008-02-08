@@ -8,7 +8,9 @@ namespace scm {
 namespace data {
     
 template<typename val_type>
-bool build_lookup_table<val_type>(boost::scoped_array<val_type>& dst, const piecewise_function_weighted_1d<unsigned char, val_type>& scal_trafu, unsigned size)
+bool build_lookup_table<val_type>(boost::scoped_array<val_type>& dst,
+                                  const piecewise_function_weighted_1d<unsigned char, val_type>& scal_trafu,
+                                  unsigned size)
 {
     if (size < 1) {
         return (false);
