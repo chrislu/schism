@@ -23,7 +23,7 @@ public:
     typedef std::pair<val_type, res_type>                       stop_type;
     typedef typename function_point_container_t::iterator       stop_iterator;
     typedef typename function_point_container_t::const_iterator const_stop_iterator;
-    typedef std::pair<stop_iterator, bool>             insert_return_type;
+    typedef std::pair<stop_iterator, bool>                      insert_return_type;
 
 public:
     piecewise_function_1d();
