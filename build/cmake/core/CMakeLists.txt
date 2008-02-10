@@ -150,7 +150,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_UTILITIES}
 )
 
-IF (WIN32)
+#IF (WIN32)
 SET(SOURCE_FILES
     ${SOURCE_FILES}
     ${SOURCE_FILES_FONT}
@@ -170,7 +170,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_SCRIPT}
     ${HEADER_FILES_SCRIPT_DETAIL}
 )
-ENDIF (WIN32)
+#ENDIF (WIN32)
 
 
 # include header and inline files in source files for visual studio projects
@@ -196,6 +196,7 @@ IF (WIN32)
 ELSEIF (UNIX)
     INCLUDE_DIRECTORIES(
         /opt/boost/latest/inc
+        /usr/include/freetype2
     )
 ENDIF (WIN32)
 
@@ -236,8 +237,8 @@ ENDIF (WIN32)
 IF (UNIX)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         boost_date_time
-        lua
         rt
+        freetype
         boost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}
         boost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}
         boost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}

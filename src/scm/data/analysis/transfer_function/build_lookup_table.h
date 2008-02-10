@@ -9,13 +9,33 @@
 
 namespace scm {
 namespace data {
-    
+
+namespace detail {
+
+template<typename val_type, typename inp_type> struct build_lookup_table_impl
+{
+    static bool build_table(boost::scoped_array<val_type>& dst,
+                            const piecewise_function_1d<inp_type, val_type>& scal_trafu,
+                            unsigned table_size);
+
+}; // struct build_lookup_table_impl
+
+} // namespace detail
+
+template<typename val_type, typename inp_type>
+bool build_lookup_table(boost::scoped_array<val_type>& dst, const piecewise_function_1d<inp_type, val_type>& scal_trafu, unsigned table_size)
+{
+    return (detail::build_lookup_table_impl<val_type, inp_type>::build_table(dst, scal_trafu, table_size));
+}
+
+/*
 template<typename val_type>
 bool build_lookup_table(boost::scoped_array<val_type>& dst, const piecewise_function_1d<unsigned char, val_type>& scal_trafu, unsigned size);
 template<typename val_type>
 bool build_lookup_table(boost::scoped_array<val_type>& dst, const piecewise_function_1d<float, val_type>& scal_trafu, unsigned size);
 template<typename val_type>
 bool build_lookup_table(boost::scoped_array<val_type>& dst, const piecewise_function_weighted_1d<unsigned char, val_type>& scal_trafu, unsigned size);
+*/
 
 //template<typename val_type>
 //bool build_preintegrated_lookup_table(boost::scoped_array<val_type>& dst,

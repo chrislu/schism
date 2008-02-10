@@ -91,7 +91,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_UTILITIES}
 )
 
-IF (WIN32)
+#IF (WIN32)
 SET(SOURCE_FILES
     ${SOURCE_FILES}
     ${SOURCE_FILES_FONT}
@@ -102,7 +102,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_FONT}
     ${HEADER_FILES_GUI}
 )
-ENDIF (WIN32)
+#ENDIF (WIN32)
 
 # include header and inline files in source files for visual studio projects
 IF (WIN32)
