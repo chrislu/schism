@@ -23,11 +23,13 @@
 #if defined(_MSC_VER)
     #define SCM_COMPILER            SCM_COMPILER_MSVC
     #define SCM_COMPILER_VER        _MSC_VER
+#   define ALWAYS_INLINE
 #elif defined(__GNUC__)
     #define SCM_COMPILER            SCM_COMPILER_GNUC
     #define SCM_COMPILER_VER        (((__GNUC__)*100) + \
                                     (__GNUC_MINOR__*10) + \
                                     __GNUC_PATCHLEVEL__)
+#   define ALWAYS_INLINE            __attribute__((always_inline))
 #else
 #error "unknown compiler"
 #endif
