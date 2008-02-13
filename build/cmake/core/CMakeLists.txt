@@ -226,11 +226,10 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 IF (WIN32)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         freetype2
-        liblua
-        libluabind
         optimized libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}      debug libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}    debug libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}   debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_system-${SCHISM_BOOST_LIB_POSTFIX_REL}       debug libboost_system-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 ENDIF (WIN32)
 
