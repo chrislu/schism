@@ -2,6 +2,7 @@
 #ifndef SCRIPT_SYSTEM_LUA_H_INCLUDED
 #define SCRIPT_SYSTEM_LUA_H_INCLUDED
 
+#if 0
 extern "C"
 {
     #include <lua.h>
@@ -44,5 +45,7 @@ private:
 } // namespace detail
 } // namespace script
 } // namespace scm
+
+#endif
 
 #endif // namespace SCRIPT_SYSTEM_LUA_H_INCLUDED
