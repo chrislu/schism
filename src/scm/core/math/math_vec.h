@@ -155,10 +155,14 @@ namespace math
         {
             struct
             {
-                scm_scalar x;
-                scm_scalar y;
-                scm_scalar z;
-                scm_scalar w;
+                union {scm_scalar x, r, s;};
+                union {scm_scalar y, g, t;};
+                union {scm_scalar z, b, p;};
+                union {scm_scalar w, a, q;};
+            //    scm_scalar x;
+            //    scm_scalar y;
+            //    scm_scalar z;
+            //    scm_scalar w;
             };
             scm_scalar  vec_array[4];
         };

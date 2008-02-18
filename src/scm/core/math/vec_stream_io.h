@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream& out_stream, const vec<scm_scalar, dim>& o
 
     out_stream << "(";
     for (std::size_t i = 0; i < dim; ++i) {
-        out_stream << (i != 0 ? "  " : "") << out_vec.vec_array[i];
+        out_stream << (i != 0 ? "  " : "") << out_vec.data_array[i];
     }
     out_stream << ")";
 
@@ -46,7 +46,7 @@ std::istream& operator>>(std::istream& in_stream, math::vec<scm_scalar, dim>& in
         in_stream.putback(cur_char);
     }
     for (std::size_t i = 0; i < dim; ++i) {
-        in_stream >> tmp_vec.vec_array[i];
+        in_stream >> tmp_vec.data_array[i];
     }
     if (bracket_version) {
         in_stream >> cur_char;
