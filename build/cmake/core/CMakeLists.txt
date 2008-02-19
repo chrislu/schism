@@ -48,6 +48,10 @@ FILE(GLOB HEADER_FILES_GUI_DETAIL               ${SRC_DIR}/gui/detail/*.h
 FILE(GLOB SOURCE_FILES_MATH                     ${SRC_DIR}/math/*.cpp)
 FILE(GLOB HEADER_FILES_MATH                     ${SRC_DIR}/math/*.h
                                                 ${SRC_DIR}/math/*.inl)
+                                                
+FILE(GLOB SOURCE_FILES_MATH_DETAIL              ${SRC_DIR}/math/detail/*.cpp)
+FILE(GLOB HEADER_FILES_MATH_DETAIL              ${SRC_DIR}/math/detail/*.h
+                                                ${SRC_DIR}/math/detail*.inl)
 
 FILE(GLOB SOURCE_FILES_PLATFORM                 ${SRC_DIR}/platform/*.cpp)
 FILE(GLOB HEADER_FILES_PLATFORM                 ${SRC_DIR}/platform/*.h
@@ -98,6 +102,7 @@ SOURCE_GROUP(source_files/font/detail               FILES ${SOURCE_FILES_FONT_DE
 SOURCE_GROUP(source_files/gui						FILES ${SOURCE_FILES_GUI}                       ${HEADER_FILES_GUI})
 SOURCE_GROUP(source_files/gui/detail				FILES ${SOURCE_FILES_GUI_DETAIL}                ${HEADER_FILES_GUI_DETAIL})
 SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH})
+SOURCE_GROUP(source_files/math/detail               FILES ${SOURCE_FILES_MATH_DETAIL}               ${HEADER_FILES_MATH_DETAIL})
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM})
 SOURCE_GROUP(source_files/platform/graphics         FILES ${SOURCE_FILES_PLATFORM_GRAPHICS}         ${HEADER_FILES_PLATFORM_GRAPHICS})
 SOURCE_GROUP(source_files/platform/graphics/detail  FILES ${SOURCE_FILES_PLATFORM_GRAPHICS_DETAIL}  ${HEADER_FILES_PLATFORM_GRAPHICS_DETAIL})
@@ -119,6 +124,7 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_CONSOLE_DETAIL}
     ${SOURCE_FILES_EXCEPTION}
     ${SOURCE_FILES_MATH}
+    ${SOURCE_FILES_MATH_DETAIL}
     ${SOURCE_FILES_RESOURCE}
     ${SOURCE_FILES_RESOURCE_DETAIL}
     ${SOURCE_FILES_ROOT}
@@ -138,6 +144,7 @@ SET(HEADER_FILES
     ${HEADER_FILES_CONSOLE_DETAIL}
     ${HEADER_FILES_EXCEPTION}
     ${HEADER_FILES_MATH}
+    ${HEADER_FILES_MATH_DETAIL}
     ${HEADER_FILES_RESOURCE}
     ${HEADER_FILES_RESOURCE_DETAIL}
     ${HEADER_FILES_ROOT}
@@ -229,7 +236,7 @@ IF (WIN32)
         optimized libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}      debug libboost_signals-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}    debug libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}   debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_system-${SCHISM_BOOST_LIB_POSTFIX_REL}       debug libboost_system-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+#        optimized libboost_system-${SCHISM_BOOST_LIB_POSTFIX_REL}       debug libboost_system-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 ENDIF (WIN32)
 

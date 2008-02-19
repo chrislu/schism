@@ -80,4 +80,3 @@ namespace math
 } // namespace math
 
 #endif // SCM_MATH_VEC_LIB_H_INCLUDED
-

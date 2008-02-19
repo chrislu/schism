@@ -5,12 +5,14 @@
 namespace scm {
 namespace math {
 
-template<typename scal_type, unsigned dim>
+template<typename scal_type, const unsigned dim>
 class vec
 {
 }; // class vec<scm_scalar, dim>
 
 } // namespace math
 } // namespace scm
+
+#include "vec.inl"
 
 #endif // VEC_H_INLCUDED

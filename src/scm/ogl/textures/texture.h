@@ -18,7 +18,7 @@ public:
 
     const gl::texture& operator=(const gl::texture& rhs);
 
-    void                bind() const;
+    void                bind(int /*texunit*/ = -1) const;
     void                unbind() const;
     void                delete_texture();
 
@@ -39,6 +39,8 @@ protected:
 private:
     GLenum              _texture_target;
     unsigned            _texture_id;
+
+    mutable int         _occupied_texture_unit;
 
 }; // class texture
 

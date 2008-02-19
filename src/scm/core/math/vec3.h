@@ -13,22 +13,35 @@ class vec<scal_type, 3>
 public:
     typedef scal_type   value_type;
 
+    enum component { _x = 0,
+                     _y = 1,
+                     _z = 2};
+
 public:
     // ctors
     vec();
     vec(const vec<scal_type, 3>& v);
     explicit vec(const scal_type s);
-    explicit vec(const scal_type s, const scal_type t, const scal_type u);
+    explicit vec(const scal_type s,
+                 const scal_type t,
+                 const scal_type u);
 
     template<typename rhs_scal_t> explicit vec(const vec<rhs_scal_t, 3>& v);
+
+    // swap
+    void swap(vec<scal_type, 3>& rhs);
 
     // assign
     vec<scal_type, 3>&                               operator=(const vec<scal_type, 3>& rhs);
     template<typename rhs_scal_t> vec<scal_type, 3>& operator=(const vec<rhs_scal_t, 3>& rhs);
 
+    // data access
+    inline scal_type*const         operator&()          { return (data_array); }
+    inline const scal_type*const   operator&() const    { return (data_array); }
+
     // index
-    inline scal_type& operator[](const int i)       { return data_array[i]; };
-    inline scal_type  operator[](const int i) const { return data_array[i]; };
+    inline scal_type& operator[](const component i)         { return data_array[i]; };
+    inline scal_type  operator[](const component i) const   { return data_array[i]; };
 
     // unary operators
     vec<scal_type, 3>& operator+=(const scal_type          s);
@@ -39,12 +52,10 @@ public:
     vec<scal_type, 3>& operator*=(const vec<scal_type, 3>& v);
     vec<scal_type, 3>& operator/=(const scal_type          s);
     vec<scal_type, 3>& operator/=(const vec<scal_type, 3>& v);
-    vec<scal_type, 3>& operator++(int);
+    vec<scal_type, 3>  operator++(int);
     vec<scal_type, 3>& operator++();
-    vec<scal_type, 3>& operator--(int);
+    vec<scal_type, 3>  operator--(int);
     vec<scal_type, 3>& operator--();
-
-    const vec<scal_type, 3>& operator-() const;
 
     // data definition
     union {

@@ -7,7 +7,7 @@
 
 namespace math
 {
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline bool operator==(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         bool tmp_ret = true;
@@ -19,7 +19,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline bool operator!=(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         bool tmp_ret = false;
@@ -31,13 +31,13 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const scm_scalar*const operator&(const vec<scm_scalar, dim>& v)
     {
         return (v.vec_array);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator+=(vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -46,7 +46,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator-=(vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -55,7 +55,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator*=(vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -64,7 +64,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator/=(vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -73,7 +73,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator*=(vec<scm_scalar, dim>& lhs, const scm_scalar rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -82,7 +82,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline vec<scm_scalar, dim>& operator/=(vec<scm_scalar, dim>& lhs, const scm_scalar rhs)
     {
         for (unsigned i = 0; i < dim; ++i) {
@@ -91,7 +91,7 @@ namespace math
         return (lhs);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator-(const vec<scm_scalar, dim>& lhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -103,7 +103,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator+(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -115,7 +115,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator-(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -127,7 +127,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator*(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -139,7 +139,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator/(const vec<scm_scalar, dim>& lhs, const vec<scm_scalar, dim>& rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -151,7 +151,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator*(const vec<scm_scalar, dim>& lhs, const scm_scalar rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -163,7 +163,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator*(const scm_scalar lhs, const vec<scm_scalar, dim>& rhs)
     {
         vec<scm_scalar, dim> tmp_ret;
@@ -175,7 +175,7 @@ namespace math
         return (tmp_ret);
     }
 
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     inline const vec<scm_scalar, dim> operator/(const vec<scm_scalar, dim>& lhs, const scm_scalar rhs)
     {
         vec<scm_scalar, dim> tmp_ret;

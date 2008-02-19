@@ -8,24 +8,24 @@
 
 namespace math
 {
-    template<typename scm_scalar, unsigned dim>
+    template<typename scm_scalar, const unsigned dim>
     class vec
     {
     public:
         vec() {}
         vec(const vec<scm_scalar, dim>& v) {
-            for(unsigned i = 0; i < dim; i++) {
+            for(unsigned i = 0; i < dim; ++i) {
                 vec_array[i] = v.vec_array[i];
             }
         }
         explicit vec(const scm_scalar s) {
-            for(unsigned i = 0; i < dim; i++) {
+            for(unsigned i = 0; i < dim; ++i) {
                 vec_array[i] = s;
             }
         }
 
         vec<scm_scalar, dim>& operator=(const vec<scm_scalar, dim>& rhs) { 
-            for(unsigned i = 0; i < dim; i++) {
+            for(unsigned i = 0; i < dim; ++i) {
                 vec_array[i] = rhs.vec_array[i];
             }
 
