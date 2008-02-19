@@ -1,6 +1,8 @@
 
 #include <algorithm>
 
+#include <scm/core/math/common.h>
+
 namespace scm {
 namespace math {
 
@@ -316,32 +318,70 @@ inline const vec<scal_type, 3> cross(const vec<scal_type, 4>& lhs, const vec<sca
                               lhs.x * rhs.y - lhs.y * rhs.x));
 }
 
+template<typename scal_type>
+const vec<scal_type, 4> clamp(const vec<scal_type, 4>& val,
+                              const vec<scal_type, 4>& min,
+                              const vec<scal_type, 4>& max)
+{
+    return (vec<scal_type, 4>(clamp(val.x, min.x, max.x),
+                              clamp(val.y, min.y, max.y),
+                              clamp(val.z, min.z, max.z),
+                              clamp(val.w, min.w, max.w)));
+}
 
+template<typename scal_type>
+const vec<scal_type, 4> pow(const vec<scal_type, 4>& val,
+                            const scal_type          exp)
+{
+    return (vec<scal_type, 4>(std::pow(val.x, exp),
+                              std::pow(val.y, exp),
+                              std::pow(val.z, exp),
+                              std::pow(val.w, exp)));
+}
 
-    template<typename scm_scalar, unsigned dim>
-    const vec<scm_scalar, dim> clamp(const vec<scm_scalar, dim>& val, const vec<scm_scalar, dim>& min, const vec<scm_scalar, dim>& max)
-    {
-        vec<scm_scalar, dim> tmp_ret;
+template<typename scal_type>
+const vec<scal_type, 4> min(const vec<scal_type, 4>& a,
+                            const vec<scal_type, 4>& b)
+{
+    return (vec<scal_type, 4>(min(a.x, b.x),
+                              min(a.y, b.y),
+                              min(a.z, b.z),
+                              min(a.w, b.w)));
+}
 
-        for (unsigned i = 0; i < dim; i++) {
-            tmp_ret[i] = ((val.vec_array[i] > max.vec_array[i]) ? max.vec_array[i] : (val.vec_array[i] < min.vec_array[i]) ? min.vec_array[i] : val.vec_array[i]);
-        }
+template<typename scal_type>
+const vec<scal_type, 4> max(const vec<scal_type, 4>& a,
+                            const vec<scal_type, 4>& b)
+{
+    return (vec<scal_type, 4>(max(a.x, b.x),
+                              max(a.y, b.y),
+                              max(a.z, b.z),
+                              max(a.w, b.w)));
+}
 
-        return (tmp_ret);
-    }
+template<typename scal_type>
+inline vec<scal_type, 4> floor(const vec<scal_type, 4>& rhs)
+{
+    return (vec<scal_type, 4>(std::floor(rhs.x),
+                              std::floor(rhs.y),
+                              std::floor(rhs.z),
+                              std::floor(rhs.w)));
+}
 
-    template<typename scm_scalar, unsigned dim>
-    const vec<scm_scalar, dim> pow(const vec<scm_scalar, dim>& val, scm_scalar exponent)
-    {
-        vec<scm_scalar, dim> tmp_ret;
+template<typename scal_type>
+inline vec<scal_type, 4> ceil(const vec<scal_type, 4>& rhs)
+{
+    return (vec<scal_type, 4>(std::ceil(rhs.x),
+                              std::ceil(rhs.y),
+                              std::ceil(rhs.z),
+                              std::ceil(rhs.w)));
+}
 
-        for (unsigned i = 0; i < dim; i++) {
-            tmp_ret[i] = math::pow(val.vec_array[i], exponent);
-        }
-
-        return (tmp_ret);
-    }
-
+template<typename scal_type> 
+inline vec<scal_type, 4> fract(const vec<scal_type, 4>& rhs)
+{ 
+    return (rhs - floor(rhs));
+}
 
 } // namespace math
 } // namespace scm

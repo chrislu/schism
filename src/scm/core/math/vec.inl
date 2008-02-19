@@ -20,5 +20,12 @@ inline const vec<scal_type, dim> normalize(const vec<scal_type, dim>& lhs)
     return (lhs / length(lhs));
 }
 
+template<typename scal_type, unsigned dim>
+inline scal_type distance(const vec<scal_type, dim>& lhs,
+                          const vec<scal_type, dim>& rhs)
+{
+    return (length(lhs - rhs));
+}
+
 } // namespace math
 } // namespace scm
