@@ -22,6 +22,8 @@ public:
     // ctors
     vec();
     vec(const vec<scal_type, 4>& v);
+    vec(const scal_type a[4]);
+
     explicit vec(const scal_type s);
     explicit vec(const scal_type s,
                  const scal_type t,
@@ -29,6 +31,9 @@ public:
                  const scal_type v = scal_type(0));
 
     template<typename rhs_scal_t> explicit vec(const vec<rhs_scal_t, 4>& v);
+
+    // dtor
+    ~vec();
 
     // swap
     void swap(vec<scal_type, 4>& rhs);

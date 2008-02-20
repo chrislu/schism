@@ -8,6 +8,7 @@ namespace math {
 template<typename scal_type, const unsigned dim>
 class vec
 {
+    typedef scal_type   value_type;
 }; // class vec<scm_scalar, dim>
 
 } // namespace math

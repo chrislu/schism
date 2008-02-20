@@ -12,8 +12,14 @@ inline vec<scal_type, 2>::vec()
 
 template<typename scal_type>
 inline vec<scal_type, 2>::vec(const vec<scal_type, 2>& v)
-  : x(v.x), y(v.y)
 {
+    std::copy(v.data_array, v.data_array + 2, data_array);
+}
+
+template<typename scal_type>
+inline vec<scal_type, 2>::vec(const scal_type a[2])
+{
+    std::copy(a, a + 2, data_array);
 }
 
 template<typename scal_type>
@@ -34,6 +40,12 @@ template<typename rhs_scal_t>
 inline vec<scal_type, 2>::vec(const vec<rhs_scal_t, 2>& v)
   : x(static_cast<scal_type>(v.x)),
     y(static_cast<scal_type>(v.y))
+{
+}
+
+// dtor
+template<typename scal_type>
+inline vec<scal_type, 2>::~vec()
 {
 }
 
@@ -267,6 +279,76 @@ inline const vec<scal_type, 2> operator/(const vec<scal_type, 2>& lhs,
                                          const scal_type_r        rhs)
 {
     return (vec<scal_type, 2>(lhs) /= rhs);
+}
+
+// common functions
+template<typename scal_type>
+inline scal_type dot(const vec<scal_type, 2>& lhs,
+                     const vec<scal_type, 2>& rhs)
+{
+    return (  lhs.x * rhs.x
+            + lhs.y * rhs.y);
+}
+
+template<typename scal_type>
+inline const vec<scal_type, 2> cross(const vec<scal_type, 2>& lhs,
+                                     const vec<scal_type, 2>& rhs)
+{
+    return (vec<scal_type, 2>(lhs.y * rhs.z - lhs.z * rhs.y,
+                              lhs.z * rhs.x - lhs.x * rhs.z));
+}
+
+template<typename scal_type>
+const vec<scal_type, 2> clamp(const vec<scal_type, 2>& val,
+                              const vec<scal_type, 2>& min,
+                              const vec<scal_type, 2>& max)
+{
+    return (vec<scal_type, 2>(clamp(val.x, min.x, max.x),
+                              clamp(val.y, min.y, max.y)));
+}
+
+template<typename scal_type>
+const vec<scal_type, 2> pow(const vec<scal_type, 2>& val,
+                            const scal_type          exp)
+{
+    return (vec<scal_type, 2>(std::pow(val.x, exp),
+                              std::pow(val.y, exp)));
+}
+
+template<typename scal_type>
+const vec<scal_type, 2> min(const vec<scal_type, 2>& a,
+                            const vec<scal_type, 2>& b)
+{
+    return (vec<scal_type, 2>(min(a.x, b.x),
+                              min(a.y, b.y)));
+}
+
+template<typename scal_type>
+const vec<scal_type, 2> max(const vec<scal_type, 2>& a,
+                            const vec<scal_type, 2>& b)
+{
+    return (vec<scal_type, 2>(max(a.x, b.x),
+                              max(a.y, b.y)));
+}
+
+template<typename scal_type>
+inline vec<scal_type, 2> floor(const vec<scal_type, 2>& rhs)
+{
+    return (vec<scal_type, 2>(std::floor(rhs.x),
+                              std::floor(rhs.y)));
+}
+
+template<typename scal_type>
+inline vec<scal_type, 2> ceil(const vec<scal_type, 2>& rhs)
+{
+    return (vec<scal_type, 2>(std::ceil(rhs.x),
+                              std::ceil(rhs.y)));
+}
+
+template<typename scal_type> 
+inline vec<scal_type, 2> fract(const vec<scal_type, 2>& rhs)
+{ 
+    return (rhs - floor(rhs));
 }
 
 } // namespace math

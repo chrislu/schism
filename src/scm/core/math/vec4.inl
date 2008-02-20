@@ -14,8 +14,14 @@ inline vec<scal_type, 4>::vec()
 
 template<typename scal_type>
 inline vec<scal_type, 4>::vec(const vec<scal_type, 4>& v)
-  : x(v.x), y(v.y), z(v.z), w(v.w)
 {
+    std::copy(v.data_array, v.data_array + 4, data_array);
+}
+
+template<typename scal_type>
+inline vec<scal_type, 4>::vec(const scal_type a[4])
+{
+    std::copy(a, a + 4, data_array);
 }
 
 template<typename scal_type>
@@ -40,6 +46,12 @@ inline vec<scal_type, 4>::vec(const vec<rhs_scal_t, 4>& v)
     y(static_cast<scal_type>(v.y)),
     z(static_cast<scal_type>(v.z)),
     w(static_cast<scal_type>(v.w))
+{
+}
+
+// dtor
+template<typename scal_type>
+inline vec<scal_type, 4>::~vec()
 {
 }
 
@@ -301,8 +313,10 @@ inline const vec<scal_type, 4> operator/(const vec<scal_type, 4>& lhs,
     return (vec<scal_type, 4>(lhs) /= rhs);
 }
 
+// common functions
 template<typename scal_type>
-inline scal_type dot(const vec<scal_type, 4>& lhs, const vec<scal_type, 4>& rhs)
+inline scal_type dot(const vec<scal_type, 4>& lhs,
+                     const vec<scal_type, 4>& rhs)
 {
     return (  lhs.x * rhs.x
             + lhs.y * rhs.y
@@ -311,11 +325,13 @@ inline scal_type dot(const vec<scal_type, 4>& lhs, const vec<scal_type, 4>& rhs)
 }
 
 template<typename scal_type>
-inline const vec<scal_type, 3> cross(const vec<scal_type, 4>& lhs, const vec<scal_type, 4>& rhs)
+inline const vec<scal_type, 4> cross(const vec<scal_type, 4>& lhs,
+                                     const vec<scal_type, 4>& rhs)
 {
-    return (vec<scal_type, 3>(lhs.y * rhs.z - lhs.z * rhs.y,
+    return (vec<scal_type, 4>(lhs.y * rhs.z - lhs.z * rhs.y,
                               lhs.z * rhs.x - lhs.x * rhs.z,
-                              lhs.x * rhs.y - lhs.y * rhs.x));
+                              lhs.x * rhs.y - lhs.y * rhs.x,
+                              scal_type(0)));
 }
 
 template<typename scal_type>

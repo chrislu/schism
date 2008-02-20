@@ -9,7 +9,7 @@ namespace math
     template<typename scm_scalar, unsigned order>
     inline void set_identity(mat<scm_scalar, order, order>& m)
     {
-        for (unsigned i = 0; i < (order * order); i++) {
+        for (unsigned i = 0; i < (order * order); ++i) {
             m.mat_array[i] = (i % (order + 1)) == 0 ? scm_scalar(1) : scm_scalar(0);
         }
 
@@ -46,19 +46,19 @@ namespace math
         unsigned min_row = 0;
         unsigned min_col = 0;
 
-        for (unsigned r = 0; r < order; r++) {
+        for (unsigned r = 0; r < order; ++r) {
             if (r != row) {
                 min_col = 0;
-                for (unsigned c = 0; c < order; c++) {
+                for (unsigned c = 0; c < order; ++c) {
                     if (c != col) {
                         src_off = r + c * order;
                         min_off = min_row + min_col * (order - 1);
 
                         tmp_minor.mat_array[min_off] = lhs.mat_array[src_off];
-                        min_col++;
+                        ++min_col;
                     }
                 }
-                min_row++;
+                ++min_row;
             }
         }
 
@@ -83,7 +83,7 @@ namespace math
         scm_scalar tmp_ret = scm_scalar(0);
 
         // determinat development after first column
-        for (unsigned r = 0; r < order; r++) {
+        for (unsigned r = 0; r < order; ++r) {
             tmp_ret +=  lhs.mat_array[r] * sgn(-int(r % 2)) * determinant(minor__(lhs, r, 0));
         }
 
@@ -99,8 +99,8 @@ namespace math
         unsigned dst_off;
 
         if (tmp_det != scm_scalar(0)) {
-            for (unsigned r = 0; r < order; r++) {
-                for (unsigned c = 0; c < order; c++) {
+            for (unsigned r = 0; r < order; ++r) {
+                for (unsigned c = 0; c < order; ++c) {
                     dst_off = c + r * order;
                     tmp_ret.mat_array[dst_off] = (scm_scalar(1) / tmp_det) * sgn(-int((r+c) % 2)) * determinant(minor__(lhs, r, c));
                 }

@@ -8,12 +8,12 @@ namespace scm {
 namespace math {
 namespace detail {
 
-inline bool floating_point_compare(const float a, const float b)
+inline bool floating_point_equal(const float a, const float b)
 {
     return (true);
 }
 
-inline bool floating_point_compare(const double a, const double b)
+inline bool floating_point_equal(const double a, const double b)
 {
     return (true);
 }
