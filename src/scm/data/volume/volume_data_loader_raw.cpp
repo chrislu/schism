@@ -73,9 +73,9 @@ volume_data_loader_raw::~volume_data_loader_raw()
 
 bool volume_data_loader_raw::open_file(const std::string& filename)
 {
-    math::vec3ui_t  dim;
-    unsigned        num_chan;
-    unsigned        bpc;
+    scm::math::vec3ui   dim;
+    unsigned            num_chan;
+    unsigned            bpc;
 
     using namespace boost::filesystem;
     path                file_path(filename, native);
@@ -101,7 +101,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
 }
 
 bool volume_data_loader_raw::open_file(const std::string& filename,
-                                       const math::vec3ui_t& dim,
+                                       const scm::math::vec3ui& dim,
                                        unsigned num_chan,
                                        unsigned byte_per_chan)
 {
@@ -136,8 +136,8 @@ bool volume_data_loader_raw::open_file(const std::string& filename,
     return (true);
 }
 
-bool volume_data_loader_raw::read_sub_volume(const math::vec<unsigned, 3>& offset,
-                                             const math::vec<unsigned, 3>& dimensions,
+bool volume_data_loader_raw::read_sub_volume(const scm::math::vec3ui& offset,
+                                             const scm::math::vec3ui& dimensions,
                                              scm::data::regular_grid_data_3d<unsigned char>& target_data)
 {
     if (!_file || !is_file_open()) {

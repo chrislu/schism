@@ -3,7 +3,6 @@
 #define TRACKBALL_MANIPULATOR_H_INCLUDED
 
 #include <scm/core/math/math.h>
-#include <scm/core/math/math_gl.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -28,15 +27,15 @@ public:
 
     void apply_transform() const;
 
-    const math::mat4f_t get_transform_matrix() const;
-    float               dolly() const;
+    const scm::math::mat4f  get_transform_matrix() const;
+    float                   dolly() const;
 
 private:
     float project_to_sphere(float x, float y) const;
 
-    math::mat_glf_t _matrix;
-    float           _radius;
-    float           _dolly;
+    scm::math::mat4f    _matrix;
+    float               _radius;
+    float               _dolly;
 
 }; // class trackball_manipulator
 

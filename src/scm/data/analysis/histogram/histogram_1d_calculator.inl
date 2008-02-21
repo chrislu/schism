@@ -27,7 +27,7 @@ bool histogram_1d_calculator<unsigned char>::calculate(scm::histogram_1d<unsigne
 
     // if number of bins not set generate them
     if (num_bins == 0) {
-        num_bins = unsigned(10.0 * math::log10(double(v_magnitude)));
+        num_bins = unsigned(10.0 * scm::math::log10(double(v_magnitude)));
     }
 
     histogram._bins.resize(num_bins);
@@ -36,9 +36,9 @@ bool histogram_1d_calculator<unsigned char>::calculate(scm::histogram_1d<unsigne
     scm::histogram_1d<unsigned char>::bin_container_t::size_type  bin_index;
     int value;
 
-    for (unsigned i = 0; i < math::get_linear_index_end(data.get_properties().get_dimensions()); i++) {
+    for (unsigned i = 0; i < get_linear_index_end(data.get_properties().get_dimensions()); i++) {
         value       = data.get_data()[i];
-        bin_index   = (unsigned)math::floor(float(value - v_min)/float(v_magnitude) * (num_bins));
+        bin_index   = (unsigned)scm::math::floor(float(value - v_min)/float(v_magnitude) * (num_bins));
 
         histogram._bins[bin_index]._absolute_amount++;
     }
@@ -55,14 +55,14 @@ bool histogram_1d_calculator<unsigned char>::calculate(scm::histogram_1d<unsigne
     for (unsigned bi = 0; bi < num_bins; bi++) {
         histogram._bins[bi]._relative_amount = (float)histogram._bins[bi]._absolute_amount / (float)num_voxels;
 
-        histogram._max_relative_amount = math::max(histogram._max_relative_amount,
-                                                   histogram._bins[bi]._relative_amount);
+        histogram._max_relative_amount = scm::math::max(histogram._max_relative_amount,
+                                                        histogram._bins[bi]._relative_amount);
 
-        histogram._max_absolute_amount = math::max(histogram._max_absolute_amount,
-                                                   histogram._bins[bi]._absolute_amount);
+        histogram._max_absolute_amount = scm::math::max(histogram._max_absolute_amount,
+                                                        histogram._bins[bi]._absolute_amount);
 
-        unsigned char min = (unsigned char)math::ceil((float)bi * bin_factor);
-        unsigned char max = (unsigned char)math::ceil((float)(bi+1) * bin_factor) - 1;
+        unsigned char min = (unsigned char)scm::math::ceil((float)bi * bin_factor);
+        unsigned char max = (unsigned char)scm::math::ceil((float)(bi+1) * bin_factor) - 1;
 
         histogram._bins[bi]._value_range.set_min(min);
         histogram._bins[bi]._value_range.set_max(max);

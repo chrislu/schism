@@ -10,7 +10,7 @@ namespace scm {
 namespace gui {
 
 font_renderer::font_renderer()
-  : _shadow_color(0.f),
+  : _shadow_color(0.f, 0.f, 0.f),
     _draw_shadow(true),
     _use_kering(true)
 {
@@ -85,21 +85,21 @@ bool font_renderer::use_kerning() const
     return (_use_kering);
 }
 
-void font_renderer::draw_string(const math::vec2i_t&         pos,
+void font_renderer::draw_string(const scm::math::vec2i&      pos,
                                 const std::string&           txt,
                                 bool                         unl,
                                 scm::font::face::style_type  stl) const
 {
-    return (draw_string(pos, txt, math::vec4f_t(1.f, 1.f, 1.f, 1.f), unl, stl));
+    return (draw_string(pos, txt, scm::math::vec4f(1.f, 1.f, 1.f, 1.f), unl, stl));
 }
 
-void font_renderer::draw_string(const math::vec2i_t&         pos,
+void font_renderer::draw_string(const scm::math::vec2i&      pos,
                                 const std::string&           txt,
-                                const math::vec3f_t          col,
+                                const scm::math::vec3f       col,
                                 bool                         unl,
                                 scm::font::face::style_type  stl) const
 {
-    return (draw_string(pos, txt, math::vec4f_t(col, 1.f), unl, stl));
+    return (draw_string(pos, txt, scm::math::vec4f(col, 1.f), unl, stl));
 }
 
 } // namespace gui

@@ -33,8 +33,8 @@ const volume_descriptor& volume_data_loader::get_volume_descriptor() const
 }
 
 
-bool volume_data_loader::read_sub_volume_data(const math::vec<unsigned, 3>& offset,
-                                              const math::vec<unsigned, 3>& dimensions,
+bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>& offset,
+                                              const scm::math::vec<unsigned, 3>& dimensions,
                                               unsigned char*const buffer)
 {
     if (!buffer || !_file || !is_file_open()) {

@@ -24,7 +24,7 @@ class __scm_export(core) text_box : public frame
 protected:
     typedef struct {
         std::string                 _text;
-        math::vec4f_t               _color;
+        scm::math::vec4f            _color;
         font::face::style_type      _style;
         bool                        _underline;
     } line_fragment;
@@ -57,11 +57,11 @@ public:
                                               bool                    /*unl*/ = false,
                                               font::face::style_type  /*stl*/ = font::face::regular);
     void                        append_string(const std::string&      /*txt*/,
-                                              const math::vec3f_t     /*col*/,
+                                              const scm::math::vec3f  /*col*/,
                                               bool                    /*unl*/ = false,
                                               font::face::style_type  /*stl*/ = font::face::regular);
     void                        append_string(const std::string&      /*txt*/,
-                                              const math::vec4f_t     /*col*/,
+                                              const scm::math::vec4f  /*col*/,
                                               bool                    /*unl*/ = false,
                                               font::face::style_type  /*stl*/ = font::face::regular);
 

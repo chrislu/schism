@@ -1,62 +1,71 @@
 
-#ifndef VEC_STREAM_IO_H_INCLUDED
-#define VEC_STREAM_IO_H_INCLUDED
+#ifndef MATH_VEC_STREAM_IO_H_INCLUDED
+#define MATH_VEC_STREAM_IO_H_INCLUDED
+
+#include <iomanip>
+#include <boost/io/ios_state.hpp>
 
 namespace scm {
 namespace math {
 
-template<typename scm_scalar, unsigned dim>
-std::ostream& operator<<(std::ostream& out_stream, const vec<scm_scalar, dim>& out_vec)
+template<typename scal_type,
+         const unsigned dim>
+std::ostream& operator<<(std::ostream& out_stream, const vec<scal_type, dim>& out_vec)
 {
-    std::ostream::sentry        out_sentry(out_stream);
+    std::ostream::sentry const  out_sentry(out_stream);
 
-    if (!out_sentry) {
+    if (out_sentry) {
+        boost::io::ios_all_saver saved_state(out_stream);
+
+        out_stream << std::fixed << std::setprecision(3);
+
+        out_stream << "(";
+        for (unsigned i = 0; i < dim; ++i) {
+            out_stream << (i != 0 ? "  " : "") << out_vec.data_array[i];
+        }
+        out_stream << ")";
+    }
+    else {
         out_stream.setstate(std::ios_base::failbit);
-        return (out_stream);
     }
-
-    out_stream << "(";
-    for (std::size_t i = 0; i < dim; ++i) {
-        out_stream << (i != 0 ? "  " : "") << out_vec.data_array[i];
-    }
-    out_stream << ")";
 
     return (out_stream);
 }
 
-template<typename scm_scalar, unsigned dim>
-std::istream& operator>>(std::istream& in_stream, math::vec<scm_scalar, dim>& in_vec)
+template<typename scal_type,
+         const unsigned dim>
+std::istream& operator>>(std::istream& in_stream, vec<scal_type, dim>& in_vec)
 {
-    std::istream::sentry        in_sentry(in_stream);
+    std::istream::sentry const  in_sentry(in_stream);
 
-    if (!in_sentry) {
-        in_stream.setstate(std::ios_base::failbit);
-        return (in_stream);
-    }
+    if (in_sentry) {
+        vec<scal_type, dim>         tmp_vec;
+        std::istream::char_type     cur_char(0);
+        bool                        bracket_version(false);
 
-    math::vec<scm_scalar, dim>  tmp_vec;
-    std::istream::char_type     cur_char(0);
-    bool                        bracket_version(false);
-
-    in_stream >> cur_char;
-
-    bracket_version = (cur_char == std::istream::char_type('('));
-
-    if (!bracket_version) {
-        in_stream.putback(cur_char);
-    }
-    for (std::size_t i = 0; i < dim; ++i) {
-        in_stream >> tmp_vec.data_array[i];
-    }
-    if (bracket_version) {
         in_stream >> cur_char;
-        if (cur_char != std::istream::char_type(')')) {
-            in_stream.clear(std::ios_base::badbit);
+
+        bracket_version = (cur_char == std::istream::char_type('('));
+
+        if (!bracket_version) {
+            in_stream.putback(cur_char);
+        }
+        for (unsigned i = 0; i < dim; ++i) {
+            in_stream >> tmp_vec.data_array[i];
+        }
+        if (bracket_version) {
+            in_stream >> cur_char;
+            if (cur_char != std::istream::char_type(')')) {
+                in_stream.clear(std::ios_base::badbit);
+            }
+        }
+
+        if (in_stream) {
+            in_vec = tmp_vec;
         }
     }
-
-    if (in_stream) {
-        in_vec = tmp_vec;
+    else {
+        in_stream.setstate(std::ios_base::failbit);
     }
 
     return (in_stream);
@@ -65,4 +74,4 @@ std::istream& operator>>(std::istream& in_stream, math::vec<scm_scalar, dim>& in
 } // namespace math
 } // namespace scm
 
-#endif // VEC_STREAM_IO_H_INCLUDED
+#endif // MATH_VEC_STREAM_IO_H_INCLUDED

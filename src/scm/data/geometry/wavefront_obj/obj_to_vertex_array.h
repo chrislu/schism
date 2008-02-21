@@ -16,8 +16,8 @@ namespace data {
 
 struct aabbox
 {
-    math::vec3f_t                                   _min;
-    math::vec3f_t                                   _max;
+    scm::math::vec3f    _min;
+    scm::math::vec3f    _max;
 };
 
 struct vertexbuffer_data

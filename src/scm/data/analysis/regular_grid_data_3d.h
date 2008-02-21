@@ -8,9 +8,8 @@
 #include <boost/scoped_array.hpp>
 
 #include <scm/core/math/math.h>
-#include <scm/core/math/math_clamp_scal.h>
-#include <scm/core/math/math_indices.h>
 
+#include <scm/data/analysis/regular_grid_indices.h>
 #include <scm/data/analysis/regular_grid_data_properties.h>
 #include <scm/data/analysis/regular_grid_data_properties_write_accessor.h>
 
@@ -37,10 +36,10 @@ public:
 
     void                                            reset();
 
-    const value_type& operator[](math::index_scalar_t index) const;
-    const value_type& operator[](const math::index3d_t& index) const;
-    value_type& operator[](math::index_scalar_t index);
-    value_type& operator[](const math::index3d_t& index);
+    const value_type& operator[](index_scalar_t index) const;
+    const value_type& operator[](const index3d_t& index) const;
+    value_type& operator[](index_scalar_t index);
+    value_type& operator[](const index3d_t& index);
 
 protected:
 

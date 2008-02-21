@@ -11,10 +11,10 @@ template<typename T>
 inline T non_linear_value_weight(typename boost::call_traits<T>::param_type val, float w)
 {
     if (w >= 0.0f) {
-        return (math::pow(val, w + 1.0f));
+        return (scm::math::pow(val, w + 1.0f));
     }
     else {
-        return (1.0f - math::abs(math::pow(val - 1.0f, math::round(-w + 1.0f))));//math::pow(val, 1.0f / (-w + 1.0f)));
+        return (1.0f - scm::math::abs(scm::math::pow(val - 1.0f, scm::math::round(-w + 1.0f))));//math::pow(val, 1.0f / (-w + 1.0f)));
     }
 }
 
@@ -85,8 +85,8 @@ scal_type piecewise_function_weighted_1d<val_type, scal_type>::operator[](float 
     if (std::numeric_limits<val_type>::is_integer){
         val_type v_min = (std::numeric_limits<val_type>::min)();
         val_type v_max = (std::numeric_limits<val_type>::max)();
-        lequal = find_lequal_point(static_cast<val_type>(math::floor(math::clamp<float>(point, v_min, v_max))));
-        gequal = find_gequal_point(static_cast<val_type>(math::ceil(math::clamp<float>(point, v_min, v_max))));
+        lequal = find_lequal_point(static_cast<val_type>(scm::math::floor(scm::math::clamp<float>(point, v_min, v_max))));
+        gequal = find_gequal_point(static_cast<val_type>(scm::math::ceil(scm::math::clamp<float>(point, v_min, v_max))));
     }
     else {
         lequal = find_lequal_point(static_cast<val_type>(point));
@@ -100,7 +100,7 @@ scal_type piecewise_function_weighted_1d<val_type, scal_type>::operator[](float 
         else {
             float     a = float(point - lequal->first) / float(gequal->first - lequal->first);
             a           = detail::non_linear_value_weight<float>(a, lequal->second._weight);
-            result      = math::lerp<scal_type>(lequal->second._value, gequal->second._value, a);
+            result      = scm::math::lerp<scal_type>(lequal->second._value, gequal->second._value, a);
         }
     }
 
@@ -143,20 +143,20 @@ typename piecewise_function_weighted_1d<val_type, scal_type>::function_point_con
         if (lequal == _function.end() || greater == _function.end()) {
             if (lequal != greater) { // in case lequal == greater the container can only be empty
                 if (lequal != _function.end()) {
-                    if (math::abs(point - lequal->first) <= epsilon) {
+                    if (scm::math::abs(point - lequal->first) <= epsilon) {
                         result = lequal;
                     }
                 }
                 else { // greater != _function.end()
-                    if (math::abs(greater->first - point) <= epsilon) {
+                    if (scm::math::abs(greater->first - point) <= epsilon) {
                         result = greater;
                     }
                 }
             }
         }
         else { // lequal != _function.end() && greater != _function.end()
-            val_type g_eps = math::abs(greater->first - point);
-            val_type l_eps = math::abs(point - lequal->first);
+            val_type g_eps = scm::math::abs(greater->first - point);
+            val_type l_eps = scm::math::abs(point - lequal->first);
             
             if (g_eps <= epsilon && l_eps <= epsilon) {
                 result = (g_eps < l_eps) ? greater : lequal;

@@ -9,6 +9,22 @@
 namespace scm {
 namespace math {
 
+using std::sin;
+using std::asin;
+using std::cos;
+using std::acos;
+using std::tan;
+using std::atan;
+using std::sqrt;
+using std::log;
+using std::log10;
+
+using std::abs;
+using std::fabs;
+using std::floor;
+using std::ceil;
+using std::pow;
+
 template<typename scal_type>
 inline int sign(const scal_type val)
 {
@@ -63,7 +79,7 @@ const T clamp(const T val,
     return ((val > max) ? max : (val < min) ? min : val);
 }
 
-template<typename scal_type, typename T>
+template<typename T, typename scal_type>
 inline T lerp(const T min,
               const T max,
               const scal_type a)

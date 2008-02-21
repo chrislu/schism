@@ -275,13 +275,13 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     else {
         // initialize wavefront_model structure
         if (out_obj._num_vertices != 0) {
-            out_obj._vertices.reset(new math::vec3f_t[out_obj._num_vertices]);
+            out_obj._vertices.reset(new scm::math::vec3f[out_obj._num_vertices]);
         }
         if (out_obj._num_normals != 0) {
-            out_obj._normals.reset(new math::vec3f_t[out_obj._num_normals]);
+            out_obj._normals.reset(new scm::math::vec3f[out_obj._num_normals]);
         }
         if (out_obj._num_tex_coords != 0) {
-            out_obj._tex_coords.reset(new math::vec2f_t[out_obj._num_tex_coords]);
+            out_obj._tex_coords.reset(new scm::math::vec2f[out_obj._num_tex_coords]);
         }
 
         for (cur_obj_it = out_obj._objects.begin(); cur_obj_it != out_obj._objects.end(); ++cur_obj_it) {
@@ -324,21 +324,21 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     line.get(line_id);
                     switch (line_id) {
                         case ' ': {
-                                math::vec3f_t&  v = out_obj._vertices[next_vertex_index++];
+                                scm::math::vec3f&  v = out_obj._vertices[next_vertex_index++];
                                 line >> v.x;
                                 line >> v.y;
                                 line >> v.z;
                             }
                             break;
                         case 'n': {
-                                math::vec3f_t&  n = out_obj._normals[next_normal_index++];
+                                scm::math::vec3f&  n = out_obj._normals[next_normal_index++];
                                 line >> n.x;
                                 line >> n.y;
                                 line >> n.z;
                             }
                             break;
                         case 't': {
-                                math::vec2f_t&  t = out_obj._tex_coords[next_tex_coord_index++];
+                                scm::math::vec2f&  t = out_obj._tex_coords[next_tex_coord_index++];
                                 line >> t.x;
                                 line >> t.y;
                             }

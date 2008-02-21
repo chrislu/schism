@@ -24,12 +24,6 @@ inline mat<scal_type, 4, 4>::mat(const scal_type a[16])
 }
 
 template<typename scal_type>
-inline mat<scal_type, 4, 4>::mat(const scal_type  s)
-{
-    std::fill(data_array, data_array + 16, s);
-}
-
-template<typename scal_type>
 inline mat<scal_type, 4, 4>::mat(const scal_type a00, const scal_type a01, const scal_type a02, const scal_type a03,
                                  const scal_type a04, const scal_type a05, const scal_type a06, const scal_type a07,
                                  const scal_type a08, const scal_type a09, const scal_type a10, const scal_type a11,
@@ -63,11 +57,24 @@ inline mat<scal_type, 4, 4>::mat(const mat<rhs_scal_t, 4, 4>& m)
 {
 }
 
-// dtor
+// constants
 template<typename scal_type>
-inline mat<scal_type, 4, 4>::~mat()
-{
-}
+/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::null_mat      = mat<scal_type, 4, 4>(0.f, 0.f, 0.f, 0.f,
+                                                                                                 0.f, 0.f, 0.f, 0.f, 
+                                                                                                 0.f, 0.f, 0.f, 0.f,
+                                                                                                 0.f, 0.f, 0.f, 0.f);
+
+template<typename scal_type>
+/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::identity      = mat<scal_type, 4, 4>(1.f, 0.f, 0.f, 0.f,
+                                                                                                 0.f, 1.f, 0.f, 0.f, 
+                                                                                                 0.f, 0.f, 1.f, 0.f,
+                                                                                                 0.f, 0.f, 0.f, 1.f);
+
+// dtor
+//template<typename scal_type>
+//inline mat<scal_type, 4, 4>::~mat()
+//{
+//}
 
 // swap
 template<typename scal_type>
@@ -81,15 +88,19 @@ template<typename scal_type>
 inline mat<scal_type, 4, 4>& mat<scal_type, 4, 4>::operator=(const mat<scal_type, 4, 4>& rhs)
 {
     std::copy(rhs.data_array, rhs.data_array + 16, data_array);
+
+    return (*this);
 }
 
 template<typename scal_type>
 template<typename rhs_scal_t>
-inline mat<scal_type, 4, 4>& mat<scal_type, 4, 4>::operator=(const vec<rhs_scal_t, 4>& rhs)
+inline mat<scal_type, 4, 4>& mat<scal_type, 4, 4>::operator=(const mat<rhs_scal_t, 4, 4>& rhs)
 {
     for (unsigned i = 0; i < 16; ++i) {
         data_array[i] = rhs.data_array[i];
     }
+
+    return (*this);
 }
 
 // index
@@ -107,6 +118,24 @@ inline scal_type  mat<scal_type, 4, 4>::operator[](const int i) const
     assert(i < 16);
 
     return (data_array[i]);
+}
+
+template<typename scal_type>
+inline vec<scal_type, 4> mat<scal_type, 4, 4>::column(const int i) const
+{
+    return (vec<scal_type, 4>(i * 4,
+                              i * 4 + 1,
+                              i * 4 + 2,
+                              i * 4 + 3));
+}
+
+template<typename scal_type>
+inline vec<scal_type, 4> mat<scal_type, 4, 4>::row(const int i) const
+{
+    return (vec<scal_type, 4>(i,
+                              i + 4,
+                              i + 8,
+                              i + 12));
 }
 
 } // namespace math

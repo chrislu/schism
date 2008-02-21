@@ -20,8 +20,8 @@ public:
 
     bool                open_file(const std::string& filename);
 
-    virtual bool        read_sub_volume(const math::vec<unsigned, 3>& offset,
-                                        const math::vec<unsigned, 3>& dimensions,
+    virtual bool        read_sub_volume(const scm::math::vec3ui& offset,
+                                        const scm::math::vec3ui& dimensions,
                                         scm::data::regular_grid_data_3d<unsigned char>& target_data); 
 
 protected:

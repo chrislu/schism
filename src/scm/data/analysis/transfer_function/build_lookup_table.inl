@@ -108,6 +108,8 @@ struct build_lookup_table_impl<val_type, unsigned char>
                             const piecewise_function_1d<unsigned char, val_type>& scal_trafu,
                             unsigned size)
     {
+        using namespace scm::math;
+
         if (size < 1) {
             return (false);
         }
@@ -130,7 +132,7 @@ struct build_lookup_table_impl<val_type, unsigned char>
         }
         else {
             dst_ind_begin   = 0;
-            dst_ind_end     = unsigned(math::floor(float(scal_trafu.stops_begin()->first) * dst_ind_scal_factor));
+            dst_ind_end     = unsigned(floor(float(scal_trafu.stops_begin()->first) * dst_ind_scal_factor));
         }
         
         for (unsigned dst_ind = dst_ind_begin; dst_ind < dst_ind_end; ++dst_ind) {
@@ -142,12 +144,12 @@ struct build_lookup_table_impl<val_type, unsigned char>
             it_left  != scal_trafu.stops_end();
             ++it_left) {
         
-            dst_ind_begin       = unsigned(math::floor(float(it_left->first) * dst_ind_scal_factor));
+            dst_ind_begin       = unsigned(floor(float(it_left->first) * dst_ind_scal_factor));
             dst_ind_begin_value = it_left->second;
         
             typename scm::data::piecewise_function_1d<unsigned char, val_type>::const_stop_iterator it_right = boost::next(it_left);
             if (it_right != scal_trafu.stops_end()) {
-            dst_ind_end         = unsigned(math::floor(float(it_right->first) * dst_ind_scal_factor));
+            dst_ind_end         = unsigned(floor(float(it_right->first) * dst_ind_scal_factor));
             dst_ind_end_value   = it_right->second;
             }
             else {
@@ -160,7 +162,7 @@ struct build_lookup_table_impl<val_type, unsigned char>
         
             for (unsigned dst_ind = dst_ind_begin; dst_ind < dst_ind_end; ++dst_ind) {
             //lerp_factor = math::shoothstep(dst_ind_begin, dst_ind_end, dst_ind);
-            dst[dst_ind] = math::lerp(dst_ind_begin_value, dst_ind_end_value, lerp_factor);
+            dst[dst_ind] = lerp(dst_ind_begin_value, dst_ind_end_value, lerp_factor);
             lerp_factor += part_step_size;
             }
         }
@@ -190,6 +192,8 @@ struct build_lookup_table_impl<val_type, float>
                             const piecewise_function_1d<float, val_type>& scal_trafu,
                             unsigned                                      size)
     {
+        using namespace scm::math;
+
         if (size < 1) {
             return (false);
         }
@@ -212,7 +216,7 @@ struct build_lookup_table_impl<val_type, float>
         }
         else {
             dst_ind_begin   = 0;
-            dst_ind_end     = unsigned(math::floor(scal_trafu.stops_begin()->first * dst_ind_scal_factor));
+            dst_ind_end     = unsigned(floor(scal_trafu.stops_begin()->first * dst_ind_scal_factor));
         }
         
         for (unsigned dst_ind = dst_ind_begin; dst_ind < dst_ind_end; ++dst_ind) {
@@ -224,12 +228,12 @@ struct build_lookup_table_impl<val_type, float>
             it_left  != scal_trafu.stops_end();
             ++it_left) {
         
-            dst_ind_begin       = unsigned(math::floor(it_left->first * dst_ind_scal_factor));
+            dst_ind_begin       = unsigned(floor(it_left->first * dst_ind_scal_factor));
             dst_ind_begin_value = it_left->second;
         
             typename scm::data::piecewise_function_1d<float, val_type>::const_stop_iterator it_right = boost::next(it_left);
             if (it_right != scal_trafu.stops_end()) {
-            dst_ind_end         = unsigned(math::floor(it_right->first * dst_ind_scal_factor));
+            dst_ind_end         = unsigned(floor(it_right->first * dst_ind_scal_factor));
             dst_ind_end_value   = it_right->second;
             }
             else {
@@ -242,7 +246,7 @@ struct build_lookup_table_impl<val_type, float>
         
             for (unsigned dst_ind = dst_ind_begin; dst_ind < dst_ind_end; ++dst_ind) {
             //lerp_factor = math::shoothstep(dst_ind_begin, dst_ind_end, dst_ind);
-            dst[dst_ind] = math::lerp(dst_ind_begin_value, dst_ind_end_value, lerp_factor);
+            dst[dst_ind] = lerp(dst_ind_begin_value, dst_ind_end_value, lerp_factor);
             lerp_factor += part_step_size;
             }
         }

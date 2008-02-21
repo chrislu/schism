@@ -23,12 +23,12 @@ public:
     void                        swap(target& /*ref*/);
 
     std::size_t                 id() const;
-    const math::mat4f_t&        transform() const;
-    void                        transform(const math::mat4f_t& /*trans*/);
+    const scm::math::mat4f&     transform() const;
+    void                        transform(const scm::math::mat4f& /*trans*/);
 
 protected:
     std::size_t                 _id;
-    math::mat4f_t               _transform;
+    scm::math::mat4f            _transform;
 
 private:
 

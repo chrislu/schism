@@ -15,10 +15,10 @@ bool uncertainty_calculator_uncertainty_cast<value_type>::calculate_uncertainty_
         return (false);
     }
 
-    math::vec<unsigned, 3>  dimensions  = source_data.get_properties().get_dimensions();
-    value_type              v_max       = (std::numeric_limits<value_type>::max)();
-    bool                    is_int      = std::numeric_limits<value_type>::is_integer;
-    float                   value_scale = static_cast<float>(v_max);
+    scm::math::vec<unsigned, 3> dimensions  = source_data.get_properties().get_dimensions();
+    value_type                  v_max       = (std::numeric_limits<value_type>::max)();
+    bool                        is_int      = std::numeric_limits<value_type>::is_integer;
+    float                       value_scale = static_cast<float>(v_max);
 
     try {
         get_data_ptr(target_data).reset(new scm::regular_grid_data_3d<value_type>::value_type[dimensions.x * dimensions.y * dimensions.z]);
@@ -30,13 +30,13 @@ bool uncertainty_calculator_uncertainty_cast<value_type>::calculate_uncertainty_
 
     set_dimensions(target_data, dimensions);
 
-    math::vec<unsigned, 3> index;
+    scm::math::vec<unsigned, 3> index;
     for (index.x = 0; index.x < dimensions.x; ++index.x) {
         for (index.y = 0; index.y < dimensions.y; ++index.y) {
             float uncertainy_accum = 0.0f;
             for (index.z = dimensions.z - 1; index.z + 1 > 0; --index.z) {
                 if (uncertainy_accum < 1.0) {
-                    uncertainy_accum = math::clamp(uncertainy_accum + _uncertainty_transfer[source_data[index]], 0.0f, 1.0f);
+                    uncertainy_accum = scm::math::clamp(uncertainy_accum + _uncertainty_transfer[source_data[index]], 0.0f, 1.0f);
                 }
                 target_data[index] = static_cast<value_type>(value_scale*uncertainy_accum);
             }

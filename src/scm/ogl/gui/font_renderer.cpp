@@ -8,10 +8,10 @@
 
 namespace {
 
-void draw_quad(const math::vec2i_t& lower_left,
-               const math::vec2i_t& upper_right,
-               const math::vec2i_t& tex_lower_left,
-               const math::vec2i_t& tex_upper_right)
+void draw_quad(const scm::math::vec2i& lower_left,
+               const scm::math::vec2i& upper_right,
+               const scm::math::vec2i& tex_lower_left,
+               const scm::math::vec2i& tex_upper_right)
 {
     glBegin(GL_QUADS);
         glTexCoord2i(tex_lower_left.x,  tex_lower_left.y);
@@ -42,12 +42,14 @@ font_renderer::~font_renderer()
 {
 }
 
-void font_renderer::draw_string(const math::vec2i_t&         pos,
+void font_renderer::draw_string(const scm::math::vec2i&      pos,
                                 const std::string&           txt,
-                                const math::vec4f_t          col,
+                                const scm::math::vec4f&      col,
                                 bool                         unl,
                                 scm::font::face::style_type  stl) const
 {
+    using namespace scm::math;
+
     if (!_active_font) {
         return;
     }
@@ -73,10 +75,10 @@ void font_renderer::draw_string(const math::vec2i_t&         pos,
 
     cur_style_tex.bind();
 
-    math::vec2i_t current_pos = pos;
+    vec2i current_pos = pos;
 
-    unsigned char               prev        = 0;
-    const math::vec2i_t         shadow_off  = math::vec2i_t(1,-1);
+    unsigned char       prev        = 0;
+    const vec2i         shadow_off  = vec2i(1, -1);
 
     foreach (unsigned char c, txt) {
         const scm::font::glyph& cur_glyph = cur_style.get_glyph(c);
@@ -96,7 +98,7 @@ void font_renderer::draw_string(const math::vec2i_t&         pos,
         }
 
         // draw glyph
-        glColor4fv(col.vec_array);
+        glColor4fv(&col);
         draw_quad(current_pos + cur_glyph._bearing,
                   current_pos + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
                   cur_glyph._tex_lower_left,
@@ -125,7 +127,7 @@ void font_renderer::draw_string(const math::vec2i_t&         pos,
         }
 
         // draw underline
-        glColor4fv(col.vec_array);
+        glColor4fv(&col);
         glBegin(GL_LINES);
             glVertex2i(pos.x, pos.y + cur_style.get_underline_position());
             glVertex2i(current_pos.x, pos.y + cur_style.get_underline_position());

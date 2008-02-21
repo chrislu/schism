@@ -44,19 +44,19 @@ const scm::data::value_range<val_type>& regular_grid_data_properties<val_type>::
 }
 
 template<typename val_type>
-const math::vec<unsigned, 3>& regular_grid_data_properties<val_type>::get_dimensions() const
+const scm::math::vec<unsigned, 3>& regular_grid_data_properties<val_type>::get_dimensions() const
 {
     return (_dimensions);
 }
 
 template<typename val_type>
-const math::vec3f_t& regular_grid_data_properties<val_type>::get_spacing() const
+const scm::math::vec3f& regular_grid_data_properties<val_type>::get_spacing() const
 {
     return (_spacing);
 }
 
 template<typename val_type>
-const math::vec3f_t& regular_grid_data_properties<val_type>::get_origin() const
+const scm::math::vec3f& regular_grid_data_properties<val_type>::get_origin() const
 {
     return (_origin);
 }

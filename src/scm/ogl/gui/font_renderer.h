@@ -19,9 +19,9 @@ public:
 
     using scm::gui::font_renderer::draw_string;
 
-    void                draw_string(const math::vec2i_t&    /*pos*/,
+    void                draw_string(const scm::math::vec2i& /*pos*/,
                                     const std::string&      /*txt*/,
-                                    const math::vec4f_t     /*col*/,
+                                    const scm::math::vec4f& /*col*/,
                                     bool                    /*unl*/ = false,
                                     font::face::style_type  /*stl*/ = font::face::regular) const;
 

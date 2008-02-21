@@ -83,19 +83,19 @@ void text_box::append_string(const std::string&      txt,
                              bool                    unl,
                              font::face::style_type  stl)
 {
-    append_string(txt, math::vec4f_t(1.f), unl, stl);
+    append_string(txt, scm::math::vec4f(1.f, 1.f, 1.f, 1.f), unl, stl);
 }
 
 void text_box::append_string(const std::string&      txt,
-                             const math::vec3f_t     col,
+                             const scm::math::vec3f  col,
                              bool                    unl,
                              font::face::style_type  stl)
 {
-    append_string(txt, math::vec4f_t(col, 1.f), unl, stl);
+    append_string(txt, scm::math::vec4f(col, 1.f), unl, stl);
 }
 
 void text_box::append_string(const std::string&      txt,
-                             const math::vec4f_t     col,
+                             const scm::math::vec4f  col,
                              bool                    unl,
                              font::face::style_type  stl)
 {
@@ -128,7 +128,7 @@ void text_box::draw_text() const
 {
     // how many lines are possible
     unsigned line_advance   = _font_renderer->get_current_line_advance();
-    std::size_t max_lines   = math::max(0, _size.y - _content_margins.z - _content_margins.w) / line_advance;
+    std::size_t max_lines   = scm::math::max(0, _size.y - _content_margins.z - _content_margins.w) / line_advance;
 
     // calculate starting position
     int   vert_start_pos;
@@ -136,15 +136,15 @@ void text_box::draw_text() const
     if (_flow == flow_top_to_bottom) {
         // top_left_pos
         vert_start_pos = _position.y + _size.y - _content_margins.w;
-        vert_start_pos -= math::min(max_lines, _lines.size()) * line_advance;
+        vert_start_pos -= scm::math::min(max_lines, _lines.size()) * line_advance;
     }
     else { // _flow == flow_bottom_to_top
         // low_left_pos
         vert_start_pos = _position.y + _content_margins.y;
     }
 
-    math::vec2i_t   start_pos;
-    unsigned        num_drawn_lines = 0;
+    scm::math::vec2i    start_pos;
+    unsigned            num_drawn_lines = 0;
 
     foreach (const text_box::line& l, _lines) {
 
@@ -156,13 +156,13 @@ void text_box::draw_text() const
         }
 
         if (l._alignment == hor_align_left) {
-            start_pos = math::vec2i_t(_position.x + _content_margins.x, vert_start_pos);
+            start_pos = scm::math::vec2i(_position.x + _content_margins.x, vert_start_pos);
         }
         else if (l._alignment == hor_align_right) {
-            start_pos = math::vec2i_t(_position.x + _size.x - _content_margins.y - line_len, vert_start_pos);
+            start_pos = scm::math::vec2i(_position.x + _size.x - _content_margins.y - line_len, vert_start_pos);
         }
         else if (l._alignment == hor_align_center) {
-            start_pos = math::vec2i_t((_position.x + _size.x - _content_margins.y) / 2 - line_len / 2, vert_start_pos);
+            start_pos = scm::math::vec2i((_position.x + _size.x - _content_margins.y) / 2 - line_len / 2, vert_start_pos);
         }
 
         foreach (const text_box::line_fragment& lf, l._fragments) {

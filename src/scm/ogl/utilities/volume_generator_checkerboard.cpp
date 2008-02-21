@@ -32,7 +32,7 @@ bool volume_generator_checkerboard::generate_float_volume(unsigned dim_x,
     for (unsigned z = 0; z < dim_z; z++) {
         for (unsigned y = 0; y < dim_y; y++) {
             for (unsigned x = 0; x < dim_x; x++) {
-                val = float(math::sgn(-int((x+y+z) % 2)));
+                val = float(scm::math::sign(-int((x+y+z) % 2)));
                 offset_dst =   x * components
                              + y * dim_x * components
                              + z * dim_x * dim_y * components;

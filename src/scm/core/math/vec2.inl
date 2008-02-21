@@ -12,15 +12,16 @@ inline vec<scal_type, 2>::vec()
 
 template<typename scal_type>
 inline vec<scal_type, 2>::vec(const vec<scal_type, 2>& v)
+  : x(v.x), y(v.y)
 {
-    std::copy(v.data_array, v.data_array + 2, data_array);
+    //std::copy(v.data_array, v.data_array + 2, data_array);
 }
 
-template<typename scal_type>
-inline vec<scal_type, 2>::vec(const scal_type a[2])
-{
-    std::copy(a, a + 2, data_array);
-}
+//template<typename scal_type>
+//inline vec<scal_type, 2>::vec(const scal_type a[2])
+//{
+//    std::copy(a, a + 2, data_array);
+//}
 
 template<typename scal_type>
 inline vec<scal_type, 2>::vec(const scal_type s)
@@ -44,10 +45,10 @@ inline vec<scal_type, 2>::vec(const vec<rhs_scal_t, 2>& v)
 }
 
 // dtor
-template<typename scal_type>
-inline vec<scal_type, 2>::~vec()
-{
-}
+//template<typename scal_type>
+//inline vec<scal_type, 2>::~vec()
+//{
+//}
 
 // swap
 template<typename scal_type>
@@ -199,19 +200,9 @@ inline const vec<scal_type, 2> operator+(const vec<scal_type,   2>& lhs,
     return (vec<scal_type, 2>(lhs) += rhs);
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 2> operator+(const scal_type_l        lhs,
-//                                         const vec<scal_type, 2>& rhs)
-//{
-//    return (vec<scal_type, 2>(lhs) += rhs);
-//
-//    //return (vec<scal_type, 2>(lhs + rhs.x,
-//    //                          lhs + rhs.y));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 2> operator+(const vec<scal_type, 2>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
     return (vec<scal_type, 2>(lhs) += rhs);
 }
@@ -223,17 +214,9 @@ inline const vec<scal_type, 2> operator-(const vec<scal_type,   2>& lhs,
     return (vec<scal_type, 2>(lhs) -= rhs);
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 2> operator-(const scal_type_l        lhs,
-//                                         const vec<scal_type, 2>& rhs)
-//{
-//    return (vec<scal_type, 2>(lhs - rhs.x,
-//                              lhs - rhs.y));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 2> operator-(const vec<scal_type, 2>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
     return (vec<scal_type, 2>(lhs) -= rhs);
 }
@@ -245,16 +228,16 @@ inline const vec<scal_type, 2> operator*(const vec<scal_type,   2>& lhs,
     return (vec<scal_type, 2>(lhs) *= rhs);
 }
 
-template<typename scal_type, typename scal_type_l>
-inline const vec<scal_type, 2> operator*(const scal_type_l        lhs,
+template<typename scal_type>
+inline const vec<scal_type, 2> operator*(const scal_type          lhs,
                                          const vec<scal_type, 2>& rhs)
 {
     return (vec<scal_type, 2>(rhs) *= lhs);
 }
 
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 2> operator*(const vec<scal_type, 2>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
     return (vec<scal_type, 2>(lhs) *= rhs);
 }
@@ -266,17 +249,9 @@ inline const vec<scal_type, 2> operator/(const vec<scal_type,   2>& lhs,
     return (vec<scal_type, 2>(lhs) /= rhs);
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 2> operator/(const scal_type_l        lhs,
-//                                         const vec<scal_type, 2>& rhs)
-//{
-//    return (vec<scal_type, 2>(lhs / rhs.x,
-//                              lhs / rhs.y));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 2> operator/(const vec<scal_type, 2>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
     return (vec<scal_type, 2>(lhs) /= rhs);
 }

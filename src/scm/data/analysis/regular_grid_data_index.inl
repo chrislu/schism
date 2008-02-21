@@ -5,9 +5,9 @@ namespace scm {
 namespace data {
 
 template<unsigned dimension>
-regular_grid_data_index<dimension>::regular_grid_data_index(const math::vec<unsigned, dimension>& initial_index,
-                                                            const math::vec<unsigned, dimension>& dimensions)
-: math::vec<unsigned, dimension>(initial_index),
+regular_grid_data_index<dimension>::regular_grid_data_index(const scm::math::vec<unsigned, dimension>& initial_index,
+                                                            const scm::math::vec<unsigned, dimension>& dimensions)
+: scm::math::vec<unsigned, dimension>(initial_index),
   _linear_index(get_linear_index_from_indices(initial_index)),
   _dimensions(dimensions)
 {
@@ -15,7 +15,7 @@ regular_grid_data_index<dimension>::regular_grid_data_index(const math::vec<unsi
 
 template<unsigned dimension>
 regular_grid_data_index<dimension>::regular_grid_data_index(const regular_grid_data_index& i)
-: math::vec<unsigned, dimension>(i),
+: scm::math::vec<unsigned, dimension>(i),
   _linear_index(get_linear_index_from_indices(i)),
   _dimensions(i._dimensions)
 {
@@ -24,7 +24,7 @@ regular_grid_data_index<dimension>::regular_grid_data_index(const regular_grid_d
 template<unsigned dimension>
 regular_grid_data_index<dimension>& regular_grid_data_index<dimension>::operator=(const regular_grid_data_index<dimension>& rhs)
 {
-    math::vec<unsigned, dimension>::operator =(rhs);
+    scm::math::vec<unsigned, dimension>::operator =(rhs);
     _dimensions = rhs._dimensions;
 
     return (*this);
@@ -33,14 +33,14 @@ regular_grid_data_index<dimension>& regular_grid_data_index<dimension>::operator
 template<unsigned dimension>
 regular_grid_data_index<dimension>& regular_grid_data_index<dimension>::operator++()
 {
-    math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(++_linear_index));
+    scm::math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(++_linear_index));
     return (*this);
 }
 
 template<unsigned dimension>
 regular_grid_data_index<dimension>& regular_grid_data_index<dimension>::operator--()
 {
-    math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(--_linear_index));
+    scm::math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(--_linear_index));
     return (*this);
 }
 
@@ -49,7 +49,7 @@ regular_grid_data_index<dimension> regular_grid_data_index<dimension>::operator+
 {
     regular_grid_data_index<dimension> tmp = *this;
 
-    math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(++_linear_index));
+    scm::math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(++_linear_index));
 
     return (tmp);
 }
@@ -59,15 +59,15 @@ regular_grid_data_index<dimension> regular_grid_data_index<dimension>::operator-
 {
     regular_grid_data_index<dimension> tmp = *this;
 
-    math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(--_linear_index));
+    scm::math::vec<unsigned, dimension>::operator =(get_indices_from_linear_index(--_linear_index));
     
     return (tmp);
 }
 
 template<unsigned dimension>
-math::vec<unsigned, dimension> regular_grid_data_index<dimension>::get_indices_from_linear_index(unsigned index)
+scm::math::vec<unsigned, dimension> regular_grid_data_index<dimension>::get_indices_from_linear_index(unsigned index)
 {
-    math::vec<unsigned, dimension> tmp_indices;
+    scm::math::vec<unsigned, dimension> tmp_indices;
     
     #ifdef _DEBUG
     unsigned max_index = 1;
@@ -86,7 +86,7 @@ math::vec<unsigned, dimension> regular_grid_data_index<dimension>::get_indices_f
 }
 
 template<unsigned dimension>
-unsigned regular_grid_data_index<dimension>::get_linear_index_from_indices(const math::vec<unsigned, dimension>& indices)
+unsigned regular_grid_data_index<dimension>::get_linear_index_from_indices(const scm::math::vec<unsigned, dimension>& indices)
 {
     unsigned tmp_index = indices[0];
     unsigned dim_amount = _dimensions[0];

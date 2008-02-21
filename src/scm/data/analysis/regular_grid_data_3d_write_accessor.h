@@ -19,9 +19,9 @@ protected:
     virtual void update(regular_grid_data_3d<val_type>& target_data);
 
     virtual void set_value_range(regular_grid_data_3d<val_type>& target_data, const scm::data::value_range<val_type>& vr);
-    virtual void set_dimensions(regular_grid_data_3d<val_type>& target_data,  const math::vec<unsigned, 3>& dim);
-    virtual void set_spacing(regular_grid_data_3d<val_type>& target_data,     const math::vec3f_t& spacing);
-    virtual void set_origin(regular_grid_data_3d<val_type>& target_data,      const math::vec3f_t& origin);
+    virtual void set_dimensions(regular_grid_data_3d<val_type>& target_data,  const scm::math::vec<unsigned, 3>& dim);
+    virtual void set_spacing(regular_grid_data_3d<val_type>& target_data,     const scm::math::vec3f& spacing);
+    virtual void set_origin(regular_grid_data_3d<val_type>& target_data,      const scm::math::vec3f& origin);
 
     typename regular_grid_data_3d<val_type>::data_pointer_type& get_data_ptr(regular_grid_data_3d<val_type>& target_data);
 

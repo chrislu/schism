@@ -4,7 +4,6 @@
 #include <scm/ogl/gl.h>
 
 #include <scm/core/math/math.h>
-#include <scm/core/math/math_gl.h>
 
 namespace scm {
 namespace gl {
@@ -19,17 +18,17 @@ axes_compass::~axes_compass()
 
 void axes_compass::render() const
 {
-    using namespace math;
+    using namespace scm::math;
 
-    mat_glf_t mv_matrix;
+    mat4f   mv_matrix;
     get_gl_matrix(GL_MODELVIEW_MATRIX, mv_matrix);
 
     mv_matrix = inverse(mv_matrix);
     
     
-    vec3f_t x_axis = vec3f_t(mv_matrix.mat_array[0], mv_matrix.mat_array[4], mv_matrix.mat_array[8]);
-    vec3f_t y_axis = vec3f_t(mv_matrix.mat_array[1], mv_matrix.mat_array[5], mv_matrix.mat_array[9]);
-    vec3f_t z_axis = vec3f_t(mv_matrix.mat_array[2], mv_matrix.mat_array[6], mv_matrix.mat_array[10]);
+    vec3f x_axis = vec3f(mv_matrix[0], mv_matrix[4], mv_matrix[8]);
+    vec3f y_axis = vec3f(mv_matrix[1], mv_matrix[5], mv_matrix[9]);
+    vec3f z_axis = vec3f(mv_matrix[2], mv_matrix[6], mv_matrix[10]);
 
     //vec3f_t x_axis = vec3f_t(mv_matrix[0][0], mv_matrix[1][0], mv_matrix[2][0]);
     //vec3f_t y_axis = vec3f_t(mv_matrix[0][1], mv_matrix[1][1], mv_matrix[2][1]);
@@ -62,15 +61,15 @@ void axes_compass::render() const
             glBegin(GL_LINES);
             glColor3f( 1, 0, 0);
             glVertex3f(0, 0, 0);
-            glVertex3fv(x_axis.vec_array);
+            glVertex3fv(&x_axis);
 
             glColor3f( 0, 1, 0);
             glVertex3f(0, 0, 0);
-            glVertex3fv(y_axis.vec_array);
+            glVertex3fv(&y_axis);
 
             glColor3f( 0, 0, 1);
             glVertex3f(0, 0, 0);
-            glVertex3fv(z_axis.vec_array);
+            glVertex3fv(&z_axis);
             glEnd();
 
         glPopMatrix();

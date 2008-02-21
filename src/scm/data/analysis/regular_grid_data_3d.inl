@@ -27,7 +27,7 @@ void regular_grid_data_3d<val_type>::update()
     value_range.set_min((std::numeric_limits<val_type>::max)());
     value_range.set_max(std::numeric_limits<val_type>::is_integer ? (std::numeric_limits<val_type>::min)() : -(std::numeric_limits<val_type>::max)());
 
-    for (math::index_scalar_t i = 0; i < math::get_linear_index_end(_properties.get_dimensions()); i++) {
+    for (index_scalar_t i = 0; i < get_linear_index_end(_properties.get_dimensions()); i++) {
         value_range.decide_and_set_min(_data[i]);
         value_range.decide_and_set_max(_data[i]);
     }
@@ -55,35 +55,35 @@ const regular_grid_data_properties<val_type>& regular_grid_data_3d<val_type>::ge
 }
 
 template<typename val_type>
-const val_type& regular_grid_data_3d<val_type>::operator[](unsigned index) const
+const val_type& regular_grid_data_3d<val_type>::operator[](index_scalar_t index) const
 {
-    assert(index < math::get_linear_index_end(_properties.get_dimensions()));
+    assert(index < get_linear_index_end(_properties.get_dimensions()));
     
     return (_data[index]);
 }
 
 template<typename val_type>
-const val_type& regular_grid_data_3d<val_type>::operator[](const math::index3d_t& index) const
+const val_type& regular_grid_data_3d<val_type>::operator[](const index3d_t& index) const
 {
-    math::index3d_t clamp_index = math::clamp(index, math::index3d_t(0, 0, 0), _properties.get_dimensions() - math::vec<unsigned, 3>(1, 1, 1));
+    index3d_t clamp_index = scm::math::clamp(index, index3d_t(0, 0, 0), _properties.get_dimensions() - scm::math::vec<unsigned, 3>(1, 1, 1));
 
-    return (_data[math::get_linear_index(clamp_index, _properties.get_dimensions())]);
+    return (_data[get_linear_index(clamp_index, _properties.get_dimensions())]);
 }
 
 template<typename val_type>
-val_type& regular_grid_data_3d<val_type>::operator[](unsigned index)
+val_type& regular_grid_data_3d<val_type>::operator[](index_scalar_t index)
 {
-    assert(index < math::get_linear_index_end(_properties.get_dimensions()));
+    assert(index < get_linear_index_end(_properties.get_dimensions()));
     
     return (_data[index]);
 }
 
 template<typename val_type>
-val_type& regular_grid_data_3d<val_type>::operator[](const math::index3d_t& index)
+val_type& regular_grid_data_3d<val_type>::operator[](const index3d_t& index)
 {
-    math::index3d_t clamp_index = math::clamp(index, math::index3d_t(0, 0, 0), _properties.get_dimensions() - math::vec<unsigned, 3>(1, 1, 1));
+    index3d_t clamp_index = scm::math::clamp(index, index3d_t(0, 0, 0), _properties.get_dimensions() - scm::math::vec<unsigned, 3>(1, 1, 1));
 
-    return (_data[math::get_linear_index(clamp_index, _properties.get_dimensions())]);
+    return (_data[get_linear_index(clamp_index, _properties.get_dimensions())]);
 }
 
 } // namespace data

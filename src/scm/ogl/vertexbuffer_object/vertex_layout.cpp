@@ -85,9 +85,9 @@ std::size_t vertex_element::data_size(data_type dt)
 {
     switch (dt) {
         case dt_float:return (sizeof(float));
-        case dt_vec2f:return (sizeof(math::vec2f_t));
-        case dt_vec3f:return (sizeof(math::vec3f_t));
-        case dt_vec4f:return (sizeof(math::vec4f_t));
+        case dt_vec2f:return (sizeof(scm::math::vec2f));
+        case dt_vec3f:return (sizeof(scm::math::vec3f));
+        case dt_vec4f:return (sizeof(scm::math::vec4f));
         default: return (0);
     }
 }

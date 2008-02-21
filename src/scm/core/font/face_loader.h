@@ -27,7 +27,7 @@ public:
     } texture_bitmap_type;
 
     typedef struct {
-        math::vec2ui_t                      _size;
+        scm::math::vec2ui                   _size;
         texture_bitmap_type                 _type;
         boost::shared_array<unsigned char>  _data;
     } texture_type;

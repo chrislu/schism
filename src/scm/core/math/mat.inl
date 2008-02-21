@@ -36,6 +36,8 @@ template<typename scal_type,
 inline mat<scal_type, order, order>& operator*=(      mat<scal_type, order, order>& lhs,
                                                 const mat<scal_type, order, order>& rhs)
 {
+    mat<scal_type, order, order> tmp_ret;
+
     unsigned    dst_off;
     unsigned    row_off;
     unsigned    col_off;
@@ -53,9 +55,11 @@ inline mat<scal_type, order, order>& operator*=(      mat<scal_type, order, orde
                 tmp_dp += lhs.data_array[row_off] * rhs.data_array[col_off];
             }
 
-            lhs.data_array[dst_off] = tmp_dp;
+            tmp_ret.data_array[dst_off] = tmp_dp;
         }
     }
+
+    lhs = tmp_ret;
 
     return (lhs);
 }
@@ -134,13 +138,15 @@ template<typename scal_type,
 inline const vec<scal_type, order> operator*(const mat<scal_type, order, order>& lhs,
                                              const vec<scal_type, order>&        rhs)
 {
-    vec<scal_type, order> tmp_ret(scal_type(0));
+    vec<scal_type, order> tmp_ret(scal_type(0), scal_type(0), scal_type(0), scal_type(0));
 
     unsigned    row_off;
 
     scal_type   tmp_dp;
 
     for (unsigned r = 0; r < order; ++r) {
+        tmp_dp = scal_type(0);
+
         for (unsigned c = 0; c < order; ++c) {
             row_off = r + c * order;
             tmp_dp += lhs.data_array[row_off] * rhs.data_array[c];
@@ -157,16 +163,18 @@ template<typename scal_type,
 inline const vec<scal_type, order> operator*(const vec<scal_type, order>&        lhs,
                                              const mat<scal_type, order, order>& rhs)
 {
-    vec<scal_type, order> tmp_ret(scal_type(0));
+    vec<scal_type, order> tmp_ret(scal_type(0), scal_type(0), scal_type(0), scal_type(0));
 
     unsigned    row_off;
 
     scal_type   tmp_dp;
 
     for (unsigned r = 0; r < order; ++r) {
+        tmp_dp = scal_type(0);
+
         for (unsigned c = 0; c < order; ++c) {
             row_off = r * order + c;
-            tmp_dp += lhs.data_array[row_off] * rhs.data_array[c];
+            tmp_dp += rhs.data_array[row_off] * lhs.data_array[c];
         }
 
         tmp_ret.data_array[r] = tmp_dp;
@@ -268,7 +276,7 @@ inline scal_type determinant(const mat<scal_type, order, order>& lhs)
 template<typename scal_type, const unsigned order>
 inline const mat<scal_type, order, order> inverse(const mat<scal_type, order, order>& lhs)
 {
-    mat<scal_type, order, order> tmp_ret(scal_type(0));
+    mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::null_mat);
     scal_type                    tmp_det = determinant(lhs);
 
     unsigned dst_off;

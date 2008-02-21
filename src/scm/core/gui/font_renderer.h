@@ -30,25 +30,25 @@ public:
     void                    use_kerning(bool /*k*/);
     bool                    use_kerning() const;
 
-    virtual void            draw_string(const math::vec2i_t&    /*pos*/,
+    virtual void            draw_string(const scm::math::vec2i& /*pos*/,
                                         const std::string&      /*txt*/,
                                         bool                    /*unl*/ = false,
                                         font::face::style_type  /*stl*/ = font::face::regular) const;
-    virtual void            draw_string(const math::vec2i_t&    /*pos*/,
+    virtual void            draw_string(const scm::math::vec2i& /*pos*/,
                                         const std::string&      /*txt*/,
-                                        const math::vec3f_t     /*col*/,
+                                        const scm::math::vec3f  /*col*/,
                                         bool                    /*unl*/ = false,
                                         font::face::style_type  /*stl*/ = font::face::regular) const;
-    virtual void            draw_string(const math::vec2i_t&    /*pos*/,
+    virtual void            draw_string(const scm::math::vec2i& /*pos*/,
                                         const std::string&      /*txt*/,
-                                        const math::vec4f_t     /*col*/,
+                                        const scm::math::vec4f& /*col*/,
                                         bool                    /*unl*/ = false,
                                         font::face::style_type  /*stl*/ = font::face::regular) const = 0;
 
 protected:
     font::face_ptr      _active_font;
     bool                _draw_shadow;
-    math::vec3f_t       _shadow_color;
+    scm::math::vec3f    _shadow_color;
     bool                _use_kering;
 
 private:

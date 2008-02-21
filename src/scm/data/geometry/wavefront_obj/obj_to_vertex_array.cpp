@@ -87,8 +87,11 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
             out_data._bboxes.push_back(aabbox());
             vertexbuffer_data::bbox_container::value_type& cur_bbox = out_data._bboxes.back();
 
-            cur_bbox._min   = math::vec3f_t((std::numeric_limits<math::vec3f_t::component_type>::max)());
-            cur_bbox._max   = math::vec3f_t((std::numeric_limits<math::vec3f_t::component_type>::min)());
+            scm::math::vec3f::value_type    max_val = (std::numeric_limits<scm::math::vec3f::value_type>::max)();
+            scm::math::vec3f::value_type    min_val = (std::numeric_limits<scm::math::vec3f::value_type>::max)();
+
+            cur_bbox._min   = scm::math::vec3f(max_val, max_val, max_val);
+            cur_bbox._max   = scm::math::vec3f(min_val, min_val, min_val);
 
             for (unsigned i = 0; i < wf_obj_grp._num_tri_faces; ++i) {
                 const wavefront_object_triangle_face& cur_face = wf_obj_grp._tri_faces[i];
@@ -99,11 +102,11 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
                                               in_obj._num_normals    != 0 ? cur_face._normals[k] : 0);
                     
                     // update bounding box
-                    const math::vec3f_t& cur_vert = in_obj._vertices[cur_index._v - 1];
+                    const scm::math::vec3f& cur_vert = in_obj._vertices[cur_index._v - 1];
 
                     for (unsigned c = 0; c < 3; ++c) {
-                        cur_bbox._min.vec_array[c] = cur_vert.vec_array[c] < cur_bbox._min.vec_array[c] ? cur_vert.vec_array[c] : cur_bbox._min.vec_array[c];
-                        cur_bbox._max.vec_array[c] = cur_vert.vec_array[c] > cur_bbox._max.vec_array[c] ? cur_vert.vec_array[c] : cur_bbox._max.vec_array[c];
+                        cur_bbox._min[c] = cur_vert[c] < cur_bbox._min[c] ? cur_vert[c] : cur_bbox._min[c];
+                        cur_bbox._max[c] = cur_vert[c] > cur_bbox._max[c] ? cur_vert[c] : cur_bbox._max[c];
                     }
 
                     // check index mapping
@@ -159,19 +162,19 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
         varray_index =  ind_it->second;
 
         memcpy(out_data._vert_array.get() + varray_index * 3,
-               in_obj._vertices[cur_index._v - 1].vec_array,
+               &(in_obj._vertices[cur_index._v - 1]),
                3 * sizeof(float));
 
         if (out_data._normals_offset) {
             memcpy(out_data._vert_array.get() + varray_index * 3
                                               + out_data._normals_offset,
-                   in_obj._normals[cur_index._n - 1].vec_array,
+                   &(in_obj._normals[cur_index._n - 1]),
                    3 * sizeof(float));
         }
         if (out_data._texcoords_offset) {
             memcpy(out_data._vert_array.get() + varray_index * 2
                                               + out_data._texcoords_offset,
-                   in_obj._tex_coords[cur_index._t - 1].vec_array,
+                   &(in_obj._tex_coords[cur_index._t - 1]),
                    2 * sizeof(float));
         }
     }

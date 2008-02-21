@@ -24,14 +24,14 @@ public:
     const volume_descriptor& operator=(const volume_descriptor&  /*rhs*/);
 
 
-    math::vec3ui_t      _data_dimensions;
+    scm::math::vec3ui   _data_dimensions;
     unsigned            _data_num_channels;
     unsigned            _data_byte_per_channel;
 
-    math::vec3f_t       _volume_origin;
-    math::vec3f_t       _volume_aspect;
+    scm::math::vec3f    _volume_origin;
+    scm::math::vec3f    _volume_aspect;
 
-    math::vec3ui_t      _brick_index;
+    scm::math::vec3ui   _brick_index;
 
     std::string         _sraw_file;
     std::string         _name;

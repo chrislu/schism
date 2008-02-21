@@ -14,14 +14,23 @@ inline vec<scal_type, 4>::vec()
 
 template<typename scal_type>
 inline vec<scal_type, 4>::vec(const vec<scal_type, 4>& v)
+//  : x(v.x), y(v.y), z(v.z), w(v.w)
 {
     std::copy(v.data_array, v.data_array + 4, data_array);
 }
 
+//template<typename scal_type>
+//inline vec<scal_type, 4>::vec(const scal_type a[4])
+//{
+//    std::copy(a, a + 4, data_array);
+//}
+
 template<typename scal_type>
-inline vec<scal_type, 4>::vec(const scal_type a[4])
+inline vec<scal_type, 4>::vec(const vec<scal_type, 3>& v,
+                              const scal_type w)
+  : w(w)
 {
-    std::copy(a, a + 4, data_array);
+    std::copy(v.data_array, v.data_array + 3, data_array);
 }
 
 template<typename scal_type>
@@ -50,10 +59,10 @@ inline vec<scal_type, 4>::vec(const vec<rhs_scal_t, 4>& v)
 }
 
 // dtor
-template<typename scal_type>
-inline vec<scal_type, 4>::~vec()
-{
-}
+//template<typename scal_type>
+//inline vec<scal_type, 4>::~vec()
+//{
+//}
 
 // swap
 template<typename scal_type>
@@ -66,7 +75,7 @@ inline void vec<scal_type, 4>::swap(vec<scal_type, 4>& rhs)
 template<typename scal_type>
 inline vec<scal_type, 4>& vec<scal_type, 4>::operator=(const vec<scal_type, 4>& rhs)
 {
-    // performance wise very bad!
+    // performancewise very bad!
     //vec<scal_type, 4> tmp(rhs);
     //swap(tmp);
 
@@ -222,95 +231,134 @@ template<typename scal_type, typename scal_type_r>
 inline const vec<scal_type, 4> operator+(const vec<scal_type,   4>& lhs,
                                          const vec<scal_type_r, 4>& rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x + rhs.x,
+                              lhs.y + rhs.y,
+                              lhs.z + rhs.z,
+                              lhs.w + rhs.w));
+#else
     return (vec<scal_type, 4>(lhs) += rhs);
+#endif
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 4> operator+(const scal_type_l        lhs,
-//                                         const vec<scal_type, 4>& rhs)
-//{
-//    return (vec<scal_type, 4>(lhs) += rhs);
-//
-//    //return (vec<scal_type, 4>(lhs + rhs.x,
-//    //                          lhs + rhs.y,
-//    //                          lhs + rhs.z,
-//    //                          lhs + rhs.w));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 4> operator+(const vec<scal_type, 4>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x + rhs,
+                              lhs.y + rhs,
+                              lhs.z + rhs,
+                              lhs.w + rhs));
+#else
+
     return (vec<scal_type, 4>(lhs) += rhs);
+#endif
 }
 
 template<typename scal_type, typename scal_type_r>
 inline const vec<scal_type, 4> operator-(const vec<scal_type,   4>& lhs,
                                          const vec<scal_type_r, 4>& rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x - rhs.x,
+                              lhs.y - rhs.y,
+                              lhs.z - rhs.z,
+                              lhs.w - rhs.w));
+
+#else
     return (vec<scal_type, 4>(lhs) -= rhs);
+#endif
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 4> operator-(const scal_type_l        lhs,
-//                                         const vec<scal_type, 4>& rhs)
-//{
-//    return (vec<scal_type, 4>(lhs - rhs.x,
-//                              lhs - rhs.y,
-//                              lhs - rhs.z,
-//                              lhs - rhs.w));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 4> operator-(const vec<scal_type, 4>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x - rhs,
+                              lhs.y - rhs,
+                              lhs.z - rhs,
+                              lhs.w - rhs));
+#else
+
     return (vec<scal_type, 4>(lhs) -= rhs);
+#endif
 }
 
 template<typename scal_type, typename scal_type_r>
 inline const vec<scal_type, 4> operator*(const vec<scal_type,   4>& lhs,
                                          const vec<scal_type_r, 4>& rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x * rhs.x,
+                              lhs.y * rhs.y,
+                              lhs.z * rhs.z,
+                              lhs.w * rhs.w));
+#else
+
     return (vec<scal_type, 4>(lhs) *= rhs);
+#endif
 }
 
-template<typename scal_type, typename scal_type_l>
-inline const vec<scal_type, 4> operator*(const scal_type_l        lhs,
+template<typename scal_type>
+inline const vec<scal_type, 4> operator*(const scal_type          lhs,
                                          const vec<scal_type, 4>& rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs * rhs.x,
+                              lhs * rhs.y,
+                              lhs * rhs.z,
+                              lhs * rhs.w));
+#else
+
     return (vec<scal_type, 4>(rhs) *= lhs);
+#endif
 }
 
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 4> operator*(const vec<scal_type, 4>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x * rhs,
+                              lhs.y * rhs,
+                              lhs.z * rhs,
+                              lhs.w * rhs));
+#else
+
     return (vec<scal_type, 4>(lhs) *= rhs);
+#endif
 }
 
 template<typename scal_type, typename scal_type_r>
 inline const vec<scal_type, 4> operator/(const vec<scal_type,   4>& lhs,
                                          const vec<scal_type_r, 4>& rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x / rhs.x,
+                              lhs.y / rhs.y,
+                              lhs.z / rhs.z,
+                              lhs.w / rhs.w));
+#else
+
     return (vec<scal_type, 4>(lhs) /= rhs);
+#endif
 }
 
-//template<typename scal_type, typename scal_type_l>
-//inline const vec<scal_type, 4> operator/(const scal_type_l        lhs,
-//                                         const vec<scal_type, 4>& rhs)
-//{
-//    return (vec<scal_type, 4>(lhs / rhs.x,
-//                              lhs / rhs.y,
-//                              lhs / rhs.z,
-//                              lhs / rhs.w));
-//}
-
-template<typename scal_type, typename scal_type_r>
+template<typename scal_type>
 inline const vec<scal_type, 4> operator/(const vec<scal_type, 4>& lhs,
-                                         const scal_type_r        rhs)
+                                         const scal_type          rhs)
 {
+#ifndef SCM_MATH_CORRECT_BIN_OPS
+    return (vec<scal_type, 4>(lhs.x / rhs,
+                              lhs.y / rhs,
+                              lhs.z / rhs,
+                              lhs.w / rhs));
+#else
+
     return (vec<scal_type, 4>(lhs) /= rhs);
+#endif
 }
 
 // common functions

@@ -24,19 +24,19 @@ void regular_grid_data_properties_write_accessor<val_type>::set_value_range(regu
 }
 
 template<typename val_type>
-void regular_grid_data_properties_write_accessor<val_type>::set_dimensions(regular_grid_data_properties<val_type>& target_prop, const math::vec<unsigned, 3>& dim)
+void regular_grid_data_properties_write_accessor<val_type>::set_dimensions(regular_grid_data_properties<val_type>& target_prop, const scm::math::vec<unsigned, 3>& dim)
 {
     target_prop._dimensions = dim;
 }
 
 template<typename val_type>
-void regular_grid_data_properties_write_accessor<val_type>::set_spacing(regular_grid_data_properties<val_type>& target_prop, const math::vec3f_t& spacing)
+void regular_grid_data_properties_write_accessor<val_type>::set_spacing(regular_grid_data_properties<val_type>& target_prop, const scm::math::vec3f& spacing)
 {
     target_prop._spacing = spacing;
 }
 
 template<typename val_type>
-void regular_grid_data_properties_write_accessor<val_type>::set_origin(regular_grid_data_properties<val_type>& target_prop, const math::vec3f_t& origin)
+void regular_grid_data_properties_write_accessor<val_type>::set_origin(regular_grid_data_properties<val_type>& target_prop, const scm::math::vec3f& origin)
 {
     target_prop._origin = origin;
 }

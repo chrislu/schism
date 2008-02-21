@@ -114,8 +114,8 @@ bool volume_data_loader_vgeo::open_file(const std::string& filename)
     return (true);
 }
 
-bool volume_data_loader_vgeo::read_sub_volume(const math::vec<unsigned, 3>& offset,
-                                              const math::vec<unsigned, 3>& dimensions,
+bool volume_data_loader_vgeo::read_sub_volume(const scm::math::vec3ui& offset,
+                                              const scm::math::vec3ui& dimensions,
                                               scm::data::regular_grid_data_3d<unsigned char>& target_data)
 {
     if (!_file || !is_file_open()) {

@@ -19,18 +19,18 @@ public:
     virtual void            draw() = 0;
     virtual void            update();
 
-    void                    position(const math::vec2i_t& /*pos*/);
-    const math::vec2i_t&    position() const;
+    void                    position(const scm::math::vec2i& /*pos*/);
+    const scm::math::vec2i& position() const;
 
-    void                    size(const math::vec2i_t& /*s*/);
-    const math::vec2i_t&    size() const;
+    void                    size(const scm::math::vec2i& /*s*/);
+    const scm::math::vec2i& size() const;
 
     void                    opacity(float /*op*/);
     float                   opacity() const;
 
 protected:
-    math::vec2i_t           _position;
-    math::vec2i_t           _size;
+    scm::math::vec2i        _position;
+    scm::math::vec2i        _size;
 
     float                   _opacity;
 

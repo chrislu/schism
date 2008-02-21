@@ -21,23 +21,10 @@ public:
     mat(const mat<scal_type, 4, 4>& m);
     mat(const scal_type a[16]);
 
-    explicit mat(const scal_type  s);
-    explicit mat(const scal_type a00,
-                 const scal_type a01,
-                 const scal_type a02,
-                 const scal_type a03,
-                 const scal_type a04,
-                 const scal_type a05,
-                 const scal_type a06,
-                 const scal_type a07,
-                 const scal_type a08,
-                 const scal_type a09,
-                 const scal_type a10,
-                 const scal_type a11,
-                 const scal_type a12,
-                 const scal_type a13,
-                 const scal_type a14,
-                 const scal_type a15);
+    explicit mat(const scal_type a00, const scal_type a01, const scal_type a02, const scal_type a03,
+                 const scal_type a04, const scal_type a05, const scal_type a06, const scal_type a07,
+                 const scal_type a08, const scal_type a09, const scal_type a10, const scal_type a11,
+                 const scal_type a12, const scal_type a13, const scal_type a14, const scal_type a15);
 
     explicit mat(const vec<scal_type, 4>& c00,
                  const vec<scal_type, 4>& c01,
@@ -47,23 +34,31 @@ public:
     template<typename rhs_scal_t>
     explicit mat(const mat<rhs_scal_t, 4, 4>& m);
 
+    // constants
+    static const mat<scal_type, 4, 4>   null_mat;
+    static const mat<scal_type, 4, 4>   identity;
+
     // dtor
-    ~mat();
+    //~mat();
 
     // swap
     void swap(mat<scal_type, 4, 4>& rhs);
 
     // assign
-    mat<scal_type, 4, 4>&                            operator=(const mat<scal_type, 4, 4>& rhs);
-    template<typename rhs_scal_t> mat<scal_type, 4, 4>& operator=(const vec<rhs_scal_t, 4>& rhs);
+    mat<scal_type, 4, 4>&           operator=(const mat<scal_type, 4, 4>& rhs);
+    template<typename rhs_scal_t>
+    mat<scal_type, 4, 4>&           operator=(const mat<rhs_scal_t, 4, 4>& rhs);
 
     // data access
-    inline scal_type*const         operator&()          { return (data_array); }
-    inline const scal_type*const   operator&() const    { return (data_array); }
+    inline scal_type*const          operator&()         { return (data_array); }
+    inline const scal_type*const    operator&() const   { return (data_array); }
 
     // index
-    inline scal_type& operator[](const int i);
-    inline scal_type  operator[](const int i) const;
+    inline scal_type&               operator[](const int i);
+    inline scal_type                operator[](const int i) const;
+
+    inline vec<scal_type, 4>        column(const int i) const;
+    inline vec<scal_type, 4>        row(const int i) const;
 
     // data definition
     union
@@ -87,7 +82,7 @@ public:
             scal_type m14;
             scal_type m15;
         };
-        scal_type  data_array[4 * 4];
+        scal_type  data_array[16];
     };
 
 }; // class mat<scal_type, 4, 4>

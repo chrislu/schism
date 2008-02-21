@@ -56,7 +56,7 @@ volume_gradient_magnitude_calculator<output_voxel_component_type,
     volume_filter_kernel_sobel3x3_y sobel_y;
     volume_filter_kernel_sobel3x3_z sobel_z;
 
-    math::vec3f_t tmp_grad;
+    scm::math::vec3f tmp_grad;
 
     for (unsigned int z = 0; z < depth; z++) {
         for (unsigned int y = 0; y < height; y++) {
@@ -81,7 +81,7 @@ volume_gradient_magnitude_calculator<output_voxel_component_type,
                 tmp_grad.y = sobel_y.apply(cur_data);
                 tmp_grad.z = sobel_z.apply(cur_data);
 
-                float magnitude = math::sqrt(math::sqr(tmp_grad.x) + math::sqr(tmp_grad.y) + math::sqr(tmp_grad.z));
+                float magnitude = scm::math::sqrt(scm::math::sqr(tmp_grad.x) + scm::math::sqr(tmp_grad.y) + scm::math::sqr(tmp_grad.z));
 
                 if (o_int) {
                     dst_buffer[get_output_offset(x, y, z)] = static_cast<output_voxel_component_type>(magnitude);
@@ -105,9 +105,9 @@ volume_gradient_magnitude_calculator<output_voxel_component_type,
 {
     unsigned int offset;
 
-    offset =   math::clamp(x, 0, int(_width)  - 1)
-             + math::clamp(y, 0, int(_height) - 1) * _width
-             + math::clamp(z, 0, int(_depth)  - 1) * _width * _height;
+    offset =   scm::math::clamp(x, 0, int(_width)  - 1)
+             + scm::math::clamp(y, 0, int(_height) - 1) * _width
+             + scm::math::clamp(z, 0, int(_depth)  - 1) * _width * _height;
 
     return (offset);
 }

@@ -1,6 +1,8 @@
 
-#ifndef VEC_H_INLCUDED
-#define VEC_H_INLCUDED
+#ifndef MATH_VEC_H_INLCUDED
+#define MATH_VEC_H_INLCUDED
+
+#define SCM_MATH_CORRECT_BIN_OPS
 
 namespace scm {
 namespace math {
@@ -16,4 +18,4 @@ class vec
 
 #include "vec.inl"
 
-#endif // VEC_H_INLCUDED
+#endif // MATH_VEC_H_INLCUDED

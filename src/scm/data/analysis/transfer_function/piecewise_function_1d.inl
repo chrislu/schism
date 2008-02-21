@@ -75,8 +75,8 @@ piecewise_function_1d<val_type, res_type>::operator[](float point) const
     if (std::numeric_limits<value_type>::is_integer){
         val_type v_min = (std::numeric_limits<value_type>::min)();
         val_type v_max = (std::numeric_limits<value_type>::max)();
-        lequal = find_lequal_stop(static_cast<value_type>(math::floor(math::clamp<float>(point, v_min, v_max))));
-        gequal = find_gequal_stop(static_cast<value_type>(math::ceil(math::clamp<float>(point, v_min, v_max))));
+        lequal = find_lequal_stop(static_cast<value_type>(scm::math::floor(scm::math::clamp<float>(point, v_min, v_max))));
+        gequal = find_gequal_stop(static_cast<value_type>(scm::math::ceil(scm::math::clamp<float>(point, v_min, v_max))));
     }
     else {
         lequal = find_lequal_stop(static_cast<value_type>(point));
@@ -89,7 +89,7 @@ piecewise_function_1d<val_type, res_type>::operator[](float point) const
         }
         else {
             float     a = float(point - lequal->first) / float(gequal->first - lequal->first);
-            result      = math::lerp<res_type>(lequal->second, gequal->second, a);
+            result      = scm::math::lerp<res_type>(lequal->second, gequal->second, a);
         }
     }
 

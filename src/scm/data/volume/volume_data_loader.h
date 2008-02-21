@@ -30,12 +30,12 @@ public:
     virtual const volume_descriptor&    get_volume_descriptor() const;
     //virtual const math::vec3ui_t& get_dataset_dimensions() const;
 
-    virtual bool        read_sub_volume(const math::vec<unsigned, 3>& offset,
-                                        const math::vec<unsigned, 3>& dimensions,
+    virtual bool        read_sub_volume(const scm::math::vec3ui& offset,
+                                        const scm::math::vec3ui& dimensions,
                                         scm::data::regular_grid_data_3d<unsigned char>& target_data) = 0; 
 
-    virtual bool        read_sub_volume_data(const math::vec<unsigned, 3>& offset,
-                                             const math::vec<unsigned, 3>& dimensions,
+    virtual bool        read_sub_volume_data(const scm::math::vec3ui& offset,
+                                             const scm::math::vec3ui& dimensions,
                                              unsigned char*const buffer);
 protected:
 

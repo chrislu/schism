@@ -6,12 +6,12 @@ namespace data {
 
 volume_descriptor::volume_descriptor()
   : _version(1),
-    _data_dimensions(0),
+    _data_dimensions(0, 0, 0),
     _data_num_channels(0),
     _data_byte_per_channel(0),
-    _volume_origin(0.f),
-    _volume_aspect(1.f),
-    _brick_index(0)
+    _volume_origin(0.f, 0.f, 0.f),
+    _volume_aspect(1.f, 1.f, 1.f),
+    _brick_index(0, 0, 0)
 {
 }
 

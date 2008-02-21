@@ -14,12 +14,12 @@ namespace font {
 
 struct __scm_export(core) glyph
 {
-    math::vec2i_t       _tex_lower_left;
-    math::vec2i_t       _tex_upper_right;
+    scm::math::vec2i    _tex_lower_left;
+    scm::math::vec2i    _tex_upper_right;
 
     unsigned            _advance;
 
-    math::vec2i_t       _bearing;
+    scm::math::vec2i    _bearing;
 
 }; // struct glyph
 

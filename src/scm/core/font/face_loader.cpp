@@ -144,6 +144,7 @@ bool face_loader::load_style(face::style_type   style,
                              unsigned           size,
                              unsigned           disp_res)
 {
+    using namespace scm::math;
 
     face_style::kerning_table&              cur_kerning_table = font_face._glyph_mappings[style]._kerning_table;
     face_style::character_glyph_mapping&    cur_glyph_mapping = font_face._glyph_mappings[style]._glyph_mapping;
@@ -183,45 +184,45 @@ bool face_loader::load_style(face::style_type   style,
     }
 
     // calculate the maximal bounding box of all glyphs in the face
-    math::vec2f_t font_bbox_x;
-    math::vec2f_t font_bbox_y;
-    math::vec2i_t font_glyph_bbox_size;
+    vec2f font_bbox_x;
+    vec2f font_bbox_y;
+    vec2i font_glyph_bbox_size;
 
     if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
         float   em_size = 1.0f * ft_font.get_face()->units_per_EM;
         float   x_scale = ft_font.get_face()->size->metrics.x_ppem / em_size;
         float   y_scale = ft_font.get_face()->size->metrics.y_ppem / em_size;
 
-        font_bbox_x = math::vec2f_t(ft_font.get_face()->bbox.xMin * x_scale,
-                                    ft_font.get_face()->bbox.xMax * x_scale);
-        font_bbox_y = math::vec2f_t(ft_font.get_face()->bbox.yMin * y_scale,
-                                    ft_font.get_face()->bbox.yMax * y_scale);
+        font_bbox_x = vec2f(ft_font.get_face()->bbox.xMin * x_scale,
+                            ft_font.get_face()->bbox.xMax * x_scale);
+        font_bbox_y = vec2f(ft_font.get_face()->bbox.yMin * y_scale,
+                            ft_font.get_face()->bbox.yMax * y_scale);
 
-        cur_line_spacing         = static_cast<unsigned>(math::ceil(ft_font.get_face()->height * y_scale));
+        cur_line_spacing         = static_cast<unsigned>(ceil(ft_font.get_face()->height * y_scale));
 
-        cur_uline_pos            = static_cast<int>(math::round(ft_font.get_face()->underline_position * y_scale));
-        cur_uline_thick          = static_cast<unsigned>(math::round(ft_font.get_face()->underline_thickness * y_scale));
+        cur_uline_pos            = static_cast<int>(round(ft_font.get_face()->underline_position * y_scale));
+        cur_uline_thick          = static_cast<unsigned>(round(ft_font.get_face()->underline_thickness * y_scale));
 
     }
     else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
 
-        font_bbox_x = math::vec2f_t(0.0f,
-                                    static_cast<float>(ft_font.get_face()->size->metrics.max_advance >> 6));
-        font_bbox_y = math::vec2f_t(0.0f,
-                                    static_cast<float>(ft_font.get_face()->size->metrics.height >> 6));
+        font_bbox_x = vec2f(0.0f,
+                            static_cast<float>(ft_font.get_face()->size->metrics.max_advance >> 6));
+        font_bbox_y = vec2f(0.0f,
+                            static_cast<float>(ft_font.get_face()->size->metrics.height >> 6));
 
         cur_line_spacing         = static_cast<int>(font_bbox_y.y);
         cur_uline_pos            = -1;
         cur_uline_thick          = 1;
     }
 
-    font_glyph_bbox_size  = math::vec2i_t(static_cast<int>(math::ceil(font_bbox_x.y) - math::floor(font_bbox_x.x)),
-                                          static_cast<int>(math::ceil(font_bbox_y.y) - math::floor(font_bbox_y.x)));
+    font_glyph_bbox_size  = vec2i(static_cast<int>(ceil(font_bbox_x.y) - floor(font_bbox_x.x)),
+                                  static_cast<int>(ceil(font_bbox_y.y) - floor(font_bbox_y.x)));
 
     // allocate texture space
     // glyphs are stacked 16x16 in the texture
-    cur_texture._size = math::vec2ui_t(font_glyph_bbox_size.x * 16,
-                                       font_glyph_bbox_size.y * 16);
+    cur_texture._size = vec2ui(font_glyph_bbox_size.x * 16,
+                               font_glyph_bbox_size.y * 16);
 
     // allocate texture destination memory
     try {
@@ -268,7 +269,7 @@ bool face_loader::load_style(face::style_type   style,
         dst_x = (i & 0x0F) * font_glyph_bbox_size.x;
         dst_y = cur_texture._size.y - ((i >> 4) + 1) * font_glyph_bbox_size.y;
 
-        math::vec2i_t actual_glyph_bbox(bitmap.width, bitmap.rows);
+        vec2i actual_glyph_bbox(bitmap.width, bitmap.rows);
 
         switch (bitmap.pixel_mode) {
             case FT_PIXEL_MODE_GRAY:
@@ -302,7 +303,7 @@ bool face_loader::load_style(face::style_type   style,
                 continue;
         }
 
-        cur_glyph._tex_lower_left   = math::vec2i_t(dst_x, dst_y);
+        cur_glyph._tex_lower_left   = vec2i(dst_x, dst_y);
         cur_glyph._tex_upper_right  = cur_glyph._tex_lower_left + actual_glyph_bbox;
 
         if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
@@ -314,9 +315,9 @@ bool face_loader::load_style(face::style_type   style,
         else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
             cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
         }
-        cur_glyph._bearing          = math::vec2i_t(ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
-                                                      (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
-                                                    - (ft_font.get_face()->glyph->metrics.height >> 6));
+        cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
+                                              (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
+                                            - (ft_font.get_face()->glyph->metrics.height >> 6));
     }
 
     // calculate kerning information

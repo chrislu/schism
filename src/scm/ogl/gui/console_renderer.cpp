@@ -9,7 +9,7 @@ console_renderer::console_renderer()
 {
     hor_alignment(scm::gui::hor_align_left);
     flow(scm::gui::flow_bottom_to_top);
-    content_margins(math::vec4i_t(10));
+    content_margins(scm::math::vec4i(10, 10, 10));
 }
 
 console_renderer::~console_renderer()

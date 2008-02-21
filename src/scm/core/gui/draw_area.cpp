@@ -5,8 +5,8 @@ namespace scm {
 namespace gui {
 
 draw_area::draw_area()
-  : _position(0),
-    _size(0),
+  : _position(0, 0),
+    _size(0, 0),
     _opacity(1.f)
 {
 }
@@ -19,22 +19,22 @@ void draw_area::update()
 {
 }
 
-void draw_area::position(const math::vec2i_t& pos)
+void draw_area::position(const scm::math::vec2i& pos)
 {
     _position = pos;
 }
 
-const math::vec2i_t& draw_area::position() const
+const scm::math::vec2i& draw_area::position() const
 {
     return (_position);
 }
 
-void draw_area::size(const math::vec2i_t& s)
+void draw_area::size(const scm::math::vec2i& s)
 {
     _size = s;
 }
 
-const math::vec2i_t& draw_area::size() const
+const scm::math::vec2i& draw_area::size() const
 {
     return (_size);
 }

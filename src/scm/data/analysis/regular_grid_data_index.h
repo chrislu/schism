@@ -10,7 +10,7 @@ namespace scm {
 namespace data {
 
 template<unsigned dimension>
-class regular_grid_data_index : public math::vec<unsigned, dimension>
+class regular_grid_data_index : public scm::math::vec<unsigned, dimension>
 {
 public:
     regular_grid_data_index(const regular_grid_data_index& i);
@@ -26,12 +26,12 @@ protected:
 
     const math::vec<unsigned, dimension>&       _dimensions;
 
-    math::vec<unsigned, dimension>              get_indices_from_linear_index(unsigned index);
-    unsigned                                    get_linear_index_from_indices(const math::vec<unsigned, dimension>& indices);
+    scm::math::vec<unsigned, dimension>         get_indices_from_linear_index(unsigned index);
+    unsigned                                    get_linear_index_from_indices(const scm::math::vec<unsigned, dimension>& indices);
 
 private:
-    regular_grid_data_index(const math::vec<unsigned, dimension>& initial_index,
-                            const math::vec<unsigned, dimension>& dimensions);
+    regular_grid_data_index(const scm::math::vec<unsigned, dimension>& initial_index,
+                            const scm::math::vec<unsigned, dimension>& dimensions);
 
     template <typename val_type, unsigned dimension> friend class regular_grid_data;
 

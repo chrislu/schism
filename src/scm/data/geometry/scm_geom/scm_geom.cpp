@@ -6,8 +6,8 @@ namespace data {
 
 geometry_descriptor::geometry_descriptor()
   : _version(1),
-    _geometry_origin(0.f),
-    _geometry_scale(1.f)
+    _geometry_origin(0.f, 0.f, 0.f),
+    _geometry_scale(1.f, 1.f, 1.f)
 {
 }
 

@@ -23,8 +23,8 @@ public:
     geometry_descriptor(const geometry_descriptor& /*rhs*/);
     const geometry_descriptor& operator=(const geometry_descriptor&  /*rhs*/);
 
-    math::vec3f_t       _geometry_origin;
-    math::vec3f_t       _geometry_scale;
+    scm::math::vec3f    _geometry_origin;
+    scm::math::vec3f    _geometry_scale;
 
     std::string         _sobj_file;
     std::string         _name;

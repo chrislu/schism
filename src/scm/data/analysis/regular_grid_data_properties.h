@@ -25,16 +25,16 @@ public:
     regular_grid_data_properties<val_type>& operator =(const regular_grid_data_properties<val_type>& rhs);
 
     const scm::data::value_range<val_type>& get_value_range() const;
-    const math::vec<unsigned, 3>&           get_dimensions() const;
-    const math::vec3f_t&                    get_spacing() const;
-    const math::vec3f_t&                    get_origin() const;
+    const scm::math::vec<unsigned, 3>&      get_dimensions() const;
+    const scm::math::vec3f&                 get_spacing() const;
+    const scm::math::vec3f&                 get_origin() const;
 
 protected:
     scm::data::value_range<val_type>        _value_range;
 
-    math::vec<unsigned, 3>                  _dimensions;
-    math::vec3f_t                           _spacing;
-    math::vec3f_t                           _origin;
+    scm::math::vec<unsigned, 3>             _dimensions;
+    scm::math::vec3f                        _spacing;
+    scm::math::vec3f                        _origin;
 
 private:
     friend class regular_grid_data_properties_write_accessor<val_type>;

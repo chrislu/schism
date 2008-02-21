@@ -25,16 +25,16 @@ public:
     void                        background_mode(background_mode_t /*mode*/);
     background_mode_t           background_mode() const;
 
-    void                        background_color(const math::vec4f_t& /*col*/);
-    const math::vec4f_t&        background_color() const;
+    void                        background_color(const scm::math::vec4f& /*col*/);
+    const scm::math::vec4f&     background_color() const;
 
-    void                        content_margins(const math::vec4i_t& /*margins*/);
-    const math::vec4i_t&        content_margins() const;
+    void                        content_margins(const scm::math::vec4i& /*margins*/);
+    const scm::math::vec4i&     content_margins() const;
 
 protected:
-    math::vec4i_t               _content_margins; // l, r, b, t
+    scm::math::vec4i            _content_margins; // l, r, b, t
     background_mode_t           _background_mode;
-    math::vec4f_t               _background_color;
+    scm::math::vec4f            _background_color;
 
 private:
 

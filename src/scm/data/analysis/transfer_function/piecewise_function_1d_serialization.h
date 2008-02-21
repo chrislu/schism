@@ -2,7 +2,6 @@
 #ifndef PIECEWISE_FUNCTION_1D_SERIALIZATION_H_INCLUDED
 #define PIECEWISE_FUNCTION_1D_SERIALIZATION_H_INCLUDED
 
-#include <scm/core/math/vec_serialization.h>
 #include <boost/format.hpp>
 
 #include <boost/spirit.hpp>

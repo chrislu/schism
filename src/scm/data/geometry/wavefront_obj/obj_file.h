@@ -21,13 +21,13 @@ struct __scm_export(data) wavefront_material
 {
     wavefront_material();
 
-    float           _Ns;
-    float           _Ni;
-    math::vec4f_t   _Ka;
-    math::vec4f_t   _Kd;
-    math::vec4f_t   _Ks;
-    math::vec4f_t   _Tf;
-    float           _d;
+    float               _Ns;
+    float               _Ni;
+    scm::math::vec4f    _Ka;
+    scm::math::vec4f    _Kd;
+    scm::math::vec4f    _Ks;
+    scm::math::vec4f    _Tf;
+    float               _d;
 }; // struct wavefront_material
 
 struct wavefront_object_triangle_face
@@ -81,9 +81,9 @@ struct wavefront_model
     std::size_t                                 _num_normals;
     std::size_t                                 _num_tex_coords;
 
-    scm::core::shared_array<math::vec3f_t>      _vertices;
-    scm::core::shared_array<math::vec3f_t>      _normals;
-    scm::core::shared_array<math::vec2f_t>      _tex_coords;
+    scm::core::shared_array<scm::math::vec3f>   _vertices;
+    scm::core::shared_array<scm::math::vec3f>   _normals;
+    scm::core::shared_array<scm::math::vec2f>   _tex_coords;
 
     material_container                          _materials;
 
