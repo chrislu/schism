@@ -17,16 +17,16 @@ inline mat<scal_type, 3, 3>::mat(const mat<scal_type, 3, 3>& m)
     std::copy(m.data_array, m.data_array + 9, data_array);
 }
 
-template<typename scal_type>
-inline mat<scal_type, 3, 3>::mat(const scal_type a[9])
-{
-    std::copy(a, a + 9, data_array);
-}
+//template<typename scal_type>
+//inline mat<scal_type, 3, 3>::mat(const scal_type a[9])
+//{
+//    std::copy(a, a + 9, data_array);
+//}
 
 template<typename scal_type>
 inline mat<scal_type, 3, 3>::mat(const scal_type a00, const scal_type a01, const scal_type a02,
                                  const scal_type a03, const scal_type a04, const scal_type a05,
-                                 const scal_type a06, const scal_type a07, const scal_type a08)  
+                                 const scal_type a06, const scal_type a07, const scal_type a08)
   : m00(a00), m01(a01), m02(a02),
     m03(a03), m04(a04), m05(a05),
     m06(a06), m07(a07), m08(a08)
@@ -54,14 +54,14 @@ inline mat<scal_type, 3, 3>::mat(const mat<rhs_scal_t, 3, 3>& m)
 
 // constants
 template<typename scal_type>
-/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::null_mat      = mat<scal_type, 4, 4>(0.f, 0.f, 0.f,
-                                                                                                 0.f, 0.f, 0.f,
-                                                                                                 0.f, 0.f, 0.f);
+/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::null_mat      = mat<scal_type, 3, 3>(scal_type(0), scal_type(0), scal_type(0),
+                                                                                                 scal_type(0), scal_type(0), scal_type(0),
+                                                                                                 scal_type(0), scal_type(0), scal_type(0));
 
 template<typename scal_type>
-/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::identity      = mat<scal_type, 4, 4>(1.f, 0.f, 0.f,
-                                                                                                 0.f, 1.f, 0.f,
-                                                                                                 0.f, 0.f, 1.f);
+/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::identity      = mat<scal_type, 3, 3>(scal_type(1), scal_type(0), scal_type(0),
+                                                                                                 scal_type(0), scal_type(1), scal_type(0),
+                                                                                                 scal_type(0), scal_type(0), scal_type(1));
 
 // dtor
 //template<typename scal_type>

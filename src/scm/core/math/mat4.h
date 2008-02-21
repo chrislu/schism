@@ -19,7 +19,7 @@ public:
     // ctors
     mat();
     mat(const mat<scal_type, 4, 4>& m);
-    mat(const scal_type a[16]);
+    //mat(const scal_type a[16]);
 
     explicit mat(const scal_type a00, const scal_type a01, const scal_type a02, const scal_type a03,
                  const scal_type a04, const scal_type a05, const scal_type a06, const scal_type a07,

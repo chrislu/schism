@@ -66,7 +66,7 @@ inline mat<scal_type, order, order>& operator*=(      mat<scal_type, order, orde
 
 template<typename scal_type,
          const unsigned row_dim,
-         unsigned col_dim>
+         const unsigned col_dim>
 inline mat<scal_type, row_dim, col_dim>& operator*=(mat<scal_type, row_dim, col_dim>&   lhs,
                                                     const scal_type                     rhs)
 {
