@@ -138,7 +138,7 @@ template<typename scal_type,
 inline const vec<scal_type, order> operator*(const mat<scal_type, order, order>& lhs,
                                              const vec<scal_type, order>&        rhs)
 {
-    vec<scal_type, order> tmp_ret(scal_type(0), scal_type(0), scal_type(0), scal_type(0));
+    vec<scal_type, order> tmp_ret(scal_type(0));
 
     unsigned    row_off;
 
@@ -163,7 +163,7 @@ template<typename scal_type,
 inline const vec<scal_type, order> operator*(const vec<scal_type, order>&        lhs,
                                              const mat<scal_type, order, order>& rhs)
 {
-    vec<scal_type, order> tmp_ret(scal_type(0), scal_type(0), scal_type(0), scal_type(0));
+    vec<scal_type, order> tmp_ret(scal_type(0));
 
     unsigned    row_off;
 

@@ -17,7 +17,7 @@ public:
     // ctors
     vec();
     vec(const vec<scal_type, 4>& v);
-    vec(const scal_type a[4]);
+    //vec(const scal_type a[4]);
 
     vec(const vec<scal_type, 3>& v,
         const scal_type w);
