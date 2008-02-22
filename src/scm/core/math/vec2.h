@@ -53,10 +53,6 @@ public:
     vec<scal_type, 2>&              operator*=(const vec<scal_type, 2>& v);
     vec<scal_type, 2>&              operator/=(const scal_type          s);
     vec<scal_type, 2>&              operator/=(const vec<scal_type, 2>& v);
-    vec<scal_type, 2>               operator++(int);
-    vec<scal_type, 2>&              operator++();
-    vec<scal_type, 2>               operator--(int);
-    vec<scal_type, 2>&              operator--();
 
     // data definition
     union {

@@ -2,8 +2,6 @@
 #ifndef MATH_VEC_H_INLCUDED
 #define MATH_VEC_H_INLCUDED
 
-#define SCM_MATH_CORRECT_BIN_OPS
-
 namespace scm {
 namespace math {
 
