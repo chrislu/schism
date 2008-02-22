@@ -116,17 +116,17 @@ inline scal_type  mat<scal_type, 3, 3>::operator[](const int i) const
 template<typename scal_type>
 inline vec<scal_type, 3> mat<scal_type, 3, 3>::column(const int i) const
 {
-    return (vec<scal_type, 3>(i * 3,
-                              i * 3 + 1,
-                              i * 3 + 2));
+    return (vec<scal_type, 3>(data_array[i * 3],
+                              data_array[i * 3 + 1],
+                              data_array[i * 3 + 2]));
 }
 
 template<typename scal_type>
 inline vec<scal_type, 3> mat<scal_type, 3, 3>::row(const int i) const
 {
-    return (vec<scal_type, 3>(i,
-                              i + 3,
-                              i + 6));
+    return (vec<scal_type, 3>(data_array[i],
+                              data_array[i + 3],
+                              data_array[i + 6]));
 }
 
 } // namespace math

@@ -109,15 +109,15 @@ inline scal_type  mat<scal_type, 2, 2>::operator[](const int i) const
 template<typename scal_type>
 inline vec<scal_type, 2> mat<scal_type, 2, 2>::column(const int i) const
 {
-    return (vec<scal_type, 2>(i * 2,
-                              i * 2 + 1));
+    return (vec<scal_type, 2>(data_array[i * 2],
+                              data_array[i * 2 + 1]));
 }
 
 template<typename scal_type>
 inline vec<scal_type, 2> mat<scal_type, 2, 2>::row(const int i) const
 {
-    return (vec<scal_type, 2>(i,
-                              i + 2));
+    return (vec<scal_type, 2>(data_array[i],
+                              data_array[i + 2]));
 }
 
 } // namespace math

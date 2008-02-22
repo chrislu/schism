@@ -123,19 +123,19 @@ inline scal_type  mat<scal_type, 4, 4>::operator[](const int i) const
 template<typename scal_type>
 inline vec<scal_type, 4> mat<scal_type, 4, 4>::column(const int i) const
 {
-    return (vec<scal_type, 4>(i * 4,
-                              i * 4 + 1,
-                              i * 4 + 2,
-                              i * 4 + 3));
+    return (vec<scal_type, 4>(data_array[i * 4],
+                              data_array[i * 4 + 1],
+                              data_array[i * 4 + 2],
+                              data_array[i * 4 + 3]));
 }
 
 template<typename scal_type>
 inline vec<scal_type, 4> mat<scal_type, 4, 4>::row(const int i) const
 {
-    return (vec<scal_type, 4>(i,
-                              i + 4,
-                              i + 8,
-                              i + 12));
+    return (vec<scal_type, 4>(data_array[i],
+                              data_array[i + 4],
+                              data_array[i + 8],
+                              data_array[i + 12]));
 }
 
 } // namespace math
