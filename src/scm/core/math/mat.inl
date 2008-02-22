@@ -134,7 +134,7 @@ operator+(const mat<scal_type, row_dim, col_dim>& lhs,
           const mat<scal_type, row_dim, col_dim>& rhs)
 {
     mat<scal_type, row_dim, col_dim> tmp(lhs);
-    return (mat<scal_type, row_dim, col_dim>(lhs) += rhs);
+    return (tmp += rhs);
 }
 
 template<typename scal_type,
