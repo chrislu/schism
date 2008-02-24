@@ -13,8 +13,12 @@ inline mat<scal_type, 4, 4>::mat()
 
 template<typename scal_type>
 inline mat<scal_type, 4, 4>::mat(const mat<scal_type, 4, 4>& m)
+  : m00(m.m00), m01(m.m01), m02(m.m02), m03(m.m03),
+    m04(m.m04), m05(m.m05), m06(m.m06), m07(m.m07),
+    m08(m.m08), m09(m.m09), m10(m.m10), m11(m.m11),
+    m12(m.m12), m13(m.m13), m14(m.m14), m15(m.m15)
 {
-    std::copy(m.data_array, m.data_array + 16, data_array);
+    //std::copy(m.data_array, m.data_array + 16, data_array);
 }
 
 //template<typename scal_type>
@@ -59,7 +63,7 @@ inline mat<scal_type, 4, 4>::mat(const mat<rhs_scal_t, 4, 4>& m)
 
 // constants
 template<typename scal_type>
-/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::null_mat      = mat<scal_type, 4, 4>(scal_type(0), scal_type(0), scal_type(0), scal_type(0),
+/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::zero          = mat<scal_type, 4, 4>(scal_type(0), scal_type(0), scal_type(0), scal_type(0),
                                                                                                  scal_type(0), scal_type(0), scal_type(0), scal_type(0),
                                                                                                  scal_type(0), scal_type(0), scal_type(0), scal_type(0),
                                                                                                  scal_type(0), scal_type(0), scal_type(0), scal_type(0));

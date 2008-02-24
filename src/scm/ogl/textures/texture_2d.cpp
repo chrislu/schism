@@ -67,6 +67,11 @@ bool texture_2d::tex_image(GLint     mip_level,
     _width  = width;
     _height = height;
 
+    tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+    tex_parameteri(GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+
     this->unbind();
 
     return (true);

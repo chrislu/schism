@@ -101,7 +101,10 @@ operator*(const mat<scal_type, order, order>& lhs,
           const mat<scal_type, order, order>& rhs)
 {
     mat<scal_type, order, order> tmp(lhs);
-    return (tmp *= rhs);
+
+    tmp *= rhs;
+
+    return (tmp);
 }
 
 template<typename scal_type,
@@ -112,7 +115,10 @@ operator*(const mat<scal_type, row_dim, col_dim>& lhs,
           const scal_type                         rhs)
 {
     mat<scal_type, row_dim, col_dim> tmp(lhs);
-    return (tmp *= rhs);
+
+    tmp *= rhs;
+
+    return (tmp);
 }
 
 template<typename scal_type,
@@ -123,7 +129,10 @@ operator/(const mat<scal_type, row_dim, col_dim>& lhs,
           const scal_type                         rhs)
 {
     mat<scal_type, row_dim, col_dim> tmp(lhs);
-    return (tmp /= rhs);
+
+    tmp /= rhs;
+
+    return (tmp);
 }
 
 template<typename scal_type,
@@ -134,7 +143,10 @@ operator+(const mat<scal_type, row_dim, col_dim>& lhs,
           const mat<scal_type, row_dim, col_dim>& rhs)
 {
     mat<scal_type, row_dim, col_dim> tmp(lhs);
-    return (tmp += rhs);
+
+    tmp += rhs;
+
+    return (tmp);
 }
 
 template<typename scal_type,
@@ -145,7 +157,10 @@ operator-(const mat<scal_type, row_dim, col_dim>& lhs,
           const mat<scal_type, row_dim, col_dim>& rhs)
 {
     mat<scal_type, row_dim, col_dim> tmp(lhs);
-    return (tmp -= rhs);
+
+    tmp -= rhs;
+
+    return (tmp);
 }
 
 template<typename scal_type,
@@ -293,7 +308,7 @@ inline scal_type determinant(const mat<scal_type, order, order>& lhs)
 template<typename scal_type, const unsigned order>
 inline const mat<scal_type, order, order> inverse(const mat<scal_type, order, order>& lhs)
 {
-    mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::null_mat);
+    mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::zero);
     scal_type                    tmp_det = determinant(lhs);
 
     unsigned dst_off;
