@@ -149,7 +149,7 @@ void art_dtrack::update(target_container& targets)
     target_container::iterator  target_it;
 
     scm::math::mat4f  track_to_opengl(scm::math::mat4f::identity);
-    scm::math::rotate(track_to_opengl, -90.0f, 1.f, 0.f, 0.f);
+    //scm::math::rotate(track_to_opengl, -180.0f, 0.f, 1.f, 0.f);
 
 
     for (unsigned i = 0; i < max_bodies; ++i) {
