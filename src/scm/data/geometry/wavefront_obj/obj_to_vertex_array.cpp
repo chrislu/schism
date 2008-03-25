@@ -38,6 +38,8 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
         return (false);
     }
 
+    using namespace scm::math;
+    
     typedef std::map<obj_vert_index, unsigned>      index_mapping;
     typedef index_mapping::value_type               index_value;
 
@@ -73,6 +75,9 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
     unsigned new_index      = 0;
     unsigned iarray_index   = 0;
 
+    vec3f::value_type    max_val = (std::numeric_limits<vec3f::value_type>::max)();
+    vec3f::value_type    min_val = (std::numeric_limits<vec3f::value_type>::max)();
+
     foreach (const wavefront_object& wf_obj, in_obj._objects) {
         foreach (const wavefront_object_group& wf_obj_grp, wf_obj._groups) {
 
@@ -87,11 +92,8 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
             out_data._bboxes.push_back(aabbox());
             vertexbuffer_data::bbox_container::value_type& cur_bbox = out_data._bboxes.back();
 
-            scm::math::vec3f::value_type    max_val = (std::numeric_limits<scm::math::vec3f::value_type>::max)();
-            scm::math::vec3f::value_type    min_val = (std::numeric_limits<scm::math::vec3f::value_type>::max)();
-
-            cur_bbox._min   = scm::math::vec3f(max_val, max_val, max_val);
-            cur_bbox._max   = scm::math::vec3f(min_val, min_val, min_val);
+            cur_bbox._min   = vec3f(max_val, max_val, max_val);
+            cur_bbox._max   = vec3f(min_val, min_val, min_val);
 
             for (unsigned i = 0; i < wf_obj_grp._num_tri_faces; ++i) {
                 const wavefront_object_triangle_face& cur_face = wf_obj_grp._tri_faces[i];
@@ -102,7 +104,7 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
                                               in_obj._num_normals    != 0 ? cur_face._normals[k] : 0);
                     
                     // update bounding box
-                    const scm::math::vec3f& cur_vert = in_obj._vertices[cur_index._v - 1];
+                    const vec3f& cur_vert = in_obj._vertices[cur_index._v - 1];
 
                     for (unsigned c = 0; c < 3; ++c) {
                         cur_bbox._min[c] = cur_vert[c] < cur_bbox._min[c] ? cur_vert[c] : cur_bbox._min[c];
