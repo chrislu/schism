@@ -61,15 +61,15 @@ void axes_compass::render() const
             glBegin(GL_LINES);
             glColor3f( 1, 0, 0);
             glVertex3f(0, 0, 0);
-            glVertex3fv(&x_axis);
+            glVertex3fv(x_axis.data_array);
 
             glColor3f( 0, 1, 0);
             glVertex3f(0, 0, 0);
-            glVertex3fv(&y_axis);
+            glVertex3fv(y_axis.data_array);
 
             glColor3f( 0, 0, 1);
             glVertex3f(0, 0, 0);
-            glVertex3fv(&z_axis);
+            glVertex3fv(z_axis.data_array);
             glEnd();
 
         glPopMatrix();

@@ -48,8 +48,8 @@ public:
     mat<scal_type, 3, 3>&           operator=(const mat<rhs_scal_t, 3, 3>& rhs);
 
     // data access
-    inline scal_type*const          operator&()         { return (data_array); }
-    inline const scal_type*const    operator&() const   { return (data_array); }
+    //inline scal_type*const          operator&()         { return (data_array); }
+    //inline const scal_type*const    operator&() const   { return (data_array); }
 
     // index
     inline scal_type&               operator[](const int i);

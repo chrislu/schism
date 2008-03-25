@@ -161,6 +161,8 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     bool            object_definition_started       = false;
     bool            grpmtl_defined                  = false;
 
+    std::string     last_used_material              = "default";
+
     wavefront_model::object_container::iterator     cur_obj_it = out_obj.add_new_object();;
     wavefront_object::group_container::iterator     cur_grp_it = cur_obj_it->add_new_group();
 
@@ -247,15 +249,16 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     line >> tag;
 
                     if (tag == std::string("usemtl")) {
-                        if (grpmtl_defined) {
+                        /*if (grpmtl_defined) {
                             cur_grp_it = cur_obj_it->add_new_group();
-                        }
+                        }*/
 
                         std::string mat_name;
                         line >> mat_name;
+                        last_used_material = mat_name;
 
-                        cur_grp_it->_material_name  =  mat_name;
-                        cur_grp_it->_name           += cur_grp_it->_material_name;
+                        /*cur_grp_it->_material_name  =  mat_name;
+                        cur_grp_it->_name           += cur_grp_it->_material_name;*/
 
                         grpmtl_defined = true;
                     }
@@ -369,18 +372,26 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                     line.putback(line_id);
                     line >> tag;
 
-                    if (tag == std::string("usemtl")) {
-                        if (grpmtl_defined) {
+                    if (tag == std::string("usemtl")) 
+                    {
+                      std::string mat_name;
+                      line >> mat_name;
+                      last_used_material = mat_name;
+
+                       /* if (grpmtl_defined) {
                             ++cur_grp_it;
                             next_face_index = 0;
                         }
 
-                        grpmtl_defined = true;
+                        */
+                      grpmtl_defined = true;
                     }
                 }
                 break;
             case 'f': {
                     wavefront_object_triangle_face& t = cur_grp_it->_tri_faces[next_face_index++];
+
+                    t._material_name = last_used_material;
 
                     for (unsigned i = 0; i < 3; ++i) {
                         

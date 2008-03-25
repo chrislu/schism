@@ -105,12 +105,12 @@ inline void scale(mat<scal_type, 4, 4>&        m,
 
 inline void get_gl_matrix(const int type, mat<float, 4, 4>& m)
 {
-    glGetFloatv(type, &m);
+    glGetFloatv(type, m.data_array);
 }
 
 inline void get_gl_matrix(const int type, mat<double, 4, 4>& m)
 {
-    glGetDoublev(type, &m);
+    glGetDoublev(type, m.data_array);
 }
 
 // TBD

@@ -87,7 +87,7 @@ void trackball_manipulator::dolly(float y) {
 
 void trackball_manipulator::apply_transform() const {
     glTranslatef(0,0,_dolly);
-    glMultMatrixf(&_matrix);
+    glMultMatrixf(_matrix.data_array);
 }
 
 const scm::math::mat4f trackball_manipulator::get_transform_matrix() const

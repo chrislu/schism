@@ -21,20 +21,21 @@ struct __scm_export(data) wavefront_material
 {
     wavefront_material();
 
-    float               _Ns;
-    float               _Ni;
-    scm::math::vec4f    _Ka;
-    scm::math::vec4f    _Kd;
-    scm::math::vec4f    _Ks;
-    scm::math::vec4f    _Tf;
-    float               _d;
+    float             _Ns;
+    float             _Ni;
+    scm::math::vec4f  _Ka;
+    scm::math::vec4f  _Kd;
+    scm::math::vec4f  _Ks;
+    scm::math::vec4f  _Tf;
+    float             _d;
 }; // struct wavefront_material
 
 struct wavefront_object_triangle_face
 {
     unsigned    _vertices[3];
     unsigned    _normals[3];
-    unsigned    _tex_coords[3];        
+    unsigned    _tex_coords[3];  
+    std::string _material_name;
 }; // struct wavefront_object_triangle_face
 
 struct wavefront_object_group

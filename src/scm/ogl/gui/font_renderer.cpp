@@ -98,7 +98,7 @@ void font_renderer::draw_string(const scm::math::vec2i&      pos,
         }
 
         // draw glyph
-        glColor4fv(&col);
+        glColor4fv(col.data_array);
         draw_quad(current_pos + cur_glyph._bearing,
                   current_pos + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
                   cur_glyph._tex_lower_left,
@@ -127,7 +127,7 @@ void font_renderer::draw_string(const scm::math::vec2i&      pos,
         }
 
         // draw underline
-        glColor4fv(&col);
+        glColor4fv(col.data_array);
         glBegin(GL_LINES);
             glVertex2i(pos.x, pos.y + cur_style.get_underline_position());
             glVertex2i(current_pos.x, pos.y + cur_style.get_underline_position());

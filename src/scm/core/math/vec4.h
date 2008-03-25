@@ -42,8 +42,8 @@ public:
     vec<scal_type, 4>&              operator=(const vec<rhs_scal_t, 4>& rhs);
 
     // data access
-    inline scal_type*const          operator&()          { return (data_array); }
-    inline const scal_type*const    operator&() const    { return (data_array); }
+    //inline scal_type*const          operator&()          { return (data_array); }
+    //inline const scal_type*const    operator&() const    { return (data_array); }
 
     // index
     inline scal_type&               operator[](const int i)         { return data_array[i]; };
