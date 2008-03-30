@@ -1,4 +1,15 @@
 
+namespace std {
+
+template<typename scal_type, const unsigned dim>
+inline void swap(scm::math::vec<scal_type, dim>& lhs,
+                 scm::math::vec<scal_type, dim>& rhs)
+{
+    lhs.swap(rhs);
+}
+
+} // namespace std
+
 namespace scm {
 namespace math {
 

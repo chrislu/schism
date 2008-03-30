@@ -2,6 +2,19 @@
 #include <scm/core/math/common.h>
 #include <scm/core/math/vec_fwd.h>
 
+namespace std {
+
+template<typename scal_type,
+         const unsigned row_dim,
+         const unsigned col_dim>
+inline void swap(scm::math::mat<scal_type, row_dim, col_dim>& lhs,
+                 scm::math::mat<scal_type, row_dim, col_dim>& rhs)
+{
+    lhs.swap(rhs);
+}
+
+} // namespace std
+
 namespace scm {
 namespace math {
 

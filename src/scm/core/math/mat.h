@@ -43,6 +43,16 @@ public:
 } // namespace math
 } // namespace scm
 
+namespace std {
+
+template<typename scal_type,
+         const unsigned row_dim,
+         const unsigned col_dim>
+void swap(scm::math::mat<scal_type, row_dim, col_dim>& lhs,
+          scm::math::mat<scal_type, row_dim, col_dim>& rhs);
+
+} // namespace std
+
 #include "mat.inl"
 
 #endif // MATH_MAT_H_INCLUDED
