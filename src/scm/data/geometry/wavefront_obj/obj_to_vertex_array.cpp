@@ -76,7 +76,7 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
     unsigned iarray_index   = 0;
 
     vec3f::value_type    max_val = (std::numeric_limits<vec3f::value_type>::max)();
-    vec3f::value_type    min_val = (std::numeric_limits<vec3f::value_type>::max)();
+    vec3f::value_type    min_val = (std::numeric_limits<vec3f::value_type>::min)();
 
     foreach (const wavefront_object& wf_obj, in_obj._objects) {
         foreach (const wavefront_object_group& wf_obj_grp, wf_obj._groups) {
