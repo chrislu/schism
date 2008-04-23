@@ -6,6 +6,8 @@
 #include <cmath>
 #include <limits>
 
+#include <scm/core/int_types.h>
+
 namespace scm {
 namespace math {
 
@@ -113,17 +115,79 @@ inline scal_type deg2rad(const scal_type deg)
 template<typename int_type>
 inline bool is_power_of_two(int_type x)
 {
-    assert(    std::numeric_limits<int_type>::is_integer()
-           && !std::numeric_limits<int_type>::is_signed());
+    assert(    std::numeric_limits<int_type>::is_integer
+           && !std::numeric_limits<int_type>::is_signed);
 
     return (! ( x & (x-1)));
+}
+
+// From: http://tekpool.wordpress.com/category/bit-count/
+template<typename int_type>
+inline unsigned bit_count(int_type x)
+{
+    assert(    std::numeric_limits<int_type>::is_integer
+           &&  sizeof(int_type) == 4);
+
+    int& i = *static_cast<int*>(&x);
+    unsigned count;
+
+    count =     i
+            - ((i >> 1) & 033333333333)
+            - ((i >> 2) & 011111111111);
+
+    return (((count + (count >> 3)) & 030707070707) % 63);
+}
+
+template<typename int_type>
+inline unsigned first_zero_bit(int_type x)
+{
+    assert(    std::numeric_limits<int_type>::is_integer
+           &&  sizeof(int_type) == 4);
+
+    int& i = *static_cast<int*>(&x);
+
+    i = ~i;
+
+    return bit_count((i & (-i)) - 1);
+}
+
+template<typename int_type>
+inline int floor_log2(int_type x)
+{
+    assert(    std::numeric_limits<int_type>::is_integer
+           && !std::numeric_limits<int_type>::is_signed
+           &&  sizeof(int_type) == 4);
+
+    int pos = 0;
+
+    if (x >= scm::core::uint32_t(1) << 16) { x >>= 16; pos += 16; }
+    if (x >= scm::core::uint32_t(1) << 8)  { x >>=  8; pos +=  8; }
+    if (x >= scm::core::uint32_t(1) << 4)  { x >>=  4; pos +=  4; }
+    if (x >= scm::core::uint32_t(1) << 2)  { x >>=  2; pos +=  2; }
+    if (x >= scm::core::uint32_t(1) << 1)  {           pos +=  1; }
+
+    return ((x == 0) ? (-1) : pos);
+}
+
+inline int floor_log2(scm::core::uint64_t x)
+{
+    int pos = 0;
+
+    if (x >= scm::core::uint64_t(1) << 32) { x >>= 32; pos += 32; }
+    if (x >= scm::core::uint64_t(1) << 16) { x >>= 16; pos += 16; }
+    if (x >= scm::core::uint64_t(1) << 8)  { x >>=  8; pos +=  8; }
+    if (x >= scm::core::uint64_t(1) << 4)  { x >>=  4; pos +=  4; }
+    if (x >= scm::core::uint64_t(1) << 2)  { x >>=  2; pos +=  2; }
+    if (x >= scm::core::uint64_t(1) << 1)  {           pos +=  1; }
+
+    return ((x == 0) ? (-1) : pos);
 }
 
 template<typename int_type>
 inline unsigned next_power_of_two(int_type x)
 {
-    assert(    std::numeric_limits<int_type>::is_integer()
-           && !std::numeric_limits<int_type>::is_signed()
+    assert(    std::numeric_limits<int_type>::is_integer
+           && !std::numeric_limits<int_type>::is_signed
            &&  sizeof(int_type) == 4);
 
     --x;
