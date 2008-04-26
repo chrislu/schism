@@ -160,25 +160,25 @@ inline int floor_log2(int_type x)
 
     int pos = 0;
 
-    if (x >= scm::core::uint32_t(1) << 16) { x >>= 16; pos += 16; }
-    if (x >= scm::core::uint32_t(1) << 8)  { x >>=  8; pos +=  8; }
-    if (x >= scm::core::uint32_t(1) << 4)  { x >>=  4; pos +=  4; }
-    if (x >= scm::core::uint32_t(1) << 2)  { x >>=  2; pos +=  2; }
-    if (x >= scm::core::uint32_t(1) << 1)  {           pos +=  1; }
+    if (x >= scm::uint32(1) << 16) { x >>= 16; pos += 16; }
+    if (x >= scm::uint32(1) << 8)  { x >>=  8; pos +=  8; }
+    if (x >= scm::uint32(1) << 4)  { x >>=  4; pos +=  4; }
+    if (x >= scm::uint32(1) << 2)  { x >>=  2; pos +=  2; }
+    if (x >= scm::uint32(1) << 1)  {           pos +=  1; }
 
     return ((x == 0) ? (-1) : pos);
 }
 
-inline int floor_log2(scm::core::uint64_t x)
+inline int floor_log2(scm::uint64 x)
 {
     int pos = 0;
 
-    if (x >= scm::core::uint64_t(1) << 32) { x >>= 32; pos += 32; }
-    if (x >= scm::core::uint64_t(1) << 16) { x >>= 16; pos += 16; }
-    if (x >= scm::core::uint64_t(1) << 8)  { x >>=  8; pos +=  8; }
-    if (x >= scm::core::uint64_t(1) << 4)  { x >>=  4; pos +=  4; }
-    if (x >= scm::core::uint64_t(1) << 2)  { x >>=  2; pos +=  2; }
-    if (x >= scm::core::uint64_t(1) << 1)  {           pos +=  1; }
+    if (x >= scm::uint64(1) << 32) { x >>= 32; pos += 32; }
+    if (x >= scm::uint64(1) << 16) { x >>= 16; pos += 16; }
+    if (x >= scm::uint64(1) << 8)  { x >>=  8; pos +=  8; }
+    if (x >= scm::uint64(1) << 4)  { x >>=  4; pos +=  4; }
+    if (x >= scm::uint64(1) << 2)  { x >>=  2; pos +=  2; }
+    if (x >= scm::uint64(1) << 1)  {           pos +=  1; }
 
     return ((x == 0) ? (-1) : pos);
 }

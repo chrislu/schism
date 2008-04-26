@@ -84,9 +84,9 @@ bool generate_vertex_buffer(const wavefront_model&               in_obj,
             iarray_index   = 0;
 
             // initialize index array
-            out_data._index_arrays.push_back(boost::shared_array<core::uint32_t>());
+            out_data._index_arrays.push_back(boost::shared_array<scm::uint32>());
             vertexbuffer_data::index_array_container::value_type& cur_index_array = out_data._index_arrays.back();
-            cur_index_array.reset(new core::uint32_t[*cur_index_count]);
+            cur_index_array.reset(new scm::uint32[*cur_index_count]);
 
             // initialize bbox
             out_data._bboxes.push_back(aabbox());

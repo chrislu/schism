@@ -23,7 +23,7 @@ struct aabbox
 struct vertexbuffer_data
 {
     typedef std::vector<std::size_t>                            index_counts_container;
-    typedef std::vector<boost::shared_array<core::uint32_t> >   index_array_container;
+    typedef std::vector<boost::shared_array<scm::uint32> >      index_array_container;
     typedef std::vector<wavefront_material>                     material_container;
     typedef std::vector<aabbox>                                 bbox_container;
 

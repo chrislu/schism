@@ -35,7 +35,7 @@ typedef boost::date_time::subsecond_duration<boost::posix_time::time_duration, 1
 using boost::posix_time::nanosec;
 #endif
 
-typedef scm::core::uint64_t             time_stamp;
+typedef scm::uint64     time_stamp;
 
 inline double to_seconds(time_duration dur) {
     return (static_cast<double>(dur.total_nanoseconds()) * 0.000000001);
