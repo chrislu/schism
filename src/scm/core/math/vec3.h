@@ -19,6 +19,10 @@ public:
     vec(const vec<scal_type, 3>& v);
     //vec(const scal_type a[3]);
 
+    vec(const vec<scal_type, 2>& v,
+        const scal_type          z = scal_type(0));
+    vec(const vec<scal_type, 4>& v);
+
     explicit vec(const scal_type s);
     explicit vec(const scal_type s,
                  const scal_type t,

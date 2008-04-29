@@ -26,11 +26,18 @@ inline vec<scal_type, 4>::vec(const vec<scal_type, 4>& v)
 //}
 
 template<typename scal_type>
-inline vec<scal_type, 4>::vec(const vec<scal_type, 3>& v,
-                              const scal_type w)
-  : w(w)
+inline vec<scal_type, 4>::vec(const vec<scal_type, 2>& v,
+                              const scal_type          z,
+                              const scal_type          w)
+  : x(v.x), y(v.y), z(z), w(w)
 {
-    std::copy(v.data_array, v.data_array + 3, data_array);
+}
+
+template<typename scal_type>
+inline vec<scal_type, 4>::vec(const vec<scal_type, 3>& v,
+                              const scal_type          w)
+  : x(v.x), y(v.y), z(v.z), w(w)
+{
 }
 
 template<typename scal_type>

@@ -17,6 +17,17 @@ inline vec<scal_type, 2>::vec(const vec<scal_type, 2>& v)
     //std::copy(v.data_array, v.data_array + 2, data_array);
 }
 
+template<typename scal_type>
+inline vec<scal_type, 2>::vec(const vec<scal_type, 3>& v)
+  : x(v.x), y(v.y)
+{
+}
+template<typename scal_type>
+inline vec<scal_type, 2>::vec(const vec<scal_type, 4>& v)
+  : x(v.x), y(v.y)
+{
+}
+
 //template<typename scal_type>
 //inline vec<scal_type, 2>::vec(const scal_type a[2])
 //{
