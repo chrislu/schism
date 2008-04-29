@@ -2,6 +2,7 @@
 #ifndef INT_TYPES_H_INCLUDED
 #define INT_TYPES_H_INCLUDED
 
+#include <cstddef>
 #include <boost/cstdint.hpp>
 
 namespace scm {
@@ -22,6 +23,8 @@ typedef boost::uint32_t     uint32;
 // 64bit integer types
 typedef boost::int64_t      int64;
 typedef boost::uint64_t     uint64;
+
+typedef std::size_t         size_t;
 
 //} // namespace core
 } // namespace scm
