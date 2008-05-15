@@ -8,7 +8,7 @@ namespace inp {
 
 target::target(std::size_t id)
   : _id(id),
-  _transform(scm::math::mat4f::identity)
+    _transform(scm::math::mat4f::identity())
 {
 }
 

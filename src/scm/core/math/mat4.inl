@@ -63,16 +63,26 @@ inline mat<scal_type, 4, 4>::mat(const mat<rhs_scal_t, 4, 4>& m)
 
 // constants
 template<typename scal_type>
-/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::zero          = mat<scal_type, 4, 4>(scal_type(0), scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0), scal_type(0));
+const mat<scal_type, 4, 4>& mat<scal_type, 4, 4>::zero()
+{
+    static mat<scal_type, 4, 4> zero_(scal_type(0), scal_type(0), scal_type(0), scal_type(0),
+                                      scal_type(0), scal_type(0), scal_type(0), scal_type(0),
+                                      scal_type(0), scal_type(0), scal_type(0), scal_type(0),
+                                      scal_type(0), scal_type(0), scal_type(0), scal_type(0));
+
+    return (zero_);
+}
 
 template<typename scal_type>
-/*static*/ const mat<scal_type, 4, 4> mat<scal_type, 4, 4>::identity      = mat<scal_type, 4, 4>(scal_type(1), scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(1), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(1), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0), scal_type(1));
+const mat<scal_type, 4, 4>& mat<scal_type, 4, 4>::identity()
+{
+    static mat<scal_type, 4, 4> identity_(scal_type(1), scal_type(0), scal_type(0), scal_type(0),
+                                          scal_type(0), scal_type(1), scal_type(0), scal_type(0),
+                                          scal_type(0), scal_type(0), scal_type(1), scal_type(0),
+                                          scal_type(0), scal_type(0), scal_type(0), scal_type(1));
+
+    return (identity_);
+}
 
 // dtor
 //template<typename scal_type>

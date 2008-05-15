@@ -148,7 +148,7 @@ void art_dtrack::update(target_container& targets)
     const unsigned              max_bodies = scm::math::min(max_tracked_bodies, boost::numeric_cast<unsigned>(num_tracked_bodies));
     target_container::iterator  target_it;
 
-    scm::math::mat4f  track_to_opengl(scm::math::mat4f::identity);
+    scm::math::mat4f  track_to_opengl(scm::math::mat4f::identity());
     //scm::math::rotate(track_to_opengl, -180.0f, 0.f, 1.f, 0.f);
 
 

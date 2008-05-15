@@ -57,14 +57,24 @@ inline mat<scal_type, 3, 3>::mat(const mat<rhs_scal_t, 3, 3>& m)
 
 // constants
 template<typename scal_type>
-/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::zero          = mat<scal_type, 3, 3>(scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(0));
+const mat<scal_type, 3, 3>& mat<scal_type, 3, 3>::zero()
+{
+    static mat<scal_type, 3, 3> zero_(scal_type(0), scal_type(0), scal_type(0),
+                                      scal_type(0), scal_type(0), scal_type(0),
+                                      scal_type(0), scal_type(0), scal_type(0));
+
+    return (zero_);
+}
 
 template<typename scal_type>
-/*static*/ const mat<scal_type, 3, 3> mat<scal_type, 3, 3>::identity      = mat<scal_type, 3, 3>(scal_type(1), scal_type(0), scal_type(0),
-                                                                                                 scal_type(0), scal_type(1), scal_type(0),
-                                                                                                 scal_type(0), scal_type(0), scal_type(1));
+const mat<scal_type, 3, 3>& mat<scal_type, 3, 3>::identity()
+{
+    static mat<scal_type, 3, 3> identity_(scal_type(1), scal_type(0), scal_type(0),
+                                          scal_type(0), scal_type(1), scal_type(0),
+                                          scal_type(0), scal_type(0), scal_type(1));
+
+    return (identity_);
+}
 
 // dtor
 //template<typename scal_type>

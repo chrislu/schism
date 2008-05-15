@@ -31,8 +31,8 @@ public:
     explicit mat(const mat<rhs_scal_t, 2, 2>& m);
 
     // constants
-    static const mat<scal_type, 2, 2>   zero;
-    static const mat<scal_type, 2, 2>   identity;
+    static const mat<scal_type, 2, 2>&  zero();
+    static const mat<scal_type, 2, 2>&  identity();
 
     // dtor
     //~mat();

@@ -321,7 +321,7 @@ inline scal_type determinant(const mat<scal_type, order, order>& lhs)
 template<typename scal_type, const unsigned order>
 inline const mat<scal_type, order, order> inverse(const mat<scal_type, order, order>& lhs)
 {
-    mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::zero);
+    mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::zero());
     scal_type                    tmp_det = determinant(lhs);
 
     unsigned dst_off;

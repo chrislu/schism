@@ -11,7 +11,7 @@ namespace gl {
 trackball_manipulator::trackball_manipulator()
   : _radius(1.f),
     _dolly(0.f),
-   _matrix(scm::math::mat4f::identity)
+    _matrix(scm::math::mat4f::identity())
 {
 }
 
@@ -56,7 +56,7 @@ void trackball_manipulator::rotation(float fx, float fy, float tx, float ty)
     // equal length) a = asin(d/2*r) --> result is in radians
     float           rot_angl = 2.0f * asin(clamp(diff_len/(2.0f * _radius), -1.0f, 1.0f));
 
-    mat4f tmp(mat4f::identity);
+    mat4f tmp(mat4f::identity());
 
     rotate(tmp, rad2deg(rot_angl), rot_axis);
 
@@ -71,7 +71,7 @@ void trackball_manipulator::translation(float x, float y)
     float near_dist = 1.f; // rough estimate, maybe construct this better
                            // from the projection matrix
 
-    mat4f tmp(mat4f::identity);
+    mat4f tmp(mat4f::identity());
 
     translate(tmp,
               x * (near_dist + dolly_abs),
@@ -94,7 +94,7 @@ const scm::math::mat4f trackball_manipulator::get_transform_matrix() const
 {
     using namespace scm::math;
 
-    mat4f tmp_ret(mat4f::identity);
+    mat4f tmp_ret(mat4f::identity());
 
     translate(tmp_ret, 0.f, 0.f, _dolly);
 
