@@ -24,6 +24,8 @@ class high_res_time_stamp;
 class __scm_export(core) time_system : public scm::core::system
 {
 public:
+
+public:
     time_system();
     virtual ~time_system();
 
@@ -31,6 +33,7 @@ public:
     bool                                initialize();
     bool                                shutdown();
 
+public:
     static ptime                        get_local_time();
     static ptime                        get_universal_time();
 
