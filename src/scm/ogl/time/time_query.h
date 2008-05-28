@@ -20,7 +20,7 @@ public:
     void        start();
     void        stop();
 
-    void        collect_result();
+    void        collect_result() const;
 
     static bool is_supported();
 

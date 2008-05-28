@@ -18,6 +18,7 @@ public:
 
     void                start();
     void                stop();
+    void                collect_result() const;
 
 protected:
 

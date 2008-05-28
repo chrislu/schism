@@ -17,13 +17,14 @@ public:
     timer_interface() : _duration(0, 0, 0, 0) {};
     virtual ~timer_interface() {};
 
-    virtual void                start()             = 0;
-    virtual void                stop()              = 0;
+    virtual void                start()                 = 0;
+    virtual void                stop()                  = 0;
+    virtual void                collect_result() const  = 0;
 
-    time_duration               get_time() const { return (_duration); }
+    time_duration               get_time() const { collect_result(); return (_duration); }
 
 protected:
-    time_duration               _duration;
+    mutable time_duration       _duration;
 
 private:
 

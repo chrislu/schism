@@ -30,9 +30,9 @@ void time_query::stop()
     glEndQuery(GL_TIME_ELAPSED_EXT);
 }
 
-void time_query::collect_result()
+void time_query::collect_result() const
 {
-    static GLuint64EXT dur = 0;
+    GLuint64EXT dur = 0;
 
     glGetQueryObjectui64vEXT(_id, GL_QUERY_RESULT, &dur);
 

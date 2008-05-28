@@ -63,7 +63,7 @@ time_stamp time_system::get_time_stamp()
 }
 
 time_duration time_system::get_elapsed_duration(time_stamp start,
-                                                       time_stamp end)
+                                                time_stamp end)
 {
     // look to wrap arounds
     time_stamp  diff((end > start) ? (end - start) : (~start + 1 + end));

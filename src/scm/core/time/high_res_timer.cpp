@@ -27,5 +27,9 @@ void high_res_timer::stop()
                                                   time_system::get_time_stamp());
 }
 
+void high_res_timer::collect_result() const
+{
+}
+
 } // namespace time
 } // namespace scm
