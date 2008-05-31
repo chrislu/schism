@@ -14,6 +14,9 @@ namespace time {
 class __scm_export(core) timer_interface
 {
 public:
+    typedef time_duration       duration_type;
+
+public:
     timer_interface() : _duration(0, 0, 0, 0) {};
     virtual ~timer_interface() {};
 
