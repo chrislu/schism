@@ -28,7 +28,7 @@ box::max_vertex() const
 }
 
 const scm::math::vec3f
-box::centroid() const
+box::center() const
 {
     return ((_max_vertex - _min_vertex) * 0.5f);
 }
