@@ -9,6 +9,24 @@ namespace scm {
 namespace gl {
 
 /*static*/
+box_classifier::classification_type
+box_classifier::classify(const scm::math::vec3f& p,
+                         const box&              b)
+{
+    if (b.min_vertex().x > p.x || p.x > b.max_vertex().x) {
+        return (box_classifier::outside);
+    }
+    if (b.min_vertex().y > p.y || p.y > b.max_vertex().y) {
+        return (box_classifier::outside);
+    }
+    if (b.min_vertex().z > p.z || p.z > b.max_vertex().z) {
+        return (box_classifier::outside);
+    }
+
+    return (box_classifier::inside);
+}
+
+/*static*/
 plane_classifier::classification_type
 plane_classifier::classify(const box&     b,
                            const plane&   p)

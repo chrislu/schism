@@ -14,6 +14,20 @@ class box;
 class frustum;
 class plane;
 
+class __scm_export(ogl) box_classifier
+{
+public:
+    typedef enum {
+        inside,
+        outside,
+        intersect
+    } classification_type;
+
+    static classification_type      classify(const scm::math::vec3f& p,
+                                             const box&     b);
+
+}; // class box_classfier
+
 class __scm_export(ogl) plane_classifier
 {
 public:
