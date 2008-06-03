@@ -27,16 +27,16 @@ plane::operator=(const plane& rhs)
     return (*this);
 }
 
-const scm::math::vec3f&
+const scm::math::vec3f
 plane::normal() const
 {
-    return (_normal);
+    return (scm::math::vec3f(_vector));
 }
 
 scm::math::vec3f::value_type
 plane::distance() const
 {
-    return (_distance);
+    return (_vector.w);
 }
 
 const scm::math::vec4f&

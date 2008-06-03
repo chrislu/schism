@@ -19,21 +19,12 @@ public:
 
     plane&                          operator=(const plane& rhs);
 
-    const scm::math::vec3f&         normal() const;
+    const scm::math::vec3f          normal() const;
     scm::math::vec3f::value_type    distance() const;
     const scm::math::vec4f&         vector() const;
 
 protected:
-    union {
-        struct {
-            scm::math::vec3f                _normal;
-            scm::math::vec3f::value_type    _distance;
-        };
-        // to try on gcc, do not know if he eats this
-        struct {
-            scm::math::vec4f                    _vector;
-        };
-    };
+    scm::math::vec4f                    _vector;
 
 }; // class frustum
 
