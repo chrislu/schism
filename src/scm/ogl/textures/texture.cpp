@@ -10,6 +10,7 @@ texture::texture(const GLenum target)
       _last_error(GL_NO_ERROR),
       _occupied_texture_unit(-1)
 {
+    generate_texture_id();
 }
 
 texture::texture(const texture& tex)
