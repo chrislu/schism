@@ -30,14 +30,6 @@ bool texture_1d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
-    if (get_texture_id() == 0) {
-        generate_texture_id();
-    }
-
-    if (get_texture_id() == 0) {
-        return (false);
-    }
-
     this->bind();
 
     glTexImage1D(get_texture_target(),

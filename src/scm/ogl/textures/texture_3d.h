@@ -5,7 +5,7 @@
 #include <scm/ogl/textures/texture.h>
 
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -32,6 +32,17 @@ public:
                               GLenum    type,
                               const GLvoid *data);
 
+    bool            tex_sub_image(GLint     mip_level,
+                                  GLint     off_x,
+                                  GLint     off_y,
+                                  GLint     off_z,
+                                  GLsizei   width,
+                                  GLsizei   height,
+                                  GLsizei   depth,
+                                  GLenum    format,
+                                  GLenum    type,
+                                  const GLvoid *data);
+
 protected:
     unsigned        _width;
     unsigned        _height;
@@ -44,6 +55,6 @@ private:
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // TEXTURE_3D_H_INCLUDED

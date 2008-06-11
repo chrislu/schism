@@ -46,14 +46,6 @@ bool texture_3d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
-    if (get_texture_id() == 0) {
-        generate_texture_id();
-    }
-
-    if (get_texture_id() == 0) {
-        return (false);
-    }
-
     this->bind();
 
     glTexImage3D(get_texture_target(),
@@ -78,6 +70,34 @@ bool texture_3d::tex_image(GLint     mip_level,
     _width  = width;
     _height = height;
     _depth  = depth;
+
+    this->unbind();
+
+    return (true);
+}
+
+bool texture_3d::tex_sub_image(GLint     mip_level,
+                               GLint     off_x,
+                               GLint     off_y,
+                               GLint     off_z,
+                               GLsizei   width,
+                               GLsizei   height,
+                               GLsizei   depth,
+                               GLenum    format,
+                               GLenum    type,
+                               const GLvoid *data)
+{
+    this->bind();
+
+    glTexSubImage3D(get_texture_target(),
+                    mip_level,
+                    off_x, off_y, off_z,
+                    width, height, depth,
+                    format, type, data);
+
+    if ((_last_error = glGetError()) != GL_NO_ERROR) {
+        return (false);
+    }
 
     this->unbind();
 

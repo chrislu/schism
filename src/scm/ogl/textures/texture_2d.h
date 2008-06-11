@@ -5,7 +5,7 @@
 #include <scm/ogl/textures/texture.h>
 
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -43,6 +43,6 @@ private:
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // TEXTURE_2D_H_INCLUDED
