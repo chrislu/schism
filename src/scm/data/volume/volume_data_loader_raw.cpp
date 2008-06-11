@@ -163,7 +163,7 @@ bool volume_data_loader_raw::read_sub_volume(const scm::math::vec3ui& offset,
         return (false);
     }
 
-    if (!read_sub_volume_data(offset, dimensions, get_data_ptr(target_data).get())) {
+    if (!read_sub_volume_data(offset, dimensions, dimensions, get_data_ptr(target_data).get())) {
         get_data_ptr(target_data).reset();
         return (false);
     }

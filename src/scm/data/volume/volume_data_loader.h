@@ -35,8 +35,10 @@ public:
                                         scm::data::regular_grid_data_3d<unsigned char>& target_data) = 0; 
 
     virtual bool        read_sub_volume_data(const scm::math::vec3ui& offset,
-                                             const scm::math::vec3ui& dimensions,
+                                             const scm::math::vec3ui& read_dimensions,
+                                             const scm::math::vec3ui& buffer_dimensions,
                                              unsigned char*const buffer);
+
 protected:
 
 
