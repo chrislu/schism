@@ -178,6 +178,94 @@ inline vec<scal_type, 3>& vec<scal_type, 3>::operator/=(const vec<scal_type, 3>&
     return (*this);
 }
 
+// unary operators
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator+=(const rhs_scal_t s)
+{
+    x += s;
+    y += s;
+    z += s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator+=(const vec<rhs_scal_t, 3>& v)
+{
+    x += v.x;
+    y += v.y;
+    z += v.z;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator-=(const rhs_scal_t s)
+{
+    x -= s;
+    y -= s;
+    z -= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator-=(const vec<rhs_scal_t, 3>& v)
+{
+    x -= v.x;
+    y -= v.y;
+    z -= v.z;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator*=(const rhs_scal_t s)
+{
+    x *= s;
+    y *= s;
+    z *= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator*=(const vec<rhs_scal_t, 3>& v)
+{
+    x *= v.x;
+    y *= v.y;
+    z *= v.z;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator/=(const rhs_scal_t s)
+{
+    x /= s;
+    y /= s;
+    z /= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 3>& vec<scal_type, 3>::operator/=(const vec<rhs_scal_t, 3>& v)
+{
+    x /= v.x;
+    y /= v.y;
+    z /= v.z;
+
+    return (*this);
+}
 // common functions
 template<typename scal_type>
 inline scal_type dot(const vec<scal_type, 3>& lhs,

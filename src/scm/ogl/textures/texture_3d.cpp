@@ -1,6 +1,8 @@
 
 #include "texture_3d.h"
 
+#include <cassert>
+
 #include <scm/ogl/utilities/error_checker.h>
 
 namespace scm {
@@ -46,6 +48,8 @@ bool texture_3d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
+    gl::error_checker ech;
+
     this->bind();
 
     glTexImage3D(get_texture_target(),
@@ -59,13 +63,14 @@ bool texture_3d::tex_image(GLint     mip_level,
                  type,
                  data);
 
-    //gl::error_checker ech;
+
+    assert(ech.ok());
 
     //if (ech.check_error()) {
     //    std::cout << ech.get_error_string() << std::endl;
-    if ((_last_error = glGetError()) != GL_NO_ERROR) {
-        return (false);
-    }
+    //if ((_last_error = glGetError()) != GL_NO_ERROR) {
+    //    return (false);
+    //}
 
     _width  = width;
     _height = height;

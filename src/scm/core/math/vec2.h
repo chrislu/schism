@@ -57,6 +57,24 @@ public:
     vec<scal_type, 2>&              operator/=(const scal_type          s);
     vec<scal_type, 2>&              operator/=(const vec<scal_type, 2>& v);
 
+    // unary operators
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator+=(const rhs_scal_t          s);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator+=(const vec<rhs_scal_t, 2>& v);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator-=(const rhs_scal_t          s);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator-=(const vec<rhs_scal_t, 2>& v);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator*=(const rhs_scal_t          s);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator*=(const vec<rhs_scal_t, 2>& v);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator/=(const rhs_scal_t          s);
+    template<typename rhs_scal_t>
+    vec<scal_type, 2>&              operator/=(const vec<rhs_scal_t, 2>& v);
+
     // data definition
     union {
         struct {scal_type x, y;};

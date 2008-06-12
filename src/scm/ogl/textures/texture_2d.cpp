@@ -1,6 +1,10 @@
 
 #include "texture_2d.h"
 
+#include <cassert>
+
+#include <scm/ogl/utilities/error_checker.h>
+
 namespace scm {
 namespace gl {
 
@@ -40,6 +44,8 @@ bool texture_2d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
+    gl::error_checker ech;
+
     this->bind();
 
     glTexImage2D(get_texture_target(),
@@ -52,9 +58,11 @@ bool texture_2d::tex_image(GLint     mip_level,
                  type,
                  data);
 
-    if ((_last_error = glGetError()) != GL_NO_ERROR) {
-        return (false);
-    }
+    assert(ech.ok());
+
+    //if ((_last_error = glGetError()) != GL_NO_ERROR) {
+    //    return (false);
+    //}
 
     _width  = width;
     _height = height;

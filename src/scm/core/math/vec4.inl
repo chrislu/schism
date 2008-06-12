@@ -195,6 +195,102 @@ inline vec<scal_type, 4>& vec<scal_type, 4>::operator/=(const vec<scal_type, 4>&
     return (*this);
 }
 
+// unary operators
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator+=(const rhs_scal_t s)
+{
+    x += s;
+    y += s;
+    z += s;
+    w += s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator+=(const vec<rhs_scal_t, 4>& v)
+{
+    x += v.x;
+    y += v.y;
+    z += v.z;
+    w += v.w;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator-=(const rhs_scal_t s)
+{
+    x -= s;
+    y -= s;
+    z -= s;
+    w -= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator-=(const vec<rhs_scal_t, 4>& v)
+{
+    x -= v.x;
+    y -= v.y;
+    z -= v.z;
+    w -= v.w;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator*=(const rhs_scal_t s)
+{
+    x *= s;
+    y *= s;
+    z *= s;
+    w *= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator*=(const vec<rhs_scal_t, 4>& v)
+{
+    x *= v.x;
+    y *= v.y;
+    z *= v.z;
+    w *= v.w;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator/=(const rhs_scal_t s)
+{
+    x /= s;
+    y /= s;
+    z /= s;
+    w /= s;
+
+    return (*this);
+}
+
+template<typename scal_type>
+template<typename rhs_scal_t>
+inline vec<scal_type, 4>& vec<scal_type, 4>::operator/=(const vec<rhs_scal_t, 4>& v)
+{
+    x /= v.x;
+    y /= v.y;
+    z /= v.z;
+    w /= v.w;
+
+    return (*this);
+}
 // common functions
 template<typename scal_type>
 inline scal_type dot(const vec<scal_type, 4>& lhs,

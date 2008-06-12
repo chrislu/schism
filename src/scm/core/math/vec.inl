@@ -187,6 +187,132 @@ operator/(const vec<scal_type, dim>& lhs,
     return (tmp);
 }
 
+// binary operators
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator+(const vec<scal_type, dim>&  lhs,
+          const vec<rhs_scal_t, dim>& rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp += rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator+(const vec<scal_type, dim>& lhs,
+          const rhs_scal_t           rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp += rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator-(const vec<scal_type, dim>&  lhs,
+          const vec<rhs_scal_t, dim>& rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp -= rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator-(const vec<scal_type, dim>& lhs,
+          const rhs_scal_t           rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp -= rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator*(const vec<scal_type, dim>&  lhs,
+          const vec<rhs_scal_t, dim>& rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp *= rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator*(const rhs_scal_t           lhs,
+          const vec<scal_type, dim>& rhs)
+{
+    vec<scal_type, dim> tmp(rhs);
+    
+    tmp *= lhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator*(const vec<scal_type, dim>& lhs,
+          const rhs_scal_t           rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp *= rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator/(const vec<scal_type, dim>&  lhs,
+          const vec<rhs_scal_t, dim>& rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp /= rhs;
+
+    return (tmp);
+}
+
+template<typename scal_type,
+         typename rhs_scal_t,
+         const unsigned dim>
+inline const vec<scal_type, dim>
+operator/(const vec<scal_type, dim>& lhs,
+          const rhs_scal_t           rhs)
+{
+    vec<scal_type, dim> tmp(lhs);
+    
+    tmp /= rhs;
+
+    return (tmp);
+}
 
 template<typename scal_type,
          const unsigned dim>
