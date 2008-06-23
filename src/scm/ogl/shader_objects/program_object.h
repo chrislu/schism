@@ -29,6 +29,8 @@ public:
     void                bind() const;
     void                unbind() const;
 
+    unsigned int        program_id() const;
+
     bool                ok() const {return (_ok); }
     const std::string&  get_linker_output() const { return (_linker_out); }
     const std::string&  get_valitation_output() const { return (_validate_out); }

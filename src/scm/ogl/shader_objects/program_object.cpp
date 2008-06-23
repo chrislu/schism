@@ -114,6 +114,11 @@ void program_object::unbind() const
     glUseProgram(0);
 }
 
+unsigned int program_object::program_id() const
+{
+    return (*_prog);
+}
+
 void program_object::set_uniform_1f(const std::string& param_name, float x) const
 {
     int location = get_uniform_location(param_name);
