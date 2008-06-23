@@ -111,6 +111,8 @@ void program_object::bind() const
 
 void program_object::unbind() const
 {
+    assert(_prog);
+
     glUseProgram(0);
 }
 
