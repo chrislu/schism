@@ -41,9 +41,18 @@ FILE(GLOB HEADER_FILES_FONT_DETAIL              ${SRC_DIR}/font/detail/*.h
 FILE(GLOB SOURCE_FILES_GUI						${SRC_DIR}/gui/*.cpp)
 FILE(GLOB HEADER_FILES_GUI                      ${SRC_DIR}/gui/*.h
                                                 ${SRC_DIR}/gui/*.inl)
+                                                
 FILE(GLOB SOURCE_FILES_GUI_DETAIL				${SRC_DIR}/gui/detail/*.cpp)
 FILE(GLOB HEADER_FILES_GUI_DETAIL               ${SRC_DIR}/gui/detail/*.h
                                                 ${SRC_DIR}/gui/detail/*.inl)
+
+FILE(GLOB SOURCE_FILES_IO                       ${SRC_DIR}/io/*.cpp)
+FILE(GLOB HEADER_FILES_IO                       ${SRC_DIR}/io/*.h
+                                                ${SRC_DIR}/io/*.inl)
+
+FILE(GLOB SOURCE_FILES_IO_DETAIL                ${SRC_DIR}/io/detail/*.cpp)
+FILE(GLOB HEADER_FILES_IO_DETAIL                ${SRC_DIR}/io/detail/*.h
+                                                ${SRC_DIR}/io/detail/*.inl)
 
 FILE(GLOB SOURCE_FILES_MATH                     ${SRC_DIR}/math/*.cpp)
 FILE(GLOB HEADER_FILES_MATH                     ${SRC_DIR}/math/*.h
@@ -101,6 +110,8 @@ SOURCE_GROUP(source_files/font                      FILES ${SOURCE_FILES_FONT}  
 SOURCE_GROUP(source_files/font/detail               FILES ${SOURCE_FILES_FONT_DETAIL}               ${HEADER_FILES_FONT_DETAIL})
 SOURCE_GROUP(source_files/gui						FILES ${SOURCE_FILES_GUI}                       ${HEADER_FILES_GUI})
 SOURCE_GROUP(source_files/gui/detail				FILES ${SOURCE_FILES_GUI_DETAIL}                ${HEADER_FILES_GUI_DETAIL})
+SOURCE_GROUP(source_files/io						FILES ${SOURCE_FILES_IO}                        ${HEADER_FILES_IO})
+SOURCE_GROUP(source_files/io/detail	                FILES ${SOURCE_FILES_IO_DETAIL}                 ${HEADER_FILES_IO_DETAIL})
 SOURCE_GROUP(source_files/math                      FILES ${SOURCE_FILES_MATH}                      ${HEADER_FILES_MATH})
 SOURCE_GROUP(source_files/math/detail               FILES ${SOURCE_FILES_MATH_DETAIL}               ${HEADER_FILES_MATH_DETAIL})
 SOURCE_GROUP(source_files/platform                  FILES ${SOURCE_FILES_PLATFORM}                  ${HEADER_FILES_PLATFORM})
@@ -123,6 +134,8 @@ SET(SOURCE_FILES
     ${SOURCE_FILES_CONSOLE}
     ${SOURCE_FILES_CONSOLE_DETAIL}
     ${SOURCE_FILES_EXCEPTION}
+    ${SOURCE_FILES_IO}
+    ${SOURCE_FILES_IO_DETAIL}
     ${SOURCE_FILES_MATH}
     ${SOURCE_FILES_MATH_DETAIL}
     ${SOURCE_FILES_RESOURCE}
@@ -143,6 +156,8 @@ SET(HEADER_FILES
     ${HEADER_FILES_CONSOLE}
     ${HEADER_FILES_CONSOLE_DETAIL}
     ${HEADER_FILES_EXCEPTION}
+    ${HEADER_FILES_IO}
+    ${HEADER_FILES_IO_DETAIL}
     ${HEADER_FILES_MATH}
     ${HEADER_FILES_MATH_DETAIL}
     ${HEADER_FILES_RESOURCE}
