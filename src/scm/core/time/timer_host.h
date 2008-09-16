@@ -17,7 +17,7 @@ class timer_interface;
 class timer_host : boost::noncopyable
 {
 public:
-    typedef scm::core::shared_ptr<timer_interface>      timer_ptr;
+    typedef scm::shared_ptr<timer_interface>      timer_ptr;
 
     struct timer_info {
         std::string     _name;

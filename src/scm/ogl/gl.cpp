@@ -11,7 +11,7 @@ namespace {
 
 static bool scm_gl_initialized = false;
 
-static scm::core::scoped_ptr<scm::gl::opengl_system>  scm_ogl_sys;
+static scm::scoped_ptr<scm::gl::opengl_system>  scm_ogl_sys;
 
 static std::string  scm_ogl_sys_name = std::string("ogl");
 

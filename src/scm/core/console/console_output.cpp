@@ -40,7 +40,7 @@ void console_out_stream::emit_stream_updated_signal()
 
     std::streamoff          len = end - beg;
 
-    core::scoped_array<char>  buf(new char[len + 1]);
+    scoped_array<char>      buf(new char[len + 1]);
 
     _stream.read(buf.get(), len);
     buf[len] = '\0';

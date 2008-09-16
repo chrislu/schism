@@ -10,7 +10,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 namespace scm {
-namespace core {
+//namespace core {
 
 using boost::scoped_ptr;
 using boost::scoped_array;
@@ -19,7 +19,7 @@ using boost::shared_array;
 using boost::weak_ptr;
 using boost::intrusive_ptr;
 
-} // namespace core
+//} // namespace core
 } // namespace scm
 
 #endif // PTR_TYPES_H_INCLUDED

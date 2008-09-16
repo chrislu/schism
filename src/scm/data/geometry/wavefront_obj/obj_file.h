@@ -43,7 +43,7 @@ struct wavefront_object_group
     wavefront_object_group() : _num_tri_faces(0) {}
 
     std::size_t                                 _num_tri_faces;
-    scm::core::shared_array<wavefront_object_triangle_face>  _tri_faces;
+    scm::shared_array<wavefront_object_triangle_face>  _tri_faces;
 
     std::string                                 _name;
     std::string                                 _material_name;
@@ -82,9 +82,9 @@ struct wavefront_model
     std::size_t                                 _num_normals;
     std::size_t                                 _num_tex_coords;
 
-    scm::core::shared_array<scm::math::vec3f>   _vertices;
-    scm::core::shared_array<scm::math::vec3f>   _normals;
-    scm::core::shared_array<scm::math::vec2f>   _tex_coords;
+    scm::shared_array<scm::math::vec3f>         _vertices;
+    scm::shared_array<scm::math::vec3f>         _normals;
+    scm::shared_array<scm::math::vec2f>         _tex_coords;
 
     material_container                          _materials;
 

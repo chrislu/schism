@@ -7,6 +7,7 @@
 #include <WinNT.h>
 
 #include <scm/core/int_types.h>
+#include <scm/core/ptr_types.h>
 #include <scm/core/io/detail/large_file_device_impl.h>
 
 namespace scm {
@@ -21,23 +22,31 @@ public:
     large_file_device_windows(const large_file_device_windows& rhs);
     virtual ~large_file_device_windows();
 
-    std::streamsize         read(char_type* s,          std::streamsize n);
-    std::streamsize         write(const char_type* s,   std::streamsize n);
+    std::streamsize                 read(char_type* s,          std::streamsize n);
+    std::streamsize                 write(const char_type* s,   std::streamsize n);
 
-    std::streampos          seek(boost::iostreams::stream_offset    off,
-                                 std::ios_base::seek_dir            way);
+    std::streampos                  seek(boost::iostreams::stream_offset    off,
+                                         std::ios_base::seek_dir            way);
 
-    void                    open(const std::string&         file_path,
-                                 std::ios_base::openmode    open_mode,
-                                 bool                       disable_system_cache,
-                                 scm::uint32                read_write_buffer_size);
+    void                            open(const std::string&         file_path,
+                                         std::ios_base::openmode    open_mode,
+                                         bool                       disable_system_cache,
+                                         scm::uint32                read_write_buffer_size);
 
-    bool                    is_open() const;
-    void                    close();
+    bool                            is_open() const;
+    void                            close();
 
 private:
-    HANDLE                  _file_handle;
-    scm::uint64             _current_position;
+    scm::int64                      file_size() const;
+
+private:
+    HANDLE                          _file_handle;
+    scm::int64                      _current_position;
+
+    scm::int32                      _volume_sector_size;
+
+    scm::shared_ptr<scm::uint8>     _read_write_buffer;
+    scm::uint32                     _read_write_buffer_size;
 
 }; // class large_file_device_windows
 

@@ -9,7 +9,7 @@ namespace {
 
 static bool scm_initialized = false;
 
-static scm::core::scoped_ptr<scm::core::root_system>  scm_root_sys;
+static scm::scoped_ptr<scm::core::root_system>  scm_root_sys;
 
 } // namespace
 

@@ -20,8 +20,8 @@ class resource_manager;
 class __scm_export(core) resource_pointer_base
 {
 protected:
-    typedef core::weak_ptr<resource_base>           resource_ptr;
-    typedef core::weak_ptr<resource_manager_base>   manager_ptr;
+    typedef weak_ptr<resource_base>             resource_ptr;
+    typedef weak_ptr<resource_manager_base>     manager_ptr;
 
 public:
     resource_pointer_base();
