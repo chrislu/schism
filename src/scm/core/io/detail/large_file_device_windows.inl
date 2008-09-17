@@ -223,20 +223,22 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
         }
 
         if (write_sector_prefetch_size > 0) {
-            int64 current_pos = _current_position;
+            if (_current_position <= _file_size) {
+                int64 current_pos = _current_position;
 
-            seek(write_beg_file_offset_vss, std::ios_base::beg);
+                seek(write_beg_file_offset_vss, std::ios_base::beg);
 
-            // ok we need some data from the beginning of the sector
-            if (read(_read_write_buffer.get(), write_sector_prefetch_size) < write_sector_prefetch_size) {
-                throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable read data from beginning of sector");
-            }
+                // ok we need some data from the beginning of the sector
+                if (read(_read_write_buffer.get(), write_sector_prefetch_size) < write_sector_prefetch_size) {
+                    throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable read data from beginning of sector");
+                }
 
-            seek(current_pos, std::ios_base::beg);
+                seek(current_pos, std::ios_base::beg);
 
-            // reset the file pointer to the beginning of the volume sector
-            if (!set_file_pointer(write_beg_file_offset_vss)) {
-                throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable to set file pointer to current position");
+                // reset the file pointer to the beginning of the volume sector
+                if (!set_file_pointer(write_beg_file_offset_vss)) {
+                    throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable to set file pointer to current position");
+                }
             }
         }
 
@@ -318,7 +320,7 @@ large_file_device_windows<char_type>::seek(boost::iostreams::stream_offset    of
     }
 
     // check for errors
-    if (next_pos < 0 || next_pos > cur_file_size) {
+    if (next_pos < 0 /*|| next_pos > cur_file_size*/) {
         throw std::ios_base::failure("large_file_device_windows<char_type>::seek(): bad seek offset");
     }
 
