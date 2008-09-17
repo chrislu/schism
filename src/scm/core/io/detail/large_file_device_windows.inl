@@ -14,6 +14,8 @@ template <typename char_type>
 scm::int64
 large_file_device_windows<char_type>::file_size() const
 {
+    assert(_file_handle != INVALID_HANDLE_VALUE);
+
     LARGE_INTEGER   cur_size_li;
 
     if (GetFileSizeEx(_file_handle, &cur_size_li) == 0) {
@@ -24,9 +26,28 @@ large_file_device_windows<char_type>::file_size() const
 }
 
 template <typename char_type>
+bool
+large_file_device_windows<char_type>::set_file_pointer(scm::int64 new_pos)
+{
+    assert(_file_handle != INVALID_HANDLE_VALUE);
+
+    LARGE_INTEGER   position_li;
+
+    position_li.QuadPart = new_pos;
+
+    if (   SetFilePointer(_file_handle, position_li.LowPart, &position_li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER
+        && GetLastError() != NO_ERROR) {
+        return (false);
+    }
+
+    return (true);
+}
+
+template <typename char_type>
 large_file_device_windows<char_type>::large_file_device_windows()
   : _file_handle(INVALID_HANDLE_VALUE),
     _current_position(0),
+    _open_mode(0),
     _volume_sector_size(0),
     _read_write_buffer_size(0)
 {
@@ -36,6 +57,7 @@ template <typename char_type>
 large_file_device_windows<char_type>::large_file_device_windows(const large_file_device_windows<char_type>& rhs)
   : _file_handle(rhs._file_handle),
     _current_position(rhs._current_position),
+    _open_mode(rhs._open_mode),
     _volume_sector_size(rhs._volume_sector_size),
     _read_write_buffer_size(rhs._read_write_buffer_size),
     _read_write_buffer(rhs._read_write_buffer)
@@ -56,6 +78,8 @@ std::streamsize
 large_file_device_windows<char_type>::read(char_type*       output_buffer,
                                            std::streamsize  num_bytes_to_read)
 {
+    assert(_file_handle != INVALID_HANDLE_VALUE);
+
     using namespace scm;
 
     uint8*      output_byte_buffer  = reinterpret_cast<uint8*const>(output_buffer);
@@ -65,14 +89,11 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
     if (_read_write_buffer_size > 0) {
 
         // set read pointer to beginning
-        LARGE_INTEGER   read_position_li;
         int64           read_beg_file_offset;
 
         read_beg_file_offset      = (_current_position / _volume_sector_size) * _volume_sector_size;  // floor
-        read_position_li.QuadPart = read_beg_file_offset;
 
-        if (   SetFilePointer(_file_handle, read_position_li.LowPart, &read_position_li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-            && GetLastError() != NO_ERROR) {
+        if (!set_file_pointer(read_beg_file_offset)) {
             throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
         }
 
@@ -141,7 +162,12 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
     }
     // normal system buffered operation
     else {
+        if (!set_file_pointer(_current_position)) {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
+        }
+
         DWORD   file_bytes_read       = 0;
+
         if (ReadFile(_file_handle, output_byte_buffer, num_bytes_to_read, &file_bytes_read, 0) == 0) {
             throw std::ios_base::failure("large_file_device_windows<char_type>::read(): error reading from file");
         }
@@ -164,8 +190,21 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
 template <typename char_type>
 std::streamsize
-large_file_device_windows<char_type>::write(const char_type* s, std::streamsize n)
+large_file_device_windows<char_type>::write(const char_type*    input_buffer,
+                                            std::streamsize     num_bytes_to_write)
 {
+    assert(_file_handle != INVALID_HANDLE_VALUE);
+
+    using namespace scm;
+
+    if (open_mode & std::ios_base::app) {
+        _current_position = file_size();
+    }
+
+    uint8*      inpput_byte_buffer  = reinterpret_cast<uint8*const>(input_buffer);
+    int64       bytes_written       = 0;
+
+
     // TODO
     return (0);
 }
@@ -322,6 +361,14 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
         throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::open(): error creating/opening file ")
                                      + complete_input_file_path.string());
     }
+
+    if (   open_mode & std::ios_base::ate
+        || open_mode & std::ios_base::app) {
+
+        _current_position = file_size();
+    }
+
+    _open_mode = open_mode;
 }
 
 template <typename char_type>

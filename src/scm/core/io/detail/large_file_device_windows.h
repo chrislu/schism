@@ -39,10 +39,13 @@ public:
 
 private:
     scm::int64                      file_size() const;
+    bool                            set_file_pointer(scm::int64 new_pos);
 
 private:
     HANDLE                          _file_handle;
     scm::int64                      _current_position;
+
+    std::ios_base::openmode         _open_mode;
 
     scm::int32                      _volume_sector_size;
 
