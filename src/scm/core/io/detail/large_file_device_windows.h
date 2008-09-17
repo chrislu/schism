@@ -4,6 +4,8 @@
 
 #ifdef _WIN32
 
+#include <string>
+
 #include <WinNT.h>
 
 #include <scm/core/int_types.h>
@@ -42,14 +44,16 @@ private:
     bool                            set_file_pointer(scm::int64 new_pos);
 
 private:
+    std::string                     _file_path;
     HANDLE                          _file_handle;
+    scm::int64                      _file_size;
     scm::int64                      _current_position;
 
     std::ios_base::openmode         _open_mode;
 
     scm::int32                      _volume_sector_size;
 
-    scm::shared_ptr<scm::uint8>     _read_write_buffer;
+    scm::shared_ptr<char>           _read_write_buffer;
     scm::uint32                     _read_write_buffer_size;
 
 }; // class large_file_device_windows
