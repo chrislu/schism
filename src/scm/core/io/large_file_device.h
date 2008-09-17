@@ -33,7 +33,7 @@ public:
     large_file(const std::string&       file_path,
                std::ios_base::openmode  open_mode = std::ios_base::in | std::ios_base::out,
                bool                     disable_system_cache = true,
-               scm::uint32              read_write_buffer_size = 262144u);
+               scm::uint32              read_write_buffer_size = 65536u);
     large_file(const large_file& rhs);
     virtual ~large_file();
 
@@ -47,7 +47,7 @@ public:
     void                    open(const std::string&         file_path,
                                  std::ios_base::openmode    open_mode = std::ios_base::in | std::ios_base::out,
                                  bool                       disable_system_cache = true,
-                                 scm::uint32                read_write_buffer_size = 262144u);
+                                 scm::uint32                read_write_buffer_size = 65536u);
 
     bool                    is_open() const;
     void                    close();

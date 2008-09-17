@@ -53,45 +53,112 @@ large_file_device_windows<char_type>::~large_file_device_windows()
 
 template <typename char_type>
 std::streamsize
-large_file_device_windows<char_type>::read(char_type* s, std::streamsize n)
+large_file_device_windows<char_type>::read(char_type*       output_buffer,
+                                           std::streamsize  num_bytes_to_read)
 {
     using namespace scm;
 
+    uint8*      output_byte_buffer  = reinterpret_cast<uint8*const>(output_buffer);
+    int64       bytes_read          = 0;
+
     // non system buffered read operation
     if (_read_write_buffer_size > 0) {
-        int64           cur_file_size           = file_size();
-        int64           read_iterations         = (n / _read_write_buffer_size) + (n % _read_write_buffer_size > 0 ? 1 : 0); // ceil
-        int64           read_beg_file_offset    = (_current_position / _volume_sector_size) * _volume_sector_size;           // floor
-        int64           write_beg_buffer_offset =  _current_position % _volume_sector_size;
 
+        // set read pointer to beginning
+        LARGE_INTEGER   read_position_li;
+        int64           read_beg_file_offset;
 
-        LARGE_INTEGER   cur_pos_li;
-        cur_pos_li.QuadPart = read_beg_file_offset;
-        SetFilePointer(_file_handle, cur_pos_li.LowPart, &cur_pos_li.HighPart, FILE_BEGIN);
+        read_beg_file_offset      = (_current_position / _volume_sector_size) * _volume_sector_size;  // floor
+        read_position_li.QuadPart = read_beg_file_offset;
 
-        for (int64 i = 0; i < read_iterations; ++i) {
-            int64       bytes_to_read           = 0;
-            int64       bytes_read              = 0;
-            
-            if ((read_beg_file_offset + i * _read_write_buffer_size) < cur_file_size) {
-                bytes_to_read = _read_write_buffer_size;
+        if (   SetFilePointer(_file_handle, read_position_li.LowPart, &read_position_li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER
+            && GetLastError() != NO_ERROR) {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
+        }
+
+        // calculate the bytes to read in multiples of the volume sector size
+        int64   bytes_to_read_vss   = 0;
+
+        bytes_to_read_vss  = (_current_position % _volume_sector_size) + num_bytes_to_read;
+        bytes_to_read_vss  =  ((bytes_to_read_vss / _volume_sector_size)
+                             + (bytes_to_read_vss % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size; // ceil
+
+        while (bytes_to_read_vss > 0) {
+            int64   buffer_bytes_to_read    = 0;
+            DWORD   buffer_bytes_read       = 0;
+
+            // determine the amount of bytes to read to the buffer
+            // note if not a complete buffer is filled, the remainder is still
+            // a interger multiple of the volume sector size
+            buffer_bytes_to_read = math::clamp<int64>(bytes_to_read_vss, 0, _read_write_buffer_size);
+
+            assert(buffer_bytes_to_read > 0);
+            assert(_read_write_buffer);
+
+            // read
+            if (ReadFile(_file_handle, _read_write_buffer.get(), buffer_bytes_to_read, &buffer_bytes_read, 0) == 0) {
+                throw std::ios_base::failure("large_file_device_windows<char_type>::read(): error reading from file");
+            }
+
+            if (buffer_bytes_read <= 0) {
+                // eof
+                return (-1);
+            }
+
+            if (buffer_bytes_read == buffer_bytes_to_read) {
+                int64   buf_read_offset     = _current_position % _volume_sector_size;
+                int64   buf_read_length     = math::min(static_cast<int64>(buffer_bytes_read) - buf_read_offset,
+                                                        num_bytes_to_read - bytes_read);
+
+                CopyMemory(output_byte_buffer,
+                           _read_write_buffer.get() + buf_read_offset,
+                           buf_read_length);
+
+                bytes_to_read_vss   -= buffer_bytes_read;
+                output_byte_buffer  += buffer_bytes_read;
+                _current_position   += buf_read_length;
+                bytes_read          += buf_read_length;
+            }
+            else if (buffer_bytes_read < buffer_bytes_to_read) {
+                // reached the end of file!
+                int64   buf_read_offset     = _current_position % _volume_sector_size;
+                int64   buf_read_length     = math::min(math::max<int64>(0, static_cast<int64>(buffer_bytes_read) - buf_read_offset),
+                                                        num_bytes_to_read - bytes_read);
+
+                CopyMemory(output_byte_buffer,
+                           _read_write_buffer.get() + buf_read_offset,
+                           buf_read_length);
+
+                bytes_to_read_vss   = 0;
+                _current_position   += buf_read_length;
+                bytes_read          += buf_read_length;
             }
             else {
-                // current end of line
+                // we should not get here
+                throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
             }
-
-            assert(bytes_to_read > 0);
-
-            ReadFile(_file_handle, _read_write_buffer.get(), bytes_to_read, &bytes_read, 0);
         }
     }
     // normal system buffered operation
     else {
-        // TODO
+        DWORD   file_bytes_read       = 0;
+        if (ReadFile(_file_handle, output_byte_buffer, num_bytes_to_read, &file_bytes_read, 0) == 0) {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::read(): error reading from file");
+        }
+
+        if (file_bytes_read == 0) {
+            // eof
+            return (-1);
+        }
+        if (file_bytes_read <= num_bytes_to_read) {
+            bytes_read = file_bytes_read;
+        }
+        else {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
+        }
     }
 
-    // TODO
-    return (0);
+    return (bytes_read);
 }
 
 template <typename char_type>
