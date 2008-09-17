@@ -33,6 +33,7 @@ public:
 
     virtual bool                    is_open() const = 0;
     virtual void                    close() = 0;
+    virtual std::streamsize         optimal_buffer_size() const = 0;
 
 }; // class large_file_device_impl
 

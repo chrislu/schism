@@ -92,5 +92,12 @@ large_file<char_t>::close()
     _impl->close();
 }
 
+template <typename char_t>
+std::streamsize
+large_file<char_t>::optimal_buffer_size() const 
+{
+    return (_impl->optimal_buffer_size());
+}
+
 } // namespace io
 } // namespace scm

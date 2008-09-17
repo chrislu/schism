@@ -129,7 +129,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
                            _read_write_buffer.get() + buf_read_offset,
                            buf_read_length);
 
-                bytes_to_read_vss   = 0;
+                bytes_to_read_vss    = 0;
                 _current_position   += buf_read_length;
                 bytes_read          += buf_read_length;
             }
@@ -151,7 +151,8 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
             return (-1);
         }
         if (file_bytes_read <= num_bytes_to_read) {
-            bytes_read = file_bytes_read;
+            _current_position   += file_bytes_read;
+            bytes_read           = file_bytes_read;
         }
         else {
             throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
@@ -340,6 +341,18 @@ large_file_device_windows<char_type>::close()
 
         // reset read write buffer invoking VirtualFree
         _read_write_buffer.reset();
+    }
+}
+
+template <typename char_type>
+std::streamsize
+large_file_device_windows<char_type>::optimal_buffer_size() const
+{
+    if (_read_write_buffer_size) {
+        return (_read_write_buffer_size);
+    }
+    else {
+        return (4096u);
     }
 }
 

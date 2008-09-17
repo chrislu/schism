@@ -27,13 +27,14 @@ class large_file {
 public:
     typedef char_t  char_type;
     struct category : public boost::iostreams::seekable_device_tag,
-                      public boost::iostreams::closable_tag {};
+                      public boost::iostreams::closable_tag,
+                      public boost::iostreams::optimally_buffered_tag {};
 
     // ctor / dtor
     large_file(const std::string&       file_path,
                std::ios_base::openmode  open_mode = std::ios_base::in | std::ios_base::out,
                bool                     disable_system_cache = true,
-               scm::uint32              read_write_buffer_size = 65536u);
+               scm::uint32              read_write_buffer_size = 8192);
     large_file(const large_file& rhs);
     virtual ~large_file();
 
@@ -47,10 +48,11 @@ public:
     void                    open(const std::string&         file_path,
                                  std::ios_base::openmode    open_mode = std::ios_base::in | std::ios_base::out,
                                  bool                       disable_system_cache = true,
-                                 scm::uint32                read_write_buffer_size = 65536u);
+                                 scm::uint32                read_write_buffer_size = 8192);
 
     bool                    is_open() const;
     void                    close();
+    std::streamsize         optimal_buffer_size() const;
 
 private:
     boost::shared_ptr<detail::large_file_device_impl<char_t> >      _impl;

@@ -35,6 +35,7 @@ public:
 
     bool                            is_open() const;
     void                            close();
+    std::streamsize                 optimal_buffer_size() const;
 
 private:
     scm::int64                      file_size() const;
