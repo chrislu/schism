@@ -240,6 +240,11 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
                     throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable to set file pointer to current position");
                 }
             }
+            else {
+                if (SetEndOfFile(_file_handle) == 0) {
+                    throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable to set new end of file");
+                }
+            }
         }
 
         // calculate the bytes to write in multiples of the volume sector size
