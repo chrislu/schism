@@ -54,8 +54,10 @@ private:
 
     scm::int32                      _volume_sector_size;
 
-    scm::shared_ptr<char>           _read_write_buffer;
-    scm::uint32                     _read_write_buffer_size;
+    scm::shared_ptr<char>           _rw_buffer;
+    scm::uint32                     _rw_buffer_size;
+    scm::int64                      _rw_buffered_start;
+    scm::int64                      _rw_buffered_end;
 
 }; // class large_file_device_windows
 

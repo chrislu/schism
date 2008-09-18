@@ -51,6 +51,7 @@ bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>&
     unsigned offset_src;
     unsigned offset_dst;
 
+#if 1
     for (unsigned int slice = 0; slice < read_dimensions.z; ++slice) {
         for (unsigned int line = 0; line < read_dimensions.y; ++line) {
             offset_src =  offset.x
@@ -66,7 +67,7 @@ bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>&
             _file.read((char*)&buffer[offset_dst], read_dimensions.x);
         }
     }
-
+#endif
     return (true);                                             
 }
 

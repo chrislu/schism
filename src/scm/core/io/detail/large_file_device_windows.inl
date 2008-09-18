@@ -50,7 +50,7 @@ large_file_device_windows<char_type>::large_file_device_windows()
     _current_position(0),
     _open_mode(0),
     _volume_sector_size(0),
-    _read_write_buffer_size(0)
+    _rw_buffer_size(0)
 {
 }
 
@@ -62,8 +62,8 @@ large_file_device_windows<char_type>::large_file_device_windows(const large_file
     _current_position(rhs._current_position),
     _open_mode(rhs._open_mode),
     _volume_sector_size(rhs._volume_sector_size),
-    _read_write_buffer_size(rhs._read_write_buffer_size),
-    _read_write_buffer(rhs._read_write_buffer)
+    _rw_buffer_size(rhs._rw_buffer_size),
+    _rw_buffer(rhs._rw_buffer)
 {
     // TODO initialize read write buffer if buiffer size > 0!
     // OR handle the rw buffer as a shared resource!
@@ -89,7 +89,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
     int64       bytes_read          = 0;
 
     // non system buffered read operation
-    if (_read_write_buffer_size > 0) {
+    if (_rw_buffer_size > 0) {
 
         // set read pointer to beginning
         int64           read_beg_file_offset_vss;
@@ -114,13 +114,18 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
             // determine the amount of bytes to read to the buffer
             // note if not a complete buffer is filled, the remainder is still
             // a interger multiple of the volume sector size
-            buffer_bytes_to_read = math::clamp<int64>(bytes_to_read_vss, 0, _read_write_buffer_size);
+            buffer_bytes_to_read = math::clamp<int64>(bytes_to_read_vss, 0, _rw_buffer_size);
 
             assert(buffer_bytes_to_read > 0);
-            assert(_read_write_buffer);
+            assert(_rw_buffer);
+
+            // test if read begin or end is in buffered range
+            if (read_beg_file_offset_vss > _rw_buffered_start && read_beg_file_offset_vss < _rw_buffered_end) {
+
+            }
 
             // read
-            if (ReadFile(_file_handle, _read_write_buffer.get(), buffer_bytes_to_read, &buffer_bytes_read, 0) == 0) {
+            if (ReadFile(_file_handle, _rw_buffer.get(), buffer_bytes_to_read, &buffer_bytes_read, 0) == 0) {
                 throw std::ios_base::failure("large_file_device_windows<char_type>::read(): error reading from file");
             }
 
@@ -134,13 +139,16 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
                 }
             }
 
+            _rw_buffered_start = read_beg_file_offset_vss;
+            _rw_buffered_end   = _rw_buffered_start + buffer_bytes_read;
+
             if (buffer_bytes_read == buffer_bytes_to_read) {
                 int64   buf_read_offset     = _current_position % _volume_sector_size;
                 int64   buf_read_length     = math::min(static_cast<int64>(buffer_bytes_read) - buf_read_offset,
                                                         num_bytes_to_read - bytes_read);
 
                 CopyMemory(output_byte_buffer,
-                           _read_write_buffer.get() + buf_read_offset,
+                           _rw_buffer.get() + buf_read_offset,
                            buf_read_length);
 
                 bytes_to_read_vss   -= buffer_bytes_read;
@@ -155,7 +163,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
                                                         num_bytes_to_read - bytes_read);
 
                 CopyMemory(output_byte_buffer,
-                           _read_write_buffer.get() + buf_read_offset,
+                           _rw_buffer.get() + buf_read_offset,
                            buf_read_length);
 
                 bytes_to_read_vss    = 0;
@@ -213,7 +221,7 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
     int64           bytes_written       = 0;
 
     // non system buffered read operation
-    if (_read_write_buffer_size > 0) {
+    if (_rw_buffer_size > 0) {
 
         // set read pointer to beginning
         int64           write_beg_file_offset_vss;
@@ -234,7 +242,7 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
                 seek(write_beg_file_offset_vss, std::ios_base::beg);
 
                 // ok we need some data from the beginning of the sector
-                if (read(_read_write_buffer.get(), write_sector_prefetch_size) < write_sector_prefetch_size) {
+                if (read(_rw_buffer.get(), write_sector_prefetch_size) < write_sector_prefetch_size) {
                     throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable read data from beginning of sector");
                 }
 
@@ -268,20 +276,20 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
             // determine the amount of bytes to write to the buffer
             // note if not a complete buffer is filled, the remainder is still
             // a interger multiple of the volume sector size
-            buffer_bytes_to_write = math::clamp<int64>(bytes_to_write_vss, 0, _read_write_buffer_size);
+            buffer_bytes_to_write = math::clamp<int64>(bytes_to_write_vss, 0, _rw_buffer_size);
             buffer_fill_start_off = _current_position % _volume_sector_size;
             buffer_fill_length    = math::min(buffer_bytes_to_write - buffer_fill_start_off,
                                               num_bytes_to_write - bytes_written);
 
             assert(buffer_bytes_to_write > 0);
-            assert(_read_write_buffer);
+            assert(_rw_buffer);
 
             // fill in the data to be written
-            CopyMemory(_read_write_buffer.get() + buffer_fill_start_off,
+            CopyMemory(_rw_buffer.get() + buffer_fill_start_off,
                        input_byte_buffer,
                        buffer_fill_length);
 
-            if (WriteFile(_file_handle, _read_write_buffer.get(), buffer_bytes_to_write, &buffer_bytes_written, 0) == 0) {
+            if (WriteFile(_file_handle, _rw_buffer.get(), buffer_bytes_to_write, &buffer_bytes_written, 0) == 0) {
                 throw std::ios_base::failure("large_file_device_windows<char_type>::write(): error writing to file");
             }
 
@@ -443,19 +451,19 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
         assert(_volume_sector_size != 0);
 
         // calculate the correct read write buffer size (round up to full multiple of bytes per sector)
-        _read_write_buffer_size = (  (read_write_buffer_size / _volume_sector_size)
+        _rw_buffer_size = (  (read_write_buffer_size / _volume_sector_size)
                                    + (read_write_buffer_size % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size;
 
-        assert(_read_write_buffer_size % _volume_sector_size == 0);
+        assert(_rw_buffer_size % _volume_sector_size == 0);
         assert(read_write_buffer_access != 0);
 
         // allocate read write buffer using VirtualAlloc
         // this aligns the memory region to page sizes
         // this memory has to be deallocated using VirtualFree, so the deallocator to the smart pointer
-        _read_write_buffer.reset(static_cast<char*>(VirtualAlloc(0, _read_write_buffer_size, MEM_COMMIT | MEM_RESERVE, read_write_buffer_access)),
+        _rw_buffer.reset(static_cast<char*>(VirtualAlloc(0, _rw_buffer_size, MEM_COMMIT | MEM_RESERVE, read_write_buffer_access)),
                                                     boost::bind(VirtualFree, _1, 0, MEM_RELEASE));
 
-        if (!_read_write_buffer) {
+        if (!_rw_buffer) {
             throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::open(): error allocating read write buffer for no system buffering operation: ")
                                          + complete_input_file_path.string());
         }
@@ -499,7 +507,7 @@ large_file_device_windows<char_type>::close()
     if (is_open()) {
         // if we were non system buffered, so i may be possible to
         // be too large because of volume sector size restrictions
-        if (   _read_write_buffer_size
+        if (   _rw_buffer_size
             && _open_mode & std::ios_base::out) {
             if (_file_size != file_size()) {
 
@@ -533,8 +541,8 @@ large_file_device_windows<char_type>::close()
     _file_handle            = INVALID_HANDLE_VALUE;
     _file_size              = 0;
     _volume_sector_size     = 0;
-    _read_write_buffer.reset();
-    _read_write_buffer_size = 0;
+    _rw_buffer.reset();
+    _rw_buffer_size = 0;
     _open_mode              = 0;
     _current_position       = 0;
 }
@@ -543,8 +551,8 @@ template <typename char_type>
 std::streamsize
 large_file_device_windows<char_type>::optimal_buffer_size() const
 {
-    if (_read_write_buffer_size) {
-        return (_read_write_buffer_size);
+    if (_rw_buffer_size) {
+        return (_rw_buffer_size / 2);
     }
     else {
         return (4096u);

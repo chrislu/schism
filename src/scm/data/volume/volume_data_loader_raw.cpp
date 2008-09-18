@@ -108,7 +108,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename,
     if (_file.is_open())
         _file.close();
 
-    _file.open(filename.c_str(), std::ios::in | std::ios::binary);
+    _file.open(filename.c_str(), std::ios_base::in | std::ios::binary);
 
     if (!_file) {
         return (false);

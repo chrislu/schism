@@ -2,8 +2,9 @@
 #ifndef SCM_DATA_VOLUME_LOADER_DATA_H_INCLUDED
 #define SCM_DATA_VOLUME_LOADER_DATA_H_INCLUDED
 
-#include <fstream>
+//#include <fstream>
 
+#include <scm/core/io/fstream.h>
 #include <scm/core/math/math.h>
 
 #include <scm/data/volume/scm_vol/scm_vol.h>
@@ -42,7 +43,7 @@ public:
 protected:
 
 
-    std::ifstream           _file;
+    io::ifstream            _file;
 
     volume_descriptor       _vol_desc;
     //math::vec3ui_t          _dimensions;
