@@ -6,7 +6,8 @@
 
 #include <string>
 
-#include <WinNT.h>
+#include <windows.h>
+//#include <WinNT.h>
 
 #include <scm/core/int_types.h>
 #include <scm/core/ptr_types.h>

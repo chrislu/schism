@@ -126,7 +126,12 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
             if (buffer_bytes_read <= 0) {
                 // eof
-                return (-1);
+                if (bytes_read == 0) {
+                    return (-1);
+                }
+                else {
+                    return (bytes_read);
+                }
             }
 
             if (buffer_bytes_read == buffer_bytes_to_read) {
@@ -294,7 +299,23 @@ large_file_device_windows<char_type>::write(const char_type*    input_buffer,
     }
     // normal system buffered operation
     else {
-        // TODO
+        if (!set_file_pointer(_current_position)) {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unable to set file pointer to current position");
+        }
+
+        DWORD   file_bytes_written  = 0;
+
+        if (WriteFile(_file_handle, input_byte_buffer, num_bytes_to_write, &file_bytes_written, 0) == 0) {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::write(): error writing from file");
+        }
+
+        if (file_bytes_written <= num_bytes_to_write) {
+            _current_position   += file_bytes_written;
+            bytes_written        = file_bytes_written;
+        }
+        else {
+            throw std::ios_base::failure("large_file_device_windows<char_type>::write(): unknown error reading from file");
+        }
     }
 
     return (bytes_written);
@@ -355,7 +376,7 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
 
     if (open_mode & std::ios_base::in) {
         desired_access              |= GENERIC_READ;
-        read_write_buffer_access    =  PAGE_READONLY;
+        read_write_buffer_access    =  PAGE_READWRITE;
     }
     if (open_mode & std::ios_base::out) {
         desired_access              |= GENERIC_WRITE;
@@ -363,7 +384,7 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
     }
 
     // share mode
-    DWORD share_mode = 0;
+    DWORD share_mode = FILE_SHARE_READ;
 
     // translate open mode to creation modes
     DWORD creation_disposition = 0;
