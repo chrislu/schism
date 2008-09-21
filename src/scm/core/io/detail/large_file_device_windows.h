@@ -44,6 +44,9 @@ private:
     scm::int64                      file_size() const;
     bool                            set_file_pointer(scm::int64 new_pos);
 
+    scm::int64                      floor_vss(const scm::int64 in_val) const;
+    scm::int64                      ceil_vss(const scm::int64 in_val) const;
+
 private:
     std::string                     _file_path;
     HANDLE                          _file_handle;

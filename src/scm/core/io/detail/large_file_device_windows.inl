@@ -3,12 +3,28 @@
 
 #include <cassert>
 
+#include <scm/core/utilities/boost_warning_disable.h>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <scm/core/utilities/boost_warning_enable.h>
 
 namespace scm {
 namespace io {
 namespace detail {
+
+template <typename char_type>
+scm::int64
+large_file_device_windows<char_type>::floor_vss(const scm::int64 in_val) const
+{
+    return((in_val / _volume_sector_size) * _volume_sector_size);
+}
+template <typename char_type>
+scm::int64
+large_file_device_windows<char_type>::ceil_vss(const scm::int64 in_val) const
+{
+    return ( ((in_val / _volume_sector_size)
+            + (in_val % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size);
+}
 
 template <typename char_type>
 scm::int64
@@ -100,16 +116,14 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
         int64           file_size_vss           = 0;
 
         // align current position to volume sector size
-        current_position_vss    = (_current_position / _volume_sector_size) * _volume_sector_size;  // floor
-        file_size_vss           =  ((_file_size / _volume_sector_size)
-                                  + (_file_size % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size; // ceil
+        current_position_vss    = floor_vss(_current_position);
+        file_size_vss           = ceil_vss(_file_size);
 
         // calculate the bytes to read in multiples of the volume sector size
         int64   bytes_to_read_vss   = 0;
 
-        bytes_to_read_vss  = (_current_position % _volume_sector_size) + num_bytes_to_read;
-        bytes_to_read_vss  =  ((bytes_to_read_vss / _volume_sector_size)
-                             + (bytes_to_read_vss % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size; // ceil
+        bytes_to_read_vss  = ceil_vss(math::min((_current_position % _volume_sector_size) + num_bytes_to_read,
+                                                _file_size - current_position_vss));
 
         while (bytes_to_read_vss > 0) {
             int64   buffer_bytes_to_read        = 0;
@@ -125,8 +139,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
             assert(buffer_bytes_to_read > 0);
             assert(_rw_buffer);
-            // 
-#if 0 // todo right caching behavior
+
             bool read_beg_in_rw_buf =    current_position_vss >= _rw_buffered_start
                                       && current_position_vss <  _rw_buffered_end;
             bool read_end_in_rw_buf =    end_position_vss >  _rw_buffered_start
@@ -148,8 +161,8 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
                 int64   new_read_pos_vss    = _rw_buffered_start - bytes_left_to_read;
 
                 // copy the buffered to the end
-                memmove(_rw_buffer.get(),
-                        _rw_buffer.get() + bytes_left_to_read,
+                memmove(_rw_buffer.get() + bytes_left_to_read,
+                        _rw_buffer.get(),
                         bytes_cached);
 
                 if (!set_file_pointer(new_read_pos_vss)) {
@@ -176,19 +189,19 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
                 // set the rw buffer region
                 _rw_buffered_start = new_read_pos_vss;
-                _rw_buffered_end   = new_read_pos_vss + buffer_bytes_read + bytes_cached;
+                _rw_buffered_end   = _rw_buffered_start + ceil_vss(buffer_bytes_read);
             }
             else if (read_beg_in_rw_buf && !read_end_in_rw_buf) {
                 // beginning position in the buffer
                 int64   bytes_cached        = _rw_buffered_end - current_position_vss;
-                int64   bytes_left_to_read  = math::min(end_position_vss - _rw_buffered_end,
-                                                        math::max(file_size_vss - _rw_buffered_end,
+                int64   bytes_left_to_read  = math::max(end_position_vss - _rw_buffered_end,
+                                                        math::min(file_size_vss - _rw_buffered_end,
                                                                   _rw_buffer_size - bytes_cached));
                 int64   new_read_pos_vss    = current_position_vss + bytes_cached;
 
                 // copy the buffered to the end
-                memmove(_rw_buffer.get() + (current_position_vss - _rw_buffered_start),
-                        _rw_buffer.get(),
+                memmove(_rw_buffer.get(),
+                        _rw_buffer.get() + (current_position_vss - _rw_buffered_start),
                         bytes_cached);
 
                 if (!set_file_pointer(new_read_pos_vss)) {
@@ -211,12 +224,9 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
                 // set the rw buffer region
                 _rw_buffered_start = new_read_pos_vss - bytes_cached;
-                _rw_buffered_end   = new_read_pos_vss + buffer_bytes_read;
+                _rw_buffered_end   = _rw_buffered_start + ceil_vss(buffer_bytes_read);
             }
-            else 
-#endif // todo right caching behavior
-
-            {
+            else {
                 // now we know we have to read everything from disk so fill up our internal rw buffer completely...
                 if (!set_file_pointer(current_position_vss)) {
                     throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
@@ -233,7 +243,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
                 // set the rw buffer region
                 _rw_buffered_start = current_position_vss;
-                _rw_buffered_end   = _rw_buffered_start + buffer_bytes_read;
+                _rw_buffered_end   = _rw_buffered_start + ceil_vss(buffer_bytes_read);
             }
 
             if (buffer_bytes_read <= 0) {
@@ -249,14 +259,21 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
             // copy data from rw buffer to output
             if (buffer_bytes_read >= buffer_bytes_to_read) {
                 int64   buf_read_offset     = (_current_position % _volume_sector_size) + rw_buffer_read_offset;
-                int64   buf_read_length     = math::min(static_cast<int64>(buffer_bytes_read) - buf_read_offset,
-                                                        num_bytes_to_read - bytes_read);
+                int64   buf_read_length     = math::min(static_cast<int64>(buffer_bytes_read) - (buf_read_offset - rw_buffer_read_offset),
+                                              math::min(num_bytes_to_read - bytes_read,
+                                                        _rw_buffer_size - buf_read_offset));
+
+                assert(buf_read_length >= 0);
+                assert(buf_read_offset >= 0);
+                assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
+                assert(buf_read_length <= num_bytes_to_read);
 
                 CopyMemory(output_byte_buffer,
                            _rw_buffer.get() + buf_read_offset,
                            buf_read_length);
 
-                assert(buffer_bytes_read % _volume_sector_size == 0);
+                assert(   (buffer_bytes_read % _volume_sector_size != 0) && (buffer_bytes_read > bytes_to_read_vss)
+                       || (buffer_bytes_read % _volume_sector_size == 0) );
 
                 bytes_to_read_vss       -= buffer_bytes_read;
                 output_byte_buffer      += buf_read_length;
@@ -267,8 +284,14 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
             else if (buffer_bytes_read < buffer_bytes_to_read) {
                 // reached the end of file, abort reading
                 int64   buf_read_offset     = (_current_position % _volume_sector_size) + rw_buffer_read_offset;
-                int64   buf_read_length     = math::min(math::max<int64>(0, static_cast<int64>(buffer_bytes_read) - buf_read_offset),
-                                                        num_bytes_to_read - bytes_read);
+                int64   buf_read_length     = math::min(math::max<int64>(0, static_cast<int64>(buffer_bytes_read) - (buf_read_offset - rw_buffer_read_offset)),
+                                              math::min(num_bytes_to_read - bytes_read,
+                                                        _rw_buffer_size - buf_read_offset));
+
+                assert(buf_read_length >= 0);
+                assert(buf_read_offset >= 0);
+                assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
+                assert(buf_read_length <= num_bytes_to_read);
 
                 CopyMemory(output_byte_buffer,
                            _rw_buffer.get() + buf_read_offset,
@@ -559,8 +582,7 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
         assert(_volume_sector_size != 0);
 
         // calculate the correct read write buffer size (round up to full multiple of bytes per sector)
-        _rw_buffer_size = (  (read_write_buffer_size / _volume_sector_size)
-                                   + (read_write_buffer_size % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size;
+        _rw_buffer_size = ceil_vss(read_write_buffer_size);;
 
         assert(_rw_buffer_size % _volume_sector_size == 0);
         assert(read_write_buffer_access != 0);
@@ -660,10 +682,10 @@ std::streamsize
 large_file_device_windows<char_type>::optimal_buffer_size() const
 {
     if (_rw_buffer_size && _volume_sector_size) {
-        return (scm::math::max<scm::int32>(_volume_sector_size, _rw_buffer_size - 2 * _volume_sector_size));
+        return (scm::math::max<scm::int32>(_volume_sector_size, _rw_buffer_size / 64));//- 2 * _volume_sector_size));
     }
     else {
-        return (4096u);
+        return (4096u);//262144u);//
     }
 }
 

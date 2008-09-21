@@ -6,7 +6,6 @@
 
 #include <boost/iostreams/categories.hpp>
 #include <boost/iostreams/positioning.hpp>
-//#include <boost/iostreams/operations.hpp>
 
 #include <boost/shared_ptr.hpp>      
 
@@ -17,7 +16,7 @@ namespace io {
 
 namespace detail {
 
-const scm::uint32   default_read_write_buffer_size = 8192u;
+const scm::uint32   default_read_write_buffer_size = 65536u;
 
 template <typename char_type> class large_file_device_impl;
 
