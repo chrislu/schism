@@ -31,9 +31,9 @@ bool volume_data_loader_svol::open_file(const std::string& filename)
     std::ifstream svol_file;
 
     svol_file.open(filename.c_str(), std::ios::in);
-    if (!svol_file) {
-        return (false);
-    }
+    //if (!svol_file) {
+    //    return (false);
+    //}
 
     svol_file >> _vol_desc;
 

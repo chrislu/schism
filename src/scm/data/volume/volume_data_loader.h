@@ -31,6 +31,9 @@ public:
     virtual const volume_descriptor&    get_volume_descriptor() const;
     //virtual const math::vec3ui_t& get_dataset_dimensions() const;
 
+    virtual bool        read_volume(scm::data::regular_grid_data_3d<unsigned char>& target_data) = 0;
+    virtual bool        read_volume_data(unsigned char*const buffer);
+
     virtual bool        read_sub_volume(const scm::math::vec3ui& offset,
                                         const scm::math::vec3ui& dimensions,
                                         scm::data::regular_grid_data_3d<unsigned char>& target_data) = 0; 
@@ -43,7 +46,8 @@ public:
 protected:
 
 
-    io::ifstream            _file;
+    io::large_file<char>    _file;
+    //io::ifstream            _file;
 
     volume_descriptor       _vol_desc;
     //math::vec3ui_t          _dimensions;

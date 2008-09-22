@@ -7,6 +7,20 @@ namespace scm {
 namespace io {
 
 template <typename char_t>
+large_file<char_t>::large_file()
+{
+#if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+
+    _impl.reset(new detail::large_file_device_windows<char_t>());
+
+#elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
+#error "atm unsupported platform"
+#elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
+#error "atm unsupported platform"
+#endif
+}
+
+template <typename char_t>
 large_file<char_t>::large_file(const std::string&       file_path,
                                std::ios_base::openmode  open_mode,
                                bool                     disable_system_cache,

@@ -31,14 +31,12 @@ bool volume_data_loader_vgeo::open_file(const std::string& filename)
 
     _file.open(filename.c_str(), std::ios::in | std::ios::binary);
 
-    if (!_file)
-        return (false);
+    //if (!_file)
+    //    return (false);
 
     vgeo_vol_hdr.reset(new VV_volume);
 
-    _file.read((char*)(vgeo_vol_hdr.get()), sizeof(VV_volume));
-
-    if (!_file) {
+    if (_file.read((char*)(vgeo_vol_hdr.get()), sizeof(VV_volume)) != sizeof(VV_volume)) {
         // error reading the header
         vgeo_vol_hdr.reset(0);
         this->close_file();
@@ -114,11 +112,41 @@ bool volume_data_loader_vgeo::open_file(const std::string& filename)
     return (true);
 }
 
+bool volume_data_loader_vgeo::read_volume(scm::data::regular_grid_data_3d<unsigned char>& target_data)
+{
+    if (/*!_file ||*/ !is_file_open()) {
+        return (false);
+    }
+
+    // for now only ubyte and one channel data!
+    if (_vol_desc._data_num_channels > 1 || _vol_desc._data_byte_per_channel > 1) {
+        return (false);
+    }
+
+    try {
+        get_data_ptr(target_data).reset(new scm::data::regular_grid_data_3d<unsigned char>::value_type[_vol_desc._data_dimensions.x * _vol_desc._data_dimensions.y * _vol_desc._data_dimensions.z]);
+    }
+    catch (std::bad_alloc&) {
+        get_data_ptr(target_data).reset();
+        return (false);
+    }
+
+    if (!read_volume_data(get_data_ptr(target_data).get())) {
+        get_data_ptr(target_data).reset();
+        return (false);
+    }
+
+    set_dimensions(target_data, _vol_desc._data_dimensions);
+    target_data.update();
+
+    return (true);
+}
+
 bool volume_data_loader_vgeo::read_sub_volume(const scm::math::vec3ui& offset,
                                               const scm::math::vec3ui& dimensions,
                                               scm::data::regular_grid_data_3d<unsigned char>& target_data)
 {
-    if (!_file || !is_file_open()) {
+    if (/*!_file ||*/ !is_file_open()) {
         return (false);
     }
 

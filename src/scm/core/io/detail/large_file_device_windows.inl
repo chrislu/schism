@@ -234,7 +234,7 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
 
                 if (ReadFile(_file_handle,
                              _rw_buffer.get(),
-                             _rw_buffer_size/*buffer_bytes_to_read*/,
+                             _rw_buffer_size,
                              &buffer_bytes_read,
                              0) == 0)
                 {
@@ -246,65 +246,31 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
                 _rw_buffered_end   = _rw_buffered_start + ceil_vss(buffer_bytes_read);
             }
 
+            // check if eof reached
             if (buffer_bytes_read <= 0) {
-                // eof
-                if (bytes_read == 0) {
-                    return (-1);
-                }
-                else {
-                    return (bytes_read);
-                }
+                return ((bytes_read == 0) ? -1 : bytes_read);
             }
 
             // copy data from rw buffer to output
-            if (buffer_bytes_read >= buffer_bytes_to_read) {
-                int64   buf_read_offset     = (_current_position % _volume_sector_size) + rw_buffer_read_offset;
-                int64   buf_read_length     = math::min(static_cast<int64>(buffer_bytes_read) - (buf_read_offset - rw_buffer_read_offset),
-                                              math::min(num_bytes_to_read - bytes_read,
-                                                        _rw_buffer_size - buf_read_offset));
+            int64   buf_read_offset     = (_current_position % _volume_sector_size) + rw_buffer_read_offset;
+            int64   buf_read_length     = math::min(math::max<int64>(0, static_cast<int64>(buffer_bytes_read) - (buf_read_offset - rw_buffer_read_offset)),
+                                          math::min(num_bytes_to_read - bytes_read,
+                                                    _rw_buffer_size - buf_read_offset));
 
-                assert(buf_read_length >= 0);
-                assert(buf_read_offset >= 0);
-                assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
-                assert(buf_read_length <= num_bytes_to_read);
+            assert(buf_read_length >= 0);
+            assert(buf_read_offset >= 0);
+            assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
+            assert(buf_read_length <= num_bytes_to_read);
 
-                CopyMemory(output_byte_buffer,
-                           _rw_buffer.get() + buf_read_offset,
-                           buf_read_length);
+            CopyMemory(output_byte_buffer,
+                       _rw_buffer.get() + buf_read_offset,
+                       buf_read_length);
 
-                assert(   (buffer_bytes_read % _volume_sector_size != 0) && (buffer_bytes_read > bytes_to_read_vss)
-                       || (buffer_bytes_read % _volume_sector_size == 0) );
-
-                bytes_to_read_vss       -= buffer_bytes_read;
-                output_byte_buffer      += buf_read_length;
-                _current_position       += buf_read_length;
-                current_position_vss    += buffer_bytes_read;
-                bytes_read              += buf_read_length;
-            }
-            else if (buffer_bytes_read < buffer_bytes_to_read) {
-                // reached the end of file, abort reading
-                int64   buf_read_offset     = (_current_position % _volume_sector_size) + rw_buffer_read_offset;
-                int64   buf_read_length     = math::min(math::max<int64>(0, static_cast<int64>(buffer_bytes_read) - (buf_read_offset - rw_buffer_read_offset)),
-                                              math::min(num_bytes_to_read - bytes_read,
-                                                        _rw_buffer_size - buf_read_offset));
-
-                assert(buf_read_length >= 0);
-                assert(buf_read_offset >= 0);
-                assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
-                assert(buf_read_length <= num_bytes_to_read);
-
-                CopyMemory(output_byte_buffer,
-                           _rw_buffer.get() + buf_read_offset,
-                           buf_read_length);
-
-                bytes_to_read_vss    = 0;
-                _current_position   += buf_read_length;
-                bytes_read          += buf_read_length;
-            }
-            //else {
-            //    // we should not get here
-            //    throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
-            //}
+            bytes_to_read_vss        = (buffer_bytes_read < buffer_bytes_to_read) ? 0 : bytes_to_read_vss - buffer_bytes_read;
+            output_byte_buffer      += buf_read_length;
+            _current_position       += buf_read_length;
+            current_position_vss    += buffer_bytes_read;
+            bytes_read              += buf_read_length;
         }
     }
     // normal system buffered operation
@@ -331,6 +297,8 @@ large_file_device_windows<char_type>::read(char_type*       output_buffer,
             throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
         }
     }
+
+    assert(bytes_read > 0);
 
     return (bytes_read);
 }
@@ -591,7 +559,7 @@ large_file_device_windows<char_type>::open(const std::string&         file_path,
         // this aligns the memory region to page sizes
         // this memory has to be deallocated using VirtualFree, so the deallocator to the smart pointer
         _rw_buffer.reset(static_cast<char*>(VirtualAlloc(0, _rw_buffer_size, MEM_COMMIT | MEM_RESERVE, read_write_buffer_access)),
-                                                    boost::bind(VirtualFree, _1, 0, MEM_RELEASE));
+                                            boost::bind(VirtualFree, _1, 0, MEM_RELEASE));
 
         if (!_rw_buffer) {
             throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::open(): error allocating read write buffer for no system buffering operation: ")
@@ -682,10 +650,10 @@ std::streamsize
 large_file_device_windows<char_type>::optimal_buffer_size() const
 {
     if (_rw_buffer_size && _volume_sector_size) {
-        return (scm::math::max<scm::int32>(_volume_sector_size, _rw_buffer_size / 64));//- 2 * _volume_sector_size));
+        return (scm::math::max<scm::int32>(_volume_sector_size * 4, _rw_buffer_size / 16));
     }
     else {
-        return (4096u);//262144u);//
+        return (4096u);
     }
 }
 

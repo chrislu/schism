@@ -32,6 +32,7 @@ public:
                       public boost::iostreams::optimally_buffered_tag {};
 
     // ctor / dtor
+    large_file();
     large_file(const std::string&       file_path,
                std::ios_base::openmode  open_mode = std::ios_base::in | std::ios_base::out,
                bool                     disable_system_cache = true,

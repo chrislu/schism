@@ -32,13 +32,32 @@ const volume_descriptor& volume_data_loader::get_volume_descriptor() const
     return (_vol_desc);
 }
 
+bool volume_data_loader::read_volume_data(unsigned char*const buffer)
+{
+    if (!buffer || /*!_file ||*/ !is_file_open()) {
+        return (false);
+    }
+
+    _file.seek(_data_start_offset, std::ios_base::beg);
+
+    scm::int64 read_size =    _vol_desc._data_dimensions.x
+                            * _vol_desc._data_dimensions.y
+                            * _vol_desc._data_dimensions.z;
+
+    if (_file.read((char*)buffer, read_size) != read_size) {
+        return (false);
+    }
+    else {
+        return (true);
+    }
+}
 
 bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>& offset,
                                               const scm::math::vec3ui&           read_dimensions,
                                               const scm::math::vec3ui&           buffer_dimensions,
                                               unsigned char*const                buffer)
 {
-    if (!buffer || !_file || !is_file_open()) {
+    if (!buffer || /*!_file ||*/ !is_file_open()) {
         return (false);
     }
 
@@ -51,7 +70,7 @@ bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>&
     unsigned offset_src;
     unsigned offset_dst;
 
-#if 1
+#if 0
     for (unsigned int slice = 0; slice < read_dimensions.z; ++slice) {
         for (unsigned int line = 0; line < read_dimensions.y; ++line) {
             offset_src =  offset.x
