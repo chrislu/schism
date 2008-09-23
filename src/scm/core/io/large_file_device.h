@@ -10,6 +10,7 @@
 #include <boost/shared_ptr.hpp>      
 
 #include <scm/core/int_types.h>
+#include <scm/core/io/file_base.h>
 
 namespace scm {
 namespace io {
@@ -17,8 +18,6 @@ namespace io {
 namespace detail {
 
 const scm::uint32   default_read_write_buffer_size = 65536u;
-
-template <typename char_type> class large_file_device_impl;
 
 } // namespace detail
 
@@ -57,7 +56,7 @@ public:
     std::streamsize         optimal_buffer_size() const;
 
 private:
-    boost::shared_ptr<detail::large_file_device_impl<char_t> >      _impl;
+    boost::shared_ptr<file_base>      _impl;
 
 }; // class large_file
 
