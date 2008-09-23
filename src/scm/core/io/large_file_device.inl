@@ -1,13 +1,6 @@
 
 #include <scm/core/platform/platform.h>
 
-#if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-#include <scm/core/io/file_win.h>
-#elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-#error "atm unsupported platform"
-#elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
-#error "atm unsupported platform"
-#endif
 
 namespace scm {
 namespace io {
@@ -15,15 +8,7 @@ namespace io {
 template <typename char_t>
 large_file<char_t>::large_file()
 {
-#if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
-    _impl.reset(new file_win());
-
-#elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-#error "atm unsupported platform"
-#elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
-#error "atm unsupported platform"
-#endif
+    _impl.reset(new file());
 }
 
 template <typename char_t>
@@ -32,31 +17,15 @@ large_file<char_t>::large_file(const std::string&       file_path,
                                bool                     disable_system_cache,
                                scm::uint32              read_write_buffer_size)
 {
-#if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
-    _impl.reset(new file_win());
+    _impl.reset(new file());
 
     open(file_path, open_mode, disable_system_cache, read_write_buffer_size);
-
-#elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-#error "atm unsupported platform"
-#elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
-#error "atm unsupported platform"
-#endif
 }
 
 template <typename char_t>
 large_file<char_t>::large_file(const large_file<char_t>& rhs)
 {
-#if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
-    _impl.reset(new file_win(*static_cast<file_win*>(rhs._impl.get())));
-
-#elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-#error "atm unsupported platform"
-#elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
-#error "atm unsupported platform"
-#endif
+    _impl.reset(new file(*rhs._impl.get()));
 }
 
 template <typename char_t>

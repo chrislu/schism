@@ -52,7 +52,7 @@ file_win::size_type
 file_win::actual_file_size() const
 {
     assert(_file_handle);
-    assert(*_file_handle != INVALID_HANDLE_VALUE);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
 
     LARGE_INTEGER   cur_size_li;
 
@@ -67,7 +67,7 @@ bool
 file_win::set_file_pointer(size_type new_pos)
 {
     assert(_file_handle);
-    assert(*_file_handle != INVALID_HANDLE_VALUE);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
 
     LARGE_INTEGER   position_li;
 
@@ -79,7 +79,6 @@ file_win::set_file_pointer(size_type new_pos)
     }
 
     return (true);
-
 }
 
 file_win::size_type
@@ -168,7 +167,7 @@ file_win::open(const std::string&       file_path,
     }
 
     // file attributes
-    DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
+    DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN;
 
     if (disable_system_cache) {
         flags_and_attributes |= FILE_FLAG_NO_BUFFERING;
@@ -292,7 +291,7 @@ file_win::read(char_type* output_buffer,
                size_type  num_bytes_to_read)
 {
     assert(_file_handle);
-    assert(*_file_handle != INVALID_HANDLE_VALUE);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
     assert(_position >= 0);
 
     using namespace scm;
@@ -500,7 +499,7 @@ file_win::write(const char_type* input_buffer,
                 size_type        num_bytes_to_write)
 {
     assert(_file_handle);
-    assert(*_file_handle != INVALID_HANDLE_VALUE);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
     assert(_position >= 0);
 
     using namespace scm;

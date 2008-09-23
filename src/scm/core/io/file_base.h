@@ -14,7 +14,7 @@ namespace scm {
 namespace io {
 
 namespace detail {
-const scm::uint32   default_cache_buffer_size = 65536u;
+const scm::uint32   default_cache_buffer_size = 32768u;
 } // namespace detail
 
 class __scm_export(core) file_base

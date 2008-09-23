@@ -10,7 +10,7 @@
 #include <boost/shared_ptr.hpp>      
 
 #include <scm/core/int_types.h>
-#include <scm/core/io/file_base.h>
+#include <scm/core/io/file.h>
 
 namespace scm {
 namespace io {
@@ -56,7 +56,7 @@ public:
     std::streamsize         optimal_buffer_size() const;
 
 private:
-    boost::shared_ptr<file_base>      _impl;
+    boost::shared_ptr<file>     _impl;
 
 }; // class large_file
 
