@@ -4,6 +4,7 @@
 #include "file_win.h"
 
 #include <algorithm>
+#include <limits>
 
 #include <scm/core/utilities/boost_warning_disable.h>
 #include <boost/bind.hpp>
@@ -201,7 +202,7 @@ file_win::open(const std::string&       file_path,
         // this aligns the memory region to page sizes
         // this memory has to be deallocated using VirtualFree, so the deallocator to the smart pointer
         _rw_buffer.reset(static_cast<char_type*>(VirtualAlloc(0, _rw_buffer_size, MEM_COMMIT | MEM_RESERVE, read_write_buffer_access)),
-                                                 boost::bind(VirtualFree, _1, 0, MEM_RELEASE));
+                                                 boost::bind<BOOL>(VirtualFree, _1, 0, MEM_RELEASE));
 
         if (!_rw_buffer) {
             //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::open(): error allocating read write buffer for no system buffering operation: ")
@@ -218,7 +219,7 @@ file_win::open(const std::string&       file_path,
                                   creation_disposition,
                                   flags_and_attributes,
                                   0),
-                       boost::bind(CloseHandle, _1));
+                       boost::bind<BOOL>(CloseHandle, _1));
 
     if (_file_handle.get() == INVALID_HANDLE_VALUE) {
         //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::open(): error creating/opening file ")
@@ -268,7 +269,7 @@ file_win::close()
                                               OPEN_EXISTING,
                                               FILE_ATTRIBUTE_NORMAL,
                                               0),
-                                   boost::bind(CloseHandle, _1));
+                                   boost::bind<BOOL>(CloseHandle, _1));
             }
             if (_file_handle.get() == INVALID_HANDLE_VALUE) {
                 throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error opening file for truncating end: ")
@@ -351,10 +352,12 @@ file_win::read(char_type* output_buffer,
                                                        math::min(_rw_buffered_start, _rw_buffer_size - bytes_cached));
                 int64   new_read_pos_vss    = _rw_buffered_start - bytes_left_to_read;
 
+                assert(bytes_cached <= (std::numeric_limits<size_t>::max)());
+
                 // copy the buffered to the end
                 memmove(_rw_buffer.get() + bytes_left_to_read,
                         _rw_buffer.get(),
-                        bytes_cached);
+                        static_cast<size_t>(bytes_cached));
 
                 if (!set_file_pointer(new_read_pos_vss)) {
                     throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
@@ -390,10 +393,12 @@ file_win::read(char_type* output_buffer,
                                                                   _rw_buffer_size - bytes_cached));
                 int64   new_read_pos_vss    = current_position_vss + bytes_cached;
 
+                assert(bytes_cached <= (std::numeric_limits<size_t>::max)());
+
                 // copy the buffered to the end
                 memmove(_rw_buffer.get(),
                         _rw_buffer.get() + (current_position_vss - _rw_buffered_start),
-                        bytes_cached);
+                        static_cast<size_t>(bytes_cached));
 
                 if (!set_file_pointer(new_read_pos_vss)) {
                     throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
@@ -452,10 +457,12 @@ file_win::read(char_type* output_buffer,
             assert(buf_read_offset >= 0);
             assert(buf_read_offset + buf_read_length <= _rw_buffer_size);
             assert(buf_read_length <= num_bytes_to_read);
+            
+            assert(buf_read_length <= (std::numeric_limits<size_t>::max)());
 
             CopyMemory(output_byte_buffer,
                        _rw_buffer.get() + buf_read_offset,
-                       buf_read_length);
+                       static_cast<size_t>(buf_read_length));
 
             bytes_to_read_vss        = (buffer_bytes_read < buffer_bytes_to_read) ? 0 : bytes_to_read_vss - buffer_bytes_read;
             output_byte_buffer      += buf_read_length;
@@ -575,10 +582,12 @@ file_win::write(const char_type* input_buffer,
             assert(buffer_bytes_to_write > 0);
             assert(_rw_buffer);
 
+            assert(buffer_fill_length <= (std::numeric_limits<size_t>::max)());
+
             // fill in the data to be written
             CopyMemory(_rw_buffer.get() + buffer_fill_start_off,
                        input_byte_buffer,
-                       buffer_fill_length);
+                       static_cast<size_t>(buffer_fill_length));
 
             if (WriteFile(_file_handle.get(),
                           _rw_buffer.get(),
