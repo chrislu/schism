@@ -2,7 +2,6 @@
 PROJECT(schism)
 
 # include platform definitions
-INCLUDE(external_versions)
 INCLUDE(schism_platform)
 INCLUDE(schism)
 
