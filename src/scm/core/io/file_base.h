@@ -46,6 +46,8 @@ public:
     virtual size_type           seek(size_type                  off,
                                      std::ios_base::seek_dir    way);
 
+	virtual size_type			set_end_of_file() = 0;
+
     virtual size_type           optimal_buffer_size() const;
 
 protected:

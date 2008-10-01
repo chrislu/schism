@@ -45,6 +45,7 @@ public:
     using detail::file_impl::read;
     using detail::file_impl::write;
     using detail::file_impl::seek;
+    using detail::file_impl::set_end_of_file;
     using detail::file_impl::optimal_buffer_size;
 }; // class file
 

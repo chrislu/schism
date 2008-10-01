@@ -637,6 +637,43 @@ file_win::write(const char_type* input_buffer,
     return (bytes_written);
 }
 
+file_win::size_type
+file_win::set_end_of_file()
+{
+  //  if (is_open()) {
+  //      // if we were non system buffered, so i may be possible to
+  //      // be too large because of volume sector size restrictions
+  //      if (   _rw_buffer_size
+  //          && _open_mode & std::ios_base::out) {
+  //          if (_file_size != actual_file_size()) {
+
+  //              _file_handle.reset();
+  //              _file_handle.reset(CreateFile(_file_path.c_str(),
+  //                                            GENERIC_WRITE,
+  //                                            PAGE_READONLY,
+  //                                            0,
+  //                                            OPEN_EXISTING,
+  //                                            FILE_ATTRIBUTE_NORMAL,
+  //                                            0),
+  //                                 boost::bind(CloseHandle, _1));
+  //          }
+  //          if (_file_handle.get() == INVALID_HANDLE_VALUE) {
+  //              throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error opening file for truncating end: ")
+  //                                           + _file_path);
+  //          }
+  //          set_file_pointer(_file_size);
+  //          if (SetEndOfFile(_file_handle.get()) == 0) {
+  //              throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error truncating end of file: ")
+  //                                           + _file_path);
+  //          }
+  //      }
+		//else {
+
+		//}
+  //  }
+	return (0);
+}
+
 } // namespace io
 } // namespace scm
 
