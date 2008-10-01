@@ -270,15 +270,16 @@ file_win::close()
                                               FILE_ATTRIBUTE_NORMAL,
                                               0),
                                    boost::bind<BOOL>(CloseHandle, _1));
-            }
-            if (_file_handle.get() == INVALID_HANDLE_VALUE) {
-                throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error opening file for truncating end: ")
-                                             + _file_path);
-            }
-            set_file_pointer(_file_size);
-            if (SetEndOfFile(_file_handle.get()) == 0) {
-                throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error truncating end of file: ")
-                                             + _file_path);
+
+                if (_file_handle.get() == INVALID_HANDLE_VALUE) {
+                    throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error opening file for truncating end: ")
+                                                 + _file_path);
+                }
+                set_file_pointer(_file_size);
+                if (SetEndOfFile(_file_handle.get()) == 0) {
+                    throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error truncating end of file: ")
+                                                 + _file_path);
+                }
             }
         }
     }
@@ -640,38 +641,65 @@ file_win::write(const char_type* input_buffer,
 file_win::size_type
 file_win::set_end_of_file()
 {
-  //  if (is_open()) {
-  //      // if we were non system buffered, so i may be possible to
-  //      // be too large because of volume sector size restrictions
-  //      if (   _rw_buffer_size
-  //          && _open_mode & std::ios_base::out) {
-  //          if (_file_size != actual_file_size()) {
+    if (is_open()) {
+        if (   _rw_buffer_size
+            && _open_mode & std::ios_base::out) {
+            // we use non system buffered access
+            // we need to reopen the file for the truncation
+            _file_handle.reset();
+            _file_handle.reset(CreateFile(_file_path.c_str(),
+                                          GENERIC_WRITE,
+                                          PAGE_READONLY,
+                                          0,
+                                          OPEN_EXISTING,
+                                          FILE_ATTRIBUTE_NORMAL,
+                                          0),
+                               boost::bind(CloseHandle, _1));
 
-  //              _file_handle.reset();
-  //              _file_handle.reset(CreateFile(_file_path.c_str(),
-  //                                            GENERIC_WRITE,
-  //                                            PAGE_READONLY,
-  //                                            0,
-  //                                            OPEN_EXISTING,
-  //                                            FILE_ATTRIBUTE_NORMAL,
-  //                                            0),
-  //                                 boost::bind(CloseHandle, _1));
-  //          }
-  //          if (_file_handle.get() == INVALID_HANDLE_VALUE) {
-  //              throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error opening file for truncating end: ")
-  //                                           + _file_path);
-  //          }
-  //          set_file_pointer(_file_size);
-  //          if (SetEndOfFile(_file_handle.get()) == 0) {
-  //              throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::close(): error truncating end of file: ")
-  //                                           + _file_path);
-  //          }
-  //      }
-		//else {
+            if (_file_handle.get() == INVALID_HANDLE_VALUE) {
+                //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::set_end_of_file(): error opening file for truncating end: ")
+                //                             + _file_path);
+                close();
+                return (-1);
+            }
 
-		//}
-  //  }
-	return (0);
+            // set file pointer to truncate location
+            set_file_pointer(_position);
+            if (SetEndOfFile(_file_handle.get()) == 0) {
+                //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::set_end_of_file(): error truncating end of file: ")
+                //                             + _file_path);
+                close();
+                return (-1);
+            }
+
+            _file_size = _position;
+
+            // reopen file with non system buffered access
+
+            std::ios_base::open_mode    reopen_mode = _open_mode;
+
+            reopen_mode &= ~std::ios_base::trunc;
+
+            _file_handle.reset();
+            if (!open(_file_path, reopen_mode, true, _rw_buffer_size)) {
+                //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::set_end_of_file(): error reopening file: ")
+                //                             + _file_path);
+                close();
+                return (-1);
+            }
+        }
+		else {
+            set_file_pointer(_position);
+            if (SetEndOfFile(_file_handle.get()) == 0) {
+                //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::set_end_of_file(): error truncating end of file: ")
+                //                             + _file_path);
+                close();
+                return (-1);
+            }
+		}
+    }
+
+	return (_position);
 }
 
 } // namespace io

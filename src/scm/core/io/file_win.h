@@ -39,6 +39,7 @@ public:
                                      size_type  num_bytes_to_read);
     size_type                   write(const char_type* input_buffer,
                                       size_type        num_bytes_to_write);
+
 	size_type					set_end_of_file();
 
 protected:
