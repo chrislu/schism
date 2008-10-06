@@ -12,7 +12,11 @@ namespace scm {
 class __scm_export(core) root : boost::noncopyable
 {
 public:
-    root(int& argc, char** argv);
+    root(int& argc, char** argv/*, app_type t = gui_application || console_application || etc.*/);
+    virtual ~root();
+
+
+
 
 protected:
 private:
