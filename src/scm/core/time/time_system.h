@@ -46,8 +46,6 @@ public:
                                                              time_stamp /*end*/);
 
 
-
-
 private:
     scoped_ptr<detail::high_res_time_stamp>   _high_res_timer;
 

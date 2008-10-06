@@ -43,6 +43,9 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/io *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/io/detail *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/io/detail *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/log *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/log *.h *.inl)
+
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/math *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/math *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/math/detail *.cpp)
