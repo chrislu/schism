@@ -1,4 +1,5 @@
 
+#if 0
 #ifndef CVAR_H_INCLUDED
 #define CVAR_H_INCLUDED
 
@@ -79,3 +80,5 @@ private:
 #include "cvar.inl"
 
 #endif // CVAR_H_INCLUDED
+
+#endif

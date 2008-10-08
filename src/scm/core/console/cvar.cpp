@@ -1,4 +1,4 @@
-
+#if 0
 #include "cvar.h"
 
 #include <limits>
@@ -81,3 +81,4 @@ std::ostream& operator<<(std::ostream& os, const cvar& var) {
 } // namespace con
 } // namespace scm
 
+#endif

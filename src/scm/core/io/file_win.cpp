@@ -654,7 +654,7 @@ file_win::set_end_of_file()
                                           OPEN_EXISTING,
                                           FILE_ATTRIBUTE_NORMAL,
                                           0),
-                               boost::bind(CloseHandle, _1));
+                               boost::bind<BOOL>(CloseHandle, _1));
 
             if (_file_handle.get() == INVALID_HANDLE_VALUE) {
                 //throw std::ios_base::failure(  std::string("large_file_device_windows<char_type>::set_end_of_file(): error opening file for truncating end: ")

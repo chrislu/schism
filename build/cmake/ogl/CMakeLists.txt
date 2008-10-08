@@ -2,9 +2,10 @@
 project(scm_ogl)
 
 include(schism_macros)
+include(schism_boost)
 include(schism_glsl)
 
-set(SRC_DIR                 "${SCHISM_SRC_DIR}/scm/ogl")
+set(SRC_DIR                 "${SCM_ROOT_DIR}/src/scm/ogl")
 set(SCM_PROJECT_SOURCE_DIR  ${SRC_DIR})
 
 set(LIBRARY_OUTPUT_PATH                         ${SCHISM_LIBRARY_DIR})
@@ -61,7 +62,7 @@ endif (WIN32)
 
 # set include and lib directories
 include_directories(
-    ${SCHISM_SRC_DIR}
+    ${SCM_ROOT_DIR}/src
 )
 # set include directories for windows external dependencies
 if (WIN32)
@@ -77,7 +78,7 @@ endif (WIN32)
 
 # set library directories
 link_directories(
-    ${SCHISM_LIB_DIR}/${SCHISM_PLATFORM}
+    ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
 )
 # set library directories for windows external dependencies
 if (WIN32)

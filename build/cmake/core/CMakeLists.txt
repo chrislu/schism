@@ -2,9 +2,10 @@
 project(scm_core)
 
 include(schism_macros)
+include(schism_boost)
 include(schism_glsl)
 
-set(SRC_DIR                 "${SCHISM_SRC_DIR}/scm/core")
+set(SRC_DIR                 "${SCM_ROOT_DIR}/src/scm/core")
 set(SCM_PROJECT_SOURCE_DIR  ${SRC_DIR})
 
 SET(LIBRARY_OUTPUT_PATH             ${SCHISM_LIBRARY_DIR})
@@ -85,7 +86,7 @@ endif (WIN32)
 
 # set include directories
 include_directories(
-    ${SCHISM_SRC_DIR}
+    ${SCM_ROOT_DIR}/src
 )
 # set include directories for windows external dependencies
 if (WIN32)
