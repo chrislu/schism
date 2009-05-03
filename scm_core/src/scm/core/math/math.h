@@ -2,6 +2,8 @@
 #ifndef SCM_MATH_H_INCLUDED
 #define SCM_MATH_H_INCLUDED
 
+#include <scm/core/numeric_types.h>
+
 #include <scm/core/math/common.h>
 
 #include <scm/core/math/vec.h>
