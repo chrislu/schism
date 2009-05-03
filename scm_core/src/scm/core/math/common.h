@@ -7,6 +7,7 @@
 #include <limits>
 
 #include <scm/core/numeric_types.h>
+#include <boost/static_assert.hpp>
 
 namespace scm {
 namespace math {
@@ -151,34 +152,41 @@ inline unsigned first_zero_bit(int_type x)
     return bit_count((i & (-i)) - 1);
 }
 
-template<typename int_type>
-inline int floor_log2(int_type x)
+inline
+scm::int32
+floor_log2(scm::uint32 x)
 {
-    assert(    std::numeric_limits<int_type>::is_integer
-           && !std::numeric_limits<int_type>::is_signed
-           &&  sizeof(int_type) == 4);
+    BOOST_STATIC_ASSERT(std::numeric_limits<scm::uint32>::is_integer);
+    BOOST_STATIC_ASSERT(!std::numeric_limits<scm::uint32>::is_signed);
+    BOOST_STATIC_ASSERT(sizeof(scm::uint32) == 4);
 
-    int pos = 0;
+    scm::int32 pos = 0;
 
-    if (x >= scm::uint32(1) << 16) { x >>= 16; pos += 16; }
-    if (x >= scm::uint32(1) << 8)  { x >>=  8; pos +=  8; }
-    if (x >= scm::uint32(1) << 4)  { x >>=  4; pos +=  4; }
-    if (x >= scm::uint32(1) << 2)  { x >>=  2; pos +=  2; }
-    if (x >= scm::uint32(1) << 1)  {           pos +=  1; }
+    if (x & 0xffff0000u) { x >>= 16; pos += 16; }
+    if (x & 0x0000ff00u) { x >>=  8; pos +=  8; }
+    if (x & 0x000000f0u) { x >>=  4; pos +=  4; }
+    if (x & 0x0000000cu) { x >>=  2; pos +=  2; }
+    if (x & 0x00000002u) {           pos +=  1; }
 
     return ((x == 0) ? (-1) : pos);
 }
 
-inline int floor_log2(scm::uint64 x)
+inline
+scm::int32
+floor_log2(scm::uint64 x)
 {
-    int pos = 0;
+    BOOST_STATIC_ASSERT(std::numeric_limits<scm::uint64>::is_integer);
+    BOOST_STATIC_ASSERT(!std::numeric_limits<scm::uint64>::is_signed);
+    BOOST_STATIC_ASSERT(sizeof(scm::uint64) == 8);
 
-    if (x >= scm::uint64(1) << 32) { x >>= 32; pos += 32; }
-    if (x >= scm::uint64(1) << 16) { x >>= 16; pos += 16; }
-    if (x >= scm::uint64(1) << 8)  { x >>=  8; pos +=  8; }
-    if (x >= scm::uint64(1) << 4)  { x >>=  4; pos +=  4; }
-    if (x >= scm::uint64(1) << 2)  { x >>=  2; pos +=  2; }
-    if (x >= scm::uint64(1) << 1)  {           pos +=  1; }
+    scm::int32 pos = 0;
+
+    if (x & 0xffffffff00000000ull) { x >>= 32; pos += 32; }
+    if (x & 0x00000000ffff0000ull) { x >>= 16; pos += 16; }
+    if (x & 0x000000000000ff00ull) { x >>=  8; pos +=  8; }
+    if (x & 0x00000000000000f0ull) { x >>=  4; pos +=  4; }
+    if (x & 0x000000000000000cull) { x >>=  2; pos +=  2; }
+    if (x & 0x0000000000000002ull) {           pos +=  1; }
 
     return ((x == 0) ? (-1) : pos);
 }
