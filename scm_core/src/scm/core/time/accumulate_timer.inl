@@ -52,7 +52,12 @@ template<class timer_t>
 typename accumulate_timer<timer_t>::duration_type
 accumulate_timer<timer_t>::average_duration() const
 {
-    return (_accumulated_duration / _accumulation_count);
+    if (_accumulation_count > 0) {
+        return (_accumulated_duration / _accumulation_count);
+    }
+    else {
+        return (duration_type());
+    }
 }
 
 } // namespace time
