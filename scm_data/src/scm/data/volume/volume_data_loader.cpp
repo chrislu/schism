@@ -66,26 +66,32 @@ bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>&
         || (offset.z + read_dimensions.z > _vol_desc._data_dimensions.z)) {
         return (false);
     }
-    
+
     scm::int64 offset_src;
     scm::int64 offset_dst;
+
+    const scm::int64                    data_value_size = static_cast<scm::int64>(_vol_desc._data_byte_per_channel) * static_cast<scm::int64>(_vol_desc._data_num_channels);
+    const scm::math::vec<scm::int64, 3> offset64(offset);
+    const scm::math::vec<scm::int64, 3> dimensions64(_vol_desc._data_dimensions);
+    const scm::math::vec<scm::int64, 3> buf_dimensions64(buffer_dimensions);
 
     bool success_reading = true;
 
     for (unsigned int slice = 0; slice < read_dimensions.z && success_reading; ++slice) {
         for (unsigned int line = 0; line < read_dimensions.y && success_reading; ++line) {
-            offset_src =  static_cast<scm::int64>(offset.x)
-                        + static_cast<scm::int64>(_vol_desc._data_dimensions.x) * static_cast<scm::int64>(offset.y + line)
-                        + static_cast<scm::int64>(_vol_desc._data_dimensions.x) * static_cast<scm::int64>(_vol_desc._data_dimensions.y) * static_cast<scm::int64>(offset.z + slice);
+            offset_src =  offset64.x
+                        + dimensions64.x * (offset64.y + line)
+                        + dimensions64.x * dimensions64.y * (offset64.z + slice);
+            offset_src *= data_value_size;
 
-            offset_src *= static_cast<scm::int64>(_vol_desc._data_byte_per_channel * _vol_desc._data_num_channels);
+            offset_dst =  buf_dimensions64.x * line
+                        + buf_dimensions64.x * buf_dimensions64.y * slice;
+            offset_dst *= data_value_size;
 
-            offset_dst =  static_cast<scm::int64>(buffer_dimensions.x) * static_cast<scm::int64>(line)
-                        + static_cast<scm::int64>(buffer_dimensions.x) * static_cast<scm::int64>(buffer_dimensions.y) * static_cast<scm::int64>(slice);
-            offset_dst *= static_cast<scm::int64>(_vol_desc._data_byte_per_channel) * static_cast<scm::int64>(_vol_desc._data_num_channels);
+            _file.seek(static_cast<scm::int64>(_data_start_offset) + offset_src, std::ios_base::beg);
+            scm::int64 read_size = data_value_size * read_dimensions.x;
 
-            _file.seek(offset_src + static_cast<scm::int64>(_data_start_offset), std::ios_base::beg);
-            if (_file.read((char*)&buffer[offset_dst], read_dimensions.x) != read_dimensions.x) {
+            if (_file.read((char*)&buffer[offset_dst], read_size) != read_size) {
                 success_reading = false;
             }
         }

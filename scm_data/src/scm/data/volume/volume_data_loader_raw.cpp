@@ -6,7 +6,7 @@
 
 //#pragma warning (disable : 4561 4793)
 #include <scm/core/utilities/boost_warning_disable.h>
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -34,7 +34,7 @@ bool parse_raw_file_name(const std::string& filename,
                          unsigned& num_components,
                          unsigned& bit_per_voxel)
 {
-    using namespace boost::spirit;
+    using namespace boost::spirit::classic;
 
     typedef std::string::const_iterator        iterator_t;
 
@@ -101,7 +101,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
         return (false);
     }
     bpc = bpc / 8;
-    num_chan = 1;
+    //num_chan = 1;
     _data_start_offset = file_offset;
 
     return (open_file(filename, dim, num_chan, bpc));
