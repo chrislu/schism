@@ -27,6 +27,7 @@ struct set_uint
 };
 
 bool parse_raw_file_name(const std::string& filename,
+                         unsigned& file_offset,
                          unsigned& width,
                          unsigned& height,
                          unsigned& depth,
@@ -37,7 +38,10 @@ bool parse_raw_file_name(const std::string& filename,
 
     typedef std::string::const_iterator        iterator_t;
 
-    rule<scanner<iterator_t> > infos =    str_p("_w") >> uint_p[set_uint(width)] 
+    file_offset = 0;
+
+    rule<scanner<iterator_t> > infos =  !(str_p("_o") >> uint_p[set_uint(file_offset)]) 
+                                       >> str_p("_w") >> uint_p[set_uint(width)] 
                                        >> str_p("_h") >> uint_p[set_uint(height)]
                                        >> str_p("_d") >> uint_p[set_uint(depth)]
                                        >> str_p("_c") >> uint_p[set_uint(num_components)]
@@ -76,6 +80,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
     scm::math::vec3ui   dim;
     unsigned            num_chan;
     unsigned            bpc;
+    unsigned            file_offset;
 
     using namespace boost::filesystem;
     path                file_path(filename, native);
@@ -83,6 +88,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
     std::string         file_extension  = extension(file_path);
 
     if (!parse_raw_file_name(file_name,
+                             file_offset,
                              dim.x,
                              dim.y,
                              dim.z,
@@ -96,6 +102,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
     }
     bpc = bpc / 8;
     num_chan = 1;
+    _data_start_offset = file_offset;
 
     return (open_file(filename, dim, num_chan, bpc));
 }
@@ -129,7 +136,8 @@ bool volume_data_loader_raw::open_file(const std::string& filename,
                * _vol_desc._data_dimensions.y
                * _vol_desc._data_dimensions.z
                * _vol_desc._data_num_channels
-               * _vol_desc._data_byte_per_channel) {
+               * _vol_desc._data_byte_per_channel
+               + _data_start_offset) {
         return (false);
     }
 
