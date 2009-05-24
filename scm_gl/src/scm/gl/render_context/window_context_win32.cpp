@@ -1,5 +1,5 @@
 
-#include "context_win32.h"
+#include "window_context_win32.h"
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
@@ -20,7 +20,7 @@ namespace gl {
 
 namespace detail {
 
-void null_deleter(context::handle::element_type* p)
+void null_deleter(context_base::handle::element_type* p)
 {
 }
 
@@ -150,7 +150,7 @@ private:
 
 } // namespace detail
 
-context_win32::context_win32()
+window_context_win32::window_context_win32()
 {
 }
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -178,22 +178,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd,uMsg,wParam,lParam);
 }
 
-context_win32::~context_win32()
+window_context_win32::~window_context_win32()
 {
     cleanup();
 }
 
 bool
-context_win32::setup(const wnd_handle hwnd,
-                     const context_format& desc)
+window_context_win32::setup(const wnd_handle hwnd,
+                            const context_format& desc)
 {
     return (setup(hwnd, desc, empty_context()));
 }
 
 bool
-context_win32::setup(const wnd_handle hwnd,
-                     const context_format& desc,
-                     const context& share_ctx)
+window_context_win32::setup(const wnd_handle hwnd,
+                            const context_format& desc,
+                            const context_base& share_ctx)
 {
     _wnd_handle.reset(hwnd, detail::null_deleter);
 
@@ -219,10 +219,10 @@ context_win32::setup(const wnd_handle hwnd,
     //               << std::hex << &WndProc << std::endl;
     //}
 
-    _hDC.reset(GetDC(static_cast<HWND>(_wnd_handle.get())),
-               boost::bind<int>(ReleaseDC, static_cast<HWND>(_wnd_handle.get()), _1));
+    _device_handle.reset(GetDC(static_cast<HWND>(_wnd_handle.get())),
+                               boost::bind<int>(ReleaseDC, static_cast<HWND>(_wnd_handle.get()), _1));
 
-    if (!_hDC) {
+    if (!_device_handle) {
         scm::err() << scm::log_level(scm::logging::ll_error)
                    << "context_win32::set_up(): "
                    << "unable to retrive device context (GetDC failed on window handle: "
@@ -273,7 +273,7 @@ context_win32::setup(const wnd_handle hwnd,
     int               result_pixel_fmts[query_max_formats];
     unsigned int      result_num_pixel_fmts = 0;
 
-    if (wglChoosePixelFormatARB(static_cast<HDC>(_hDC.get()),
+    if (wglChoosePixelFormatARB(static_cast<HDC>(_device_handle.get()),
                                 static_cast<const int*>(&(pixel_desc[0])),
                                 NULL,
                                 query_max_formats,
@@ -293,7 +293,7 @@ context_win32::setup(const wnd_handle hwnd,
         return (false);
     }
 
-    if (SetPixelFormat(static_cast<HDC>(_hDC.get()), result_pixel_fmts[0], NULL) != TRUE) {
+    if (SetPixelFormat(static_cast<HDC>(_device_handle.get()), result_pixel_fmts[0], NULL) != TRUE) {
         scm::err() << scm::log_level(scm::logging::ll_error)
                    << "context_win32::set_up(): "
                    << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << std::endl;
@@ -306,7 +306,7 @@ context_win32::setup(const wnd_handle hwnd,
                    << "WGL_ARB_create_context not supported: "
                    << "using default wglCreateContest function which does not allow request of versioned OpenGL context" << std::endl;
 
-        _context_handle.reset(wglCreateContext(static_cast<HDC>(_hDC.get())),
+        _context_handle.reset(wglCreateContext(static_cast<HDC>(_device_handle.get())),
                               boost::bind<BOOL>(wglDeleteContext, _1));
 
         if (!share_ctx.empty()/* != empty_context()*/) {
@@ -334,7 +334,7 @@ context_win32::setup(const wnd_handle hwnd,
         }
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
-        _context_handle.reset(wglCreateContextAttribsARB(static_cast<HDC>(_hDC.get()),
+        _context_handle.reset(wglCreateContextAttribsARB(static_cast<HDC>(_device_handle.get()),
                                                          static_cast<HGLRC>(share_ctx.context_handle().get()),
                                                          static_cast<const int*>(&(ctx_attribs[0]))),
                               boost::bind<BOOL>(wglDeleteContext, _1));
@@ -343,14 +343,14 @@ context_win32::setup(const wnd_handle hwnd,
     if (!_context_handle) {
         scm::err() << scm::log_level(scm::logging::ll_error)
                    << "context_win32::set_up(): "
-                   << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << std::endl;
+                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed)"  << std::endl;
         return (false);
     }
 
     _context_format = desc;
     make_current(true);
 
-    std::string wgl_ext_string = (char*)wglGetExtensionsStringARB(static_cast<HDC>(_hDC.get()));
+    std::string wgl_ext_string = (char*)wglGetExtensionsStringARB(static_cast<HDC>(_device_handle.get()));
     std::replace(wgl_ext_string.begin(), wgl_ext_string.end(), ' ', '\n');
 
     std::cout << "OpenGL WGL extensions: " << std::endl;
@@ -361,31 +361,31 @@ context_win32::setup(const wnd_handle hwnd,
 }
 
 bool
-context_win32::make_current(bool current) const
+window_context_win32::make_current(bool current) const
 {
-    return (wglMakeCurrent(static_cast<HDC>(_hDC.get()),
+    return (wglMakeCurrent(static_cast<HDC>(_device_handle.get()),
                            current ? static_cast<HGLRC>(_context_handle.get()) : NULL) == TRUE ? true : false);
 }
 
-void context_win32::swap_buffers() const
+void window_context_win32::swap_buffers() const
 {
-    SwapBuffers(static_cast<HDC>(_hDC.get()));
+    SwapBuffers(static_cast<HDC>(_device_handle.get()));
 }
 
-void context_win32::cleanup()
+void window_context_win32::cleanup()
 {
     make_current(false);
     _context_handle.reset();
-    _hDC.reset();
+    _device_handle.reset();
     //wglDeleteContext(this->_hGLRC);
     //ReleaseDC(_wnd_handle, this->_hDC);
 }
 
 /*static*/
-context_win32&
-context_win32::empty_context()
+window_context_win32&
+window_context_win32::empty_context()
 {
-    static context_win32 emptyctx;
+    static window_context_win32 emptyctx;
     return (emptyctx);
 }
 

@@ -1,6 +1,6 @@
 
-#ifndef SCM_GL_CONTEXT_H_INCLUDED
-#define SCM_GL_CONTEXT_H_INCLUDED
+#ifndef SCM_GL_CONTEXT_BASE_H_INCLUDED
+#define SCM_GL_CONTEXT_BASE_H_INCLUDED
 
 #include <boost/utility.hpp>
 
@@ -15,36 +15,29 @@ namespace gl {
 
 class context_format;
 
-class __scm_export(ogl) context : boost::noncopyable
+class __scm_export(ogl) context_base : boost::noncopyable
 {
 public:
-    typedef void*                   wnd_handle;
     typedef scm::shared_ptr<void>   handle;
 
 public:
-    context();
-    virtual ~context();
+    context_base();
+    virtual ~context_base();
 
-    virtual bool            setup(const wnd_handle hwnd,
-                                  const context_format& desc) = 0;
-    virtual bool            setup(const wnd_handle hwnd,
-                                  const context_format& desc,
-                                  const context& share_ctx) = 0;
     virtual void            cleanup() = 0;
 
     virtual bool            make_current(bool current = true) const = 0;
-    virtual void            swap_buffers() const = 0;
 
     const context_format&   format() const;
     const handle&           context_handle() const;
-
-    virtual bool            operator==(const context& rhs) const;
-    virtual bool            operator!=(const context& rhs) const;
+    const handle&           device_handle() const;
 
     virtual bool            empty() const;
 
 protected:
     context_format          _context_format;
+
+    handle                  _device_handle;  // win: HDC, linux: display*
     handle                  _context_handle;
 
 };
@@ -54,4 +47,5 @@ protected:
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
-#endif // SCM_GL_CONTEXT_H_INCLUDED
+
+#endif // SCM_GL_CONTEXT_BASE_H_INCLUDED
