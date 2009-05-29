@@ -8,6 +8,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/weak_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 namespace scm {
 
@@ -17,6 +18,9 @@ using boost::shared_ptr;
 using boost::shared_array;
 using boost::weak_ptr;
 using boost::intrusive_ptr;
+
+using boost::make_shared;
+using boost::allocate_shared;
 
 } // namespace scm
 
