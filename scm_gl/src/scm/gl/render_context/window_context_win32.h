@@ -27,12 +27,14 @@ public:
     void            cleanup();
 
     bool            make_current(bool current = true) const;
-    void            swap_buffers() const;
+    void            swap_buffers(int interval = 0) const;
 
     static window_context_win32& empty_context();
 
 protected:
     handle          _wnd_handle;
+
+    bool            _swap_control_supported;
 };
 
 } // namespace gl

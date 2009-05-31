@@ -151,8 +151,10 @@ private:
 } // namespace detail
 
 window_context_win32::window_context_win32()
+  : _swap_control_supported(false)
 {
 }
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)									// Check For Windows Messages
@@ -347,6 +349,15 @@ window_context_win32::setup(const wnd_handle hwnd,
         return (false);
     }
 
+    if (wglewIsSupported("WGL_EXT_swap_control")) {
+        _swap_control_supported = true;
+    }
+    else {
+        scm::err() << scm::log_level(scm::logging::ll_warning)
+                   << "context_win32::set_up(): "
+                   << "WGL_EXT_swap_control not supported, operating system default behavior used."  << std::endl;
+    }
+
     _context_format = desc;
     make_current(true);
 
@@ -367,8 +378,11 @@ window_context_win32::make_current(bool current) const
                            current ? static_cast<HGLRC>(_context_handle.get()) : NULL) == TRUE ? true : false);
 }
 
-void window_context_win32::swap_buffers() const
+void window_context_win32::swap_buffers(int interval) const
 {
+    if (_swap_control_supported) {
+        wglSwapIntervalEXT(interval);
+    }
     SwapBuffers(static_cast<HDC>(_device_handle.get()));
 }
 

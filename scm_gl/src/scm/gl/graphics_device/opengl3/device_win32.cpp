@@ -101,7 +101,7 @@ opengl_device_win32::setup_render_context(const device_context_config& cfg, unsi
         } break;
     }
 
-    pixel_desc.push_back(0);                        pixel_desc.push_back(0); // terminate list
+    pixel_desc.push_back(0);    pixel_desc.push_back(0); // terminate list
 
     const int         query_max_formats = 20;
     int               result_pixel_fmts[query_max_formats];

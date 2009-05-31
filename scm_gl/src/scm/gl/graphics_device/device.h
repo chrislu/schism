@@ -47,6 +47,7 @@ protected:
 
 private:
 
+
 }; // class device
 
 } // namespace gl

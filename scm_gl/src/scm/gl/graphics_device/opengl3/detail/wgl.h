@@ -1,6 +1,6 @@
 
-#ifndef SCM_GL_DETAIL_GL_WGL_WGL_H_INCLUDED
-#define SCM_GL_DETAIL_GL_WGL_WGL_H_INCLUDED
+#ifndef SCM_GL_DETAIL_GL_WGL_H_INCLUDED
+#define SCM_GL_DETAIL_GL_WGL_H_INCLUDED
 
 #include <scm/core/platform/platform.h>
 

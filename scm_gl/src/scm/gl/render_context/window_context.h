@@ -27,7 +27,7 @@ public:
                                   const context_format& desc,
                                   const context_base& share_ctx) = 0;
 
-    virtual void            swap_buffers() const = 0;
+    virtual void            swap_buffers(int interval = 0) const = 0;
 
     virtual bool            operator==(const window_context& rhs) const;
     virtual bool            operator!=(const window_context& rhs) const;

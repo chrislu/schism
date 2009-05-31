@@ -29,6 +29,8 @@ protected:
     device_context(device& dev);
 
 private:
+    
+
 }; // class device_context
 
 } // namespace gl

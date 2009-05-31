@@ -11,6 +11,7 @@ namespace data {
 template<typename val_type,
          typename res_type>
 piecewise_function_1d<val_type, res_type>::piecewise_function_1d()
+  : _dirty(true)
 {
 }
 
@@ -19,6 +20,7 @@ template<typename val_type,
 typename piecewise_function_1d<val_type, res_type>::insert_return_type
 piecewise_function_1d<val_type, res_type>::add_stop(const stop_type& stop)
 {
+    _dirty = true;
     return (_function.insert(stop));
 }
 
@@ -45,14 +47,32 @@ void piecewise_function_1d<val_type, res_type>::del_stop(value_type point)
 
     if (existent_stop != _function.end()) {
         _function.erase(existent_stop);
+        _dirty = true;
     }
+}
+
+template<typename val_type,
+         typename res_type>
+bool piecewise_function_1d<val_type, res_type>::dirty() const
+{
+    return (_dirty);
+}
+
+template<typename val_type,
+         typename res_type>
+void piecewise_function_1d<val_type, res_type>::dirty(const bool d)
+{
+    _dirty = d;
 }
 
 template<typename val_type,
          typename res_type>
 void piecewise_function_1d<val_type, res_type>::clear()
 {
-    _function.clear();
+    if (_function.size() != 0) {
+        _dirty = true;
+        _function.clear();
+    }
 }
 
 template<typename val_type,

@@ -38,6 +38,9 @@ public:
     insert_return_type      add_stop(value_type point, result_type value);
     void                    del_stop(value_type point);
 
+    bool                    dirty() const;
+    void                    dirty(const bool d);
+
     void                    clear();
     bool                    empty() const;
 
@@ -99,6 +102,7 @@ protected:
 
 protected:
     function_point_container_t              _function;
+    bool                                    _dirty;
 
 private:
     //BOOST_STATIC_ASSERT(std::numeric_limits<val_type>::is_specialized);
