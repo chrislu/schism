@@ -19,9 +19,9 @@ public:
 
     const gl::texture_3d& operator=(const gl::texture_3d& rhs);
 
-    unsigned        get_width() const       { return (_width); }
-    unsigned        get_height() const      { return (_height); }
-    unsigned        get_depth() const       { return (_depth); }
+    unsigned        width() const       { return (_width); }
+    unsigned        height() const      { return (_height); }
+    unsigned        depth() const       { return (_depth); }
 
     bool            tex_image(GLint     mip_level,
                               GLint     internal_format,

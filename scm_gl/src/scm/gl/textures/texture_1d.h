@@ -18,7 +18,7 @@ public:
 
     const gl::texture_1d& operator=(const gl::texture_1d& rhs);
 
-    unsigned        get_width() const { return (_width); }
+    unsigned        width() const { return (_width); }
 
     bool            tex_image(GLint     mip_level,
                               GLint     internal_format,

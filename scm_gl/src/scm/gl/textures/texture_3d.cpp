@@ -9,7 +9,7 @@ namespace scm {
 namespace gl {
 
 texture_3d::texture_3d()
-    : texture(GL_TEXTURE_3D),
+    : texture(GL_TEXTURE_3D, GL_TEXTURE_BINDING_3D),
       _width(0),
       _height(0),
       _depth(0)
@@ -48,11 +48,26 @@ bool texture_3d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
+    assert(glGetError() == GL_NONE);
+
     gl::error_checker ech;
-
-    this->bind();
-
-    glTexImage3D(get_texture_target(),
+#ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
+    glTextureImage3DEXT(texture_id(),
+                        texture_target(),
+                        mip_level,
+                        internal_format,
+                        width,
+                        height,
+                        depth,
+                        0,
+                        format,
+                        type,
+                        data);
+    assert(ech.ok());
+#else // SCM_GL_USE_DIRECT_STATE_ACCESS
+    binding_guard guard(texture_target(), texture_binding());
+    bind();
+    glTexImage3D(texture_target(),
                  mip_level,
                  internal_format,
                  width,
@@ -62,21 +77,26 @@ bool texture_3d::tex_image(GLint     mip_level,
                  format,
                  type,
                  data);
-
-
     assert(ech.ok());
-
     //if (ech.check_error()) {
     //    std::cout << ech.get_error_string() << std::endl;
     //if ((_last_error = glGetError()) != GL_NO_ERROR) {
     //    return (false);
     //}
+    unbind();
+#endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
     _width  = width;
     _height = height;
     _depth  = depth;
 
-    this->unbind();
+    tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+    tex_parameteri(GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+    tex_parameteri(GL_TEXTURE_WRAP_R,     GL_CLAMP_TO_EDGE);
+
+    assert(glGetError() == GL_NONE);
 
     return (true);
 }
@@ -92,19 +112,32 @@ bool texture_3d::tex_sub_image(GLint     mip_level,
                                GLenum    type,
                                const GLvoid *data)
 {
-    this->bind();
+    assert(glGetError() == GL_NONE);
 
-    glTexSubImage3D(get_texture_target(),
+    gl::error_checker ech;
+#ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
+    glTextureSubImage3DEXT(texture_id(), texture_target(),
+                           mip_level,
+                           off_x, off_y, off_z,
+                           width, height, depth,
+                           format, type, data);
+    assert(ech.ok());
+#else // SCM_GL_USE_DIRECT_STATE_ACCESS
+    binding_guard guard(texture_target(), texture_binding());
+    bind();
+    glTexSubImage3D(texture_target(),
                     mip_level,
                     off_x, off_y, off_z,
                     width, height, depth,
                     format, type, data);
+    assert(ech.ok());
+    //if ((_last_error = glGetError()) != GL_NO_ERROR) {
+    //    return (false);
+    //}
+    unbind();
+#endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    if ((_last_error = glGetError()) != GL_NO_ERROR) {
-        return (false);
-    }
-
-    this->unbind();
+    assert(glGetError() == GL_NONE);
 
     return (true);
 }

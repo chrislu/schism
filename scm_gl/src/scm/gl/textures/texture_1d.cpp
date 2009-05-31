@@ -9,7 +9,7 @@ namespace scm {
 namespace gl {
 
 texture_1d::texture_1d()
-    : texture(GL_TEXTURE_1D),
+    : texture(GL_TEXTURE_1D, GL_TEXTURE_BINDING_1D),
       _width(0)
 {
 }
@@ -34,11 +34,26 @@ bool texture_1d::tex_image(GLint     mip_level,
                            GLenum    type,
                            const GLvoid *data)
 {
+    assert(glGetError() == GL_NONE);
+
     gl::error_checker ech;
+#ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
+    glTextureImage1DEXT(texture_id(),
+                        texture_target(),
+                        mip_level,
+                        internal_format,
+                        width,
+                        0,
+                        format,
+                        type,
+                        data);
+    assert(ech.ok());
 
-    this->bind();
+#else // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    glTexImage1D(get_texture_target(),
+    binding_guard guard(texture_target(), texture_binding());
+    bind();
+    glTexImage1D(texture_target(),
                  mip_level,
                  internal_format,
                  width,
@@ -48,14 +63,19 @@ bool texture_1d::tex_image(GLint     mip_level,
                  data);
 
     assert(ech.ok());
-
     //if ((_last_error = glGetError()) != GL_NO_ERROR) {
     //    return (false);
     //}
+    unbind();
+#endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
     _width = width;
 
-    this->unbind();
+    tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tex_parameteri(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+
+    assert(glGetError() == GL_NONE);
 
     return (true);
 }

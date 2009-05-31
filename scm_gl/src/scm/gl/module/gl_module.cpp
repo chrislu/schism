@@ -122,6 +122,21 @@ gl_module::initialize_gl_context()
         }
     }
 
+#ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
+    if (is_supported("GL_EXT_direct_state_access")) {
+        scm::out() << scm::log_level(scm::logging::ll_info)
+                   << "gl_module::initialize_gl_context(): "
+                   << "GL_EXT_direct_state_access supported and enabled for scm_gl use."  << std::endl;
+    }
+    else {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "gl_module::initialize_gl_context(): "
+                   << "GL_EXT_direct_state_access not supported but enabled for scm_gl use "
+                   << "(undefine SCM_GL_USE_DIRECT_STATE_ACCESS!)" << std::endl;
+        return (false);
+    }
+#endif // SCM_GL_USE_DIRECT_STATE_ACCESS
+
     scm::out() << scm::log_level(scm::logging::ll_info)
                << "successfully initialized scm.gl module context:"  << std::endl;
 

@@ -66,9 +66,9 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
             
             texture_2d_rect& cur_tex = *font_face->_style_textures[*style_it];
 
-            cur_tex.bind();
+            //cur_tex.bind();
             cur_tex.tex_image(0,
-                              GL_ALPHA,
+                              GL_ALPHA8,
                               get_current_face_texture(*style_it)._size.x,
                               get_current_face_texture(*style_it)._size.y,
                               GL_ALPHA,

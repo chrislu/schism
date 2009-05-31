@@ -2,9 +2,11 @@
 #ifndef TEXTURE_H_INCLUDED
 #define TEXTURE_H_INCLUDED
 
-#include <scm/gl/opengl.h>
+#include <boost/noncopyable.hpp>
 
-#include <boost/shared_ptr.hpp>
+#include <scm/core/pointer_types.h>
+
+#include <scm/gl/opengl.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -14,6 +16,19 @@ namespace gl {
 
 class __scm_export(ogl) texture
 {
+public:
+    class binding_guard : boost::noncopyable
+    {
+    public:
+        binding_guard(unsigned /*target*/, unsigned /*binding*/);
+        virtual ~binding_guard();
+    private:
+        int             _save_active_texture_unit;
+        int             _save_texture_object;
+        unsigned        _binding;
+        unsigned        _target;
+    };
+
 public:
     texture(const gl::texture& tex);
     virtual ~texture();
@@ -25,12 +40,13 @@ public:
 
     void                            tex_parameteri(GLenum pname, GLint param);
 
-    int                             get_texture_target() const;
-    unsigned                        get_texture_id() const;
-    int                             get_last_error() const;
+    int                             texture_target() const;
+    int                             texture_binding() const;
+    unsigned                        texture_id() const;
+    int                             last_error() const;
 
 protected:
-    texture(const GLenum target);
+    texture(const GLenum target, const GLenum binding);
 
 private:
     void                                checked_lazy_generate_texture_id() const ;
@@ -40,7 +56,9 @@ protected:
 
 private:
     GLenum                              _texture_target;
-    mutable boost::shared_ptr<GLuint>   _texture_id;
+    GLenum                              _texture_binding;
+
+    mutable scm::shared_ptr<GLuint>     _texture_id;
 
     mutable int                         _occupied_texture_unit;
 }; // class texture

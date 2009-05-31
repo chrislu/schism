@@ -51,7 +51,7 @@ program_object program_object_factory::create(const program_object_makefile& mak
         }
         if (!vert_shader->compile()) {
             _error_output +=  std::string("compile error: vertex domain: \n")
-                            + vert_shader->get_compiler_output()
+                            + vert_shader->compiler_output()
                             + std::string("\n");
             compile_error = true;
         }
@@ -85,7 +85,7 @@ program_object program_object_factory::create(const program_object_makefile& mak
         }
         if (!frag_shader->compile()) {
             _error_output +=  std::string("compile error: fragment domain: \n")
-                            + frag_shader->get_compiler_output()
+                            + frag_shader->compiler_output()
                             + std::string("\n");
             compile_error = true;
         }
@@ -101,7 +101,7 @@ program_object program_object_factory::create(const program_object_makefile& mak
         // program linking
         if (!new_program_object.link()) {
             _error_output +=  std::string("link error: \n")
-                            + new_program_object.get_linker_output()
+                            + new_program_object.linker_output()
                             + std::string("\n");
         }
     }
