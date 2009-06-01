@@ -38,11 +38,12 @@ public:
     void                            bind(int /*texunit*/ = -1) const;
     void                            unbind() const;
 
-    void                            tex_parameteri(GLenum pname, GLint param);
+    void                            parameter(GLenum pname, int param);
+    void                            parameter(GLenum pname, float param);
 
-    int                             texture_target() const;
-    int                             texture_binding() const;
-    unsigned                        texture_id() const;
+    int                             target() const;
+    int                             binding() const;
+    unsigned                        id() const;
     int                             last_error() const;
 
 protected:

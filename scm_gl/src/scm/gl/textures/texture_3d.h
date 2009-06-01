@@ -23,25 +23,25 @@ public:
     unsigned        height() const      { return (_height); }
     unsigned        depth() const       { return (_depth); }
 
-    bool            tex_image(GLint     mip_level,
-                              GLint     internal_format,
-                              GLsizei   width,
-                              GLsizei   height,
-                              GLsizei   depth,
-                              GLenum    format,
-                              GLenum    type,
-                              const GLvoid *data);
+    bool            image_data(GLint     mip_level,
+                               GLint     internal_format,
+                               GLsizei   width,
+                               GLsizei   height,
+                               GLsizei   depth,
+                               GLenum    format,
+                               GLenum    type,
+                               const GLvoid *data);
 
-    bool            tex_sub_image(GLint     mip_level,
-                                  GLint     off_x,
-                                  GLint     off_y,
-                                  GLint     off_z,
-                                  GLsizei   width,
-                                  GLsizei   height,
-                                  GLsizei   depth,
-                                  GLenum    format,
-                                  GLenum    type,
-                                  const GLvoid *data);
+    bool            image_sub_data(GLint     mip_level,
+                                   GLint     off_x,
+                                   GLint     off_y,
+                                   GLint     off_z,
+                                   GLsizei   width,
+                                   GLsizei   height,
+                                   GLsizei   depth,
+                                   GLenum    format,
+                                   GLenum    type,
+                                   const GLvoid *data);
 
 protected:
     unsigned        _width;

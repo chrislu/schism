@@ -70,7 +70,7 @@
 #       error "unsupported windows platform compiler"
 #   endif
 
-#   ifdef _DEBUG
+#   ifdef NDEBUG
 #       define SCM_DEBUG   1
 #   else
 #       define SCM_DEBUG   0
@@ -89,7 +89,7 @@
 #       define __scm_private(lib)
 #   endif
 
-#   ifdef DEBUG
+#   ifdef NDEBUG
 #       define SCM_DEBUG   1
 #   else
 #       define SCM_DEBUG   0

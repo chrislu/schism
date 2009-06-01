@@ -67,19 +67,19 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
             texture_2d_rect& cur_tex = *font_face->_style_textures[*style_it];
 
             //cur_tex.bind();
-            cur_tex.tex_image(0,
-                              GL_ALPHA8,
-                              get_current_face_texture(*style_it)._size.x,
-                              get_current_face_texture(*style_it)._size.y,
-                              GL_ALPHA,
-                              GL_UNSIGNED_BYTE,
-                              (void*)get_current_face_texture(*style_it)._data.get());
+            cur_tex.image_data(0,
+                               GL_ALPHA8,
+                               get_current_face_texture(*style_it)._size.x,
+                               get_current_face_texture(*style_it)._size.y,
+                               GL_ALPHA,
+                               GL_UNSIGNED_BYTE,
+                               (void*)get_current_face_texture(*style_it)._data.get());
 
             if (!_error_check.ok()) {
                 scm::err() << scm::log_level(scm::logging::ll_error)
                            << "scm::gl::face_loader::load(): "
                            << "error uploading face texture: "
-                           << _error_check.get_error_string()
+                           << _error_check.error_string()
                            << std::endl;
 
                 font_face->cleanup_textures();
@@ -88,11 +88,11 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
                 return (font_face);
             }
 
-            cur_tex.tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            cur_tex.tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            cur_tex.parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            cur_tex.parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-            cur_tex.tex_parameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            cur_tex.tex_parameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            cur_tex.parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            cur_tex.parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
     }
 

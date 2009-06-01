@@ -2,6 +2,7 @@
 #include "texture.h"
 
 #include <cassert>
+#include <scm/gl/utilities/gl_assert.h>
 
 #include <scm/core/platform/platform.h>
 
@@ -14,22 +15,22 @@ texture::binding_guard::binding_guard(unsigned target, unsigned binding)
     _binding(binding),
     _target(target)
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture::binding_guard::binding_guard()");
 
     glGetIntegerv(GL_ACTIVE_TEXTURE, &_save_active_texture_unit);
     glGetIntegerv(_binding, &_save_texture_object);
 
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture::binding_guard::binding_guard()");
 }
 
 texture::binding_guard::~binding_guard()
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture::binding_guard::~binding_guard()");
 
     glActiveTexture(_save_active_texture_unit);
     glBindTexture(_target, _save_texture_object);
 
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture::binding_guard::~binding_guard()");
 }
 
 texture::texture(const GLenum target, const GLenum binding)
@@ -79,32 +80,45 @@ const texture& texture::operator=(const texture& rhs)
 //    }
 //}
 
-void texture::tex_parameteri(GLenum pname, GLint param)
+void texture::parameter(GLenum pname, int param)
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture::parameter(GLenum, int)");
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glTextureParameteriEXT(texture_id(), _texture_target, pname, param);
+    glTextureParameteriEXT(id(), target(), pname, param);
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
-    binding_guard guard(texture_target(), texture_binding());
+    binding_guard guard(target(), binding());
     bind();
-    glTexParameteri(_texture_target, pname, param);
+    glTexParameteri(target(), pname, param);
     unbind();
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
-    assert(glGetError() == GL_NONE);
-
+    gl_assert_error("exiting texture::parameter(GLenum, int)");
 }
 
-int texture::texture_target() const
+void texture::parameter(GLenum pname, float param)
+{
+    gl_assert_error("entering texture::parameter(GLenum, float)");
+#ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
+    glTextureParameterfEXT(id(), target(), pname, param);
+#else // SCM_GL_USE_DIRECT_STATE_ACCESS
+    binding_guard guard(target(), binding());
+    bind();
+    glTexParameterf(target(), pname, param);
+    unbind();
+#endif // SCM_GL_USE_DIRECT_STATE_ACCESS
+    gl_assert_error("exiting texture::parameter(GLenum, float)");
+}
+
+int texture::target() const
 {
     return (_texture_target);
 }
 
-int texture::texture_binding() const
+int texture::binding() const
 {
     return (_texture_binding);
 }
 
-unsigned texture::texture_id() const
+unsigned texture::id() const
 {
     checked_lazy_generate_texture_id();
 
@@ -118,40 +132,40 @@ int texture::last_error() const
 
 void texture::bind(int texunit) const
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture::bind()");
     assert(_texture_id);
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
     _occupied_texture_unit = texunit > 0 ? texunit : 0;
-    glBindMultiTextureEXT(GL_TEXTURE0 + _occupied_texture_unit, _texture_target, texture_id());
-    glEnableIndexedEXT(_texture_target, _occupied_texture_unit);
+    glBindMultiTextureEXT(GL_TEXTURE0 + _occupied_texture_unit, target(), id());
+    glEnableIndexedEXT(target(), _occupied_texture_unit);
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
     if (texunit >= 0) {
         _occupied_texture_unit = texunit;
         glActiveTexture(GL_TEXTURE0 + _occupied_texture_unit);
-        assert(glGetError() == GL_NONE);
+        gl_assert_error("texture::bind() after glActiveTexture");
     }
-    glEnable(_texture_target);
-    assert(glGetError() == GL_NONE);
-    glBindTexture(_texture_target, texture_id());
+    glEnable(glEnable());
+    gl_assert_error("texture::bind() after glEnable(glEnable)");
+    glBindTexture(target(), id());
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture::bind()");
 }
 
 void texture::unbind() const
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture::unbind()");
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glDisableIndexedEXT(_texture_target, _occupied_texture_unit);
-    glBindMultiTextureEXT(GL_TEXTURE0 + _occupied_texture_unit, _texture_target, 0);
+    glDisableIndexedEXT(target(), _occupied_texture_unit);
+    glBindMultiTextureEXT(GL_TEXTURE0 + _occupied_texture_unit, target(), 0);
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
     if (_occupied_texture_unit >= 0) {
         glActiveTexture(GL_TEXTURE0 + _occupied_texture_unit);
         _occupied_texture_unit = -1;
     }
-    glBindTexture(_texture_target, 0);
-    glDisable(_texture_target);
+    glBindTexture(target(), 0);
+    glDisable(target());
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture::unbind()");
 }
 
 void texture::checked_lazy_generate_texture_id() const

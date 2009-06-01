@@ -21,22 +21,22 @@ public:
     unsigned        width() const       { return (_width); }
     unsigned        height() const      { return (_height); }
 
-    bool            tex_image(GLint     mip_level,
-                              GLint     internal_format,
-                              GLsizei   width,
-                              GLsizei   height,
-                              GLenum    format,
-                              GLenum    type,
-                              const GLvoid *data);
+    bool            image_data(GLint     mip_level,
+                               GLint     internal_format,
+                               GLsizei   width,
+                               GLsizei   height,
+                               GLenum    format,
+                               GLenum    type,
+                               const GLvoid *data);
 
-    bool            tex_sub_image(GLint     mip_level,
-                                  GLint     off_x,
-                                  GLint     off_y,
-                                  GLsizei   width,
-                                  GLsizei   height,
-                                  GLenum    format,
-                                  GLenum    type,
-                                  const GLvoid *data);
+    bool            image_sub_data(GLint     mip_level,
+                                   GLint     off_x,
+                                   GLint     off_y,
+                                   GLsizei   width,
+                                   GLsizei   height,
+                                   GLenum    format,
+                                   GLenum    type,
+                                   const GLvoid *data);
 
 protected:
     texture_2d(const GLenum target, const GLenum binding);

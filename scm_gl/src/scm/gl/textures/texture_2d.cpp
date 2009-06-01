@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <scm/gl/utilities/error_checker.h>
+#include <scm/gl/utilities/gl_assert.h>
 
 namespace scm {
 namespace gl {
@@ -36,20 +37,20 @@ const texture_2d& texture_2d::operator=(const texture_2d& rhs)
     return (*this);
 }
 
-bool texture_2d::tex_image(GLint     mip_level,
-                           GLint     internal_format,
-                           GLsizei   width,
-                           GLsizei   height,
-                           GLenum    format,
-                           GLenum    type,
-                           const GLvoid *data)
+bool texture_2d::image_data(GLint     mip_level,
+                            GLint     internal_format,
+                            GLsizei   width,
+                            GLsizei   height,
+                            GLenum    format,
+                            GLenum    type,
+                            const GLvoid *data)
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture_2d::image_data()");
 
     gl::error_checker ech;
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glTextureImage2DEXT(texture_id(),
-                        texture_target(),
+    glTextureImage2DEXT(id(),
+                        target(),
                         mip_level,
                         internal_format,
                         width,
@@ -60,9 +61,9 @@ bool texture_2d::tex_image(GLint     mip_level,
                         data);
     assert(ech.ok());
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
-    binding_guard guard(texture_target(), texture_binding());
+    binding_guard guard(target(), binding());
     bind();
-    glTexImage2D(texture_target(),
+    glTexImage2D(target(),
                  mip_level,
                  internal_format,
                  width,
@@ -81,39 +82,39 @@ bool texture_2d::tex_image(GLint     mip_level,
     _width  = width;
     _height = height;
 
-    tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    tex_parameteri(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-    tex_parameteri(GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+    parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    parameter(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+    parameter(GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
 
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture_2d::image_data()");
 
     return (true);
 }
 
-bool texture_2d::tex_sub_image(GLint     mip_level,
-                               GLint     off_x,
-                               GLint     off_y,
-                               GLsizei   width,
-                               GLsizei   height,
-                               GLenum    format,
-                               GLenum    type,
-                               const GLvoid *data)
+bool texture_2d::image_sub_data(GLint     mip_level,
+                                GLint     off_x,
+                                GLint     off_y,
+                                GLsizei   width,
+                                GLsizei   height,
+                                GLenum    format,
+                                GLenum    type,
+                                const GLvoid *data)
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture_2d::image_sub_data()");
 
     gl::error_checker ech;
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glTextureSubImage2DEXT(texture_id(), texture_target(),
+    glTextureSubImage2DEXT(id(), target(),
                            mip_level,
                            off_x, off_y,
                            width, height,
                            format, type, data);
     assert(ech.ok());
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
-    binding_guard guard(texture_target(), texture_binding());
+    binding_guard guard(target(), binding());
     bind();
-    glTexSubImage2D(texture_target(),
+    glTexSubImage2D(target(),
                     mip_level,
                     off_x, off_y,
                     width, height,
@@ -125,7 +126,7 @@ bool texture_2d::tex_sub_image(GLint     mip_level,
     unbind();
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture_2d::image_sub_data()");
 
     return (true);
 }

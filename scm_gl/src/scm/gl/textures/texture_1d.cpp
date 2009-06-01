@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <scm/gl/utilities/error_checker.h>
+#include <scm/gl/utilities/gl_assert.h>
 
 namespace scm {
 namespace gl {
@@ -27,19 +28,19 @@ const texture_1d& texture_1d::operator=(const texture_1d& rhs)
     return (*this);
 }
 
-bool texture_1d::tex_image(GLint     mip_level,
-                           GLint     internal_format,
-                           GLsizei   width,
-                           GLenum    format,
-                           GLenum    type,
-                           const GLvoid *data)
+bool texture_1d::image_data(GLint     mip_level,
+                            GLint     internal_format,
+                            GLsizei   width,
+                            GLenum    format,
+                            GLenum    type,
+                            const GLvoid *data)
 {
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("entering texture_1d::image_data()");
 
     gl::error_checker ech;
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glTextureImage1DEXT(texture_id(),
-                        texture_target(),
+    glTextureImage1DEXT(id(),
+                        target(),
                         mip_level,
                         internal_format,
                         width,
@@ -51,9 +52,9 @@ bool texture_1d::tex_image(GLint     mip_level,
 
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    binding_guard guard(texture_target(), texture_binding());
+    binding_guard guard(target(), binding());
     bind();
-    glTexImage1D(texture_target(),
+    glTexImage1D(target(),
                  mip_level,
                  internal_format,
                  width,
@@ -71,11 +72,11 @@ bool texture_1d::tex_image(GLint     mip_level,
 
     _width = width;
 
-    tex_parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    tex_parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    tex_parameteri(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+    parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    parameter(GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
 
-    assert(glGetError() == GL_NONE);
+    gl_assert_error("exiting texture_1d::image_data()");
 
     return (true);
 }

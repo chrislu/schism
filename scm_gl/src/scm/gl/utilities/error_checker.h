@@ -19,13 +19,15 @@ public:
     virtual ~error_checker();
 
     bool                ok();
-    std::string         get_error_string(const GLenum /*error*/);
-    std::string         get_error_string();
+    static std::string  error_string(const GLenum /*error*/);
+    std::string         error_string();
 
 protected:
     GLenum              _error;
 
 }; // class error_checker
+
+
 
 } // namespace gl
 } // namespace scm
