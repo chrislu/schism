@@ -3,7 +3,7 @@
 #define SCM_MATH_H_INCLUDED
 
 #include <scm/core/numeric_types.h>
-#include <scm/core/platform/config.h>
+#include <scm/core/math/config.h>
 
 #include <scm/core/math/common.h>
 
@@ -51,7 +51,7 @@ typedef mat<double, 4, 4>   mat4d;
 const float                 pi_f = 3.14159265358979323846264338327950288f;
 const double                pi_d = 3.14159265358979323846264338327950288;
 
-#ifdef SCM_CORE_FLOAT_DEFAULT_MATH
+#if SCM_CORE_MATH_FP_PRECISION == SCM_CORE_MATH_FP_PRECISION_SINGLE
 typedef vec2f               vec2;
 typedef vec3f               vec3;
 typedef vec4f               vec4;
@@ -59,7 +59,7 @@ typedef vec4f               vec4;
 typedef mat2f               mat2;
 typedef mat3f               mat3;
 typedef mat4f               mat4;
-#else // SCM_CORE_FLOAT_DEFAULT_MATH
+#elif SCM_CORE_MATH_FP_PRECISION == SCM_CORE_MATH_FP_PRECISION_DOUBLE
 typedef vec2d               vec2;
 typedef vec3d               vec3;
 typedef vec4d               vec4;
@@ -67,7 +67,9 @@ typedef vec4d               vec4;
 typedef mat2d               mat2;
 typedef mat3d               mat3;
 typedef mat4d               mat4;
-#endif // SCM_CORE_FLOAT_DEFAULT_MATH
+#else
+#error "SCM_CORE_MATH_FP_PRECISION not defined"
+#endif // SCM_CORE_MATH_FP_PRECISION
 
 } // namespace math
 } // namespace scm

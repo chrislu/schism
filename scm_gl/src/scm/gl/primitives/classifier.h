@@ -42,11 +42,6 @@ public:
     static classification_type      classify(const box&     b,
                                              const plane&   p);
 
-    // helper
-    static const scm::math::vec3f   n_vertex(const box&     b,
-                                             const plane&   p);
-    static const scm::math::vec3f   p_vertex(const box&     b,
-                                             const plane&   p);
 }; // class plane_classifier
 
 class __scm_export(ogl) frustum_classifier

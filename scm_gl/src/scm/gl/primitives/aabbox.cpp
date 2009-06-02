@@ -1,5 +1,6 @@
 
 #include "aabbox.h"
+#if 0
 
 #include <scm/core/math/math.h>
 
@@ -56,3 +57,5 @@ aabbox::classify(const plane& p) const
 
 } // namespace gl
 } // namespace scm
+#endif / 0
+

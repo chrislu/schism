@@ -1,12 +1,34 @@
 
 #include "frustum.h"
 
+#include <algorithm>
+
 namespace scm {
 namespace gl {
 
 frustum::frustum(const scm::math::mat4f& mvp_matrix)
+  : _planes(6)
 {
     update(mvp_matrix);
+}
+
+frustum::frustum(const frustum& f)
+  : _planes(f._planes)
+{
+}
+
+frustum&
+frustum::operator=(const frustum& rhs)
+{
+    frustum tmp(rhs);
+    swap(tmp);
+    return (*this);
+}
+
+void
+frustum::swap(frustum& rhs)
+{
+    std::swap(_planes, rhs._planes);
 }
 
 void
@@ -22,7 +44,7 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 + mvp_matrix.m08;
     tmp_plane.w = mvp_matrix.m15 + mvp_matrix.m12;
 
-    _planes[left_plane]   = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[left_plane]     = plane(tmp_plane);
 
     // right plane
     tmp_plane.x = mvp_matrix.m03 - mvp_matrix.m00;
@@ -30,7 +52,7 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 - mvp_matrix.m08;
     tmp_plane.w = mvp_matrix.m15 - mvp_matrix.m12;
 
-    _planes[right_plane]  = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[right_plane]    = plane(tmp_plane);
 
     // bottom plane
     tmp_plane.x = mvp_matrix.m03 + mvp_matrix.m01;
@@ -38,7 +60,7 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 + mvp_matrix.m09;
     tmp_plane.w = mvp_matrix.m15 + mvp_matrix.m13;
 
-    _planes[bottom_plane]    = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[bottom_plane]   = plane(tmp_plane);
 
     // top plane
     tmp_plane.x = mvp_matrix.m03 - mvp_matrix.m01;
@@ -46,7 +68,7 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 - mvp_matrix.m09;
     tmp_plane.w = mvp_matrix.m15 - mvp_matrix.m13;
 
-    _planes[top_plane] = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[top_plane]      = plane(tmp_plane);
 
     // near plane
     tmp_plane.x = mvp_matrix.m03 + mvp_matrix.m02;
@@ -54,7 +76,7 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 + mvp_matrix.m10;
     tmp_plane.w = mvp_matrix.m15 + mvp_matrix.m14;
 
-    _planes[near_plane]   = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[near_plane]     = plane(tmp_plane);
 
     // far plane
     tmp_plane.x = mvp_matrix.m03 - mvp_matrix.m02;
@@ -62,13 +84,30 @@ frustum::update(const scm::math::mat4f& mvp_matrix)
     tmp_plane.z = mvp_matrix.m11 - mvp_matrix.m10;
     tmp_plane.w = mvp_matrix.m15 - mvp_matrix.m14;
 
-    _planes[far_plane]    = plane(tmp_plane / length(vec3f(tmp_plane)));
+    _planes[far_plane]      = plane(tmp_plane);
 }
 
 const plane&
 frustum::get_plane(unsigned int p) const
 {
     return (_planes[p]);
+}
+
+void
+frustum::transform(const frustum::mat4_type& t)
+{
+    using namespace scm::math;
+    transform_preinverted(inverse(t));
+}
+
+void
+frustum::transform_preinverted(const frustum::mat4_type& t)
+{
+    using namespace scm::math;
+    frustum::mat4_type inv_trans = transpose(t);
+    for (unsigned i = 0; i < 6; ++i) {
+        _planes[i].transform_preinverted_transposed(inv_trans);
+    }
 }
 
 } // namespace gl

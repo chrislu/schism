@@ -2,6 +2,8 @@
 #ifndef SCM_OGL_PRIMITIVES_FRUSTUM_H_INCLUDED
 #define SCM_OGL_PRIMITIVES_FRUSTUM_H_INCLUDED
 
+#include <vector>
+
 #include <scm/core/math/math.h>
 
 #include <scm/gl/primitives/plane.h>
@@ -14,6 +16,8 @@ namespace gl {
 
 class __scm_export(ogl) frustum
 {
+    typedef scm::math::mat4f    mat4_type;
+
 public:
     typedef enum {
         left_plane        = 0x00,
@@ -25,18 +29,36 @@ public:
     } plane_identifier;
 
 public:
-    frustum(const scm::math::mat4f& mvp_matrix = scm::math::mat4f::identity());
+    frustum(const mat4_type& mvp_matrix = mat4_type::identity());
+    frustum(const frustum& f);
 
-    void                update(const scm::math::mat4f& mvp_matrix);
+    frustum&            operator=(const frustum& rhs);
+    void                swap(frustum& rhs);
+
+    void                update(const mat4_type& mvp_matrix);
     const plane&        get_plane(unsigned int p) const;
 
+    void                transform(const mat4_type& t);
+    void                transform_preinverted(const mat4_type& t);
+
 protected:
-    plane               _planes[6];
+    std::vector<plane> _planes;
 
 }; // class frustum
 
 } // namespace gl
 } // namespace scm
+
+namespace std {
+
+template<>
+inline void swap(scm::gl::frustum& lhs,
+                 scm::gl::frustum& rhs)
+{
+    lhs.swap(rhs);
+}
+
+} // namespace std
 
 #include <scm/core/utilities/platform_warning_enable.h>
 

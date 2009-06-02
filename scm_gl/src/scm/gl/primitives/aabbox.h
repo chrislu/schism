@@ -12,8 +12,8 @@
 namespace scm {
 namespace gl {
 
+#if 0
 class plane;
-
 class __scm_export(ogl) aabbox : public scm::gl::box
 {
 public:
@@ -35,6 +35,7 @@ public:
     plane_classification_type       classify(const plane& p) const;
 
 }; // class aabbox
+#endif // 0
 
 } // namespace gl
 } // namespace scm

@@ -10,26 +10,60 @@
 namespace scm {
 namespace gl {
 
+// describing plane equation
+//  - a*x + b*y + c*z + d = 0
+//  - so d gives you the distance of the origin related to the plane!
 class __scm_export(ogl) plane
 {
+    typedef scm::math::vec4f    vec4_type;
+    typedef scm::math::vec3f    vec3_type;
+    typedef scm::math::mat4f    mat4_type;
+
 public:
     plane();
     plane(const plane& p);
-    explicit plane(const scm::math::vec4f& p);
+    explicit plane(const vec4_type& p);
 
-    plane&                          operator=(const plane& rhs);
+    plane&                  operator=(const plane& rhs);
+    void                    swap(plane& rhs);
 
-    const scm::math::vec3f          normal() const;
-    scm::math::vec3f::value_type    distance() const;
-    const scm::math::vec4f&         vector() const;
+    const vec3_type         normal() const;
+    vec3_type::value_type   distance(const vec3_type& p) const;
+
+    const vec4_type&        vector() const;
+
+    void                    transform(const mat4_type& t);
+    void                    transform_preinverted(const mat4_type& t);
+    void                    transform_preinverted_transposed(const mat4_type& t);
+
+    unsigned                p_corner() const;
+    unsigned                n_corner() const;
 
 protected:
-    scm::math::vec4f                    _vector;
+    void                    normalize();
+    void                    update_corner_indices();
+
+protected:
+    vec4_type               _vector;
+
+    unsigned                _p_corner;
+    unsigned                _n_corner;
 
 }; // class frustum
 
 } // namespace gl
 } // namespace scm
+
+namespace std {
+
+template<>
+inline void swap(scm::gl::plane& lhs,
+                 scm::gl::plane& rhs)
+{
+    lhs.swap(rhs);
+}
+
+} // namespace std
 
 #include <scm/core/utilities/platform_warning_enable.h>
 

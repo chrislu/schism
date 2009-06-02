@@ -12,25 +12,28 @@ namespace gl {
 
 class __scm_export(ogl) box
 {
+typedef scm::math::vec3f    vec3_type;
+
 public:
-    box(const scm::math::vec3f& min_vert = scm::math::vec3f(0.0f, 0.0f, 0.0f),
-        const scm::math::vec3f& max_vert = scm::math::vec3f(1.0f, 1.0f, 1.0f));
+    box(const vec3_type& min_vert = vec3_type(0.0f),
+        const vec3_type& max_vert = vec3_type(1.0f));
     box(const box& b);
     virtual ~box();
 
     box&                        operator=(const box& b);
     void                        swap(box& b);
 
-    const scm::math::vec3f&     min_vertex() const;
-    const scm::math::vec3f&     max_vertex() const;
-    const scm::math::vec3f      center() const;
+    const vec3_type&            min_vertex() const;
+    const vec3_type&            max_vertex() const;
+    const vec3_type             center() const;
+    const vec3_type             corner(unsigned ind) const;
 
-    void                        min_vertex(const scm::math::vec3f& vert);
-    void                        max_vertex(const scm::math::vec3f& vert);
+    void                        min_vertex(const vec3_type& vert);
+    void                        max_vertex(const vec3_type& vert);
 
 protected:
-    scm::math::vec3f            _min_vertex;
-    scm::math::vec3f            _max_vertex;
+    vec3_type                   _min_vertex;
+    vec3_type                   _max_vertex;
 
 }; //class box
 
@@ -39,8 +42,12 @@ protected:
 
 namespace std {
 
-void __scm_export(ogl) swap(scm::gl::box& lhs,
-                            scm::gl::box& rhs);
+template<>
+inline void swap(scm::gl::box& lhs,
+                 scm::gl::box& rhs)
+{
+    lhs.swap(rhs);
+}
 
 } // namespace std
 

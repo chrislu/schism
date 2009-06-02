@@ -44,39 +44,15 @@ plane_classifier::classify(const box&     b,
 {
     using namespace scm::math;
 
-    if ((dot(n_vertex(b, p), p.normal()) + p.distance()) > 0.0f) {
+    if (p.distance(b.corner(p.n_corner())) > 0.0f) {
         return (plane_classifier::front);
     }
-    else if ((dot(p_vertex(b, p), p.normal()) + p.distance()) > 0.0f) {
+    else if (p.distance(b.corner(p.p_corner())) > 0.0f) {
         return (plane_classifier::intersect);
     }
     else {
         return (plane_classifier::back);
     }
-}
-
-/*static*/
-const scm::math::vec3f
-plane_classifier::n_vertex(const box&     b,
-                           const plane&   p)
-{
-    scm::math::vec3f n_vert((p.normal().x < 0.0f) ? b.max_vertex().x : b.min_vertex().x,
-                            (p.normal().y < 0.0f) ? b.max_vertex().y : b.min_vertex().y,
-                            (p.normal().z < 0.0f) ? b.max_vertex().z : b.min_vertex().z);
-    
-    return (n_vert); 
-}
-
-/*static*/
-const scm::math::vec3f
-plane_classifier::p_vertex(const box&     b,
-                           const plane&   p)
-{
-    scm::math::vec3f p_vert((p.normal().x < 0.0f) ? b.min_vertex().x : b.max_vertex().x,
-                            (p.normal().y < 0.0f) ? b.min_vertex().y : b.max_vertex().y,
-                            (p.normal().z < 0.0f) ? b.min_vertex().z : b.max_vertex().z);
-
-    return (p_vert);
 }
 
 /*static*/
