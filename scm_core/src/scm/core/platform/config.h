@@ -20,4 +20,9 @@
 #   define  _WIN_VER                SCM_WIN_VER
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
+// use float as default value type for all math classes
+//  - undefine this to use double default math
+#define SCM_CORE_FLOAT_DEFAULT_MATH
+//#undef SCM_CORE_FLOAT_DEFAULT_MATH
+
 #endif // CONFIG_H_INCLUDED

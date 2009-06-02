@@ -144,7 +144,7 @@ void texture::bind(int texunit) const
         glActiveTexture(GL_TEXTURE0 + _occupied_texture_unit);
         gl_assert_error("texture::bind() after glActiveTexture");
     }
-    glEnable(glEnable());
+    glEnable(target());
     gl_assert_error("texture::bind() after glEnable(glEnable)");
     glBindTexture(target(), id());
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS

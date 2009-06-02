@@ -13,7 +13,7 @@
 //    - texture objects
 //    - program objects
 #define SCM_GL_USE_DIRECT_STATE_ACCESS
-#undef SCM_GL_USE_DIRECT_STATE_ACCESS
+//#undef SCM_GL_USE_DIRECT_STATE_ACCESS
 
 namespace scm {
 namespace gl {
