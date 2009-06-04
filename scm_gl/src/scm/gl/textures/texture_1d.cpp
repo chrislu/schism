@@ -19,15 +19,6 @@ texture_1d::~texture_1d()
 {
 }
 
-const texture_1d& texture_1d::operator=(const texture_1d& rhs)
-{
-    gl::texture::operator=(rhs);
-
-    this->_width    = rhs._width;
-
-    return (*this);
-}
-
 bool texture_1d::image_data(GLint     mip_level,
                             GLint     internal_format,
                             GLsizei   width,

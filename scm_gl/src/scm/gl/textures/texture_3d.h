@@ -17,8 +17,6 @@ public:
     texture_3d(const gl::texture_3d& tex);
     virtual ~texture_3d();
 
-    const gl::texture_3d& operator=(const gl::texture_3d& rhs);
-
     unsigned        width() const       { return (_width); }
     unsigned        height() const      { return (_height); }
     unsigned        depth() const       { return (_depth); }

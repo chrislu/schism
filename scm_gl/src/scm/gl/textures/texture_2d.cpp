@@ -27,16 +27,6 @@ texture_2d::~texture_2d()
 {
 }
 
-const texture_2d& texture_2d::operator=(const texture_2d& rhs)
-{
-    gl::texture::operator=(rhs);
-
-    this->_width    = rhs._width;
-    this->_height   = rhs._height;
-
-    return (*this);
-}
-
 bool texture_2d::image_data(GLint     mip_level,
                             GLint     internal_format,
                             GLsizei   width,

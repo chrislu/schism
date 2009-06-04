@@ -45,40 +45,12 @@ texture::texture(const GLenum target, const GLenum binding)
     glGenTextures(1, _texture_id.get());
 }
 
-texture::texture(const texture& tex)
-  : _texture_target(tex._texture_target),
-    _texture_id(tex._texture_id),
-    _last_error(GL_NO_ERROR),
-    _occupied_texture_unit(-1)
-{
-}
-
 texture::~texture()
 {
     if (_texture_id.unique()) {
         glDeleteTextures(1, _texture_id.get());
     }
 }
-
-const texture& texture::operator=(const texture& rhs)
-{
-    if (_texture_id.unique()) {
-        glDeleteTextures(1, _texture_id.get());
-    }
-
-    this->_texture_id       = rhs._texture_id;
-    this->_texture_target   = rhs._texture_target;
-
-    return (*this);
-}
-
-//void texture::delete_texture()
-//{
-//    if (*_texture_id != 0) {
-//        glDeleteTextures(1, _texture_id.get());
-//        _texture_id.ResetDC
-//    }
-//}
 
 void texture::parameter(GLenum pname, int param)
 {

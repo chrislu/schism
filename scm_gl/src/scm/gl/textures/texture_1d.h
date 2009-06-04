@@ -16,8 +16,6 @@ public:
     texture_1d();
     virtual ~texture_1d();
 
-    const gl::texture_1d& operator=(const gl::texture_1d& rhs);
-
     unsigned        width() const { return (_width); }
 
     bool            image_data(GLint     mip_level,

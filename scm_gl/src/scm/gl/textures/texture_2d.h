@@ -16,8 +16,6 @@ public:
     texture_2d();
     virtual ~texture_2d();
 
-    const gl::texture_2d& operator=(const gl::texture_2d& rhs);
-
     unsigned        width() const       { return (_width); }
     unsigned        height() const      { return (_height); }
 

@@ -14,7 +14,7 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(ogl) texture
+class __scm_export(ogl) texture : boost::noncopyable
 {
 public:
     class binding_guard : boost::noncopyable
@@ -30,10 +30,7 @@ public:
     };
 
 public:
-    texture(const gl::texture& tex);
     virtual ~texture();
-
-    const gl::texture&              operator=(const gl::texture& rhs);
 
     void                            bind(int /*texunit*/ = -1) const;
     void                            unbind() const;

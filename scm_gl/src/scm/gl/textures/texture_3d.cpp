@@ -29,17 +29,6 @@ texture_3d::~texture_3d()
 {
 }
 
-const texture_3d& texture_3d::operator=(const texture_3d& rhs)
-{
-    gl::texture::operator=(rhs);
-
-    this->_width    = rhs._width;
-    this->_height   = rhs._height;
-    this->_depth    = rhs._depth;
-
-    return (*this);
-}
-
 bool texture_3d::image_data(GLint     mip_level,
                             GLint     internal_format,
                             GLsizei   width,
