@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <scm/gl/primitives/box.h>
+
 namespace scm {
 namespace gl {
 
@@ -94,6 +96,22 @@ unsigned
 plane::n_corner() const
 {
     return (_n_corner);
+}
+
+plane::classification_result
+plane::classify(const box& b) const
+{
+    using namespace scm::math;
+
+    if (distance(b.corner(_n_corner)) > vec3_type::value_type(0)) {
+        return (front);
+    }
+    else if (distance(b.corner(_p_corner)) > vec3_type::value_type(0)) {
+        return (intersect);
+    }
+    else {
+        return (back);
+    }
 }
 
 void

@@ -14,8 +14,11 @@
 namespace scm {
 namespace gl {
 
+class box;
+
 class __scm_export(ogl) frustum
 {
+public:
     typedef scm::math::mat4f    mat4_type;
 
 public:
@@ -28,18 +31,26 @@ public:
         far_plane         = 0x05
     } plane_identifier;
 
+    typedef enum {
+        inside,
+        outside,
+        intersect
+    } classification_result;
+
 public:
     frustum(const mat4_type& mvp_matrix = mat4_type::identity());
     frustum(const frustum& f);
 
-    frustum&            operator=(const frustum& rhs);
-    void                swap(frustum& rhs);
+    frustum&                operator=(const frustum& rhs);
+    void                    swap(frustum& rhs);
 
-    void                update(const mat4_type& mvp_matrix);
-    const plane&        get_plane(unsigned int p) const;
+    void                    update(const mat4_type& mvp_matrix);
+    const plane&            get_plane(unsigned int p) const;
 
-    void                transform(const mat4_type& t);
-    void                transform_preinverted(const mat4_type& t);
+    void                    transform(const mat4_type& t);
+    void                    transform_preinverted(const mat4_type& t);
+
+    classification_result   classify(const box& b) const;
 
 protected:
     std::vector<plane> _planes;

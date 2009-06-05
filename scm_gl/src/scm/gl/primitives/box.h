@@ -10,9 +10,18 @@
 namespace scm {
 namespace gl {
 
+class ray;
+
 class __scm_export(ogl) box
 {
-typedef scm::math::vec3f    vec3_type;
+public:
+    typedef scm::math::vec3f    vec3_type;
+
+    typedef enum {
+        inside,
+        outside,
+        overlap
+    } classification_result;
 
 public:
     box(const vec3_type& min_vert = vec3_type(0.0f),
@@ -30,6 +39,11 @@ public:
 
     void                        min_vertex(const vec3_type& vert);
     void                        max_vertex(const vec3_type& vert);
+
+    classification_result       classify(const vec3_type& p) const;
+    classification_result       classify(const box& a) const;
+
+    bool                        intersect(const ray& r, vec3_type& entry, vec3_type& exit) const;
 
 protected:
     vec3_type                   _min_vertex;

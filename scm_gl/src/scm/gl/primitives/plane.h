@@ -10,14 +10,23 @@
 namespace scm {
 namespace gl {
 
+class box;
+
 // describing plane equation
 //  - a*x + b*y + c*z + d = 0
 //  - so d gives you the distance of the origin related to the plane!
 class __scm_export(ogl) plane
 {
+public:
     typedef scm::math::vec4f    vec4_type;
     typedef scm::math::vec3f    vec3_type;
     typedef scm::math::mat4f    mat4_type;
+
+    typedef enum {
+        front,
+        back,
+        intersect
+    } classification_result;
 
 public:
     plane();
@@ -38,6 +47,8 @@ public:
 
     unsigned                p_corner() const;
     unsigned                n_corner() const;
+
+    classification_result   classify(const box& b) const;
 
 protected:
     void                    normalize();

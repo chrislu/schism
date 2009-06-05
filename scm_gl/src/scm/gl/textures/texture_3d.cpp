@@ -17,14 +17,6 @@ texture_3d::texture_3d()
 {
 }
 
-texture_3d::texture_3d(const texture_3d& tex)
-    : texture(tex),
-      _width(tex._width),
-      _height(tex._height),
-      _depth(tex._depth)
-{
-}
-
 texture_3d::~texture_3d()
 {
 }

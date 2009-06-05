@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <scm/gl/primitives/box.h>
+
 namespace scm {
 namespace gl {
 
@@ -108,6 +110,26 @@ frustum::transform_preinverted(const frustum::mat4_type& t)
     for (unsigned i = 0; i < 6; ++i) {
         _planes[i].transform_preinverted_transposed(inv_trans);
     }
+}
+
+frustum::classification_result
+frustum::classify(const box& b) const
+{
+    bool plane_intersect = false;
+
+    // normals of frustum planes point inside the frustum
+    for (unsigned i = 0; i < 6; ++i) {
+        plane::classification_result cur_plane_res = _planes[i].classify(b);
+
+        if (cur_plane_res == plane::back) {
+            return (outside);
+        }
+        else if (cur_plane_res == plane::intersect) {
+            plane_intersect = true;
+        }
+    }
+
+    return (plane_intersect ? intersect : inside);
 }
 
 } // namespace gl

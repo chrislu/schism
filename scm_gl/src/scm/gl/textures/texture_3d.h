@@ -14,7 +14,6 @@ class __scm_export(ogl) texture_3d : public texture
 {
 public:
     texture_3d();
-    texture_3d(const gl::texture_3d& tex);
     virtual ~texture_3d();
 
     unsigned        width() const       { return (_width); }
