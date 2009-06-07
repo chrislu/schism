@@ -27,6 +27,7 @@ public:
     void                    swap(ray& rhs);
 
     void                    transform(const mat4_type& t);
+    void                    transform_preinverted(const mat4_type& t);
 
     const vec3_type&        origin() const;
     const vec3_type&        direction() const;

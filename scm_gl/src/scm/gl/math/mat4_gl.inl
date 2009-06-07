@@ -113,16 +113,15 @@ inline void get_gl_matrix(const int type, mat<double, 4, 4>& m)
     glGetDoublev(type, m.data_array);
 }
 
-// TBD
-#if 0
-inline mat4_t gl_ortho_matrix(  const float left,
-                                const float right,
-                                const float bottom,
-                                const float top,
-                                const float near_z,
-                                const float far_z)
+template<typename scal_type>
+inline
+void
+ortho_matrix(mat<scal_type, 4, 4>& m,
+             scal_type left, scal_type right,
+             scal_type bottom, scal_type top,
+             scal_type near_z, scal_type far_z)
 {
-    float A,B,C,D,E,F;
+    scal_type A,B,C,D,E,F;
 
     A=-(right+left)/(right-left);
     B=-(top+bottom)/(top-bottom);
@@ -132,20 +131,21 @@ inline mat4_t gl_ortho_matrix(  const float left,
     E=2.0f/(top-bottom);
     F=2.0f/(right-left);
 
-    return (mat4_t( F, 0, 0, 0,
-                    0, E, 0, 0,
-                    0, 0, D, 0,
-                    A, B, C, 1));
+    m = mat<scal_type, 4, 4>( F, 0, 0, 0,
+                              0, E, 0, 0,
+                              0, 0, D, 0,
+                              A, B, C, 1);
 }
 
-inline mat4_t gl_frustum_matrix(const float left,
-                                const float right,
-                                const float bottom,
-                                const float top,
-                                const float near_z,
-                                const float far_z)
+template<typename scal_type>
+inline
+void
+frustum_matrix(mat<scal_type, 4, 4>& m,
+               scal_type left, scal_type right,
+               scal_type bottom, scal_type top,
+               scal_type near_z, scal_type far_z)
 {
-    float A,B,C,D,E,F;
+    scal_type A,B,C,D,E,F;
 
     A=(right+left)/(right-left);
     B=(top+bottom)/(top-bottom);
@@ -154,23 +154,96 @@ inline mat4_t gl_frustum_matrix(const float left,
     E=2.0f*near_z/(top-bottom);
     F=2.0f*near_z/(right-left);
 
-    return (mat4_t(	F, 0, 0, 0,
-                    0, E, 0, 0,
-                    A, B, C,-1,
-                    0, 0, D, 0));
+    m = mat<scal_type, 4, 4>(F, 0, 0, 0,
+                             0, E, 0, 0,
+                             A, B, C,-1,
+                             0, 0, D, 0);
 }
 
-inline mat4_t gl_perspective_matrix( const float fovy   = 45,      // = 45, 
-                                     const float aspect = 4.0f/3.0f,
-                                     const float near_z = 0.1f,
-                                     const float far_z  = 100)
+template<typename scal_type>
+inline
+void
+perspective_matrix(mat<scal_type, 4, 4>& m,
+                   scal_type fovy,
+                   scal_type aspect,
+                   scal_type near_z,
+                   scal_type far_z)
 {
-    float maxy = tanf( deg2rad(fovy*.5f)) * near_z;
-    float maxx = maxy*aspect;
+    scal_type maxy = math::tan(deg2rad(fovy *.5)) * near_z;
+    scal_type maxx = maxy*aspect;
 
-    return (gl_frustum_matrix(-maxx, maxx, -maxy, maxy, near_z, far_z));
+    frustum_matrix(m, -maxx, maxx, -maxy, maxy, near_z, far_z);
 }
-#endif
+
+template<typename scal_type>
+inline
+void
+look_at_matrix(mat<scal_type, 4, 4>& m,
+               const vec<scal_type, 3>& eye,
+               const vec<scal_type, 3>& center,
+               const vec<scal_type, 3>& up)
+{
+    vec<scal_type, 3> z_axis = normalize(center - eye);
+    vec<scal_type, 3> y_axis = normalize(up);
+    vec<scal_type, 3> x_axis = normalize(cross(z_axis, y_axis));
+    y_axis = normalize(cross(x_axis, z_axis));
+
+    m.data_array[0]  =  x_axis.x;
+    m.data_array[1]  =  y_axis.x;
+    m.data_array[2]  = -z_axis.x;
+    m.data_array[3]  = scal_type(0.0);
+
+    m.data_array[4]  =  x_axis.y;
+    m.data_array[5]  =  y_axis.y;
+    m.data_array[6]  = -z_axis.y;
+    m.data_array[7]  = scal_type(0.0);
+
+    m.data_array[8]  =  x_axis.z;
+    m.data_array[9]  =  y_axis.z;
+    m.data_array[10] = -z_axis.z;
+    m.data_array[11] = scal_type(0.0);
+
+    m.data_array[12] = scal_type(0.0);
+    m.data_array[13] = scal_type(0.0);
+    m.data_array[14] = scal_type(0.0);
+    m.data_array[15] = scal_type(1.0);
+
+    translate(m, -eye);
+}
+
+template<typename scal_type>
+inline
+void
+look_at_matrix_inv(mat<scal_type, 4, 4>& m,
+                   const vec<scal_type, 3>& eye,
+                   const vec<scal_type, 3>& center,
+                   const vec<scal_type, 3>& up)
+{
+    vec<scal_type, 3> z_axis = normalize(center - eye);
+    vec<scal_type, 3> y_axis = normalize(up);
+    vec<scal_type, 3> x_axis = normalize(cross(z_axis, y_axis));
+    y_axis = normalize(cross(x_axis, z_axis));
+
+    m.data_array[0]  =  x_axis.x;
+    m.data_array[1]  =  x_axis.y;
+    m.data_array[2]  =  x_axis.z;
+    m.data_array[3]  = scal_type(0.0);
+
+    m.data_array[4]  =  y_axis.x;
+    m.data_array[5]  =  y_axis.y;
+    m.data_array[6]  =  y_axis.z;
+    m.data_array[7]  = scal_type(0.0);
+
+    m.data_array[8]  = -z_axis.x;
+    m.data_array[9]  = -z_axis.y;
+    m.data_array[10] = -z_axis.z;
+    m.data_array[11] = scal_type(0.0);
+
+    m.data_array[12] = eye.x;
+    m.data_array[13] = eye.y;
+    m.data_array[14] = eye.z;
+    m.data_array[15] = scal_type(1.0);
+}
 
 
 } // namespace math

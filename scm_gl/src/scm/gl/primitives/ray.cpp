@@ -49,7 +49,20 @@ ray::transform(const ray::mat4_type& t)
     mat4_type inv_trans = transpose(inverse(t));
 
     _direction = vec3_type(inv_trans * vec4_type(_direction, vec4_type::value_type(0)));
-    _origin    = vec3_type(t * vec4_type(_origin, vec4_type::value_type(1)));
+    _origin    = vec3_type(t         * vec4_type(_origin,    vec4_type::value_type(1)));
+
+    normalize();
+}
+
+void
+ray::transform_preinverted(const ray::mat4_type& it)
+{
+    using namespace scm::math;
+
+    mat4_type inv_trans = transpose(it);
+
+    _direction = vec3_type(inv_trans   * vec4_type(_direction, vec4_type::value_type(0)));
+    _origin    = vec3_type(inverse(it) * vec4_type(_origin,    vec4_type::value_type(1)));
 
     normalize();
 }
@@ -69,7 +82,7 @@ ray::direction() const
 void
 ray::normalize()
 {
-    math::normalize(_direction);
+    _direction = math::normalize(_direction);
 }
 
 } // namespace gl
