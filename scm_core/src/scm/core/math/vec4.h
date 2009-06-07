@@ -33,8 +33,13 @@ public:
 
     template<typename rhs_scal_t> explicit vec(const vec<rhs_scal_t, 4>& v);
 
+
     // dtor
     //~vec();
+
+    // constants
+    static const vec<scal_type, 4>&  zero();
+    static const vec<scal_type, 4>&  one();
 
     // swap
     void swap(vec<scal_type, 4>& rhs);

@@ -71,6 +71,23 @@ inline vec<scal_type, 4>::vec(const vec<rhs_scal_t, 4>& v)
 //{
 //}
 
+// constants
+template<typename scal_type>
+const vec<scal_type, 4>&
+vec<scal_type, 4>::zero()
+{
+    static vec<scal_type, 4> zero_(scal_type(0), scal_type(0), scal_type(0), scal_type(0));
+    return (zero_);
+}
+
+template<typename scal_type>
+const vec<scal_type, 4>&
+vec<scal_type, 4>::one()
+{
+    static vec<scal_type, 4> one_(scal_type(1), scal_type(1), scal_type(1), scal_type(1));
+    return (one_);
+}
+
 // swap
 template<typename scal_type>
 inline void vec<scal_type, 4>::swap(vec<scal_type, 4>& rhs)

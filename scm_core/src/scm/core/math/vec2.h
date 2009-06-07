@@ -31,6 +31,10 @@ public:
     // dtor
     //~vec();
 
+    // constants
+    static const vec<scal_type, 2>&  zero();
+    static const vec<scal_type, 2>&  one();
+
     // swap
     void swap(vec<scal_type, 2>& rhs);
 
