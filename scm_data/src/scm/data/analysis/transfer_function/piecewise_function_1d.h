@@ -27,9 +27,10 @@ public:
 
 public:
     piecewise_function_1d();
-    piecewise_function_1d(const piecewise_function_1d<val_type, res_type>& ref) : _function(ref._function) {}
+    piecewise_function_1d(const piecewise_function_1d<val_type, res_type>& ref) : _function(ref._function), _dirty(ref._dirty) {}
     piecewise_function_1d<val_type, res_type>& operator=(const piecewise_function_1d<val_type, res_type>& rhs) {
         _function = rhs._function;
+        _dirty    = rhs._dirty;
         return (*this);
     }
 

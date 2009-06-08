@@ -140,7 +140,7 @@ arc_ball::drag(value_type x, value_type y)
                 _translation_vector -= t_obj;
             }
             else if (_scope == global) {
-                _distance -= v;
+                _distance += v;
             }
         }
 

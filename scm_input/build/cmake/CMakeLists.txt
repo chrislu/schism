@@ -16,6 +16,9 @@ scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/input *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/input/devices *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/input/devices *.h *.inl)
+
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/input/tracking *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/input/tracking *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/input/tracking/detail *.cpp)
@@ -31,6 +34,7 @@ endif (WIN32)
 # set include and lib directories
 include_directories(
     ${SCM_ROOT_DIR}/scm_core/src
+    ${SCM_ROOT_DIR}/scm_gl/src
     ${SCM_ROOT_DIR}/scm_input/src
 )
 # set include directories for windows external dependencies
