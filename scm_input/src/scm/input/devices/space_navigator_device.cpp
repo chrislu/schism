@@ -1,6 +1,15 @@
 
 #include "space_navigator_device.h"
 
+#include <iostream>
+
+#include <scm/log.h>
+#include <scm/gl/math/math.h>
+
+#include <scm/input/config.h>
+
+#ifdef SCM_INPUT_DEVICE_SPACE_NAVIGATOR
+
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 // com stuff for the driver callbacks
@@ -47,11 +56,6 @@ using namespace ATL;
 // end com stuff
 
 #endif SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
-#include <iostream>
-
-#include <scm/log.h>
-#include <scm/gl/math/math.h>
 
 [module(type=dll, name = "scm_input_sn")]
 [event_receiver(com)]
@@ -197,6 +201,7 @@ space_navigator_impl::update()
     translation->get_Length(&translation_length);
 
 
+    std::cout << "update impl" << std::endl;
     if (   rotation_angle > 0.0
         || translation_length > 0.0) {
         double time_factor = 1.0;
@@ -260,6 +265,21 @@ space_navigator_impl::on_key_up(int k)
     return (S_OK);
 }
 
+#else // SCM_INPUT_DEVICE_SPACE_NAVIGATOR
+
+class space_navigator_impl
+{
+public:
+    space_navigator_impl(scm::inp::space_navigator*const d = 0) {};
+    virtual ~space_navigator_impl() {};
+
+public:
+    void                update() {};
+
+private:
+};
+
+#endif // SCM_INPUT_DEVICE_SPACE_NAVIGATOR
 
 namespace scm {
 namespace inp {
