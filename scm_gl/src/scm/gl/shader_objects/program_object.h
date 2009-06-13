@@ -44,6 +44,7 @@ public:
     unsigned int        program_id() const;
 
     bool                ok() const {return (_ok); }
+    const bool          linker_output_available() const { return (!_linker_out.empty()); }
     const std::string&  linker_output() const { return (_linker_out); }
     const std::string&  valitation_output() const { return (_validate_out); }
 

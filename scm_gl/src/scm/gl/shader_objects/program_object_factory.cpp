@@ -14,16 +14,17 @@
 namespace scm {
 namespace gl {
 
-std::string program_object_factory::_error_output = std::string("");
+std::string program_object_factory::_output = std::string("");
 
-program_object program_object_factory::create(const program_object_makefile& make_file)
+program_object
+program_object_factory::create(const program_object_makefile& make_file)
 {
     program_object      new_program_object;
 
     bool                compile_error = false;
     bool                attach_error  = false;
 
-    clear_error_output();
+    clear_output();
 
     boost::scoped_ptr<scm::gl::shader_object>   vert_shader;
     boost::scoped_ptr<scm::gl::shader_object>   frag_shader;
@@ -34,7 +35,7 @@ program_object program_object_factory::create(const program_object_makefile& mak
 
         foreach (const std::string& vert_inc_file, make_file._vert_include_files) {
             if (!vert_shader->add_include_code_from_file(vert_inc_file)) {
-                _error_output +=  std::string("error: failed to load file ('")
+                _output +=  std::string("error: failed to load file ('")
                                 + vert_inc_file
                                 + std::string("')\n");
                 compile_error = true;
@@ -44,16 +45,21 @@ program_object program_object_factory::create(const program_object_makefile& mak
             vert_shader->add_defines(vert_define);
         }
         if (!vert_shader->set_source_code_from_file(make_file._vert_source_file)) {
-            _error_output +=  std::string("error: failed to load file ('")
-                            + make_file._vert_source_file
-                            + std::string("')\n");
+            _output +=  std::string("error: failed to load file ('")
+                      + make_file._vert_source_file
+                      + std::string("')\n");
             compile_error = true;
         }
         if (!vert_shader->compile()) {
-            _error_output +=  std::string("compile error: vertex domain: \n")
-                            + vert_shader->compiler_output()
-                            + std::string("\n");
+            _output +=  std::string("compile error: vertex domain: \n")
+                      + vert_shader->compiler_output()
+                      + std::string("\n");
             compile_error = true;
+        }
+        if (vert_shader->compiler_output_available()) {
+            _output +=  std::string("compiler output: vertex domain: \n")
+                      + vert_shader->compiler_output()
+                      + std::string("\n");
         }
         if (!compile_error) {
             if (!new_program_object.attach_shader(*vert_shader)) {
@@ -68,9 +74,9 @@ program_object program_object_factory::create(const program_object_makefile& mak
 
         foreach (const std::string& frag_inc_file, make_file._frag_include_files) {
             if (!frag_shader->add_include_code_from_file(frag_inc_file)) {
-                _error_output +=  std::string("error: failed to load file ('")
-                                + frag_inc_file
-                                + std::string("')\n");
+                _output +=  std::string("error: failed to load file ('")
+                          + frag_inc_file
+                          + std::string("')\n");
                 compile_error = true;
             }
         }
@@ -78,16 +84,18 @@ program_object program_object_factory::create(const program_object_makefile& mak
             frag_shader->add_defines(frag_define);
         }
         if (!frag_shader->set_source_code_from_file(make_file._frag_source_file)) {
-            _error_output +=  std::string("error: failed to load file ('")
-                            + make_file._frag_source_file
-                            + std::string("')\n");
+            _output +=  std::string("error: failed to load file ('")
+                      + make_file._frag_source_file
+                      + std::string("')\n");
             compile_error = true;
         }
         if (!frag_shader->compile()) {
-            _error_output +=  std::string("compile error: fragment domain: \n")
-                            + frag_shader->compiler_output()
-                            + std::string("\n");
             compile_error = true;
+        }
+        if (frag_shader->compiler_output_available()) {
+            _output +=  std::string("compiler output: fragment domain: \n")
+                      + frag_shader->compiler_output()
+                      + std::string("\n");
         }
         if (!compile_error) {
             if (!new_program_object.attach_shader(*frag_shader)) {
@@ -100,23 +108,36 @@ program_object program_object_factory::create(const program_object_makefile& mak
     {
         // program linking
         if (!new_program_object.link()) {
-            _error_output +=  std::string("link error: \n")
-                            + new_program_object.linker_output()
-                            + std::string("\n");
+            _output +=  std::string("linker error: \n")
+                      + new_program_object.linker_output()
+                      + std::string("\n");
+        }
+        else if (new_program_object.linker_output_available()) {
+            _output +=  std::string("linker output: \n")
+                      + new_program_object.linker_output()
+                      + std::string("\n");
         }
     }
 
     return (new_program_object);
 }
 
-const std::string& program_object_factory::error_output()
+bool
+program_object_factory::output_available()
 {
-    return (_error_output);
+    return (!_output.empty());
 }
 
-void program_object_factory::clear_error_output()
+const std::string&
+program_object_factory::output()
 {
-    _error_output.clear();
+    return (_output);
+}
+
+void
+program_object_factory::clear_output()
+{
+    _output.clear();
 }
 
 } // namespace gl

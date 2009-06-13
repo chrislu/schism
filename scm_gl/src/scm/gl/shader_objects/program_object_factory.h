@@ -34,12 +34,13 @@ class __scm_export(ogl) program_object_factory
 public:
     static program_object       create(const program_object_makefile&    /*make_file*/);
 
-    static const std::string&   error_output();
+    static bool                 output_available();
+    static const std::string&   output();
 
 protected:
-    static void                 clear_error_output();
+    static void                 clear_output();
 
-    static std::string          _error_output;
+    static std::string          _output;
 }; // class program_object_factory
 
 } // namespace gl

@@ -81,17 +81,17 @@ bool program_object::link()
     glLinkProgram(*_prog);
     glGetProgramiv(*_prog, GL_LINK_STATUS, &link_state);
 
+    // get the linker output
+    int info_len = 0;
+    glGetProgramiv(*_prog, GL_INFO_LOG_LENGTH, &info_len);
+    if (info_len) {
+        boost::scoped_array<GLchar> linker_info;
+        linker_info.reset(new GLchar[info_len]);
+        glGetProgramInfoLog(*_prog, info_len, NULL, linker_info.get());
+        _linker_out = std::string(linker_info.get());
+    }
+
     if (!link_state) {
-        GLchar*   linker_info;
-        int       info_len;
-
-        glGetProgramiv(*_prog, GL_INFO_LOG_LENGTH, &info_len);
-        linker_info = new GLchar[info_len];
-        glGetProgramInfoLog(*_prog, info_len, NULL, linker_info);
-
-        _linker_out = std::string(linker_info);
-        delete [] linker_info;
-
         _ok = false;
     }
 

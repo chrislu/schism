@@ -26,6 +26,7 @@ public:
     bool                    set_source_code_from_file(const std::string& /*filename*/);
 
     bool                    compile();
+    const bool              compiler_output_available() const { return (!_compiler_out.empty()); }
     const std::string&      compiler_output() const { return (_compiler_out); }
 
 protected:

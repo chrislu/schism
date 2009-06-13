@@ -7,7 +7,7 @@
 #include <string>
 
 #include <scm/core/platform/platform.h>
-#include <scm/core/utilities/luabind_warning_disable.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
@@ -27,11 +27,9 @@ protected:
 
 }; // class error_checker
 
-
-
 } // namespace gl
 } // namespace scm
 
-#include <scm/core/utilities/luabind_warning_enable.h>
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // ERROR_CHECKER_H_INCLUDED

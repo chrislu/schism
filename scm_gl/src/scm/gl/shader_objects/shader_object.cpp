@@ -91,16 +91,17 @@ bool shader_object::compile()
     glCompileShader(_obj);
     glGetShaderiv(_obj, GL_COMPILE_STATUS, &compile_state);
 
-    if (!compile_state) {
+    // get the compiler output
+    int info_len = 0;
+    glGetShaderiv(_obj, GL_INFO_LOG_LENGTH, &info_len);
+    if (info_len) {
         boost::scoped_array<GLchar> compiler_info;
-        int                         info_len;
-
-        glGetShaderiv(_obj, GL_INFO_LOG_LENGTH, &info_len);
         compiler_info.reset(new GLchar[info_len]);
         glGetShaderInfoLog(_obj, info_len, NULL, compiler_info.get());
-
         _compiler_out = std::string(compiler_info.get());
+    }
 
+    if (!compile_state) {
         glDeleteShader(_obj);
         return (false);
     }
