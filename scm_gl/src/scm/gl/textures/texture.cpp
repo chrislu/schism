@@ -127,8 +127,8 @@ void texture::unbind() const
 {
     gl_assert_error("entering texture::unbind()");
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
-    glDisableIndexedEXT(target(), _occupied_texture_unit);
     glBindMultiTextureEXT(GL_TEXTURE0 + _occupied_texture_unit, target(), 0);
+    glDisableIndexedEXT(target(), _occupied_texture_unit);
 #else // SCM_GL_USE_DIRECT_STATE_ACCESS
     if (_occupied_texture_unit >= 0) {
         glActiveTexture(GL_TEXTURE0 + _occupied_texture_unit);
