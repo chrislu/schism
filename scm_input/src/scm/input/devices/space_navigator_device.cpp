@@ -58,6 +58,10 @@ using namespace ATL;
 #endif SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 [module(type=dll, name = "scm_input_sn")]
+class atl_scm_sn_module // The atl module class which the module attribute belongs to
+{
+};
+
 [event_receiver(com)]
 class space_navigator_impl
 {
@@ -70,6 +74,7 @@ public:
     HRESULT             on_key_down(int k);
     HRESULT             on_key_up(int k);
 
+    void                init_com();
     void                update();
 
 private:
@@ -82,7 +87,109 @@ private:
 space_navigator_impl::space_navigator_impl(scm::inp::space_navigator*const d)
   : _device(d)
 {
-    HRESULT hr=::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    init_com();
+}
+
+space_navigator_impl::~space_navigator_impl()
+{
+    HRESULT hr = E_FAIL;
+
+    CComPtr<IDispatch> _3DxDevice;
+    if (_3d_sensor) {
+        hr = _3d_sensor->get_Device(&_3DxDevice);
+    }
+    else if (_3d_keyboard) {
+        hr = _3d_keyboard->get_Device(&_3DxDevice);
+    }
+
+    if (SUCCEEDED(hr)) {
+        CComPtr<ISimpleDevice> _3DxSimpleDevice;
+        hr = _3DxDevice.QueryInterface(&_3DxSimpleDevice);
+        if (SUCCEEDED(hr)) {
+            _3DxSimpleDevice->Disconnect();
+            _3DxSimpleDevice.Release();
+        }
+    }
+
+    if (_3d_sensor) {
+        // unhook (unadvise) the sensor event sink
+        __unhook(&_ISensorEvents::SensorInput, _3d_sensor, 
+                 &space_navigator_impl::on_sensor_input);
+        _3d_sensor.Release();
+    }
+
+    if (_3d_keyboard) {
+        __unhook(&_IKeyboardEvents::KeyDown, _3d_keyboard,
+                 &space_navigator_impl::on_key_down);
+        __unhook(&_IKeyboardEvents::KeyUp, _3d_keyboard,
+                 &space_navigator_impl::on_key_up);
+        _3d_keyboard.Release();
+    }
+}
+
+void
+space_navigator_impl::update()
+{
+    static DWORD last_time_stamp = 0;
+
+    using namespace scm;
+    using namespace scm::math;
+
+    CComPtr<IAngleAxis> rotation;
+    CComPtr<IVector3D>  translation;
+    double              rotation_angle;
+    double              translation_length;
+
+    _3d_sensor->get_Rotation(&rotation);
+    _3d_sensor->get_Translation(&translation);
+    rotation->get_Angle(&rotation_angle);
+    translation->get_Length(&translation_length);
+
+    _device->_rotation = mat4f::identity();
+    _device->_translation = mat4f::identity();
+
+    if (   rotation_angle > 0.0
+        || translation_length > 0.0) {
+        double time_factor = 1.0;
+
+        DWORD time_stamp = ::GetTickCount();
+        if (last_time_stamp) {
+            double  period;
+            _3d_sensor->get_Period(&period);
+            time_factor = (double)(time_stamp - last_time_stamp) / (/*1000.0 **/ period);
+            //std::cout << period << " " << time_factor << std::endl;
+        }
+        last_time_stamp = time_stamp;
+
+
+        // translation
+        vec3d  trans_vec;
+        translation->get_X(&trans_vec.x);
+        translation->get_Y(&trans_vec.y);
+        translation->get_Z(&trans_vec.z);
+
+        trans_vec *= vec3d(_device->_translation_sensitivity) * time_factor;
+        translate(_device->_translation, math::vec3f(trans_vec));
+
+
+        // rotation
+        vec3d  rot_axis;
+        rotation->get_X(&rot_axis.x);
+        rotation->get_Y(&rot_axis.y);
+        rotation->get_Z(&rot_axis.z);
+
+        rotation_angle *= time_factor;
+        rotate(_device->_rotation, (float)rotation_angle, math::vec3f(rot_axis));
+    }
+
+    rotation.Release();
+    translation.Release();
+}
+
+void
+space_navigator_impl::init_com()
+{
+    HRESULT hr=::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY);
     if (!SUCCEEDED(hr)) {
         CString strError;
         strError.FormatMessage (_T("Error 0x%x"), hr);
@@ -144,101 +251,6 @@ space_navigator_impl::space_navigator_impl(scm::inp::space_navigator*const d)
         }
         //_3DxDevice.Release();
     }
-}
-
-space_navigator_impl::~space_navigator_impl()
-{
-    HRESULT hr = E_FAIL;
-
-    CComPtr<IDispatch> _3DxDevice;
-    if (_3d_sensor) {
-        hr = _3d_sensor->get_Device(&_3DxDevice);
-    }
-    else if (_3d_keyboard) {
-        hr = _3d_keyboard->get_Device(&_3DxDevice);
-    }
-
-    if (SUCCEEDED(hr)) {
-        CComPtr<ISimpleDevice> _3DxSimpleDevice;
-        hr = _3DxDevice.QueryInterface(&_3DxSimpleDevice);
-        if (SUCCEEDED(hr)) {
-            _3DxSimpleDevice->Disconnect();
-            _3DxSimpleDevice.Release();
-        }
-    }
-
-    if (_3d_sensor) {
-        // unhook (unadvise) the sensor event sink
-        __unhook(&_ISensorEvents::SensorInput, _3d_sensor, 
-                 &space_navigator_impl::on_sensor_input);
-        _3d_sensor.Release();
-    }
-
-    if (_3d_keyboard) {
-        __unhook(&_IKeyboardEvents::KeyDown, _3d_keyboard,
-                 &space_navigator_impl::on_key_down);
-        __unhook(&_IKeyboardEvents::KeyUp, _3d_keyboard,
-                 &space_navigator_impl::on_key_up);
-        _3d_keyboard.Release();
-    }
-}
-void
-space_navigator_impl::update()
-{
-    static DWORD last_time_stamp = 0;
-
-    using namespace scm;
-    using namespace scm::math;
-
-    CComPtr<IAngleAxis> rotation;
-    CComPtr<IVector3D>  translation;
-    double              rotation_angle;
-    double              translation_length;
-
-    _3d_sensor->get_Rotation(&rotation);
-    _3d_sensor->get_Translation(&translation);
-    rotation->get_Angle(&rotation_angle);
-    translation->get_Length(&translation_length);
-
-
-    std::cout << "update impl" << std::endl;
-    if (   rotation_angle > 0.0
-        || translation_length > 0.0) {
-        double time_factor = 1.0;
-
-    std::cout << "update impl" << std::endl;
-        DWORD time_stamp = ::GetTickCount();
-        if (last_time_stamp) {
-            double  period;
-            _3d_sensor->get_Period(&period);
-            time_factor = (double)(time_stamp - last_time_stamp) / period;
-        }
-        last_time_stamp = time_stamp;
-
-
-        // translation
-        vec3d  trans_vec;
-        translation->get_X(&trans_vec.x);
-        translation->get_Y(&trans_vec.y);
-        translation->get_Z(&trans_vec.z);
-
-        trans_vec *= vec3d(_device->_translation_sensitivity) * time_factor;
-        translate(_device->_translation, math::vec3f(trans_vec));
-
-
-        // rotation
-        vec3d  rot_axis;
-        rotation->get_X(&rot_axis.x);
-        rotation->get_Y(&rot_axis.y);
-        rotation->get_Z(&rot_axis.z);
-
-        rotation_angle *= time_factor;
-        rotate(_device->_rotation, (float)rotation_angle, math::vec3f(rot_axis));
-
-        std::cout << _device->_rotation << std::endl;
-    }
-    rotation.Release();
-    translation.Release();
 }
 
 HRESULT

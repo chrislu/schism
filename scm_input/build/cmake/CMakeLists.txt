@@ -14,7 +14,7 @@ scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/input *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/input *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/input/devices *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/input/devices *.h *.inl)
