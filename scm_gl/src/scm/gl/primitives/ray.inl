@@ -1,48 +1,52 @@
 
-#include "ray.h"
-
 #include <algorithm>
 
 namespace scm {
 namespace gl {
 
-ray::ray()
-  : _origin(ray::vec3_type::value_type(0)),
-    _direction(ray::vec3_type::value_type(0))
+template<typename s>
+ray_impl<s>::ray_impl()
+  : _origin(ray_impl::vec3_type::value_type(0)),
+    _direction(ray_impl::vec3_type::value_type(0))
 {
 }
 
-ray::ray(const ray& p)
+template<typename s>
+ray_impl<s>::ray_impl(const ray_impl<s>& p)
   : _origin(p._origin),
     _direction(p._direction)
 {
 }
 
-ray::ray(const ray::vec3_type& org,
-         const ray::vec3_type& dir)
+template<typename s>
+ray_impl<s>::ray_impl(const typename ray_impl<s>::vec3_type& org,
+                      const typename ray_impl::vec3_type& dir)
   : _origin(org),
     _direction(dir)
 {
     normalize();
 }
 
-ray&
-ray::operator=(const ray& rhs)
+template<typename s>
+ray_impl<s>&
+ray_impl<s>::operator=(const ray_impl<s>& rhs)
 {
-    ray tmp(rhs);
+    ray_impl<s> tmp(rhs);
     swap(tmp);
     return (*this);
 }
 
+template<typename s>
 void
-ray::swap(ray& rhs)
+ray_impl<s>::swap(ray_impl<s>& rhs)
 {
     std::swap(_origin,    rhs._origin);
     std::swap(_direction, rhs._direction);
 }
 
+template<typename s>
 void
-ray::transform(const ray::mat4_type& t)
+ray_impl<s>::transform(const typename ray_impl<s>::mat4_type& t)
 {
     using namespace scm::math;
 
@@ -54,8 +58,9 @@ ray::transform(const ray::mat4_type& t)
     normalize();
 }
 
+template<typename s>
 void
-ray::transform_preinverted(const ray::mat4_type& it)
+ray_impl<s>::transform_preinverted(const typename ray_impl<s>::mat4_type& it)
 {
     using namespace scm::math;
 
@@ -67,20 +72,23 @@ ray::transform_preinverted(const ray::mat4_type& it)
     normalize();
 }
 
-const ray::vec3_type&
-ray::origin() const
+template<typename s>
+const typename ray_impl<s>::vec3_type&
+ray_impl<s>::origin() const
 {
     return (_origin);
 }
 
-const ray::vec3_type&
-ray::direction() const
+template<typename s>
+const typename ray_impl<s>::vec3_type&
+ray_impl<s>::direction() const
 {
     return (_direction);
 }
 
+template<typename s>
 void
-ray::normalize()
+ray_impl<s>::normalize()
 {
     _direction = math::normalize(_direction);
 }

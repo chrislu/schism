@@ -4,27 +4,30 @@
 
 #include <scm/core/math.h>
 
+#include <scm/gl/primitives/primitives_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 
-class __scm_export(ogl) ray
+template <typename s>
+class ray_impl
 {
 public:
-    typedef scm::math::vec4f    vec4_type;
-    typedef scm::math::vec3f    vec3_type;
-    typedef scm::math::mat4f    mat4_type;
+    typedef scm::math::vec<s, 4>    vec4_type;
+    typedef scm::math::vec<s, 3>    vec3_type;
+    typedef scm::math::mat<s, 4, 4> mat4_type;
 
 public:
-    ray();
-    ray(const ray& p);
-    explicit ray(const vec3_type& org,
-                 const vec3_type& dir);
+    ray_impl();
+    ray_impl(const ray_impl& p);
+    explicit ray_impl(const vec3_type& org,
+                      const vec3_type& dir);
 
-    ray&                    operator=(const ray& rhs);
-    void                    swap(ray& rhs);
+    ray_impl&               operator=(const ray_impl& rhs);
+    void                    swap(ray_impl& rhs);
 
     void                    transform(const mat4_type& t);
     void                    transform_preinverted(const mat4_type& t);
@@ -46,14 +49,16 @@ protected:
 
 namespace std {
 
-template<>
-inline void swap(scm::gl::ray& lhs,
-                 scm::gl::ray& rhs)
+template<typename s>
+inline void swap(scm::gl::ray_impl<s>& lhs,
+                 scm::gl::ray_impl<s>& rhs)
 {
     lhs.swap(rhs);
 }
 
 } // namespace std
+
+#include "ray.inl"
 
 #include <scm/core/utilities/platform_warning_enable.h>
 

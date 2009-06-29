@@ -4,18 +4,20 @@
 
 #include <scm/core/math/math.h>
 
+#include <scm/gl/primitives/primitives_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 
-class ray;
-
-class __scm_export(ogl) box
+template<typename s>
+class box_impl
 {
 public:
-    typedef scm::math::vec3f    vec3_type;
+    typedef scm::math::vec<s, 3>    vec3_type;
+    typedef ray_impl<s>             ray_type;
 
     typedef enum {
         inside,
@@ -24,13 +26,13 @@ public:
     } classification_result;
 
 public:
-    box(const vec3_type& min_vert = vec3_type(0.0f),
-        const vec3_type& max_vert = vec3_type(1.0f));
-    box(const box& b);
-    virtual ~box();
+    box_impl(const vec3_type& min_vert = vec3_type(0.0f),
+             const vec3_type& max_vert = vec3_type(1.0f));
+    box_impl(const box_impl& b);
+    virtual ~box_impl();
 
-    box&                        operator=(const box& b);
-    void                        swap(box& b);
+    box_impl&                   operator=(const box_impl& b);
+    void                        swap(box_impl& b);
 
     const vec3_type&            min_vertex() const;
     const vec3_type&            max_vertex() const;
@@ -41,9 +43,9 @@ public:
     void                        max_vertex(const vec3_type& vert);
 
     classification_result       classify(const vec3_type& p) const;
-    classification_result       classify(const box& a) const;
+    classification_result       classify(const box_impl& a) const;
 
-    bool                        intersect(const ray& r, vec3_type& entry, vec3_type& exit) const;
+    bool                        intersect(const ray_type& r, vec3_type& entry, vec3_type& exit) const;
 
 protected:
     vec3_type                   _min_vertex;
@@ -56,16 +58,16 @@ protected:
 
 namespace std {
 
-template<>
-inline void swap(scm::gl::box& lhs,
-                 scm::gl::box& rhs)
+template<typename s>
+inline void swap(scm::gl::box_impl<s>& lhs,
+                 scm::gl::box_impl<s>& rhs)
 {
     lhs.swap(rhs);
 }
 
 } // namespace std
 
+#include "box.inl"
 #include <scm/core/utilities/platform_warning_enable.h>
-
 
 #endif // SCM_OGL_PRIMITIVES_BOX_H_INCLUDED

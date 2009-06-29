@@ -4,23 +4,26 @@
 
 #include <scm/core/math/math.h>
 
+#include <scm/gl/primitives/primitives_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 
-class box;
-
 // describing plane equation
 //  - a*x + b*y + c*z + d = 0
 //  - so d gives you the distance of the origin related to the plane!
-class __scm_export(ogl) plane
+template <typename s>
+class plane_impl
 {
 public:
-    typedef scm::math::vec4f    vec4_type;
-    typedef scm::math::vec3f    vec3_type;
-    typedef scm::math::mat4f    mat4_type;
+    typedef s                       scal_type;
+    typedef scm::math::vec<s, 4>    vec4_type;
+    typedef scm::math::vec<s, 3>    vec3_type;
+    typedef scm::math::mat<s, 4, 4> mat4_type;
+    typedef box_impl<s>             box_type;
 
     typedef enum {
         front,
@@ -29,17 +32,20 @@ public:
     } classification_result;
 
 public:
-    plane();
-    plane(const plane& p);
-    explicit plane(const vec4_type& p);
+    plane_impl();
+    plane_impl(const plane_impl& p);
+    explicit plane_impl(const vec4_type& p);
 
-    plane&                  operator=(const plane& rhs);
-    void                    swap(plane& rhs);
+    plane_impl&             operator=(const plane_impl& rhs);
+    void                    swap(plane_impl& rhs);
 
     const vec3_type         normal() const;
-    vec3_type::value_type   distance(const vec3_type& p) const;
+    scal_type               distance() const;                       // distance of the origin to the plane(-d)
+    scal_type               distance(const vec3_type& p) const;     // distance of a point to the plane
 
     const vec4_type&        vector() const;
+
+    void                    reverse();
 
     void                    transform(const mat4_type& t);
     void                    transform_preinverted(const mat4_type& t);
@@ -48,7 +54,7 @@ public:
     unsigned                p_corner() const;
     unsigned                n_corner() const;
 
-    classification_result   classify(const box& b) const;
+    classification_result   classify(const box_type& b) const;
 
 protected:
     void                    normalize();
@@ -67,15 +73,16 @@ protected:
 
 namespace std {
 
-template<>
-inline void swap(scm::gl::plane& lhs,
-                 scm::gl::plane& rhs)
+template<typename s>
+inline void swap(scm::gl::plane_impl<s>& lhs,
+                 scm::gl::plane_impl<s>& rhs)
 {
     lhs.swap(rhs);
 }
 
 } // namespace std
 
+#include "plane.inl"
 #include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SCM_OGL_PRIMITIVES_PLANE_H_INCLUDED

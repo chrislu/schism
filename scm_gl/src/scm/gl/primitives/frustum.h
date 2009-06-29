@@ -6,6 +6,7 @@
 
 #include <scm/core/math/math.h>
 
+#include <scm/gl/primitives/primitives_fwd.h>
 #include <scm/gl/primitives/plane.h>
 
 #include <scm/core/platform/platform.h>
@@ -14,12 +15,13 @@
 namespace scm {
 namespace gl {
 
-class box;
-
-class __scm_export(ogl) frustum
+template<typename s>
+class frustum_impl
 {
 public:
-    typedef scm::math::mat4f    mat4_type;
+    typedef scm::math::mat<s, 4, 4> mat4_type;
+    typedef box_impl<s>             box_type;
+    typedef plane_impl<s>           plane_type;
 
 public:
     typedef enum {
@@ -38,22 +40,22 @@ public:
     } classification_result;
 
 public:
-    frustum(const mat4_type& mvp_matrix = mat4_type::identity());
-    frustum(const frustum& f);
+    frustum_impl(const mat4_type& mvp_matrix = mat4_type::identity());
+    frustum_impl(const frustum_impl& f);
 
-    frustum&                operator=(const frustum& rhs);
-    void                    swap(frustum& rhs);
+    frustum_impl&           operator=(const frustum_impl& rhs);
+    void                    swap(frustum_impl& rhs);
 
     void                    update(const mat4_type& mvp_matrix);
-    const plane&            get_plane(unsigned int p) const;
+    const plane_type&       get_plane(unsigned int p) const;
 
     void                    transform(const mat4_type& t);
     void                    transform_preinverted(const mat4_type& t);
 
-    classification_result   classify(const box& b) const;
+    classification_result   classify(const box_type& b) const;
 
 protected:
-    std::vector<plane> _planes;
+    std::vector<plane_type> _planes;
 
 }; // class frustum
 
@@ -62,15 +64,16 @@ protected:
 
 namespace std {
 
-template<>
-inline void swap(scm::gl::frustum& lhs,
-                 scm::gl::frustum& rhs)
+template<typename s>
+inline void swap(scm::gl::frustum_impl<s>& lhs,
+                 scm::gl::frustum_impl<s>& rhs)
 {
     lhs.swap(rhs);
 }
 
 } // namespace std
 
+#include "frustum.inl"
 #include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SCM_OGL_PRIMITIVES_FRUSTUM_H_INCLUDED
