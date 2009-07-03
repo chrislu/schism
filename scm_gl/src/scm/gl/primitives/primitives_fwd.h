@@ -28,6 +28,23 @@ typedef frustum_impl<float>     frustum;
 typedef plane_impl<float>       plane;
 typedef ray_impl<float>         ray;
 
+template<typename scal_type>
+struct epsilon
+{
+};
+
+template<>
+struct epsilon<float>
+{
+    static float value() { return (1.0e-4f); }
+};
+
+template<>
+struct epsilon<double>
+{
+    static double value() { return (1.0e-6); }
+};
+
 } // namespace gl
 } // namespace scm
 

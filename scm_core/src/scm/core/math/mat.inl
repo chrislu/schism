@@ -205,6 +205,33 @@ operator*(const mat<scal_type, order, order>& lhs,
 template<typename scal_type,
          const unsigned order>
 inline const vec<scal_type, order>
+operator*(const mat<scal_type, order, order>& lhs,
+          const vec<scal_type, order - 1>&    rhs)
+{
+    vec<scal_type, order - 1> tmp_ret(scal_type(0));
+
+    unsigned    row_off;
+
+    scal_type   tmp_dp;
+
+    for (unsigned r = 0; r < order - 1; ++r) {
+        tmp_dp = scal_type(0);
+
+        for (unsigned c = 0; c < order - 1; ++c) {
+            row_off = r + c * order;
+            tmp_dp += lhs.data_array[row_off] * rhs.data_array[c];
+        }
+
+        // w == 1
+        tmp_ret.data_array[r] = tmp_dp + lhs.data_array[r + (order - 1) * order];
+    }
+
+    return (tmp_ret);
+}
+
+template<typename scal_type,
+         const unsigned order>
+inline const vec<scal_type, order>
 operator*(const vec<scal_type, order>&        lhs,
           const mat<scal_type, order, order>& rhs)
 {

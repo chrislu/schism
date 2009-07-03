@@ -28,12 +28,14 @@ public:
     typedef enum {
         front,
         back,
+        coincide,
         intersect
     } classification_result;
 
 public:
     plane_impl();
     plane_impl(const plane_impl& p);
+    plane_impl(const vec3_type& p0, const vec3_type& p1, const vec3_type& p2);
     explicit plane_impl(const vec4_type& p);
 
     plane_impl&             operator=(const plane_impl& rhs);
@@ -54,7 +56,8 @@ public:
     unsigned                p_corner() const;
     unsigned                n_corner() const;
 
-    classification_result   classify(const box_type& b) const;
+    classification_result   classify(const box_type& b, scal_type e = epsilon<scal_type>::value()) const;
+    classification_result   classify(const vec3_type& p, scal_type e = epsilon<scal_type>::value()) const;
 
 protected:
     void                    normalize();

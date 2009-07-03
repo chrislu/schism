@@ -8,7 +8,7 @@ namespace gl {
 
 template<typename s>
 plane_impl<s>::plane_impl()
-  : _vector(typename plane_impl<s>::vec4_type::zero()),
+  : _vector(vec4_type::zero()),
     _p_corner(0u),
     _n_corner(0u)
 {
@@ -23,7 +23,28 @@ plane_impl<s>::plane_impl(const plane_impl<s>& p)
 }
 
 template<typename s>
-plane_impl<s>::plane_impl(const typename plane_impl<s>::vec4_type& p)
+plane_impl<s>::plane_impl(const vec3_type& p0, const vec3_type& p1, const vec3_type& p2)
+  : _p_corner(0u),
+    _n_corner(0u)
+{
+    using namespace scm::math;
+
+    // p2  p2 - p1
+    // o<--------o p1
+    //           |
+    //           |  p0 - p1
+    //           \/
+    //           o p0
+
+    vec3_type   n = math::normalize(cross(p2 - p1, p0 - p1));
+    scal_type   d = -dot(n, p1);
+
+    _vector = vec4_type(n, d);
+    update_corner_indices();
+}
+
+template<typename s>
+plane_impl<s>::plane_impl(const vec4_type& p)
   : _vector(p)
 {
     normalize();
@@ -63,7 +84,7 @@ plane_impl<s>::distance() const
 
 template<typename s>
 typename plane_impl<s>::scal_type
-plane_impl<s>::distance(const typename plane_impl<s>::vec3_type& p) const
+plane_impl<s>::distance(const vec3_type& p) const
 {
     return (  _vector.x * p.x
             + _vector.y * p.y
@@ -87,7 +108,7 @@ plane_impl<s>::reverse()
 
 template<typename s>
 void
-plane_impl<s>::transform(const typename plane_impl<s>::mat4_type& t)
+plane_impl<s>::transform(const mat4_type& t)
 {
     using namespace scm::math;
     transform_preinverted(inverse(t));
@@ -95,7 +116,7 @@ plane_impl<s>::transform(const typename plane_impl<s>::mat4_type& t)
 
 template<typename s>
 void
-plane_impl<s>::transform_preinverted(const typename plane_impl<s>::mat4_type& t)
+plane_impl<s>::transform_preinverted(const mat4_type& t)
 {
     using namespace scm::math;
     transform_preinverted_transposed(transpose(t));
@@ -103,7 +124,7 @@ plane_impl<s>::transform_preinverted(const typename plane_impl<s>::mat4_type& t)
 
 template<typename s>
 void
-plane_impl<s>::transform_preinverted_transposed(const typename plane_impl<s>::mat4_type& t)
+plane_impl<s>::transform_preinverted_transposed(const mat4_type& t)
 {
     _vector = t * _vector;
     normalize();
@@ -125,18 +146,37 @@ plane_impl<s>::n_corner() const
 
 template<typename s>
 typename plane_impl<s>::classification_result
-plane_impl<s>::classify(const typename plane_impl<s>::box_type& b) const
+plane_impl<s>::classify(const box_type& b, scal_type e) const
 {
     using namespace scm::math;
 
-    if (distance(b.corner(_n_corner)) > vec3_type::value_type(0)) {
+    if (distance(b.corner(_n_corner)) > e) {
         return (front);
     }
-    else if (distance(b.corner(_p_corner)) > vec3_type::value_type(0)) {
+    else if (distance(b.corner(_p_corner)) > e) {
         return (intersect);
     }
     else {
         return (back);
+    }
+}
+
+template<typename s>
+typename plane_impl<s>::classification_result
+plane_impl<s>::classify(const vec3_type& p, scal_type e) const
+{
+    using namespace scm::math;
+
+    scal_type d = distance(p);
+
+    if (d > e) {
+        return (front);
+    }
+    else if (d < -e) {
+        return (back);
+    }
+    else {
+        return (coincide);
     }
 }
 
