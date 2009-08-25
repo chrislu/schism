@@ -35,12 +35,12 @@ private:
     level                   _log_level;
 
     std::ostringstream      _ostream;
-
-    template <class T> friend out_stream& operator<<(out_stream& os, const T& rhs);
-    friend out_stream& operator<<(out_stream& os, const scm::logging::level& lev);
-    friend out_stream& operator<<(out_stream& os, const boost::format& rhs);
-    friend out_stream& operator<<(out_stream& os, std::ios_base& (*_Pfn)(std::ios_base&));
-    friend out_stream& operator<<(out_stream& os, std::ostream& (*_Pfn)(std::ostream&));
+public:
+    template <typename T> out_stream& operator<<(const T& rhs);
+    out_stream& operator<<(const scm::logging::level& lev);
+    //friend out_stream& operator<<(out_stream& os, const boost::format& rhs);
+    out_stream& operator<<(std::ios_base& (*_Pfn)(std::ios_base&));
+    out_stream& operator<<(std::ostream& (*_Pfn)(std::ostream&));
 
 }; // out_stream
 

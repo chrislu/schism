@@ -6,29 +6,30 @@
 namespace scm {
 namespace logging {
 
-template<class T>
+template<typename T>
 out_stream&
-operator<<(out_stream& os, const T& rhs)
+out_stream::operator<<(const T& rhs)
 {
-    if (os.log_level() <= os._logger->log_level()) {
-        os._ostream << rhs;
+    if (log_level() <= _logger->log_level()) {
+        _ostream << rhs;
     }
 
-    return (os);
+    return (*this);
 }
+
 
 inline out_stream&
-operator<<(out_stream& os, const level& lev)
+out_stream::operator<<(const level& lev)
 {
-    if (os.log_level() != lev) {
-        os.flush();
-        os._log_level = lev;
+    if (log_level() != lev) {
+        //os.flush();
+        _log_level = lev;
     }
 
-    return (os);
+    return (*this);
 }
 
-
+#if 0
 inline out_stream&
 operator<<(out_stream& os, const boost::format& rhs)
 {
@@ -38,25 +39,25 @@ operator<<(out_stream& os, const boost::format& rhs)
 
     return (os);
 }
-
+#endif
 inline out_stream&
-operator<<(out_stream& os, std::ios_base& (*_Pfn)(std::ios_base&))
+out_stream::operator<<(std::ios_base& (*_Pfn)(std::ios_base&))
 {
-    if (os.log_level() <= os._logger->log_level()) {
-        os._ostream << _Pfn;
+    if (log_level() <= _logger->log_level()) {
+        _ostream << _Pfn;
     }
 
-    return (os);
+    return (*this);
 }
 
 inline out_stream&
-operator<<(out_stream& os, std::ostream& (*_Pfn)(std::ostream&))
+out_stream::operator<<(std::ostream& (*_Pfn)(std::ostream&))
 {
-    if (os.log_level() <= os._logger->log_level()) {
-        os._ostream << _Pfn;
+    if (log_level() <= _logger->log_level()) {
+        _ostream << _Pfn;
     }
 
-    return (os);
+    return (*this);
 }
 
 } // namespace logging

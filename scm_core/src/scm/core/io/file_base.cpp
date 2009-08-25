@@ -105,7 +105,7 @@ file_base::reset_values()
     _file_path.clear();
     _file_size                  = 0;
 
-    _open_mode                  = 0;
+    _open_mode                  = static_cast<std::ios_base::openmode>(0);
 
     _volume_sector_size         = 0;
     _async_requests             = 0;

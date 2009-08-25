@@ -33,7 +33,7 @@ private:
     static bool            run_pre_core_shutdown_functions(core& c);
     static bool            run_post_core_shutdown_functions(core& c);
 
-    friend class core;
+    friend class ::scm::core;
 };
 
 // helper structs

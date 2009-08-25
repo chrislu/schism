@@ -3,7 +3,7 @@ project(scm_gl)
 
 include(schism_macros)
 include(schism_boost)
-include(schism_glsl)
+#include(schism_glsl)
 
 set(SRC_DIR                         "${scm_gl_SOURCE_DIR}/../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})

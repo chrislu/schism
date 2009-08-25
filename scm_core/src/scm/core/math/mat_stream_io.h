@@ -3,6 +3,8 @@
 #define MATH_MAT_STREAM_IO_H_INCLUDED
 
 #include <iomanip>
+#include <ostream>
+#include <istream>
 #include <boost/io/ios_state.hpp>
 
 namespace scm {

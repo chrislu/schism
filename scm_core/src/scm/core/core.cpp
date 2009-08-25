@@ -32,7 +32,8 @@ core::core(int argc, char **argv)
 
     setup_logging("");
 
-    scm::out() << version_string() << std::endl;
+    scm::out() << version_string()
+ << std::endl;
     scm::out() << "startup time: "
                << time::universal_time() << std::endl;
     scm::out() << log_level(logging::ll_info)
