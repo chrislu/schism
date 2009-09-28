@@ -17,6 +17,11 @@
 
 #include <scm/gl/render_context/window_context.h>
 
+// HACK FUCKING GLEW
+#define WGL_CONTEXT_PROFILE_MASK_ARB		        0x9126
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB	        0x00000001
+#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB   0x00000002
+
 namespace scm {
 namespace gl {
 
@@ -147,12 +152,19 @@ headless_context_win32::setup(const context_format& desc,
 
         ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
         ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
-        if (desc.foreward_compatible()) {
+        if (desc.forward_compatible()) {
             ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
         }
         if (desc.debug()) {
             ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
         }
+        if (desc.compatibility_profile()) {
+            ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
+        }
+        else {
+            ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+        }
+
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
         _context_handle.reset(wglCreateContextAttribsARB(static_cast<HDC>(_device_handle.get()),

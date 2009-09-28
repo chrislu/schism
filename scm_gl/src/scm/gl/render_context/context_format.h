@@ -31,7 +31,8 @@ public:
     bool                    stereo() const                     { return (_stereo); }
 
     bool                    debug() const                      { return (_debug); }
-    bool                    foreward_compatible() const        { return (_foreward_compatible); }
+    bool                    forward_compatible() const         { return (_forward_compatible); }
+    bool                    compatibility_profile() const      { return (_compatibility_profile); }
     int                     version_major() const              { return (_version_major); }
     int                     version_minor() const              { return (_version_minor); }
 
@@ -45,7 +46,8 @@ public:
     void                    stereo(bool v)                     { _stereo = v; }
 
     void                    debug(bool v)                      { _debug = v; }
-    void                    foreward_compatible(bool v)        { _foreward_compatible = v; }
+    void                    forward_compatible(bool v)         { _forward_compatible = v; }
+    void                    compatibility_profile(bool v)      { _compatibility_profile = v; }
     void                    version_major(int v)               { _version_major = v; }
     void                    version_minor(int v)               { _version_minor = v; }
 
@@ -64,7 +66,8 @@ private:
     bool                    _stereo;
 
     bool                    _debug;
-    bool                    _foreward_compatible;
+    bool                    _forward_compatible;
+    bool                    _compatibility_profile;
     int                     _version_major;
     int                     _version_minor;
 
