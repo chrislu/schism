@@ -12,7 +12,7 @@
 #   define SCM_WIN_VER_DEFAULT     _WIN32_WINNT
 
 // this is the target platform
-#   define SCM_WIN_VER              SCM_WIN_VER_XP_SP2
+#   define SCM_WIN_VER              SCM_WIN_VER_VISTA
 
 #   undef   _WIN32_WINNT
 #   define  _WIN32_WINNT            SCM_WIN_VER

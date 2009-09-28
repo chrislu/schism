@@ -2,6 +2,11 @@
 #ifndef SCM_IO_FILE_H_INCLUDED
 #define SCM_IO_FILE_H_INCLUDED
 
+#define SCM_REBUILD_FILE 1
+//#undef SCM_REBUILD_FILE
+
+#if !SCM_REBUILD_FILE 
+
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 #include <scm/core/io/file_win.h>
 #elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
@@ -10,7 +15,13 @@
 #error "atm unsupported platform"
 #endif
 
+#endif
+
+#include <string>
+
 #include <boost/noncopyable.hpp>
+
+#include <scm/core/numeric_types.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -18,6 +29,7 @@
 namespace scm {
 namespace io {
 
+#if !SCM_REBUILD_FILE 
 namespace detail {
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
@@ -52,7 +64,7 @@ public:
     using detail::file_impl::optimal_buffer_size;
 }; // class file
 
-#if 0
+#else
 
 namespace detail {
 const scm::uint32   default_cache_buffer_size       = 32768u;
@@ -64,6 +76,10 @@ class file_core;
 class __scm_export(core) file : boost::noncopyable
 {
 public:
+    typedef char                char_type;
+    typedef scm::int64          size_type;
+
+public:
     file();
     virtual ~file();
 
@@ -74,14 +90,14 @@ public:
                                      std::ios_base::openmode  open_mode                         = std::ios_base::in | std::ios_base::out,
                                      bool                     disable_system_cache              = true,
                                      scm::uint32              read_write_buffer_size            = detail::default_cache_buffer_size,
-                                     scm::uint32              read_write_asynchronous_requests  = detail::default_asynchronous_requests) = 0;
-    bool                        is_open() const = 0;
-    void                        close() = 0;
+                                     scm::uint32              read_write_asynchronous_requests  = detail::default_asynchronous_requests);
+    bool                        is_open() const;
+    void                        close();
     size_type                   read(char_type*const output_buffer,
-                                     size_type       num_bytes_to_read) = 0;
+                                     size_type       num_bytes_to_read);
     size_type                   write(const char_type*const input_buffer,
-                                      size_type             num_bytes_to_write) = 0;
-	size_type			        set_end_of_file() = 0;
+                                      size_type             num_bytes_to_write);
+	size_type			        set_end_of_file();
 
     // fixed functionality
     size_type                   seek(size_type                  off,
