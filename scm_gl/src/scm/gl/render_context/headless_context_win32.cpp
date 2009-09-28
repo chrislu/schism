@@ -22,6 +22,9 @@
 #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB	        0x00000001
 #define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB   0x00000002
 
+#define ERROR_INVALID_VERSION_ARB                   0x2095
+#define ERROR_INVALID_PROFILE_ARB                   0x2096
+
 namespace scm {
 namespace gl {
 
@@ -174,6 +177,15 @@ headless_context_win32::setup(const context_format& desc,
     }
 
     if (!_context_handle) {
+        DWORD           e = GetLastError();
+        std::string     es;
+
+        switch (e) {
+            case ERROR_INVALID_VERSION_ARB: es.assign("ERROR_INVALID_VERSION_ARB");break;
+            case ERROR_INVALID_PROFILE_ARB: es.assign("ERROR_INVALID_PROFILE_ARB");break;
+            default: es.assign("unknown error");
+        }
+
         scm::err() << scm::log_level(scm::logging::ll_error)
                    << "headless_context_win32::set_up(): "
                    << "unable to create OpenGL context (wglCreateContextAttribsARB failed)" << std::endl;

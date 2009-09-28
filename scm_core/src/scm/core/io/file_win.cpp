@@ -394,7 +394,7 @@ void
 file_win::close()
 {
     if (is_open()) {
-        // if we were non system buffered, so it may be possible to
+        // if we were non system buffered, it may be possible to
         // be too large because of volume sector size alignment restrictions
         if (   async_io_mode()
             && _open_mode & std::ios_base::out) {

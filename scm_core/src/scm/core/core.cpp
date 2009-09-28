@@ -32,8 +32,7 @@ core::core(int argc, char **argv)
 
     setup_logging("");
 
-    scm::out() << version_string()
- << std::endl;
+    scm::out() << version_string() << std::endl;
     scm::out() << "startup time: "
                << time::universal_time() << std::endl;
     scm::out() << log_level(logging::ll_info)
@@ -152,10 +151,7 @@ core::initialize(int argc, char **argv)
     _system_state = ss_init;
 
     _command_line_options.add_options()
-            ("help", "show this help message")
-            ("width", boost::program_options::value<int>()->default_value(1024), "output width")
-            ("height", boost::program_options::value<int>()->default_value(640), "output height")
-            ("fullscreen", boost::program_options::value<bool>()->default_value(false), "run in fullscreen mode");
+            ("help", "show this help message");
 
     scm::out() << log_level(logging::ll_info)
                << " - parsing command line options" << std::endl;
