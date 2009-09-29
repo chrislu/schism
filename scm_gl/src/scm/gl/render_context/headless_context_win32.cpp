@@ -188,7 +188,7 @@ headless_context_win32::setup(const context_format& desc,
 
         scm::err() << scm::log_level(scm::logging::ll_error)
                    << "headless_context_win32::set_up(): "
-                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed)" << std::endl;
+                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed [" << es << "])"  << std::endl;
         return (false);
     }
 
