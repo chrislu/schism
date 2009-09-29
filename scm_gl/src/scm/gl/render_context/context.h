@@ -1,24 +1,19 @@
 
-#ifndef SCM_GL_CONTEXT_BASE_H_INCLUDED
-#define SCM_GL_CONTEXT_BASE_H_INCLUDED
+#ifndef SCM_GL__CONTEXT_H_INCLUDED
+#define SCM_GL__CONTEXT_H_INCLUDED
 
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <scm/core/pointer_types.h>
-#include <scm/gl/render_context/context_format.h>
-
-#include <scm/core/platform/platform.h>
-#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 
-class context_format;
-
-class __scm_export(ogl) context_base : boost::noncopyable
+class context : boost::noncopyable
 {
 public:
     typedef scm::shared_ptr<void>   handle;
+    typedef void*                   window_handle;
 
 public:
     context_base();
@@ -42,10 +37,7 @@ protected:
 
 };
 
-} // namespace gl
-} // namespace scm
+} // namepspace gl
+} // namepspace scm
 
-#include <scm/core/utilities/platform_warning_enable.h>
-
-
-#endif // SCM_GL_CONTEXT_BASE_H_INCLUDED
+#endif // SCM_GL__CONTEXT_H_INCLUDED
