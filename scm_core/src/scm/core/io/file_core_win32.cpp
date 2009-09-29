@@ -120,6 +120,7 @@ struct io_result
 } // namespace detail
 
 file_core_win32::file_core_win32()
+  : file_core()
 {
 }
 
@@ -135,7 +136,7 @@ file_core_win32::open(const std::string&       file_path,
                       scm::uint32              read_write_asynchronous_requests)
 {
     using namespace boost::filesystem;
-#if 0
+
     path            input_file_path(file_path, native);
     path            complete_input_file_path(system_complete(input_file_path));
 
@@ -297,7 +298,7 @@ file_core_win32::open(const std::string&       file_path,
     _file_path  = complete_input_file_path.string();
     _open_mode  = open_mode;
     _file_size  = actual_file_size();
-#endif
+
     return (true);
 }
 
@@ -315,26 +316,719 @@ file_core_win32::is_open() const
 void
 file_core_win32::close()
 {
+    if (is_open()) {
+        // if we are non system buffered, it is possible to be too large
+        // because of volume sector size alignment restrictions
+        if (   async_io_mode()
+            && _open_mode & std::ios_base::out) {
+            if (_file_size != actual_file_size()) {
+
+                _file_handle.reset();
+                _file_handle.reset(CreateFile(_file_path.c_str(),
+                                              GENERIC_WRITE,
+                                              PAGE_READONLY,
+                                              0,
+                                              OPEN_EXISTING,
+                                              FILE_ATTRIBUTE_NORMAL,
+                                              0),
+                                   boost::bind<BOOL>(CloseHandle, _1));
+
+                if (_file_handle.get() == INVALID_HANDLE_VALUE) {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_win::close(): "
+                               << "error opening file for truncating end: "
+                               << "'" << _file_path << "'" << std::endl;
+                    throw std::ios_base::failure(  std::string("file_win::close(): error opening file for truncating end: ")
+                                                 + _file_path);
+                }
+                set_file_pointer(_file_size);
+                if (SetEndOfFile(_file_handle.get()) == 0) {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_win::close(): "
+                               << "error truncating end of file: "
+                               << "'" << _file_path << "'" << std::endl;
+                    throw std::ios_base::failure(  std::string("file_win::close(): error truncating end of file: ")
+                                                 + _file_path);
+                }
+            }
+        }
+    }
+
+    // reset read write buffer invoking VirtualFree
+    reset_values();
 }
 
 file_core_win32::size_type
 file_core_win32::read(char_type*const output_buffer,
                       size_type       num_bytes_to_read)
 {
-    return (0);
+    assert(_file_handle);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
+    assert(_position >= 0);
+
+    using namespace scm;
+
+    uint8*      output_byte_buffer  = reinterpret_cast<uint8*>(output_buffer);
+    int64       bytes_read          = 0;
+
+    // non system buffered read operation
+    //if (_rw_buffer_size > 0) {
+    if (async_io_mode()) {
+        bytes_read = read_async(output_buffer, num_bytes_to_read);
+    }
+    // normal system buffered operation
+    else {
+        if (!set_file_pointer(_position)) {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_win::read(): "
+                       << "unable to set file pointer to current position " << std::endl;
+            return (0);
+            //throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unable to set file pointer to current position");
+        }
+
+        DWORD   file_bytes_read       = 0;
+
+        if (ReadFile(_file_handle.get(), output_byte_buffer, static_cast<DWORD>(num_bytes_to_read), &file_bytes_read, 0) == 0) {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_win::read(): "
+                       << "error reading from file " << _file_path << std::endl;
+            return (0);
+            //throw std::ios_base::failure("large_file_device_windows<char_type>::read(): error reading from file");
+        }
+
+        if (file_bytes_read == 0) {
+            // eof
+            return (-1);
+        }
+        if (file_bytes_read <= num_bytes_to_read) {
+            _position           += file_bytes_read;
+            bytes_read           = file_bytes_read;
+        }
+        else {
+            //throw std::ios_base::failure("large_file_device_windows<char_type>::read(): unknown error reading from file");
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_win::read(): "
+                       << "unknown error reading from file " << _file_path << std::endl;
+            return (0);
+        }
+    }
+
+    assert(bytes_read > 0);
+
+    return (bytes_read);
 }
 
 file_core_win32::size_type
 file_core_win32::write(const char_type*const input_buffer,
                        size_type             num_bytes_to_write)
 {
-    return (0);
+    assert(_file_handle);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
+    assert(_position >= 0);
+
+    using namespace scm;
+
+    if (_open_mode & std::ios_base::app) {
+        _position = _file_size;
+    }
+
+    const uint8*    input_byte_buffer   = reinterpret_cast<const uint8*>(input_buffer);
+    int64           bytes_written       = 0;
+
+    // non system buffered read operation
+    if (async_io_mode()) {
+        //scm::err() << scm::log_level(scm::logging::ll_error)
+        //           << "file_win::write(): "
+        //           << "file was opened for async read operations (async write not supported)" << std::endl;
+        //return (0);
+        bytes_written = write_async(input_buffer, num_bytes_to_write);
+    }
+    // normal system buffered operation
+    else {
+        if (!set_file_pointer(_position)) {
+            return (0);
+        }
+
+        DWORD   file_bytes_written  = 0;
+
+        if (WriteFile(_file_handle.get(),
+                      input_byte_buffer,
+                      static_cast<DWORD>(num_bytes_to_write),
+                      &file_bytes_written,
+                      0) == 0) {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_win::write(): "
+                       << "error writing to file " << _file_path << std::endl;
+            return (0);
+        }
+
+        if (file_bytes_written <= num_bytes_to_write) {
+            _position           += file_bytes_written;
+            bytes_written        = file_bytes_written;
+        }
+        else {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_win::write(): "
+                       << "unknown error writing to file " << _file_path << std::endl;
+        }
+    }
+
+    return (bytes_written);
 }
 
 file_core_win32::size_type
 file_core_win32::set_end_of_file()
 {
-    return (0);
+    if (is_open()) {
+        if (   async_io_mode()
+            && _open_mode & std::ios_base::out) {
+            // we use non system buffered access
+            // we need to reopen the file for the truncation
+            _file_handle.reset();
+            _file_handle.reset(CreateFile(_file_path.c_str(),
+                                          GENERIC_WRITE,
+                                          PAGE_READONLY,
+                                          0,
+                                          OPEN_EXISTING,
+                                          FILE_ATTRIBUTE_NORMAL,
+                                          0),
+                               boost::bind<BOOL>(CloseHandle, _1));
+
+            if (_file_handle.get() == INVALID_HANDLE_VALUE) {
+                scm::err() << scm::log_level(scm::logging::ll_error)
+                           << "file_win::set_end_of_file(): "
+                           << "error opening file for truncating end: "
+                           << _file_path << std::endl;
+
+                close();
+                return (-1);
+            }
+
+            // set file pointer to truncate location
+            set_file_pointer(_position);
+            if (SetEndOfFile(_file_handle.get()) == 0) {
+                scm::err() << scm::log_level(scm::logging::ll_error)
+                           << "file_win::set_end_of_file(): "
+                           << "error truncating end of file: "
+                           << "position " << std::hex << _position << " file "
+                           << _file_path << std::endl;
+
+                close();
+                return (-1);
+            }
+
+            _file_size = _position;
+
+            // reopen file with non system buffered access
+
+            std::ios_base::open_mode    reopen_mode = _open_mode;
+
+            reopen_mode &= ~std::ios_base::trunc;
+
+            _file_handle.reset();
+            if (!open(_file_path, reopen_mode, true, _async_request_buffer_size, _async_requests)) {
+                scm::err() << scm::log_level(scm::logging::ll_error)
+                           << "file_win::set_end_of_file(): "
+                           << "error reopening file: "
+                           << _file_path << std::endl;
+                close();
+                return (-1);
+            }
+        }
+		else {
+            set_file_pointer(_position);
+            if (SetEndOfFile(_file_handle.get()) == 0) {
+                scm::err() << scm::log_level(scm::logging::ll_error)
+                           << "file_win::set_end_of_file(): "
+                           << "error truncating end of file: "
+                           << "position " << std::hex << _position << " file "
+                           << _file_path << std::endl;
+
+                close();
+                return (-1);
+            }
+		}
+    }
+
+	return (_position);
+}
+
+
+file_core_win32::size_type
+file_core_win32::read_async(char_type*const output_buffer,
+                            size_type       num_bytes_to_read)
+{
+    assert(async_io_mode());
+
+    using detail::overlapped_ext;
+    using detail::request_ptr;
+    using detail::request_ptr_queue;
+    using detail::request_ptr_map;
+
+    request_ptr_queue       free_requests;
+    request_ptr_map         running_requests;
+
+    size_type   position_vss            = vss_align_floor(_position);
+    size_type   file_size_vss           = vss_align_ceil(_file_size);
+    size_type   bytes_to_read_vss       = vss_align_ceil(math::min(_position  - position_vss + num_bytes_to_read,
+                                                             _file_size - position_vss));
+
+    size_type   bytes_read              = 0;
+    size_type   read_end_position_vss   = position_vss + bytes_to_read_vss;
+    size_type   next_read_request_pos   = position_vss;
+
+    scm::int32  allocate_requests       = scm::math::min<scm::int32>(_async_requests, static_cast<scm::int32>(bytes_to_read_vss / _async_request_buffer_size + 1));
+
+    //scm::out() << "allocate_requests: " << allocate_requests << std::endl;
+
+    // allocate the request structs
+    for (scm::int32 i = 0; i < allocate_requests; ++i) {
+        request_ptr new_request(new overlapped_ext(_async_request_buffer_size));
+        free_requests.push(new_request);
+    }
+
+    scm::time::accumulate_timer<scm::time::high_res_timer>  request_processing_timer;
+
+    do {
+        // fill up request queue
+        while (!free_requests.empty() && next_read_request_pos < read_end_position_vss) {
+            // retrieve a free request structure
+            request_ptr  read_request_ovl = free_requests.front();
+            free_requests.pop();
+
+            size_type bytes_left            = read_end_position_vss - next_read_request_pos;
+            size_type request_bytes_to_read = scm::math::min<size_type>(bytes_left, _async_request_buffer_size);
+            DWORD     request_bytes_read    = 0;
+
+            // setup overlapped structure
+            read_request_ovl->position(next_read_request_pos);
+            read_request_ovl->bytes_to_process(request_bytes_to_read);
+
+            next_read_request_pos += request_bytes_to_read;
+            running_requests.insert(request_ptr_map::value_type(read_request_ovl.get(), read_request_ovl));
+
+            if (!read_async_request(read_request_ovl)) {
+                cancel_async_io();
+                return (bytes_read);
+            }
+
+            assert(free_requests.size() + running_requests.size() == allocate_requests);
+        }
+
+        // ok now wait for requests to be filled
+        if (!running_requests.empty()) {
+            std::vector<detail::io_result>  results;
+
+            if (!query_async_results(results, allocate_requests)) {
+                cancel_async_io();
+                return (bytes_read);
+            }
+
+            assert(!results.empty());
+
+            // evaluate io results
+            foreach (const detail::io_result& result, results) {
+                
+                //request_processing_timer.start();
+
+                if (result._bytes_processed != result._ovl->bytes_to_process()) {
+                    if (result._ovl->position() + result._bytes_processed < _file_size) {
+                        scm::err() << scm::log_level(scm::logging::ll_error)
+                                   << "file_core_win32::read_async(): read result with different than requested length "
+                                   << "(requested: " << result._ovl->bytes_to_process()
+                                   << ", read: " << result._bytes_processed << ")" << std::endl;
+
+                        cancel_async_io();
+                        return (bytes_read);
+                    }
+                }
+                // copy the data from the ovl buffer to the outbuffer
+                size_type   target_off      = result._ovl->position() - _position;
+                size_type   copy_write_off  = math::max<size_type>(0,  target_off);
+                size_type   copy_read_off   = math::max<size_type>(0, -target_off);
+                size_type   copy_read_bytes = math::min<size_type>(result._bytes_processed - copy_read_off, num_bytes_to_read - copy_write_off);
+
+                char_type*       copy_dst   = output_buffer               + copy_write_off;
+                const char_type* copy_src   = result._ovl->buffer().get() + copy_read_off;
+
+                if (memcpy(copy_dst, copy_src, copy_read_bytes) != copy_dst) {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_core_win32::read_async(): error copying to destination buffer" << std::endl;
+
+                    cancel_async_io();
+                    return (bytes_read);
+                }
+
+                bytes_read += copy_read_bytes;
+
+                // find our ovl structure in the map
+                // add the pointer to the free list and remove it from the used map
+                request_ptr_map::iterator   result_request = running_requests.find(result._ovl);
+
+                if (result_request != running_requests.end()) {
+                    free_requests.push(result_request->second);
+                    running_requests.erase(result_request);
+                }
+                else {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_core_win32::read_async(): error finding result read request in running request list" << std::endl;
+
+                    cancel_async_io();
+                    return (bytes_read);
+                }
+                assert(free_requests.size() + running_requests.size() == allocate_requests);
+
+                //request_processing_timer.stop();
+            }
+        }
+    } while(   bytes_read < num_bytes_to_read
+            && !(running_requests.empty() && next_read_request_pos >= read_end_position_vss));
+
+    if (bytes_read == num_bytes_to_read) {
+        _position = _position + bytes_read;
+    }
+
+    //double avg_request_processing_time = scm::time::to_milliseconds(request_processing_timer.accumulated_duration())
+    //                                     / request_processing_timer.accumulation_count();
+
+    //scm::out() << std::fixed << "avg request processing time: " << avg_request_processing_time << "msec" << std::endl;
+
+    return (bytes_read);
+}
+
+bool
+file_core_win32::read_async_request(const detail::request_ptr& req) const
+{
+    DWORD request_bytes_read = 0;
+
+    if (ReadFile(_file_handle.get(),
+                 req->buffer().get(),
+                 static_cast<DWORD>(req->bytes_to_process()),
+                 &request_bytes_read,
+                 req.get()) == 0)
+    {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_core_win32::read_async_request(): "
+                       << "error starting read request "
+                       << "(file: "      << _file_path
+                       << ", position: " << std::hex << "0x" << req->position()
+                       << ", length: "   << std::dec << req->bytes_to_process() << ")" << std::endl;
+            return (false);
+        }
+    }
+
+    return (true);
+}
+
+file_core_win32::size_type
+file_core_win32::write_async(const char_type*const input_buffer,
+                             size_type             num_bytes_to_write)
+{
+    assert(async_io_mode());
+
+    using detail::overlapped_ext;
+    using detail::request_ptr;
+    using detail::request_ptr_queue;
+    using detail::request_ptr_map;
+
+    request_ptr_queue       free_requests;
+    request_ptr_map         running_requests;
+
+    size_type   position_vss            = vss_align_floor(_position);
+    size_type   position_end_vss        = vss_align_ceil(_position + num_bytes_to_write);
+
+    size_type   file_size_vss           = vss_align_ceil(_file_size);
+    size_type   bytes_to_write_vss      = position_end_vss - position_vss;
+
+    size_type   begin_sec               = position_vss;
+    size_type   begin_sec_prefetch      = position_vss - _position;
+    size_type   end_sec                 = vss_align_floor(_position + num_bytes_to_write);
+    size_type   end_sec_prefetch        = position_end_vss - end_sec;
+
+    size_type   bytes_written           = 0;
+    size_type   next_write_request_pos  = position_vss;
+
+    if (begin_sec_prefetch != 0 &&
+        end_sec_prefetch   != 0) {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_core_win32::write_async(): trying to write shit that is not vss aligned!"
+                   << " file: " << _file_path << ")" << std::endl;
+        return (0);
+    }
+
+    scm::int32 allocate_requests = scm::math::min<scm::int32>(_async_requests, static_cast<scm::int32>(bytes_to_write_vss / _async_request_buffer_size + 1));
+
+    //scm::out() << "allocate_requests: " << allocate_requests << std::endl;
+
+    // allocate the request structs
+    for (scm::int32 i = 0; i < allocate_requests; ++i) {
+        request_ptr new_request(new overlapped_ext(_async_request_buffer_size));
+        free_requests.push(new_request);
+    }
+
+    do {
+        // fill up request queue
+        while (!free_requests.empty() && next_write_request_pos < position_end_vss) {
+            // retrieve a free request structure
+            request_ptr  write_request_ovl = free_requests.front();
+            free_requests.pop();
+
+            size_type bytes_left                = position_end_vss - next_write_request_pos;
+            size_type request_bytes_to_write    = scm::math::min<size_type>(bytes_left, _async_request_buffer_size);
+            DWORD     request_bytes_written     = 0;
+
+            // setup overlapped structure
+            write_request_ovl->position(next_write_request_pos);
+            write_request_ovl->bytes_to_process(request_bytes_to_write);
+
+            // copy the request data to the request buffer
+            size_type   copy_read_off       = write_request_ovl->position() - position_vss;
+            size_type   copy_write_off      = 0;
+            size_type   copy_write_bytes    = request_bytes_to_write;
+
+            const char_type* copy_src       = input_buffer + copy_read_off;
+            char_type*       copy_dst       = write_request_ovl->buffer().get() + copy_write_off;
+
+            if (memcpy(copy_dst, copy_src, copy_write_bytes) != copy_dst) {
+                scm::err() << scm::log_level(scm::logging::ll_error)
+                           << "file_core_win32::write_async(): error copying to destination buffer" << std::endl;
+
+                cancel_async_io();
+                return (bytes_written);
+            }
+
+            next_write_request_pos += request_bytes_to_write;
+            running_requests.insert(request_ptr_map::value_type(write_request_ovl.get(), write_request_ovl));
+
+            if (!write_async_request(write_request_ovl)) {
+                cancel_async_io();
+                return (bytes_written);
+            }
+
+            assert(free_requests.size() + running_requests.size() == allocate_requests);
+        }
+
+        // ok now wait for requests to be filled
+        if (!running_requests.empty()) {
+            std::vector<detail::io_result>  results;
+
+            if (!query_async_results(results, allocate_requests)) {
+                cancel_async_io();
+                return (bytes_written);
+            }
+
+            assert(!results.empty());
+
+            // evaluate io results
+            foreach (const detail::io_result& result, results) {
+                if (result._bytes_processed != result._ovl->bytes_to_process()) {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_core_win32::write_async(): write result with different than requested length "
+                               << "(requested: " << result._ovl->bytes_to_process()
+                               << ", read: " << result._bytes_processed << ")" << std::endl;
+
+                    cancel_async_io();
+                    return (bytes_written);
+                }
+
+                bytes_written += result._bytes_processed;
+
+                // find our ovl structure in the map
+                // add the pointer to the free list and remove it from the used map
+                request_ptr_map::iterator   result_request = running_requests.find(result._ovl);
+
+                if (result_request != running_requests.end()) {
+                    free_requests.push(result_request->second);
+                    running_requests.erase(result_request);
+                }
+                else {
+                    scm::err() << scm::log_level(scm::logging::ll_error)
+                               << "file_core_win32::write_async(): error finding result write request in running request list" << std::endl;
+
+                    cancel_async_io();
+                    return (bytes_written);
+                }
+                assert(free_requests.size() + running_requests.size() == allocate_requests);
+            }
+        }
+    } while(bytes_written < num_bytes_to_write);
+
+    if (bytes_written == num_bytes_to_write) {
+        _position = _position + bytes_written;
+    }
+    if (_file_size < _position) {
+        _file_size = _position;
+    }
+
+    return (bytes_written);
+}
+
+bool
+file_core_win32::write_async_request(const detail::request_ptr& req) const
+{
+    DWORD request_bytes_write = 0;
+
+    if (WriteFile(_file_handle.get(),
+                  req->buffer().get(),
+                  static_cast<DWORD>(req->bytes_to_process()),
+                  &request_bytes_write,
+                  req.get()) == 0)
+    {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            scm::err() << scm::log_level(scm::logging::ll_error)
+                       << "file_core_win32::write_async_request(): "
+                       << "error starting write request "
+                       << "(file: "      << _file_path
+                       << ", position: " << std::hex << "0x" << req->position()
+                       << ", length: "   << std::dec << req->bytes_to_process() << ")" << std::endl;
+            return (false);
+        }
+    }
+
+    return (true);
+}
+
+bool
+file_core_win32::query_async_results(std::vector<detail::io_result>& results_vec,
+                                     int query_max_results) const
+{
+    using detail::overlapped_ext;
+    using detail::io_result;
+
+#if SCM_WIN_VER >= SCM_WIN_VER_VISTA
+    scm::scoped_array<OVERLAPPED_ENTRY> result_entries(new OVERLAPPED_ENTRY[query_max_results]);
+    ULONG                               result_entries_fetched = 0;
+
+    if (GetQueuedCompletionStatusEx(_completion_port.get(),
+                                    result_entries.get(),
+                                    query_max_results,
+                                    &result_entries_fetched,
+                                    INFINITE,
+                                    FALSE) != 0)
+    {
+        //scm::out() << result_entries_fetched << std::endl;
+        assert(results_vec.empty());
+
+        for (ULONG i = 0; i < result_entries_fetched; ++i) {
+            io_result new_result;
+
+            new_result._bytes_processed = result_entries[i].dwNumberOfBytesTransferred;
+            new_result._key             = result_entries[i].lpCompletionKey;
+            new_result._ovl             = static_cast<detail::overlapped_ext*>(result_entries[i].lpOverlapped);
+
+            results_vec.push_back(new_result);
+        }
+    }
+    else {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_core_win32::read_async(): GetQueuedCompletionStatusEx returned with error" << std::endl;
+
+        return (false);
+    }
+#else // SCM_WIN_VER >= SCM_WIN_VER_VISTA
+    DWORD           result_bytes_read = 0;
+    ULONG_PTR       result_key        = 0;
+    overlapped_ext* result_ovl;
+
+    if (GetQueuedCompletionStatus(_completion_port.get(),
+                                  &result_bytes_read,
+                                  &result_key,
+                                  reinterpret_cast<LPOVERLAPPED*>(&result_ovl),
+                                  INFINITE) != 0)
+    {
+        io_result new_result;
+
+        new_result._bytes_processed = result_bytes_read;
+        new_result._key             = result_key;
+        new_result._ovl             = result_ovl;
+
+        assert(results_vec.empty());
+
+        results_vec.push_back(new_result);
+    }
+    else {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_core_win32::read_async(): GetQueuedCompletionStatus returned with error" << std::endl;
+
+        return (false);
+    }
+#endif // SCM_WIN_VER >= SCM_WIN_VER_VISTA
+
+    return (true);
+}
+
+
+void
+file_core_win32::cancel_async_io() const
+{
+#if SCM_WIN_VER >= SCM_WIN_VER_VISTA
+    // CancelIoEx only available on Windows Vista and up
+    if (CancelIoEx(_file_handle.get(), NULL) == 0) {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_core_win32::cancel_async_io(): "
+                   << "error cancelling outstanding io requests "
+                   << "(file: " << _file_path << ")" << std::endl;
+    }
+#else // SCM_WIN_VER >= SCM_WIN_VER_VISTA
+    if (CancelIo(_file_handle.get()) == 0) {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_core_win32::cancel_async_io(): "
+                   << "error cancelling outstanding io requests "
+                   << "(file: " << _file_path << ")" << std::endl;
+    }
+#endif // SCM_WIN_VER >= SCM_WIN_VER_VISTA
+}
+
+file_core_win32::size_type
+file_core_win32::actual_file_size() const
+{
+    assert(_file_handle);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
+
+    LARGE_INTEGER   cur_size_li;
+
+    if (GetFileSizeEx(_file_handle.get(), &cur_size_li) == 0) {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_win::actual_file_size(): "
+                   << "error retrieving current file size: " << _file_path << std::endl;
+        throw std::ios_base::failure("file_win::actual_file_size(): error retrieving current file size");
+    }
+
+    return (static_cast<size_type>(cur_size_li.QuadPart));
+}
+
+bool
+file_core_win32::set_file_pointer(size_type new_pos)
+{
+    assert(_file_handle);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
+
+    LARGE_INTEGER   position_li;
+
+    position_li.QuadPart = new_pos;
+
+    if (   SetFilePointer(_file_handle.get(), position_li.LowPart, &position_li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER
+        && GetLastError() != NO_ERROR) {
+        scm::err() << scm::log_level(scm::logging::ll_error)
+                   << "file_win::set_file_pointer(): "
+                   << "error setting file pointer to position "
+                   << std::hex << new_pos 
+                   << " on file '" << _file_path << "'" << std::endl;
+
+        return (false);
+    }
+
+    return (true);
+}
+
+void
+file_core_win32::reset_values()
+{
+    file_core::reset_values();
+
+    _completion_port.reset();
+    _file_handle.reset();
 }
 
 } // namepspace io

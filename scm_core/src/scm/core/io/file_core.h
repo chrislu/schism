@@ -34,6 +34,34 @@ public:
 
 	virtual size_type			set_end_of_file() = 0;
 
+    // fixed functionality
+    size_type                   seek(size_type                  off,
+                                     std::ios_base::seek_dir    way);
+    size_type                   optimal_buffer_size() const;
+
+    size_type                   size() const;
+    const std::string&          file_path() const;
+
+    scm::int32                  volume_sector_size() const;
+    size_type                   vss_align_floor(const size_type in_val) const;
+    size_type                   vss_align_ceil(const size_type in_val) const;
+
+protected:
+    virtual void                reset_values();
+    virtual bool                async_io_mode() const;
+
+protected:
+    size_type                   _position;
+
+    std::string                 _file_path;
+    size_type                   _file_size;
+
+    std::ios_base::openmode     _open_mode;
+
+    scm::int32                  _volume_sector_size;
+    scm::int32                  _async_requests;
+    scm::int32                  _async_request_buffer_size;
+
 }; // class file_core
 
 } // namepspace io

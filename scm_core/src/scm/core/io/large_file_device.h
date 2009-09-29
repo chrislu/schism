@@ -29,7 +29,7 @@ public:
     large_file(const std::string&       file_path,
                std::ios_base::openmode  open_mode                           = std::ios_base::in | std::ios_base::out,
                bool                     disable_system_cache                = true,
-               scm::uint32              read_write_buffer_size              = detail::default_cache_buffer_size,
+               scm::uint32              read_write_buffer_size              = detail::default_io_block_size,
                scm::uint32              read_write_asynchronous_requests    = detail::default_asynchronous_requests);
     large_file(const large_file& rhs);
     virtual ~large_file();
@@ -44,7 +44,7 @@ public:
     void                    open(const std::string&         file_path,
                                  std::ios_base::openmode    open_mode                           = std::ios_base::in | std::ios_base::out,
                                  bool                       disable_system_cache                = true,
-                                 scm::uint32                read_write_buffer_size              = detail::default_cache_buffer_size,
+                                 scm::uint32                read_write_buffer_size              = detail::default_io_block_size,
                                  scm::uint32                read_write_asynchronous_requests    = detail::default_asynchronous_requests);
 
     bool                    is_open() const;
@@ -77,7 +77,7 @@ public:
     large_file_source(const std::string&       file_path,
                       std::ios_base::openmode  open_mode                            = std::ios_base::in,
                       bool                     disable_system_cache                 = true,
-                      scm::uint32              read_write_buffer_size               = detail::default_cache_buffer_size,
+                      scm::uint32              read_write_buffer_size               = detail::default_io_block_size,
                       scm::uint32              read_write_asynchronous_requests     = detail::default_asynchronous_requests)
         : large_file<char_t>(file_path,
                              open_mode & ~std::ios_base::out,
@@ -93,7 +93,7 @@ public:
     void                    open(const std::string&       file_path,
                                  std::ios_base::openmode  open_mode                            = std::ios_base::in,
                                  bool                     disable_system_cache                 = true,
-                                 scm::uint32              read_write_buffer_size               = detail::default_cache_buffer_size,
+                                 scm::uint32              read_write_buffer_size               = detail::default_io_block_size,
                                  scm::uint32              read_write_asynchronous_requests     = detail::default_asynchronous_requests)
     {
         large_file<char_t>::open(file_path,
@@ -125,7 +125,7 @@ public:
     large_file_sink(const std::string&       file_path,
                       std::ios_base::openmode  open_mode                            = std::ios_base::out,
                       bool                     disable_system_cache                 = true,
-                      scm::uint32              read_write_buffer_size               = detail::default_cache_buffer_size,
+                      scm::uint32              read_write_buffer_size               = detail::default_io_block_size,
                       scm::uint32              read_write_asynchronous_requests     = detail::default_asynchronous_requests)
         : large_file<char_t>(file_path,
                              open_mode & ~std::ios_base::in,
@@ -141,7 +141,7 @@ public:
     void                    open(const std::string&         file_path,
                                  std::ios_base::openmode    open_mode                           = std::ios_base::out,
                                  bool                       disable_system_cache                = true,
-                                 scm::uint32                read_write_buffer_size              = detail::default_cache_buffer_size,
+                                 scm::uint32                read_write_buffer_size              = detail::default_io_block_size,
                                  scm::uint32                read_write_asynchronous_requests    = detail::default_asynchronous_requests)
     {
         large_file<char_t>::open(file_path,
