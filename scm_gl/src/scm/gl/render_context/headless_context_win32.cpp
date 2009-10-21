@@ -161,7 +161,7 @@ headless_context_win32::setup(const context_format& desc,
         if (desc.debug()) {
             ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
         }
-        if (!wglewIsSupported("WGL_ARB_create_context_profile")) {
+        if (wglewIsSupported("WGL_ARB_create_context_profile")) {
             if (desc.compatibility_profile()) {
                 ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
             }
