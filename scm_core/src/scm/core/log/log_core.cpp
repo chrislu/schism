@@ -81,7 +81,7 @@ logging_core::get_logger_ptr(const std::string& log_name)
 std::string
 logging_core::retrieve_parent_name(const std::string& name) const
 {
-    if (name.find("..") != std::string.npos) {
+    if (name.find("..") != std::string::npos) {
         throw std::invalid_argument("logging_core::retrieve_parent_name: <fatal> encountered logger name containing '..'");
     }
     else if (name.find(".") == name.size() - 1) {
@@ -89,7 +89,7 @@ logging_core::retrieve_parent_name(const std::string& name) const
     }
 
     std::string::size_type parent_end_index = name.rfind(".");
-    if (parent_end_index != std::string.npos) {
+    if (parent_end_index != std::string::npos) {
         return (name.substr(0, parent_end_index));
     }
     else {
