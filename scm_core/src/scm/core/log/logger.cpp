@@ -94,7 +94,7 @@ logger::fatal()
 void
 logger::process_message(const message& msg)
 {
-    foreach (listener_ptr& listn_ptr, _listeners) {
+    foreach (const listener_ptr& listn_ptr, _listeners) {
         listn_ptr->notify(msg);
     }
     if (_parent) {
