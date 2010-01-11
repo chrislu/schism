@@ -37,7 +37,7 @@ protected:
 
 
 protected:
-    scm::shared_ptr<detail::wgl>    _wgl;
+    scm::scoped_ptr<detail::wgl>    _wgl;
     handle                          _hDC;
 
 private:

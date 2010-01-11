@@ -9,40 +9,45 @@
 namespace scm {
 namespace gl {
 
+
+
 class context : boost::noncopyable
 {
 public:
     typedef scm::shared_ptr<void>   handle;
 
-public:
-    context_base();
-    virtual ~context_base();
+#if   SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+    typedef handle          device_handle;
+    typedef handle          surface_handle;
+#elif SCM_PLATFORM == SCM_PLATFORM_LINUX
+    typedef Display*        device_handle;
+    typedef XID             surface_handle;
+#elif SCM_PLATFORM == SCM_PLATFORM_APPLE
+#error "atm unsupported platform"
+#endif // SCM_PLATFORM
 
-    virtual void            cleanup() = 0;
+    struct surface_descriptor
+    {
+        device_handle           _device;
+        surface_handle          _surface;
+    }; // struct surface_descriptor
+
+public:
+    context(const surface_descriptor&  srfce,
+            const context_format&      desc,
+            const context_base&        share_ctx = null_context());
+    virtual ~context();
 
     virtual bool            make_current(bool current = true) const = 0;
-    bool                    setup_windowed_context(const handle          dev_hndl,
-                                                   const handle          wnd_hndl,
-                                                   const context_format& desc,
-                                                   const context_base&   share_ctx);
-    bool                    setup_headless_context(const handle          dev_hndl,
-                                                   const context_format& desc,
-                                                   const context_base&   parent_ctx);
-
-    bool                    make_current(bool current = true) const;
-    void                    swap_buffers(int interval = 0) const;
-
-    void                    cleanup();
+    virtual void            swap_buffers(int interval = 0) const = 0;
+    virtual bool            empty() const = 0;
 
     const context_format&   format() const;
-
-    const handle&           context_handle() const;
-    const handle&           device_handle() const;
-    const handle&           drawable_handle() const;
-
-    virtual bool            empty() const;
+    static context&         null_context();
 
 protected:
+    context(); // create null context
+
     context_format          _context_format;
 
     handle                  _device;    // win/WGL: HDC,            linux/GLX: Display*
