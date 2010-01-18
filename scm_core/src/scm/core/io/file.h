@@ -4,8 +4,6 @@
 
 #include <string>
 
-#include <boost/noncopyable.hpp>
-
 #include <scm/core/numeric_types.h>
 #include <scm/core/pointer_types.h>
 
@@ -23,7 +21,7 @@ const scm::uint32   default_asynchronous_requests   = 8u;
 
 class file_core;
 
-class __scm_export(core) file : boost::noncopyable
+class __scm_export(core) file
 {
 public:
     typedef char                char_type;
@@ -57,7 +55,9 @@ public:
     const std::string&          file_path() const;
 
 private:
-    scm::scoped_ptr<file_core>  _file_core;
+    scm::shared_ptr<file_core>  _file_core;
+
+    // compiler generated copy constructor and assign operator work, they clone the core pointer
 
 }; // class file
 

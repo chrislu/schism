@@ -39,7 +39,7 @@ template <typename char_t>
 std::streamsize
 large_file<char_t>::read(char_type* s, std::streamsize n)
 {
-    file_base::char_type* char_buf = reinterpret_cast<file_base::char_type*>(s);
+    file::char_type* char_buf = reinterpret_cast<file::char_type*>(s);
 
     return (_impl->read(char_buf, n));
 }
@@ -48,7 +48,7 @@ template <typename char_t>
 std::streamsize
 large_file<char_t>::write(const char_type* s, std::streamsize n)
 {
-    const file_base::char_type* char_buf = reinterpret_cast<const file_base::char_type*>(s);
+    const file::char_type* char_buf = reinterpret_cast<const file::char_type*>(s);
 
     return (_impl->write(char_buf, n));
 }

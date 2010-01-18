@@ -8,7 +8,7 @@
 #include <scm/log.h>
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl/render_context/detail/context_helper.h>
+#include <scm/gl/graphics_device/opengl3/detail/context_helper.h>
 
 namespace scm {
 namespace gl {
