@@ -1,10 +1,25 @@
 
 #include "compiler.h"
 
+#include <ostream>
+#include <map>
+
+#include <boost/assign/list_of.hpp>
 #include <boost/filesystem.hpp>
+
+#include <scm/gl/opengl.h>
 
 namespace scm {
 namespace gl {
+
+namespace detail {
+
+static const std::map<shader_compiler::shader_type, GLenum> gl_shader_types
+    = boost::assign::map_list_of(shader_compiler::vertex_shader, GL_VERTEX_SHADER)
+                                (shader_compiler::geometry_shader, GL_GEOMETRY_SHADER)
+                                (shader_compiler::fragment_shader, GL_FRAGMENT_SHADER);
+
+} // namespace detail
 
 shader_compiler::shader_compiler()
 {
@@ -43,6 +58,14 @@ shader_compiler::compile(const shader_type           t,
                                std::ostream&         out_stream /*= std::cout*/)
 {
     using namespace boost::filesystem;
+
+    path file_path(shader_file, native);
+
+    if (!exists(file_path) || is_directory(file_path)) {
+        out_stream << "shader_compiler::compile() <error>: "
+                   << shader_file << "does not exist or is a directory" << std::endl;
+        return (shader_obj_ptr());
+    }
 
 
 

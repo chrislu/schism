@@ -52,7 +52,7 @@ public:
                                     const std::string&          /*shader_file*/,
                                     const define_list&          /*defines*/,
                                     const include_path_list&    /*includes*/,
-                                          std::ostream&         /*out_stream*/      = std::cout);
+                                          std::ostream&         /*out_stream*/);
 
 private:
     include_path_list       _default_include_paths;
