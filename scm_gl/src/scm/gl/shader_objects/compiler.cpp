@@ -63,10 +63,28 @@ shader_compiler::compile(const shader_type           t,
 
     if (!exists(file_path) || is_directory(file_path)) {
         out_stream << "shader_compiler::compile() <error>: "
-                   << shader_file << "does not exist or is a directory" << std::endl;
+                   << shader_file << " does not exist or is a directory" << std::endl;
         return (shader_obj_ptr());
     }
 
+    // generate final includes and defines
+    include_path_list   combined_includes(includes);        // custom includes take priority, first in list searched first
+    combined_includes.insert(combined_includes.end(), _default_include_paths.begin(), _default_include_paths.end());
+
+    define_list         combined_defines(_default_defines); // custom defines take priority, last in list inserted last into code
+    combined_defines.insert(combined_defines.end(), defines.begin(), defines.end());
+
+    // read source file
+    std::string source_string;
+
+    if (!scm::io::read_text_file(shader_file, source_string)) {
+        out_stream << "shader_compiler::compile() <error>: "
+                   << "unable to read file: " << shader_file << std::endl;
+        return (shader_obj_ptr());
+    }
+
+    // now do the parsing
+    // #version
 
 
     return (shader_obj_ptr());

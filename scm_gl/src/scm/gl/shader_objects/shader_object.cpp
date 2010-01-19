@@ -8,6 +8,8 @@
 
 #include <scm/gl.h>
 
+#include <scm/core/io/tools.h>
+
 namespace scm {
 namespace gl {
 
@@ -111,6 +113,7 @@ bool shader_object::compile()
 
 bool shader_object::get_source_from_file(const std::string& filename, std::string& out_code)
 {
+#if 0
     std::ifstream               file;
     boost::scoped_array<char>   code;
     std::streamsize             len;
@@ -142,6 +145,9 @@ bool shader_object::get_source_from_file(const std::string& filename, std::strin
     out_code = std::string(code.get());
 
     return (true);
+#else
+    return (scm::io::read_text_file(filename, out_code));
+#endif
 }
 
 } // namespace gl

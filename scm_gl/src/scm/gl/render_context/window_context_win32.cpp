@@ -343,10 +343,6 @@ window_context_win32::setup(const wnd_handle hwnd,
             ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
         }
         if (wglewIsSupported("WGL_ARB_create_context_profile")) {
-            scm::err() << scm::log_level(scm::logging::ll_warning)
-                       << "headless_context_win32::set_up(): "
-                       << "WGL_ARB_create_context_profile available" << std::endl;
-
             if (desc.compatibility_profile()) {
                 ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
             }
