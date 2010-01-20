@@ -3,9 +3,15 @@
 
 #include <ostream>
 #include <map>
+#include <vector>
+#include <string>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
+
+#include <scm/core/io/tools.h>
+#include <scm/core/utilities/foreach.h>
 
 #include <scm/gl/opengl.h>
 
@@ -85,6 +91,32 @@ shader_compiler::compile(const shader_type           t,
 
     // now do the parsing
     // #version
+    boost::regex    version_regex("\\s*#\\s*version\\s+(\\d{3})(\\s+([a-zA-Z]*))?\\s*(//|/\\*.*)?");
+
+    std::vector<std::string> a;
+
+    a.push_back("#version 150");
+    a.push_back("#version 150 core");
+    a.push_back("#version 150 core//plaaah");
+    a.push_back("#version 150 core //plaaah");
+    a.push_back("#version 150 core/*plaaah");
+    a.push_back("#version 150 core /*plaaah");
+    a.push_back(" # version  150   ");
+    a.push_back("  #  version    150    core   ");
+    a.push_back("   #   version   150     core//  plaaah  ");
+    a.push_back("    #    version     150     core     //    plaaah    ");
+    a.push_back("    #    version     150     core/*   plaaah   ");
+    a.push_back("    #    version     150     core     /*    plaaah    ");
+
+    foreach(const std::string& s, a) {
+        boost::smatch m;
+        if (boost::regex_search(s, m, version_regex)) {
+            out_stream << m[0] << std::endl;
+            out_stream << m[1] << " " << m[2] << " " << m[3] << " " << m[4] << " " << m[5] << " " << m[6] << " " << m[7] << std::endl;
+        } else {
+            out_stream << "error matching: " << s << std::endl;
+        }
+    }
 
 
     return (shader_obj_ptr());

@@ -128,6 +128,7 @@ if (WIN32)
         glew32
         glut32
         opengl32
+        optimized libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_REL}           debug libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 endif (WIN32)
 if (UNIX)

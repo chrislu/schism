@@ -27,7 +27,7 @@ read_text_file(const std::string& in_file_path, std::string& out_file_string)
     // reserve at least file_size characters in string
     out_file_string.resize(f->size());
 
-    assert(out_file_string.capacity() > f->size());
+    assert(out_file_string.capacity() >= f->size());
 
     if (f->read(&out_file_string[0], f->size()) != f->size()) {
         scm::out() << scm::log_level(scm::logging::ll_error)
