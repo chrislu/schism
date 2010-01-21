@@ -30,6 +30,10 @@ public:
         geometry_shader,
         fragment_shader
     };
+    enum shader_profile {
+        opengl_core,
+        opengl_compatibility
+    };
 
     struct shader_define {
         shader_define(const std::string& n, const std::string& v) : _name(n), _value(v) {};
@@ -57,6 +61,11 @@ public:
 private:
     include_path_list       _default_include_paths;
     define_list             _default_defines;
+
+    int                     _default_glsl_version;
+    shader_profile          _default_glsl_profile;
+
+    int                     _max_include_recursion_depth;
 
 }; // class shader_compiler
 
