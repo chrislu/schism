@@ -51,8 +51,8 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl/primitives *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl/render_context *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl/render_context *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl/render_context/detail *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl/render_context/detail *.h *.inl)
+#scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl/render_context/detail *.cpp)
+#scm_project_files(HEADER_FILES      ${SRC_DIR}/gl/render_context/detail *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl/shader_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl/shader_objects *.h *.inl)
