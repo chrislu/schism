@@ -142,6 +142,7 @@ shader_compiler::compile(const shader_type           t,
             boost::smatch m;
             if (boost::regex_match(in_line, m, version_line_regex)) {
                 out_stream << in_line << std::endl;
+                version_line_found = true;
                 if (m[4] == "/*") {
                     multi_line_comment = true;
                 }
@@ -159,6 +160,7 @@ shader_compiler::compile(const shader_type           t,
                            << _default_glsl_version << " "
                            << detail::shader_profile_strings[_default_glsl_profile] << std::endl;
                 out_stream << detail::line_string(line_number, file_name);
+                version_line_found = true;
             }
         }
         ++line_number;
