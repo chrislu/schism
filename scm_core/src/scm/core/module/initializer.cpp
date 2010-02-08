@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
+//#include <boost/thread.hpp>
 
 #include <scm/core/utilities/foreach.h>
 #include <scm/core/utilities/static_global.h>

@@ -19,6 +19,7 @@ namespace scm {
 namespace gl {
 
 class shader_object;
+class program_object;
 
 typedef shared_ptr<shader_object>   shader_obj_ptr;
 
@@ -35,32 +36,31 @@ public:
         opengl_compatibility
     };
 
-    struct shader_define {
-        shader_define(const std::string& n, const std::string& v) : _name(n), _value(v) {};
+    struct macro_definition {
+        macro_definition(const std::string& n, const std::string& v) : _name(n), _value(v) {};
         std::string     _name;
         std::string     _value;
     };
 
-    typedef boost::filesystem::path     include_path;
-    typedef std::list<shader_define>    define_list;
-    typedef std::list<include_path>     include_path_list;
+    typedef std::list<macro_definition> macro_definition_list;
+    typedef std::list<std::string>      include_path_list;
 
 public:
     shader_compiler();
     virtual ~shader_compiler();
 
     void                    add_include_path(const std::string& /*p*/);
-    void                    add_define(const shader_define& /*d*/);
+    void                    add_macro_definition(const macro_definition& /*d*/);
 
-    shader_obj_ptr          compile(const shader_type           /*t*/,
-                                    const std::string&          /*shader_file*/,
-                                    const define_list&          /*defines*/,
-                                    const include_path_list&    /*includes*/,
-                                          std::ostream&         /*out_stream*/);
+    shader_obj_ptr          compile(const shader_type               /*t*/,
+                                    const std::string&              /*shader_file*/,
+                                    const macro_definition_list&    /*defines*/,
+                                    const include_path_list&        /*includes*/,
+                                          std::ostream&             /*out_stream*/);
 
 private:
     include_path_list       _default_include_paths;
-    define_list             _default_defines;
+    macro_definition_list   _default_defines;
 
     int                     _default_glsl_version;
     shader_profile          _default_glsl_profile;
