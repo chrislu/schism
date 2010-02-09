@@ -19,33 +19,32 @@ __scm_export(core) int log_streambuf_index();
 } // namespace detail
 
 
-class indent
+template <typename char_type, typename traits = std::char_traits<char_type> >
+class basic_indention_format
 {
 public:
-    indent(int i) : _indention(i > 0 ? i : 0) {}
+    typedef std::basic_ostream<char_type, traits>   ostream_type;
+    typedef basic_log_streambuf<char_type, traits>  log_streambuf_type;
 
-    template <typename char_type, typename traits>
-    std::basic_ostream<char_type, traits> &operator()(std::basic_ostream<char_type, traits>& os) const
-    {
-        typedef basic_log_streambuf<char_type, traits> log_streambuf_type;
+public:
+    //basic_indention_format(int i) : _indention(i > 0 ? i : 0) {}
 
-        log_streambuf_type* lsb = dynamic_cast<log_streambuf_type*>(os.rdbuf());
-        if (!lsb) {
-            lsb = install_log_streambuf(os, detail::log_streambuf_index());
-            os.register_callback(callback, detail::log_streambuf_index());
-        }
-        lsb->indention(_indention);
+    //ostream_type& operator()(ostream_type& os) const
+    //{
+    //    log_streambuf_type* lsb = dynamic_cast<log_streambuf_type*>(os.rdbuf());
+    //    if (!lsb) {
+    //        lsb = install_log_streambuf(os, detail::log_streambuf_index());
+    //        os.register_callback(callback, detail::log_streambuf_index());
+    //    }
+    //    lsb->indention(_indention);
 
-        return (os);
-    }
-private:
-    template <typename char_type, typename traits>
+    //    return (os);
+    //}
+//private:
     static
-    basic_log_streambuf<char_type, traits>*
-    install_log_streambuf(std::basic_ostream<char_type, traits>& os, int index)
+    log_streambuf_type*
+    install_log_streambuf(ostream_type& os, int index)
     {
-        typedef basic_log_streambuf<char_type, traits> log_streambuf_type;
-
         log_streambuf_type* log_rdbuf = new log_streambuf_type(os.rdbuf());
         os.rdbuf(log_rdbuf);
         os.pword(index) = log_rdbuf;
@@ -57,13 +56,10 @@ private:
         return (log_rdbuf);
     }
 
-    template <typename char_type, typename traits>
     static
     void
-    uninstall_log_streambuf(std::basic_ostream<char_type, traits>& os, int index)
+    uninstall_log_streambuf(ostream_type& os, int index)
     {
-        typedef basic_log_streambuf<char_type, traits> log_streambuf_type;
-
         log_streambuf_type* old_ptr = static_cast<log_streambuf_type*>(os.pword(index));
         log_streambuf_type* old_ptr_rd = dynamic_cast<log_streambuf_type*>(os.rdbuf());
 
@@ -80,20 +76,20 @@ private:
         os.pword(index) = 0;
     }
 
-    static void callback(std::ios_base::event ev, std::ios_base& ios_obj, int index) {
+    static
+    void
+    callback(std::ios_base::event ev, std::ios_base& ios_obj, int index)
+    {
         if (ev == std::ios_base::erase_event) {
             // ok if we are here this means, we are a log_streambuf about to be deleted
             // this could mean, we get simply deleted or we are about to get copied
             assert(0 != ios_obj.pword(index));
 
-            if (std::ostream& os = dynamic_cast<std::ostream&>(ios_obj)) {
-                uninstall_log_streambuf(os, index);
-            }
-            else if (std::wostream& os = dynamic_cast<std::wostream&>(ios_obj)) {
-                uninstall_log_streambuf(os, index);
+            if (ostream_type* os = dynamic_cast<ostream_type*>(&ios_obj)) {
+                uninstall_log_streambuf(*os, index);
             }
             else {
-                throw std::runtime_error("scm::log::indent::callback() runtime error, failed to dynamic_cast ios_obj.");
+//                throw std::runtime_error("scm::log::indent::callback() runtime error, failed to dynamic_cast ios_obj.");
             }
         }
         else if(ev == std::ios_base::copyfmt_event) {
@@ -101,15 +97,9 @@ private:
             // has the new log_streambuf pointer
             assert(0 != ios_obj.pword(index));
 
-            if (std::ostream& os = dynamic_cast<std::ostream&>(ios_obj)) {
-                log_streambuf* copied_log_buf = static_cast<log_streambuf*>(os.pword(index));
-                log_streambuf* new_log_rdbuf  = install_log_streambuf(os, index);
-
-                new_log_rdbuf->copy_indention_attributes(*copied_log_buf);
-            }
-            else if (std::wostream& os = dynamic_cast<std::wostream&>(ios_obj)) {
-                wlog_streambuf* copied_log_buf = static_cast<wlog_streambuf*>(os.pword(index));
-                wlog_streambuf* new_log_rdbuf  = install_log_streambuf(os, index);
+            if (ostream_type& os = dynamic_cast<ostream_type&>(ios_obj)) {
+                log_streambuf_type* copied_log_buf = static_cast<log_streambuf_type*>(os.pword(index));
+                log_streambuf_type* new_log_rdbuf  = install_log_streambuf(os, index);
 
                 new_log_rdbuf->copy_indention_attributes(*copied_log_buf);
             }
@@ -119,13 +109,42 @@ private:
         }
     }
 
+//private:
+//    int _indention;
+};
+
+//typedef basic_indention_format<char>     indent;
+//typedef basic_indention_format<wchar_t>  windent;
+
+class basic_indention_manip
+{
+public:
+    basic_indention_manip(int i) : _indention(i > 0 ? i : 0) {}
+
+    template <typename char_type, typename traits>
+    std::basic_ostream<char_type, traits>& operator()(std::basic_ostream<char_type, traits>& os) const
+    {
+        typedef basic_log_streambuf<char_type, traits>  log_streambuf_type;
+
+        log_streambuf_type* lsb = dynamic_cast<log_streambuf_type*>(os.rdbuf());
+        if (!lsb) {
+            lsb = basic_indention_format<char_type, traits>::install_log_streambuf(os, detail::log_streambuf_index());
+            os.register_callback(basic_indention_format<char_type, traits>::callback, detail::log_streambuf_index());
+        }
+        lsb->indention(_indention);
+
+        return (os);
+    }
+
 private:
     int _indention;
-};
+}; // class basic_indention_manip
+
+typedef basic_indention_manip indent;
 
 template <typename char_type, typename traits>
 inline std::basic_ostream<char_type, traits>&
-operator<<(std::basic_ostream<char_type,traits>& os, const scm::logging::indent& indention)
+operator<<(std::basic_ostream<char_type,traits>& os, const scm::logging::basic_indention_manip& indention)
 {
     return (indention(os));
 }
