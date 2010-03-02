@@ -333,24 +333,24 @@ window_context_win32::setup(const wnd_handle hwnd,
     }
     else {
         std::vector<int>  ctx_attribs;
-
-        ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
-        ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
-        if (desc.forward_compatible()) {
-            ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
-        }
-        if (desc.debug()) {
-            ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
-        }
-        if (wglewIsSupported("WGL_ARB_create_context_profile")) {
-            if (desc.compatibility_profile()) {
-                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
-            }
-            else {
-                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
-            }
-        }
-        
+		if(desc.version_major() > 2) {
+			ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
+			ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
+			if (desc.forward_compatible()) {
+				ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
+			}
+			if (desc.debug()) {
+				ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
+			}
+			if (wglewIsSupported("WGL_ARB_create_context_profile")) {
+				if (desc.compatibility_profile()) {
+					ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
+				}
+				else {
+					ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+				}
+			}
+		}
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
         _context_handle.reset(wglCreateContextAttribsARB(static_cast<HDC>(_device_handle.get()),
