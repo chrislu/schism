@@ -111,14 +111,17 @@ gl_module::initialize_gl_context()
         }
 
         int profile_mask = 0;
-        //glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile_mask);
+#ifdef GL_CONTEXT_PROFILE_MASK
+        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile_mask);
         if (profile_mask & GL_CONTEXT_CORE_PROFILE_BIT) {
             _context_info._profile.assign("core profile");
         }
         else if (profile_mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) {
             _context_info._profile.assign("compatibility profile");
         }
-        else {
+        else
+#endif
+        {
             _context_info._profile.assign("unknown profile");
         }
     }
