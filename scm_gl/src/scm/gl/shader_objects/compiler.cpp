@@ -35,10 +35,10 @@
 #endif // BOOST_WAVE_SUPPORT_PRAGMA_ONCE
 #define BOOST_WAVE_SUPPORT_PRAGMA_ONCE 1
 
-#include <boost/wave.hpp>
-#include <boost/wave/preprocessing_hooks.hpp>
-#include <boost/wave/cpplexer/cpp_lex_token.hpp>
-#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
+//#include <boost/wave.hpp>
+//#include <boost/wave/preprocessing_hooks.hpp>
+//#include <boost/wave/cpplexer/cpp_lex_token.hpp>
+//#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
 
 #pragma warning(pop)
 
@@ -50,7 +50,7 @@
 
 
 namespace {
-
+#if 0
 template<typename input_token_type>
 class glsl_preprocessing_hook : public boost::wave::context_policies::eat_whitespace<input_token_type>//boost::wave::context_policies::default_preprocessing_hooks
 {
@@ -123,7 +123,7 @@ public:
     }
 
 }; // class glsl_preprocessing_hook
-
+#endif
 } // namespace detail
 
 namespace scm {
@@ -224,7 +224,7 @@ shader_compiler::compile(const shader_type           t,
                    << "unable to read file: " << shader_file << std::endl;
         return (shader_obj_ptr());
     }
-
+#if 0
     namespace wave = boost::wave;
 
     typedef wave::cpplexer::lex_token<> token_type;
@@ -294,7 +294,7 @@ shader_compiler::compile(const shader_type           t,
     std::stringstream   out_stream;
     std::string         in_line;
     scm::size_t         line_number = 1;
-
+#endif
     //out_stream << std::setprecision(6);
 
 #if 0

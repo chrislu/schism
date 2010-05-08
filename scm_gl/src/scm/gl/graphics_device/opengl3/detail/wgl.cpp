@@ -46,8 +46,8 @@ wgl::initialize()
     if (wglGetCurrentContext() == 0) {
         dummy_context.reset(new detail::classic_gl_context);
         if (!dummy_context->create()) {
-            scm::err() << scm::log_level(scm::logging::ll_error)
-                       << "wgl::initialize(): unable to initialize dummy OpenGL context" << std::endl;
+            scm::err() << log::error
+                       << "wgl::initialize(): unable to initialize dummy OpenGL context" << log::end;
             return (false);
         }
     }
@@ -56,16 +56,16 @@ wgl::initialize()
     wglGetExtensionsStringARB       = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
     
     if (wglGetExtensionsStringARB == 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
-                   << "wgl::initialize(): WGL_ARB_extensions_string not supported" << std::endl;
+        scm::err() << log::error
+                   << "wgl::initialize(): WGL_ARB_extensions_string not supported" << log::end;
         return (false);
     }
 
     // get and tokenize the extension strings
     HDC cur_hdc = wglGetCurrentDC();
     if (cur_hdc == 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
-                   << "wgl::initialize(): unable to retrieve current HDC" << std::endl;
+        scm::err() << log::error
+                   << "wgl::initialize(): unable to retrieve current HDC" << log::end;
         return (false);
     }
     std::string wgl_ext_string = reinterpret_cast<const char*>(wglGetExtensionsStringARB(cur_hdc));
@@ -82,8 +82,8 @@ wgl::initialize()
     wglCreateContextAttribsARB      = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     
     if (wglCreateContextAttribsARB == 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
-                   << "wgl::initialize(): WGL_ARB_create_context not supported" << std::endl;
+        scm::err() << log::error
+                   << "wgl::initialize(): WGL_ARB_create_context not supported" << log::end;
         return (false);
     }
 
@@ -95,8 +95,8 @@ wgl::initialize()
     if (   wglGetPixelFormatAttribivARB == 0
         || wglGetPixelFormatAttribfvARB == 0
         || wglChoosePixelFormatARB == 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
-                   << "wgl::initialize(): WGL_ARB_pixel_format not supported" << std::endl;
+        scm::err() << log::error
+                   << "wgl::initialize(): WGL_ARB_pixel_format not supported" << log::end;
         return (false);
     }
 
@@ -106,18 +106,18 @@ wgl::initialize()
 
     if (   wglSwapIntervalEXT == 0
         || wglGetSwapIntervalEXT == 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
-                   << "wgl::initialize(): WGL_EXT_swap_control not supported" << std::endl;
+        scm::err() << log::error
+                   << "wgl::initialize(): WGL_EXT_swap_control not supported" << log::end;
         return (false);
     }
 
     if (!is_supported("WGL_ARB_framebuffer_sRGB")) {
-        scm::out() << scm::log_level(scm::logging::ll_warning)
-                   << "wgl::initialize(): WGL_ARB_framebuffer_sRGB not supported" << std::endl;
+        scm::out() << log::warning
+                   << "wgl::initialize(): WGL_ARB_framebuffer_sRGB not supported" << log::end;
     }
     if (!is_supported("WGL_ARB_multisample")) {
-        scm::out() << scm::log_level(scm::logging::ll_warning)
-                   << "wgl::initialize(): WGL_ARB_multisample not supported" << std::endl;
+        scm::out() << log::warning
+                   << "wgl::initialize(): WGL_ARB_multisample not supported" << log::end;
     }
 
     _initialized = true;

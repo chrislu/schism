@@ -4,7 +4,7 @@
 namespace scm {
 namespace data {
 
-volume_descriptor::volume_descriptor()
+volume_file_descriptor::volume_file_descriptor()
   : _version(1),
     _data_dimensions(0, 0, 0),
     _data_num_channels(0),
@@ -15,11 +15,11 @@ volume_descriptor::volume_descriptor()
 {
 }
 
-volume_descriptor::~volume_descriptor()
+volume_file_descriptor::~volume_file_descriptor()
 {
 }
 
-volume_descriptor::volume_descriptor(const volume_descriptor& rhs)
+volume_file_descriptor::volume_file_descriptor(const volume_file_descriptor& rhs)
   : _version(rhs._version),
     _data_dimensions(rhs._data_dimensions),
     _data_num_channels(rhs._data_num_channels),
@@ -32,7 +32,7 @@ volume_descriptor::volume_descriptor(const volume_descriptor& rhs)
 {
 }
 
-const volume_descriptor& volume_descriptor::operator=(const volume_descriptor& rhs)
+const volume_file_descriptor& volume_file_descriptor::operator=(const volume_file_descriptor& rhs)
 {
     _data_dimensions        = rhs._data_dimensions;
     _data_num_channels      = rhs._data_num_channels;
@@ -46,7 +46,7 @@ const volume_descriptor& volume_descriptor::operator=(const volume_descriptor& r
     return (*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const volume_descriptor& desc)
+std::ostream& operator<<(std::ostream& os, const volume_file_descriptor& desc)
 {
     os << "scm_vol " << desc._version << std::endl
        << desc._data_dimensions.x << " " << desc._data_dimensions.y << " " << desc._data_dimensions.z << std::endl
@@ -61,7 +61,7 @@ std::ostream& operator<<(std::ostream& os, const volume_descriptor& desc)
     return (os);
 }
 
-std::istream& operator>>(std::istream& i, volume_descriptor& desc)
+std::istream& operator>>(std::istream& i, volume_file_descriptor& desc)
 {
     std::string head;
 

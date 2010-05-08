@@ -4,7 +4,7 @@
 #include <scm/core/log/message.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
 listener_file::listener_file(const std::string& file_name, bool append)
   : _file_name(file_name),
@@ -26,5 +26,5 @@ listener_file::notify(const message& msg)
     _file_stream.flush();
 }
 
-} // namespace logging
+} // namespace log
 } // namespace scm

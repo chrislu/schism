@@ -1,5 +1,5 @@
 
-#include "log_core.h"
+#include "core.h"
 
 #include <iostream>
 #include <cassert>
@@ -7,10 +7,10 @@
 #include <scm/core/log/logger.h>
 #include <scm/core/utilities/foreach.h>
 
-SCM_SINGLETON_PLACEMENT(core, scm::logging::logging_core)
+SCM_SINGLETON_PLACEMENT(core, scm::log::logging_core)
 
 namespace scm {
-namespace logging {
+namespace log {
 
 logging_core::logging_core()
 : default_log_name("")
@@ -108,5 +108,5 @@ std::ostream& operator<<(std::ostream& os, const logging_core& rhs)
     return (os);
 }
 
-} // namespace logging
+} // namespace log
 } // namespace scm

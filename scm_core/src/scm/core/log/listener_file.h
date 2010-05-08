@@ -11,7 +11,7 @@
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
 class message;
 
@@ -29,7 +29,7 @@ private:
 
 }; // class listener_file
 
-} // namespace logging
+} // namespace log
 } // namespace scm
 
 #include <scm/core/utilities/platform_warning_enable.h>

@@ -60,6 +60,8 @@ public:
     vec<scal_type, 2>&              operator*=(const vec<scal_type, 2>& v);
     vec<scal_type, 2>&              operator/=(const scal_type          s);
     vec<scal_type, 2>&              operator/=(const vec<scal_type, 2>& v);
+    bool                            operator==(const vec<scal_type, 2>& v) const;
+    bool                            operator!=(const vec<scal_type, 2>& v) const;
 
     // unary operators
     template<typename rhs_scal_t>

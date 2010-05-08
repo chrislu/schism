@@ -42,17 +42,17 @@ bool
 gl_module::initialize(core& c)
 {
     if (_initialized) {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
-                   << "gl_module::initialize()(): "
-                   << "allready initialized" << std::endl;
+        scm::err() << log::warning
+                   << "gl_module::initialize(): "
+                   << "allready initialized" << log::end;
         return (true);
     }
 
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "initializing scm.gl module:"  << std::endl;
+    scm::out() << log::info
+               << "initializing scm.gl module:"  << log::end;
 
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "successfully initialized scm::ogl library"  << std::endl;
+    scm::out() << log::info
+               << "successfully initialized scm::ogl library"  << log::end;
 
     _initialized = true;
     return (true);
@@ -61,17 +61,17 @@ gl_module::initialize(core& c)
 bool
 gl_module::initialize_gl_context()
 {
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "initializing scm.gl module context:"  << std::endl;
+    scm::out() << log::info
+               << "initializing scm.gl module context:"  << log::end;
 
 
     // enable the checking for GL3 'extensions'
     glewExperimental = GL_TRUE;
 
     if (glewInit() != GLEW_OK) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "gl_module::initialize_gl_context(): "
-                   << "unable to initialize OpenGL sub system (GLEW Init failed)" << std::endl;
+                   << "unable to initialize OpenGL sub system (GLEW Init failed)" << log::end;
 
         return (false);
     }
@@ -88,10 +88,10 @@ gl_module::initialize_gl_context()
                                            >> (*bsc::anychar_p)[bsc::assign_a(_context_info._version_info)];
 
     if (!bsc::parse(gl_version_string, gl_version_string_format, bsc::space_p).full) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "gl_module::initialize_gl_context(): "
                    << "unable to parse OpenGL Version string, malformed version string ('"
-                   << gl_version_string << "')" << std::endl;
+                   << gl_version_string << "')" << log::end;
 
         return (false);
     }
@@ -109,6 +109,18 @@ gl_module::initialize_gl_context()
 
             _supported_extensions.insert(std::string(extension_string));
         }
+
+        int profile_mask;
+        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile_mask);
+        if (profile_mask & GL_CONTEXT_CORE_PROFILE_BIT) {
+            _context_info._profile.assign("core profile");
+        }
+        else if (profile_mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) {
+            _context_info._profile.assign("compatibility profile");
+        }
+        else {
+            _context_info._profile.assign("unknown profile");
+        }
     }
     else {
         std::string gl_ext_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
@@ -124,21 +136,21 @@ gl_module::initialize_gl_context()
 
 #ifdef SCM_GL_USE_DIRECT_STATE_ACCESS
     if (is_supported("GL_EXT_direct_state_access")) {
-        scm::out() << scm::log_level(scm::logging::ll_info)
+        scm::out() << log::info
                    << "gl_module::initialize_gl_context(): "
-                   << "GL_EXT_direct_state_access supported and enabled for scm_gl use."  << std::endl;
+                   << "GL_EXT_direct_state_access supported and enabled for scm_gl use."  << log::end;
     }
     else {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "gl_module::initialize_gl_context(): "
                    << "GL_EXT_direct_state_access not supported but enabled for scm_gl use "
-                   << "(undefine SCM_GL_USE_DIRECT_STATE_ACCESS!)" << std::endl;
+                   << "(undefine SCM_GL_USE_DIRECT_STATE_ACCESS!)" << log::end;
         return (false);
     }
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "successfully initialized scm.gl module context:"  << std::endl;
+    scm::out() << log::info
+               << "successfully initialized scm.gl module context:"  << log::end;
 
     return (true);
 }
@@ -146,13 +158,13 @@ gl_module::initialize_gl_context()
 bool
 gl_module::shutdown(core& c)
 {
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "shutting down scm.gl module:"  << std::endl;
+    scm::out() << log::info
+               << "shutting down scm.gl module:"  << log::end;
 
     _initialized = false;
 
-    scm::out() << scm::log_level(scm::logging::ll_info)
-               << "successfully shut down scm.gl module"  << std::endl;
+    scm::out() << log::info
+               << "successfully shut down scm.gl module"  << log::end;
 
     return (true);
 }
@@ -185,7 +197,8 @@ std::ostream& operator<<(std::ostream& out_stream, const gl_module& gl_mod)
                << "version:     " << gl_mod.context_information()._version_major << "." 
                                   << gl_mod.context_information()._version_minor << "." 
                                   << gl_mod.context_information()._version_release << " " 
-                                  << gl_mod.context_information()._version_info << std::endl
+                                  << gl_mod.context_information()._version_info << " "
+                                  << gl_mod.context_information()._profile << std::endl
                << "extensions : " << "(found " << gl_mod._supported_extensions.size() << ")" << std::endl;
 
     for (gl_module::extension_string_container::const_iterator i = gl_mod._supported_extensions.begin(); i != gl_mod._supported_extensions.end(); ++i) {

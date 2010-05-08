@@ -1,5 +1,5 @@
 
-#include "log_streambuf_manip.h"
+#include "streambuf_manip.h"
 
 #include <scm/core/utilities/static_global.h>
 
@@ -18,7 +18,7 @@ SCM_STATIC_GLOBAL(ios_base_log_streambuf_index, global_ios_base_log_streambuf_in
 } // namespace 
 
 namespace scm {
-namespace logging {
+namespace string {
 namespace detail {
 
 int log_streambuf_index()
@@ -27,5 +27,5 @@ int log_streambuf_index()
 }
 
 } // namespace detail
-} // namespace log
+} // namespace string
 } // namespace scm

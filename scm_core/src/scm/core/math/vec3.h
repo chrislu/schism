@@ -62,6 +62,8 @@ public:
     vec<scal_type, 3>&              operator*=(const vec<scal_type, 3>& v);
     vec<scal_type, 3>&              operator/=(const scal_type          s);
     vec<scal_type, 3>&              operator/=(const vec<scal_type, 3>& v);
+    bool                            operator==(const vec<scal_type, 3>& v) const;
+    bool                            operator!=(const vec<scal_type, 3>& v) const;
 
     template<typename rhs_scal_t>
     vec<scal_type, 3>&              operator+=(const rhs_scal_t          s);

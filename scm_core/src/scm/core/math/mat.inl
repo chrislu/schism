@@ -106,6 +106,38 @@ operator/=(mat<scal_type, row_dim, col_dim>& lhs,
     return (lhs);
 }
 
+template<typename scal_type,
+         const unsigned row_dim,
+         const unsigned col_dim>
+inline bool
+operator==(const mat<scal_type, row_dim, col_dim>& lhs,
+           const mat<scal_type, row_dim, col_dim>& rhs)
+{
+    bool return_value = true;
+
+    for (unsigned i = 0; (i < (row_dim * col_dim)) && return_value; ++i) {
+        return_value = (return_value && (lhs.data_array[i] == rhs.data_array[i]));
+    }
+
+    return (return_value);
+}
+
+template<typename scal_type,
+         const unsigned row_dim,
+         const unsigned col_dim>
+inline bool
+operator!=(const mat<scal_type, row_dim, col_dim>& lhs,
+           const mat<scal_type, row_dim, col_dim>& rhs)
+{
+    bool return_value = false;
+
+    for (unsigned i = 0; (i < (row_dim * col_dim)) && !return_value; ++i) {
+        return_value = (return_value || (lhs.data_array[i] != rhs.data_array[i]));
+    }
+
+    return (return_value);
+}
+
 // binary operators
 template<typename scal_type,
          const unsigned order>

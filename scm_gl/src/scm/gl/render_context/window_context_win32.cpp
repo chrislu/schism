@@ -211,48 +211,48 @@ window_context_win32::setup(const wnd_handle hwnd,
     //LONG dwstyle   = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
     //if (SetWindowLong(static_cast<HWND>(_wnd_handle.get()), GWL_EXSTYLE, dwexstyle) == 0) {
-    //    scm::err() << scm::log_level(scm::logging::ll_warning)
+    //    scm::err() << log::warning
     //               << "context_win32::set_up(): "
     //               << "SetWindowLong failed for GWL_EXSTYLE: "
-    //               << std::hex << dwexstyle << std::endl;
+    //               << std::hex << dwexstyle << log::end;
     //}
     //if (SetWindowLong(static_cast<HWND>(_wnd_handle.get()), GWL_STYLE, dwstyle) == 0) {
-    //    scm::err() << scm::log_level(scm::logging::ll_warning)
+    //    scm::err() << log::warning
     //               << "context_win32::set_up(): "
     //               << "SetWindowLong failed for GWL_STYLE: "
-    //               << std::hex << dwstyle << std::endl;
+    //               << std::hex << dwstyle << log::end;
     //}
     //if (SetWindowLongPtr(static_cast<HWND>(_wnd_handle.get()), GWLP_WNDPROC, (LONG_PTR)&WndProc) == 0) {
-    //    scm::err() << scm::log_level(scm::logging::ll_warning)
+    //    scm::err() << log::warning
     //               << "context_win32::set_up(): "
     //               << "SetWindowLong failed for GWL_WNDPROC: "
-    //               << std::hex << &WndProc << std::endl;
+    //               << std::hex << &WndProc << log::end;
     //}
 
     _device_handle.reset(GetDC(static_cast<HWND>(_wnd_handle.get())),
                                boost::bind<int>(ReleaseDC, static_cast<HWND>(_wnd_handle.get()), _1));
 
     if (!_device_handle) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
                    << "unable to retrive device context (GetDC failed on window handle: "
-                   << std::hex << _wnd_handle.get() << ")" << std::endl;
+                   << std::hex << _wnd_handle.get() << ")" << log::end;
         return (false);
     }
 
     detail::old_school_gl_context dummy_context;
 
     if (!dummy_context.create(desc)) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "unable setup dummy gl context to initialize WGL ARB extensions" << std::endl;
+                   << "unable setup dummy gl context to initialize WGL ARB extensions" << log::end;
         return (false);
     }
 
     if (glewInit() != GLEW_OK) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "unable to initialize WGL ARB extensions, glewInit failed" << std::endl;
+                   << "unable to initialize WGL ARB extensions, glewInit failed" << log::end;
         dummy_context.destroy();
         return (false);
     }
@@ -290,31 +290,31 @@ window_context_win32::setup(const wnd_handle hwnd,
                                 result_pixel_fmts,
                                 &result_num_pixel_fmts) != TRUE)
     {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "wglChoosePixelFormat failed" << std::endl;
+                   << "wglChoosePixelFormat failed" << log::end;
         return (false);
     }
 
     if (result_num_pixel_fmts < 1) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "wglChoosePixelFormat returned 0 matching pixel formats" << std::endl;
+                   << "wglChoosePixelFormat returned 0 matching pixel formats" << log::end;
         return (false);
     }
 
     if (SetPixelFormat(static_cast<HDC>(_device_handle.get()), result_pixel_fmts[0], NULL) != TRUE) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << std::endl;
+                   << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << log::end;
         return (false);
     }
 
     if (!wglewIsSupported("WGL_ARB_create_context")){
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "context_win32::set_up(): "
                    << "WGL_ARB_create_context not supported: "
-                   << "using default wglCreateContest function which does not allow request of versioned OpenGL context" << std::endl;
+                   << "using default wglCreateContest function which does not allow request of versioned OpenGL context" << log::end;
 
         _context_handle.reset(wglCreateContext(static_cast<HDC>(_device_handle.get())),
                               boost::bind<BOOL>(wglDeleteContext, _1));
@@ -323,10 +323,10 @@ window_context_win32::setup(const wnd_handle hwnd,
             if (wglShareLists(static_cast<HGLRC>(share_ctx.context_handle().get()),
                               static_cast<HGLRC>(_context_handle.get())) == FALSE) {
 
-                scm::err() << scm::log_level(scm::logging::ll_error)
+                scm::err() << log::error
                            << "context_win32::set_up(): "
                            << "wglShareLists failed (this: " << std::hex << _context_handle.get()
-                           << ", share: " << std::hex << share_ctx.context_handle().get() << std::endl;
+                           << ", share: " << std::hex << share_ctx.context_handle().get() << log::end;
                 return (false);
             }
         }
@@ -334,22 +334,22 @@ window_context_win32::setup(const wnd_handle hwnd,
     else {
         std::vector<int>  ctx_attribs;
 		if(desc.version_major() > 2) {
-			ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
-			ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
-			if (desc.forward_compatible()) {
-				ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
-			}
-			if (desc.debug()) {
-				ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
-			}
-			if (wglewIsSupported("WGL_ARB_create_context_profile")) {
-				if (desc.compatibility_profile()) {
-					ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
-				}
-				else {
-					ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
-				}
-			}
+        ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
+        ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
+        if (desc.forward_compatible()) {
+            ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
+        }
+        if (desc.debug()) {
+            ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
+        }
+        if (wglewIsSupported("WGL_ARB_create_context_profile")) {
+            if (desc.compatibility_profile()) {
+                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
+            }
+            else {
+                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+            }
+        }
 		}
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
@@ -369,9 +369,9 @@ window_context_win32::setup(const wnd_handle hwnd,
             default: es.assign("unknown error");
         }
 
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "context_win32::set_up(): "
-                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed [" << es << "])"  << std::endl;
+                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed [" << es << "])"  << log::end;
         return (false);
     }
 
@@ -379,9 +379,9 @@ window_context_win32::setup(const wnd_handle hwnd,
         _swap_control_supported = true;
     }
     else {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "context_win32::set_up(): "
-                   << "WGL_EXT_swap_control not supported, operating system default behavior used."  << std::endl;
+                   << "WGL_EXT_swap_control not supported, operating system default behavior used."  << log::end;
     }
 
     _context_format = desc;

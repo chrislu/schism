@@ -34,11 +34,11 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
               size,
               disp_res)) {
 
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::gl::face_loader::load(): "
                    << "error loading font face: "
                    << file_name
-                   << std::endl;
+                   << log::end;
 
         font_face->cleanup_textures();
         free_texture_resources();
@@ -76,11 +76,11 @@ scm::gl::face_ptr face_loader::load(const std::string& file_name,
                                (void*)get_current_face_texture(*style_it)._data.get());
 
             if (!_error_check.ok()) {
-                scm::err() << scm::log_level(scm::logging::ll_error)
+                scm::err() << log::error
                            << "scm::gl::face_loader::load(): "
                            << "error uploading face texture: "
                            << _error_check.error_string()
-                           << std::endl;
+                           << log::end;
 
                 font_face->cleanup_textures();
                 free_texture_resources();

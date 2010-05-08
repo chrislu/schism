@@ -14,14 +14,14 @@
 namespace scm {
 namespace data {
 
-class __scm_export(data) volume_descriptor
+class __scm_export(data) volume_file_descriptor
 {
 public:
-    volume_descriptor();
-    virtual ~volume_descriptor();
+    volume_file_descriptor();
+    virtual ~volume_file_descriptor();
 
-    volume_descriptor(const volume_descriptor& /*rhs*/);
-    const volume_descriptor& operator=(const volume_descriptor&  /*rhs*/);
+    volume_file_descriptor(const volume_file_descriptor& /*rhs*/);
+    const volume_file_descriptor& operator=(const volume_file_descriptor&  /*rhs*/);
 
 
     scm::math::vec3ui   _data_dimensions;
@@ -39,8 +39,8 @@ public:
     const unsigned      _version;
 }; // class volume_descriptor
 
-__scm_export(data) std::ostream& operator<<(std::ostream& /*os*/, const volume_descriptor& /*desc*/);
-__scm_export(data) std::istream& operator>>(std::istream& /*i*/, volume_descriptor& /*desc*/);
+__scm_export(data) std::ostream& operator<<(std::ostream& /*os*/, const volume_file_descriptor& /*desc*/);
+__scm_export(data) std::istream& operator>>(std::istream& /*i*/, volume_file_descriptor& /*desc*/);
 
 } // namespace data
 } // namespace scm

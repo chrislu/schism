@@ -10,7 +10,7 @@
 #include <scm/core/pointer_types.h>
 
 namespace scm {
-namespace logging {
+namespace string {
 
 class log_streambuf_base
 {
@@ -140,7 +140,7 @@ private:
 typedef basic_log_streambuf<char>       log_streambuf;
 typedef basic_log_streambuf<wchar_t>    wlog_streambuf;
 
-} // namespace log
+} // namespace string
 } // namespace scm
 
 #endif // SCM_CORE_LOG_LOG_STREAMBUF_H_INCLUDED

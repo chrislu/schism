@@ -4,7 +4,7 @@
 #include <scm/core/log/message.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
 listener::listener()
   : _style(log_decorated)
@@ -19,7 +19,7 @@ std::string
 listener::get_log_message(const message& msg)
 {
     switch (_style) {
-        case log_plain:             return (msg.raw_message());break;
+        case log_plain:             return (msg.plain_message());break;
         case log_decorated:         return (msg.decorated_message());break;
         case log_full_decorated:    return (msg.full_decorated_message());break;
         default:                    return (std::string(""));break;

@@ -44,21 +44,21 @@ bool face_loader::check_font_file(const std::string& in_file_name,
         font_file = path(_resources_path) / font_file;
 
         if (!exists(font_file)) {
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << "scm::font::face_loader::check_font_file(): "
                        << "unable to find specified font file directly ('" << in_file_name << "') "
                        << "or relative to resource path ('" << font_file.string() << "')"
-                       << std::endl;
+                       << log::end;
             return (false);
         }
     }
 
     if (is_directory(font_file)) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::check_font_file(): "
                    << "specified file name ('" << in_file_name << "') "
                    << "is not a file"
-                   << std::endl;
+                   << log::end;
         return (false);
     }
 
@@ -118,11 +118,11 @@ bool face_loader::load(face&              font_face,
                         font_size_at_disp_res,
                         disp_res)) {
 
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << "scm::font::face_loader::load(): "
                        << "error loading face style (id ='" << style_it->first << "') "
                        << "using font file ('" << style_it->second << "')"
-                       << std::endl;
+                       << log::end;
 
             free_texture_resources();
             font_face.clear();
@@ -156,28 +156,28 @@ bool face_loader::load_style(face::style_type   style,
     detail::ft_face     ft_font;
 
     if (!ft_lib.open()) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::load_style(): "
                    << "unable to initialize freetype library"
-                   << std::endl;
+                   << log::end;
 
         return (false);
     }
 
     if (!ft_font.open_face(ft_lib, file_name)) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::load_style(): "
                    << "unable to load font file ('" << file_name << "')"
-                   << std::endl;
+                   << log::end;
 
         return (false);
     }
 
     if (FT_Set_Char_Size(ft_font.get_face(), 0, size << 6, 0, disp_res) != 0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::load_style(): "
                    << "unable to set character size ('" << size << "') "
-                   << std::endl;
+                   << log::end;
 
         return (false);
     }
@@ -229,11 +229,11 @@ bool face_loader::load_style(face::style_type   style,
     }
     catch (std::bad_alloc&) {
         cur_texture._data.reset();
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::load_style(): "
                    << "unable to allocate font texture memory of size ('"
                    << cur_texture._size.x * cur_texture._size.y << "byte')"
-                   << std::endl;
+                   << log::end;
 
         return (false);
     }
@@ -320,28 +320,28 @@ bool face_loader::load_style(face::style_type   style,
     }
 
     // calculate kerning information
-    cur_kerning_table.resize(boost::extents[256][256]);
+    //cur_kerning_table.resize(boost::extents[256][256]);
 
-    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_KERNING) {
-        for (unsigned l = 0; l < 256; ++l) {
-            FT_UInt l_glyph_index = FT_Get_Char_Index(ft_font.get_face(), l);
-            for (unsigned r = 0; r < 256; ++r) {
-                FT_UInt     r_glyph_index = FT_Get_Char_Index(ft_font.get_face(), r);
-                FT_Vector   delta;
-                FT_Get_Kerning(ft_font.get_face(), l_glyph_index, r_glyph_index,
-                               FT_KERNING_DEFAULT, &delta);
+    //if (ft_font.get_face()->face_flags & FT_FACE_FLAG_KERNING) {
+    //    for (unsigned l = 0; l < 256; ++l) {
+    //        FT_UInt l_glyph_index = FT_Get_Char_Index(ft_font.get_face(), l);
+    //        for (unsigned r = 0; r < 256; ++r) {
+    //            FT_UInt     r_glyph_index = FT_Get_Char_Index(ft_font.get_face(), r);
+    //            FT_Vector   delta;
+    //            FT_Get_Kerning(ft_font.get_face(), l_glyph_index, r_glyph_index,
+    //                           FT_KERNING_DEFAULT, &delta);
 
-                cur_kerning_table[l][r] = static_cast<char>(delta.x >> 6);
-            }
-        }
-    }
-    else {
-        for (unsigned l = 0; l < 256; ++l) {
-            for (unsigned r = 0; r < 256; ++r) {
-                cur_kerning_table[l][r] = 0;
-            }
-        }
-    }
+    //            cur_kerning_table[l][r] = static_cast<char>(delta.x >> 6);
+    //        }
+    //    }
+    //}
+    //else {
+    //    for (unsigned l = 0; l < 256; ++l) {
+    //        for (unsigned r = 0; r < 256; ++r) {
+    //            cur_kerning_table[l][r] = 0;
+    //        }
+    //    }
+    //}
 
     return (true);
 }
@@ -418,18 +418,18 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
     detail::ft_face     ft_font;
 
     if (!ft_lib.open()) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::available_72dpi_size(): "
                    << "unable to initialize freetype library"
-                   << std::endl;
+                   << log::end;
         return (0);
     }
 
     if (!ft_font.open_face(ft_lib, font_file.file_string())) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::available_72dpi_size(): "
                    << "unable to load font file ('" << font_file.file_string() << "')"
-                   << std::endl;
+                   << log::end;
         return (0);
     }
 
@@ -446,11 +446,11 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
         }
 
         if (available_sizes.empty()) {
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << "scm::font::face_loader::available_72dpi_size(): "
                        << "specified font file ('" << font_file.file_string() << "') "
                        << "contains fixed size font but fails to report available sizes"
-                       << std::endl;
+                       << log::end;
             return (0);
         }
 
@@ -469,11 +469,11 @@ unsigned face_loader::available_72dpi_size(const std::string& file_name,
         }
     }
     else {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "scm::font::face_loader::available_72dpi_size(): "
                    << "specified font file ('" << font_file.file_string() << "') "
                    << "contains unsupported face type"
-                   << std::endl;
+                   << log::end;
         return (0);
     }
 
@@ -492,9 +492,9 @@ const face_loader::texture_type& face_loader::get_current_face_texture(face::sty
 
             output << "scm::font::face_loader::get_current_face_texture(): "
                    << "unable to retrieve texture for requested style (id = '" << style << "') "
-                   << "fallback to regular style failed!" << std::endl;
+                   << "fallback to regular style failed!" << log::end;
 
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << output.str();
 
             throw std::runtime_error(output.str());

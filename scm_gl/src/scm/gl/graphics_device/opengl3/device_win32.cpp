@@ -27,17 +27,17 @@ opengl_device_win32::opengl_device_win32(const device_initializer& init,
 {
     _wgl.reset(new detail::wgl());
     if (!_wgl->initialize()) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device_win32::setup_render_context(): "
-                   << "wglChoosePixelFormat failed" << std::endl;
+                   << "wglChoosePixelFormat failed" << log::end;
         throw (std::runtime_error("opengl_device::opengl_device(): error initializing WGL"));
     }
 
     if (   cfg._context_type != device_context_config::CONTEXT_WINDOWED
         || cfg._context_type != device_context_config::CONTEXT_FULLSCREEN) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device_win32::setup_render_context(): "
-                   << "only windowed and fullscreen contexts supported as main context" << std::endl;
+                   << "only windowed and fullscreen contexts supported as main context" << log::end;
         throw (std::runtime_error("opengl_device::opengl_device(): error"));
     }
 
@@ -58,10 +58,10 @@ opengl_device_win32::setup_render_context(const device_context_config& cfg, unsi
                boost::bind<int>(ReleaseDC, static_cast<HWND>(cfg._output_window.get()), _1));
 
     if (!_hDC) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device::setup_render_context(): "
                    << "unable to retrive device context (GetDC failed on window handle: "
-                   << std::hex << cfg._output_window.get() << ")" << std::endl;
+                   << std::hex << cfg._output_window.get() << ")" << log::end;
         return (false);
     }
 
@@ -114,30 +114,30 @@ opengl_device_win32::setup_render_context(const device_context_config& cfg, unsi
                                       result_pixel_fmts,
                                       &result_num_pixel_fmts) != TRUE)
     {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device::setup_render_context(): "
-                   << "wglChoosePixelFormat failed" << std::endl;
+                   << "wglChoosePixelFormat failed" << log::end;
         return (false);
     }
 
     if (result_num_pixel_fmts < 1) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device::setup_render_context(): "
-                   << "wglChoosePixelFormat returned 0 matching pixel formats" << std::endl;
+                   << "wglChoosePixelFormat returned 0 matching pixel formats" << log::end;
         return (false);
     }
 
     if (SetPixelFormat(static_cast<HDC>(_hDC.get()), result_pixel_fmts[0], NULL) != TRUE) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device::setup_render_context(): "
-                   << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << std::endl;
+                   << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << log::end;
         return (false);
     }
 
     if (feature_level < opengl_device::OPENGL_FEATURE_LEVEL_3_0) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "opengl_device::setup_render_context(): "
-                   << "currently only feature levels > OpenGL 3.0 supported" << std::endl;
+                   << "currently only feature levels > OpenGL 3.0 supported" << log::end;
         return (false);
     }
 
@@ -170,9 +170,9 @@ opengl_device_win32::setup_render_context(const device_context_config& cfg, unsi
     //                      boost::bind<BOOL>(wglDeleteContext, _1));
 
     //if (!_context_handle) {
-    //    scm::err() << scm::log_level(scm::logging::ll_error)
+    //    scm::err() << log::error
     //               << "opengl_device::setup_render_context(): "
-    //               << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << std::endl;
+    //               << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << log::end;
 
     //    return (false);
     //}

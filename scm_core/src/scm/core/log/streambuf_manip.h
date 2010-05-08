@@ -6,12 +6,12 @@
 #include <ostream>
 #include <stdexcept>
 
-#include <scm/core/log/log_streambuf.h>
+#include <scm/core/log/streambuf.h>
 
 #include <scm/core/platform/platform.h>
 
 namespace scm {
-namespace logging {
+namespace string {
 namespace detail {
 
 __scm_export(core) int log_streambuf_index();
@@ -144,12 +144,12 @@ typedef basic_indention_manip indent;
 
 template <typename char_type, typename traits>
 inline std::basic_ostream<char_type, traits>&
-operator<<(std::basic_ostream<char_type,traits>& os, const scm::logging::basic_indention_manip& indention)
+operator<<(std::basic_ostream<char_type,traits>& os, const scm::string::basic_indention_manip& indention)
 {
     return (indention(os));
 }
 
-} // namespace log
+} // namespace string
 } // namespace scm
 
 #endif // SCM_CORE_LOG_LOG_STREAMBUF_MANIP_H_INCLUDED

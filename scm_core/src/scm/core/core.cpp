@@ -11,6 +11,7 @@
 #include <scm/log.h>
 #include <scm/time.h>
 #include <scm/core/version.h>
+#include <scm/core/log/logger_state.h>
 #include <scm/core/log/listener_file.h>
 #include <scm/core/log/listener_ostream.h>
 #include <scm/core/module/initializer.h>
@@ -32,41 +33,49 @@ core::core(int argc, char **argv)
 
     setup_logging("");
 
-    scm::out() << version_string() << std::endl;
+    scm::out() << version_string() << log::end;
     scm::out() << "startup time: "
-               << time::universal_time() << std::endl;
-    scm::out() << log_level(logging::ll_info)
-               << "initializing scm.core:" << std::endl;
+               << time::universal_time() << log::end;
+    {
+        log::logger_format_saver save_indent(scm::out());
+        scm::out() << log::info
+                   << "initializing scm.core:" << log::end;
 
-    if (!initialize(argc, argv)) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::core(): errors during core initialization" << std::endl;
-        shutdown();
-        throw std::runtime_error("core::core: <fatal> errors during initialization");
+        scm::out() << log::indent;
+
+        if (!initialize(argc, argv)) {
+            scm::err() << log::fatal
+                       << "core::core(): errors during core initialization" << log::end;
+            shutdown();
+            throw std::runtime_error("core::core: <fatal> errors during initialization");
+        }
     }
 
-    scm::out() << log_level(logging::ll_info)
-               << "successfully initialized scm.core:" << std::endl;
+    scm::out() << log::info
+               << "successfully initialized scm.core:" << log::end;
 
-    scm::out() << scm::logging::core::get() << std::endl;
-
+    scm::out() << scm::log::core::get() << log::end;
 }
 
 core::~core()
 {
-    scm::out() << log_level(logging::ll_info)
-               << "shutting down scm.core:" << std::endl;
+    {
+        log::logger_format_saver save_indent(scm::out());
+        scm::out() << log::info
+                   << "shutting down scm.core:" << log::end;
+        scm::out() << log::indent;
 
-    if (!shutdown()) {
-        throw std::runtime_error("core::~core: <fatal> errors during shutdown");
+        if (!shutdown()) {
+            throw std::runtime_error("core::~core: <fatal> errors during shutdown");
+        }
     }
 
-    scm::out() << log_level(logging::ll_info)
-               << "successfully shut down scm.core" << std::endl;
-    scm::out() << log_level(logging::ll_info)
+    scm::out() << log::info
+               << "successfully shut down scm.core" << log::end;
+    scm::out() << log::info
                << "shutdown time: "
-               << time::universal_time() << std::endl;
-    scm::out() << "bye sick, sad world..." << std::endl;
+               << time::universal_time() << log::end;
+    scm::out() << "bye sick, sad world..." << log::end;
 
     cleanup_logging();
 
@@ -137,13 +146,13 @@ core::add_command_line_options(const core::command_line_option_descr&   opt,
 bool
 core::initialize(int argc, char **argv)
 {
-    scm::out() << log_level(logging::ll_info)
-               << " - running pre core init functions" << std::endl;
+    scm::out() << log::info
+               << " - running pre core init functions" << log::end;
 
     _system_state = ss_pre_init;
     if (!module::initializer::run_pre_core_init_functions(instance())) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::initialize(): errors in pre core init functions" << std::endl;
+        scm::err() << log::fatal
+                   << "core::initialize(): errors in pre core init functions" << log::end;
         return (false);
     }
 
@@ -153,20 +162,20 @@ core::initialize(int argc, char **argv)
     _command_line_options.add_options()
             ("help", "show this help message");
 
-    scm::out() << log_level(logging::ll_info)
-               << " - parsing command line options" << std::endl;
+    scm::out() << log::info
+               << " - parsing command line options" << log::end;
     if (!parse_command_line(argc, argv)) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::initialize(): error parsing command line options" << std::endl;
+        scm::err() << log::fatal
+                   << "core::initialize(): error parsing command line options" << log::end;
         return (false);
     }
 
-    scm::out() << log_level(logging::ll_info)
-               << " - running post core init functions" << std::endl;
+    scm::out() << log::info
+               << " - running post core init functions" << log::end;
 
     if (!module::initializer::run_post_core_init_functions(instance())) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::initialize(): errors in post core init functions" << std::endl;
+        scm::err() << log::fatal
+                   << "core::initialize(): errors in post core init functions" << log::end;
         return (false);
     }
 
@@ -180,23 +189,23 @@ core::shutdown()
 {
     _system_state = ss_shutdown;
 
-    scm::out() << log_level(logging::ll_info)
-               << " - running pre core shutdown functions" << std::endl;
+    scm::out() << log::info
+               << " - running pre core shutdown functions" << log::end;
 
     if (!module::initializer::run_pre_core_shutdown_functions(instance())) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::shutdown(): errors in pre core shutdown functions" << std::endl;
+        scm::err() << log::fatal
+                   << "core::shutdown(): errors in pre core shutdown functions" << log::end;
         return (false);
     }
 
     // shutdown core
 
-    scm::out() << log_level(logging::ll_info)
-               << " - running post core shutdown functions" << std::endl;
+    scm::out() << log::info
+               << " - running post core shutdown functions" << log::end;
 
     if (!module::initializer::run_post_core_shutdown_functions(instance())) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::shutdown(): errors in post core shutdown functions" << std::endl;
+        scm::err() << log::fatal
+                   << "core::shutdown(): errors in post core shutdown functions" << log::end;
         return (false);
     }
 
@@ -208,40 +217,36 @@ core::setup_logging(const std::string& log_file)
 {
     if (!log_file.empty()) {
         try {
-            logging::logger::listener_ptr   logfile_list(new logging::listener_file(log_file));
-            logfile_list->style(scm::logging::listener::log_full_decorated);
-            logging::core::get().default_log().add_listener(logfile_list);
+            log::logger::listener_ptr   logfile_list(new log::listener_file(log_file));
+            logfile_list->style(scm::log::listener::log_full_decorated);
+            log::core::get().default_log().add_listener(logfile_list);
         }
         catch (std::exception& e) {
             std::cerr << "core::setup_logging(): <error> " << e.what() << std::endl;
         }
 #if SCM_DEBUG
-        logging::core::get().default_log().log_level(logging::ll_info);
+        log::core::get().default_log().log_level(log::ll_info);
 #else
-        logging::core::get().default_log().log_level(logging::ll_error);
+        log::core::get().default_log().log_level(log::ll_error);
 #endif
     }
 
-    logging::logger::listener_ptr   cout_list(new logging::listener_ostream(std::cout));
-    cout_list->style(scm::logging::listener::log_plain);
-    logger("scm.out").log_level(logging::ll_output);
-    logger("scm.out").add_listener(cout_list);
-
+    // the default output logger
+    log::logger::listener_ptr   cout_list(new log::listener_ostream(std::cout));
+    cout_list->style(scm::log::listener::log_plain);//log_full_decorated);//
 #if SCM_DEBUG
-    logger("scm.err").log_level(logging::ll_debug);
+    logger("scm").log_level(log::ll_debug);
 #else
-    logger("scm.err").log_level(logging::ll_warning);
+    logger("scm").log_level(log::ll_output);
 #endif
-    logging::logger::listener_ptr   cerr_list(new logging::listener_ostream(std::cerr));
-    logger("scm.err").add_listener(cerr_list);
+    logger("scm").add_listener(cout_list);
 }
 
 void
 core::cleanup_logging()
 {
-    logger("scm.out").clear_listeners();
-    logger("scm.err").clear_listeners();
-    logging::core::get().default_log().clear_listeners();
+    logger("scm").clear_listeners();
+    log::core::get().default_log().clear_listeners();
 }
 
 bool
@@ -258,11 +263,11 @@ core::parse_command_line(int argc, char **argv)
         bpo::notify(_command_line);
     }
     catch (std::exception& e) {
-        scm::err() << log_level(logging::ll_fatal)
-                   << "core::parse_command_line(): error parsing command line (" << e.what() << ")" << std::endl;
+        scm::err() << log::fatal
+                   << "core::parse_command_line(): error parsing command line (" << e.what() << ")" << log::end;
         // print out usage
-        scm::err() << log_level(logging::ll_fatal)
-                   << "usage: " << std::endl
+        scm::err() << log::fatal
+                   << "usage: " << log::end
                    << _command_line_options;
 
         continue_after_parse = false;
@@ -273,7 +278,7 @@ core::parse_command_line(int argc, char **argv)
         using std::string;
 
         if (_command_line.count("help")) {
-            cout << "usage: " << std::endl;
+            cout << "usage: " << log::end;
             cout << _command_line_options;
 
             continue_after_parse = false;
@@ -283,11 +288,11 @@ core::parse_command_line(int argc, char **argv)
 
             command_line_descr_container::iterator mod_iter = _module_options.find(mod);
             if (mod_iter != _module_options.end()) {
-                cout << "module '" << mod << "' usage: " << std::endl;
-                cout << mod_iter->second << std::endl;
+                cout << "module '" << mod << "' usage: " << log::end;
+                cout << mod_iter->second << log::end;
             }
             else {
-                cout << "unknown module '" << mod << "' in the --help-module option" << std::endl;
+                cout << "unknown module '" << mod << "' in the --help-module option" << log::end;
             }
             continue_after_parse = false;
         }

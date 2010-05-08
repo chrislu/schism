@@ -70,7 +70,7 @@
 #       error "unsupported windows platform compiler"
 #   endif
 
-#   ifdef NDEBUG
+#   ifndef NDEBUG
 #       define SCM_DEBUG   1
 #   else
 #       define SCM_DEBUG   0

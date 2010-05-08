@@ -45,12 +45,12 @@ time_stamp get_pfc_frequency()
                       1024,
                       0);
 
-        scm::out() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "high_res_time_stamp::initialize(): "
-                   << "error obtaining performance counter frequency" << std::endl
-                   << " - system error message: " << std::endl << "    "
+                   << "error obtaining performance counter frequency" << log::nline
+                   << " - system error message: " << log::nline << "    "
                    << error_msg
-                   << std::endl;
+                   << log::end;
 
         LocalFree(error_msg);
 
@@ -99,12 +99,12 @@ time_stamp high_res_time_stamp::now()
                       1024,
                       0);
 
-        scm::out() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "high_res_time_stamp::now(): "
-                   << "error obtaining performance counter" << std::endl
-                   << " - system error message: " << std::endl << "    "
+                   << "error obtaining performance counter" << log::nline
+                   << " - system error message: " << log::nline << "    "
                    << error_msg
-                   << std::endl;
+                   << log::end;
 
         LocalFree(error_msg);
 

@@ -10,7 +10,7 @@
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
 typedef enum {
     ll_fatal       = 0x01,
@@ -48,7 +48,7 @@ private:
 
 }; // class level
 
-} // namespace logging
+} // namespace log
 } // namespace scm
 
 #include <scm/core/utilities/platform_warning_enable.h>

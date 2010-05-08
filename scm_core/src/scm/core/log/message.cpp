@@ -1,15 +1,15 @@
 
 #include "message.h"
 
+#include <algorithm>
 #include <sstream>
 
 #include <scm/time.h>
-#include <scm/core/log/logger.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
-message::message(const logger& ref_log, const level& lev, const std::string& msg)
+message::message(const logger_type& ref_log, const level& lev, const string_type& msg)
   : _sending_logger(ref_log),
     _log_level(lev),
     _message(msg)
@@ -22,8 +22,7 @@ message::~message()
 {
 }
 
-
-const logger&
+const message::logger_type&
 message::sending_logger() const
 {
     return (_sending_logger);
@@ -35,41 +34,89 @@ message::log_level() const
     return (_log_level);
 }
 
-const std::string&
+const message::string_type&
 message::raw_message() const
 {
     return (_message);
 }
 
-std::string
+void
+message::decorate_message(const string_type& decoration,
+                          const string_type& in_message,
+                                string_type& out_message) const
+{
+    ostream_type    decorated_message;
+    scm::size_t     decoration_indent = decoration.size();
+    stream_type     raw_msg_stream(in_message);
+    string_type     raw_msg_line;
+    bool            indent_decoration = false;
+    scm::size_t     log_indention_width = sending_logger().indent_level() * sending_logger().indent_width();
+
+    decorated_message << decoration;
+    while (std::getline(raw_msg_stream, raw_msg_line)) {
+        if (   (0 < decoration_indent)
+            && indent_decoration
+            && !raw_msg_line.empty()) {
+            std::fill_n(std::ostreambuf_iterator<char_type>(decorated_message.rdbuf()),
+                        decoration_indent,
+                        char_type(' '));
+        }
+        if (  (0 < log_indention_width)
+            && !raw_msg_line.empty()) {
+            std::fill_n(std::ostreambuf_iterator<char_type>(decorated_message.rdbuf()),
+                        sending_logger().indent_level() * sending_logger().indent_width(),
+                        sending_logger().indent_fill_char());
+        }
+        decorated_message << raw_msg_line << std::endl;
+        indent_decoration = true;
+    }
+    out_message.swap(decorated_message.str());
+}
+
+const message::string_type&
+message::plain_message() const
+{
+    if (_plain_message.empty()) {
+        decorate_message("", raw_message(), _plain_message);
+    }
+
+    return (_plain_message);
+}
+
+const message::string_type&
 message::decorated_message() const
 {
-    std::ostringstream dec_message;
+    if (_decorated_message.empty()) {
+        ostream_type msg_decoration;
 
-    if (!sending_logger().name().empty()) {
-        dec_message << sending_logger().name() << " ";
+        if (!sending_logger().name().empty()) {
+            msg_decoration << sending_logger().name() << " ";
+        }
+        msg_decoration << "<" << log_level().to_string() << "> ";
+
+        decorate_message(msg_decoration.str(), raw_message(), _decorated_message);
     }
-    dec_message << "<" << log_level().to_string() << "> ";
-    dec_message << raw_message();
 
-    return (dec_message.str());
+    return (_decorated_message);
 }
 
-std::string
+const message::string_type&
 message::full_decorated_message() const
 {
-    std::ostringstream dec_message;
+    if (_full_decorated_message.empty()) {
+        ostream_type msg_decoration;
 
-    dec_message << _time << ": ";
+        msg_decoration << _time << ": ";
+        if (!sending_logger().name().empty()) {
+            msg_decoration << sending_logger().name() << " ";
+        }
+        msg_decoration << "<" << log_level().to_string() << "> ";
 
-    if (!sending_logger().name().empty()) {
-        dec_message << sending_logger().name() << " ";
+        decorate_message(msg_decoration.str(), raw_message(), _full_decorated_message);
     }
-    dec_message << "<" << log_level().to_string() << "> ";
-    dec_message << raw_message();
 
-    return (dec_message.str());
+    return (_full_decorated_message);
 }
 
-} // namespace logging
+} // namespace log
 } // namespace scm

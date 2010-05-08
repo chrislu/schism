@@ -49,15 +49,15 @@ headless_context_win32::setup(const context_format& desc,
                               const window_context& partent_ctx)
 {
     if (!wglewIsSupported("WGL_ARB_pbuffer")){
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "WGL_ARB_pbuffer not supported" << std::endl;
+                   << "WGL_ARB_pbuffer not supported" << log::end;
         return (false);
     }
     if (partent_ctx.empty()/* != empty_context()*/) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "invalid parent context" << std::endl;
+                   << "invalid parent context" << log::end;
         return (false);
     }
 
@@ -93,16 +93,16 @@ headless_context_win32::setup(const context_format& desc,
                                 result_pixel_fmts,
                                 &result_num_pixel_fmts) != TRUE)
     {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "wglChoosePixelFormat failed" << std::endl;
+                   << "wglChoosePixelFormat failed" << log::end;
         return (false);
     }
 
     if (result_num_pixel_fmts < 1) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "wglChoosePixelFormat returned 0 matching pixel formats" << std::endl;
+                   << "wglChoosePixelFormat returned 0 matching pixel formats" << log::end;
         return (false);
     }
 
@@ -114,9 +114,9 @@ headless_context_win32::setup(const context_format& desc,
                    boost::bind<BOOL>(wglDestroyPbufferARB, _1));
 
     if (!_pbuffer) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "wglCreatePbufferARB failed for format number: " << result_pixel_fmts[0] << std::endl;
+                   << "wglCreatePbufferARB failed for format number: " << result_pixel_fmts[0] << log::end;
         return (false);
     }
 
@@ -124,18 +124,18 @@ headless_context_win32::setup(const context_format& desc,
                          boost::bind<int>(wglReleasePbufferDCARB, static_cast<HPBUFFERARB>(_pbuffer.get()), _1));
 
     if (!_device_handle) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
                    << "unable to retrive pbuffer device context (wglGetPbufferDCARB failed on pbuffer handle: "
-                   << std::hex << _pbuffer.get() << ")" << std::endl;
+                   << std::hex << _pbuffer.get() << ")" << log::end;
         return (false);
     }
 
     if (!wglewIsSupported("WGL_ARB_create_context")){
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "headless_context_win32::set_up(): "
                    << "WGL_ARB_create_context not supported: "
-                   << "using default wglCreateContest function which does not allow request of versioned OpenGL context" << std::endl;
+                   << "using default wglCreateContest function which does not allow request of versioned OpenGL context" << log::end;
 
         _context_handle.reset(wglCreateContext(static_cast<HDC>(_device_handle.get())),
                               boost::bind<BOOL>(wglDeleteContext, _1));
@@ -143,10 +143,10 @@ headless_context_win32::setup(const context_format& desc,
         if (wglShareLists(static_cast<HGLRC>(partent_ctx.context_handle().get()),
                           static_cast<HGLRC>(_context_handle.get())) == FALSE) {
 
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << "headless_context_win32::set_up(): "
                        << "wglShareLists failed (this: " << std::hex << _context_handle.get()
-                       << ", share: " << std::hex << partent_ctx.context_handle().get() << std::endl;
+                       << ", share: " << std::hex << partent_ctx.context_handle().get() << log::end;
             return (false);
         }
     }
@@ -188,9 +188,9 @@ headless_context_win32::setup(const context_format& desc,
             default: es.assign("unknown error");
         }
 
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "headless_context_win32::set_up(): "
-                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed [" << es << "])"  << std::endl;
+                   << "unable to create OpenGL context (wglCreateContextAttribsARB failed [" << es << "])"  << log::end;
         return (false);
     }
 

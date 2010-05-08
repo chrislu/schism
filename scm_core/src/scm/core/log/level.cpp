@@ -2,7 +2,7 @@
 #include "level.h"
 
 namespace scm {
-namespace logging {
+namespace log {
 
 level::level(level_type lev)
   : _log_level(lev)
@@ -68,5 +68,5 @@ level::operator<(const level_type& rhs) const
     return (_log_level < rhs);
 }
 
-} // namespace logging
+} // namespace log
 } // namespace scm

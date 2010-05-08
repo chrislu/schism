@@ -26,7 +26,9 @@ set(SCHISM_LIBRARY_DIR    ${LIBRARY_OUTPUT_PATH})
 set(SCHISM_EXECUTABLE_DIR ${EXECUTABLE_OUTPUT_PATH})
 
 # Include subprojects
-add_subdirectory(../../scm_core/build/cmake     ${CMAKE_CURRENT_BINARY_DIR}/scm_core_cmake_out)
-add_subdirectory(../../scm_gl/build/cmake       ${CMAKE_CURRENT_BINARY_DIR}/scm_gl_cmake_out)
-add_subdirectory(../../scm_data/build/cmake     ${CMAKE_CURRENT_BINARY_DIR}/scm_data_cmake_out)
-add_subdirectory(../../scm_input/build/cmake    ${CMAKE_CURRENT_BINARY_DIR}/scm_input_cmake_out)
+add_subdirectory(../../scm_core/build/cmake     ${CMAKE_CURRENT_BINARY_DIR}/scm_core_out)
+add_subdirectory(../../scm_gl/build/cmake       ${CMAKE_CURRENT_BINARY_DIR}/scm_gl_out)
+add_subdirectory(../../scm_gl_core/build/cmake  ${CMAKE_CURRENT_BINARY_DIR}/scm_gl_core_out)
+add_subdirectory(../../scm_gl_util/build/cmake  ${CMAKE_CURRENT_BINARY_DIR}/scm_gl_util_out)
+add_subdirectory(../../scm_data/build/cmake     ${CMAKE_CURRENT_BINARY_DIR}/scm_data_out)
+add_subdirectory(../../scm_input/build/cmake    ${CMAKE_CURRENT_BINARY_DIR}/scm_input_out)

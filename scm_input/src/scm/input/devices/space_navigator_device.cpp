@@ -193,9 +193,9 @@ space_navigator_impl::init_com()
     if (!SUCCEEDED(hr)) {
         CString strError;
         strError.FormatMessage (_T("Error 0x%x"), hr);
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "space_navigator_impl::space_navigator_impl()"
-                   << "CoInitializeEx failed: " << strError << std::endl;
+                   << "CoInitializeEx failed: " << strError << log::end;
     }
 
     CComPtr<IUnknown> _3DxDevice;
@@ -204,9 +204,9 @@ space_navigator_impl::init_com()
     if (!SUCCEEDED(hr)) {
         CString strError;
         strError.FormatMessage (_T("Error 0x%x"), hr);
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "space_navigator_impl::space_navigator_impl()"
-                   << "_3DxDevice.CoCreateInstance failed: " << strError << std::endl;
+                   << "_3DxDevice.CoCreateInstance failed: " << strError << log::end;
     }
     else {
         CComPtr<ISimpleDevice> _3DxSimpleDevice;
@@ -215,9 +215,9 @@ space_navigator_impl::init_com()
         if (!SUCCEEDED(hr)) {
             CString strError;
             strError.FormatMessage (_T("Error 0x%x"), hr);
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << "space_navigator_impl::space_navigator_impl()"
-                       << "_3DxDevice.QueryInterface failed: " << strError << std::endl;
+                       << "_3DxDevice.QueryInterface failed: " << strError << log::end;
         }
         else {
             // Get the interfaces to the sensor and the keyboard;
@@ -241,12 +241,12 @@ space_navigator_impl::init_com()
             if (!SUCCEEDED(hr)) {
                 CString strError;
                 strError.FormatMessage (_T("Error 0x%x"), hr);
-                scm::err() << scm::log_level(scm::logging::ll_error)
+                scm::err() << log::error
                            << "space_navigator_impl::space_navigator_impl()"
-                           << "_3DxSimpleDevice.Connect failed: " << strError << std::endl;
+                           << "_3DxSimpleDevice.Connect failed: " << strError << log::end;
             }
             else {
-                scm::out() << "space_navigator_impl::space_navigator_impl(): successfully connected to _3DxSimpleDevice driver" << std::endl;
+                scm::out() << "space_navigator_impl::space_navigator_impl(): successfully connected to _3DxSimpleDevice driver" << log::end;
             }
         }
         //_3DxDevice.Release();

@@ -1,29 +1,42 @@
 
 #include "log.h"
 
-#include <scm/core/log/log_core.h>
+#include <scm/core/log/core.h>
+#include <scm/core/platform/platform.h>
+
+namespace  {
+
+scm::log::logger& default_out = scm::logger("scm");
+
+} // namespace 
 
 namespace scm {
 
-log&
+log::logger&
 logger(const std::string& name)
 {
-    log& ret_log = logging::core::get().get_logger(name);
+    log::logger& ret_log = log::core::get().get_logger(name);
     return (ret_log);
 }
 
-logging::out_stream
+log::out_stream
 out()
 {
-    log& ret_log = logging::core::get().get_logger("scm.out");
-    return (ret_log.output());
+    //log::logger& ret_log = log::core::get().get_logger("scm.out");
+    //return (ret_log.output());
+    return (default_out.output());
 }
 
-logging::out_stream
+log::out_stream
 err()
 {
-    log& ret_log = logging::core::get().get_logger("scm.err");
-    return (ret_log.error());
+    //log::logger& ret_log = log::core::get().get_logger("scm.err");
+    //return (ret_log.error());
+#if SCM_DEBUG
+    return (default_out.debug());
+#else
+    return (default_out.error());
+#endif
 }
 
 } // namespace scm

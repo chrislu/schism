@@ -32,7 +32,7 @@ const texture_2d_rect& face::get_glyph_texture(font::face::style_type style) con
                    << "unable to retrieve requested style (id = '" << style << "') "
                    << "fallback to regular style failed!" << std::endl;
 
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << output.str();
 
             throw std::runtime_error(output.str());

@@ -18,7 +18,7 @@ volume_data_loader::~volume_data_loader()
 
 void volume_data_loader::close_file()
 {
-    _vol_desc = volume_descriptor();
+    _vol_desc = volume_file_descriptor();
     _file.close();
 }
 
@@ -27,7 +27,7 @@ bool volume_data_loader::is_file_open() const
     return (_file.is_open());
 }
 
-const volume_descriptor& volume_data_loader::get_volume_descriptor() const
+const volume_file_descriptor& volume_data_loader::get_volume_descriptor() const
 {
     return (_vol_desc);
 }

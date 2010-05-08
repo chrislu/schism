@@ -263,6 +263,18 @@ inline vec<scal_type, 2>& vec<scal_type, 2>::operator/=(const vec<rhs_scal_t, 2>
     return (*this);
 }
 
+template<typename scal_type>
+inline bool vec<scal_type, 2>::operator==(const vec<scal_type, 2>& v) const
+{
+    return ((x == v.x) && (y == v.y));
+}
+
+template<typename scal_type>
+inline bool vec<scal_type, 2>::operator!=(const vec<scal_type, 2>& v) const
+{
+    return ((x != v.x) || (y != v.y));
+}
+
 // common functions
 template<typename scal_type>
 inline scal_type dot(const vec<scal_type, 2>& lhs,

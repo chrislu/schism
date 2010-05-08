@@ -34,6 +34,8 @@ public:
         std::string     _vendor;
         std::string     _renderer;
 
+        std::string     _profile;
+
         context_info() : _version_major(0), _version_minor(0), _version_release(0) {}
     };
 

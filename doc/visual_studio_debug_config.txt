@@ -6,8 +6,8 @@ Project Properties:
                    PATH=./../../../../../../schism/lib/win_x86/$(ConfigurationName);./../../../../lib/win_x86/$(ConfigurationName);./../../../../../../externals/lib/$(ConfigurationName);%PATH%
  - x64 project
    * working dir:  $(TargetDir)
-   * environment:  PATH=./../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../lib/win_x64/$(ConfigurationName);./../../../../../externals/lib/$(ConfigurationName);%PATH%
+   * environment:  PATH=./../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../lib/win_x64/$(ConfigurationName);./../../../../../externals_vc90/lib/$(ConfigurationName);%PATH%
    * environment (project subdir)
-                   PATH=./../../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../lib/win_x64/$(ConfigurationName);./../../../../../../externals/lib/$(ConfigurationName);%PATH%
-             vc10  PATH=./../../../../../../schism/lib/win_x64/$(Configuration);./../../../../lib/win_x64/$(Configuration);./../../../../../../externals/lib/$(Configuration);%PATH%
+                   PATH=./../../../../../../schism/lib/win_x64/$(ConfigurationName);./../../../../lib/win_x64/$(ConfigurationName);./../../../../../../externals_vc90/lib/$(ConfigurationName);%PATH%
+             vc10  PATH=./../../../../../../schism/lib/win_x64/$(Configuration);./../../../../lib/win_x64/$(Configuration);./../../../../../../externals_vc100/lib/$(Configuration);%PATH%
 

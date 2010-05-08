@@ -28,7 +28,7 @@ public:
     virtual void        close_file();
     virtual bool        is_file_open() const;
     
-    virtual const volume_descriptor&    get_volume_descriptor() const;
+    virtual const volume_file_descriptor&    get_volume_descriptor() const;
     //virtual const math::vec3ui_t& get_dataset_dimensions() const;
 
     virtual bool        read_volume(scm::data::regular_grid_data_3d<unsigned char>& target_data) = 0;
@@ -49,7 +49,7 @@ protected:
     io::file                _file;
     //io::ifstream            _file;
 
-    volume_descriptor       _vol_desc;
+    volume_file_descriptor  _vol_desc;
     //math::vec3ui_t          _dimensions;
 
     //unsigned                _num_channels;

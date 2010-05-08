@@ -4,7 +4,7 @@
 #include <scm/core/log/message.h>
 
 namespace scm {
-namespace logging {
+namespace log {
 
 listener_ostream::listener_ostream(std::ostream& os)
   : _ostream(os)
@@ -22,5 +22,5 @@ listener_ostream::notify(const message& msg)
     _ostream.flush();
 }
 
-} // namespace logging
+} // namespace log
 } // namespace scm

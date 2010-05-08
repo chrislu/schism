@@ -42,8 +42,8 @@ int face_style::get_kerning(unsigned char left,
 
 void face_style::clear()
 {
-    _glyph_mapping.clear();
-    _kerning_table.resize(boost::extents[0][0]);
+    //_glyph_mapping.clear();
+    //_kerning_table.resize(boost::extents[0][0]);
 }
 
 int face_style::get_underline_position() const
@@ -107,9 +107,10 @@ int face::get_kerning(unsigned char    left,
                       unsigned char    right,
                       face::style_type style) const
 {
-    const face_style&   fstyle = get_face_style(style);
+    //const face_style&   fstyle = get_face_style(style);
 
-    return (fstyle.get_kerning(left, right));
+    //return (fstyle.get_kerning(left, right));
+    return (0);
 }
 
 int face::get_underline_position(style_type style) const
@@ -140,7 +141,7 @@ const face_style& face::get_face_style(style_type style) const
                    << "unable to retrieve requested style (id = '" << style << "') "
                    << "fallback to regular style failed!" << std::endl;
 
-            scm::err() << scm::log_level(scm::logging::ll_error)
+            scm::err() << log::error
                        << output.str();
 
             throw std::runtime_error(output.str());

@@ -69,8 +69,10 @@ bool texture_2d::image_data(GLint     mip_level,
     unbind();
 #endif // SCM_GL_USE_DIRECT_STATE_ACCESS
 
-    _width  = width;
-    _height = height;
+    if (mip_level == 0) {
+        _width  = width;
+        _height = height;
+    }
 
     parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -42,9 +42,9 @@ bool art_dtrack::initialize()
     assert(_dtrack);
 
     if (_initialized) {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "art_dtrack::initialize(): "
-                   << "allready initialized" << std::endl;
+                   << "allready initialized" << log::end;
         return (true);
     }
 
@@ -63,9 +63,9 @@ bool art_dtrack::initialize()
     error_dtrack = _dtrack->init(&init_dtrack);
     
     if (error_dtrack != DTRACK_ERR_NONE) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "art_dtrack::initialize(): "
-                   << "unable to initialize dtrack device (error: '" << error_dtrack << "')" << std::endl;
+                   << "unable to initialize dtrack device (error: '" << error_dtrack << "')" << log::end;
 
         return (false);
     }
@@ -74,9 +74,9 @@ bool art_dtrack::initialize()
     error_dtrack = _dtrack->send_udp_command(DTRACK_CMD_CAMERAS_AND_CALC_ON, 1);
 
     if (error_dtrack != DTRACK_ERR_NONE) {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "art_dtrack::initialize(): "
-                   << "unable to enable cameras and calculation (error: '" << error_dtrack << "')" << std::endl;
+                   << "unable to enable cameras and calculation (error: '" << error_dtrack << "')" << log::end;
     }
 
     _initialized = true;
@@ -87,9 +87,9 @@ bool art_dtrack::initialize()
 bool art_dtrack::shutdown()
 {
     if (!_initialized) {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "art_dtrack::shutdown(): "
-                   << "not initialized initialized" << std::endl;
+                   << "not initialized initialized" << log::end;
         return (true);
     }
 
@@ -99,9 +99,9 @@ bool art_dtrack::shutdown()
     error_dtrack = _dtrack->exit();
     
     if (error_dtrack != DTRACK_ERR_NONE) {
-        scm::err() << scm::log_level(scm::logging::ll_error)
+        scm::err() << log::error
                    << "art_dtrack::shutdown(): "
-                   << "unable to shutdown dtrack device (error: '" << error_dtrack << "')" << std::endl;
+                   << "unable to shutdown dtrack device (error: '" << error_dtrack << "')" << log::end;
 
         return (false);
     }
@@ -139,9 +139,9 @@ void art_dtrack::update(target_container& targets)
                                                 &dummy,                 0,              0);
 
     if (error_dtrack != DTRACK_ERR_NONE) {
-        scm::err() << scm::log_level(scm::logging::ll_warning)
+        scm::err() << log::warning
                    << "art_dtrack::update(): "
-                   << "unable to receive dtrack packet (error: '" << error_dtrack << "')" << std::endl;
+                   << "unable to receive dtrack packet (error: '" << error_dtrack << "')" << log::end;
         return;
     }
 
