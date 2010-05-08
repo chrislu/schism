@@ -110,8 +110,8 @@ gl_module::initialize_gl_context()
             _supported_extensions.insert(std::string(extension_string));
         }
 
-        int profile_mask;
-        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile_mask);
+        int profile_mask = 0;
+        //glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile_mask);
         if (profile_mask & GL_CONTEXT_CORE_PROFILE_BIT) {
             _context_info._profile.assign("core profile");
         }
