@@ -131,14 +131,14 @@ namespace gl {
 
 namespace detail {
 
-static std::map<shader_compiler::shader_type, GLenum> gl_shader_types
-    = boost::assign::map_list_of(shader_compiler::vertex_shader,   GL_VERTEX_SHADER)
-                                (shader_compiler::geometry_shader, GL_GEOMETRY_SHADER)
-                                (shader_compiler::fragment_shader, GL_FRAGMENT_SHADER);
-
-static std::map<shader_compiler::shader_profile, std::string> shader_profile_strings
-    = boost::assign::map_list_of(shader_compiler::opengl_core,          "core")
-                                (shader_compiler::opengl_compatibility, "compatibility");
+//static std::map<shader_compiler::shader_type, GLenum> gl_shader_types
+//    = boost::assign::map_list_of(shader_compiler::vertex_shader,   GL_VERTEX_SHADER)
+//                                (shader_compiler::geometry_shader, GL_GEOMETRY_SHADER)
+//                                (shader_compiler::fragment_shader, GL_FRAGMENT_SHADER);
+//
+//static std::map<shader_compiler::shader_profile, std::string> shader_profile_strings
+//    = boost::assign::map_list_of(shader_compiler::opengl_core,          "core")
+//                                (shader_compiler::opengl_compatibility, "compatibility");
 
 class line_string
 {
