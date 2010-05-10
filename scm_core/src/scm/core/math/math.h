@@ -72,6 +72,39 @@ typedef mat4d               mat4;
 #endif // SCM_CORE_MATH_FP_PRECISION
 
 } // namespace math
+
+//typedef math::vec2f     vec2f;
+//typedef math::vec3f     vec3f;
+//typedef math::vec4f     vec4f;
+//
+//typedef math::vec2d     vec2d;
+//typedef math::vec3d     vec3d;
+//typedef math::vec4d     vec4d;
+//                    
+//typedef math::vec2i     vec2i;
+//typedef math::vec3i     vec3i;
+//typedef math::vec4i     vec4i;
+//
+//typedef math::vec2ui    vec2ui;
+//typedef math::vec3ui    vec3ui;
+//typedef math::vec4ui    vec4ui;
+//
+//typedef math::mat2f     mat2f;
+//typedef math::mat3f     mat3f;
+//typedef math::mat4f     mat4f;
+//                    
+//typedef math::mat2d     mat2d;
+//typedef math::mat3d     mat3d;
+//typedef math::mat4d     mat4d;
+//
+//typedef math::vec2      vec2;
+//typedef math::vec3      vec3;
+//typedef math::vec4      vec4;
+//
+//typedef math::mat2      mat2;
+//typedef math::mat3      mat3;
+//typedef math::mat4      mat4;
+
 } // namespace scm
 
 #endif // SCM_MATH_H_INCLUDED

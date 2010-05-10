@@ -40,9 +40,11 @@ bool volume_data_loader::read_volume_data(unsigned char*const buffer)
 
     _file.seek(_data_start_offset, std::ios_base::beg);
 
-    scm::int64 read_size =    _vol_desc._data_dimensions.x
-                            * _vol_desc._data_dimensions.y
-                            * _vol_desc._data_dimensions.z;
+    scm::int64 read_size =    static_cast<scm::int64>(_vol_desc._data_dimensions.x)
+                            * static_cast<scm::int64>(_vol_desc._data_dimensions.y)
+                            * static_cast<scm::int64>(_vol_desc._data_dimensions.z)
+                            * static_cast<scm::int64>(_vol_desc._data_byte_per_channel)
+                            * static_cast<scm::int64>(_vol_desc._data_num_channels);
 
     if (_file.read((char*)buffer, read_size) != read_size) {
         return (false);
