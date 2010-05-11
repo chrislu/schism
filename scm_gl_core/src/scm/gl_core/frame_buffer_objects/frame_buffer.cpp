@@ -302,7 +302,7 @@ frame_buffer::apply_attachments(const render_context& in_context)
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
         util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
         glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
-    #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
         bool attachments_changed = false;
         for (unsigned i = 0; i < static_cast<unsigned>(_selected_color_attachments.size()); ++i) {
@@ -328,11 +328,11 @@ frame_buffer::apply_attachments(const render_context& in_context)
             }
         }
         if (true /*attachments_changed*/) {
-    #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
             glapi.glFramebufferDrawBuffersEXT(buffer_id(), static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
-    #else
+#else
             glapi.glDrawBuffers(static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
-    #endif
+#endif
         }
         if (_selected_depth_stencil_attachment != _current_depth_stencil_attachment) {
 
