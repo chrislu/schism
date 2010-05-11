@@ -61,6 +61,18 @@ vertex_array::bind(render_context& ren_ctx) const
     gl_assert(glapi, leaving vertex_array:bind());
 }
 
+void
+vertex_array::unbind(render_context& ren_ctx) const
+{
+    assert(state().ok());
+
+    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+
+    glapi.glBindVertexArray(0);
+
+    gl_assert(glapi, leaving vertex_array:unbind());
+}
+
 bool
 vertex_array::build_buffer_slots(const render_device&           in_ren_dev,
                                  const vertex_format&           in_vert_format,

@@ -46,6 +46,7 @@ protected:
                  const program_ptr&             in_program = program_ptr());
 
     void                bind(render_context& ren_ctx) const;
+    void                unbind(render_context& ren_ctx) const;
     bool                build_buffer_slots(const render_device&           in_ren_dev,
                                            const vertex_format&           in_vert_format,
                                            const std::vector<buffer_ptr>& in_attrib_buffers,

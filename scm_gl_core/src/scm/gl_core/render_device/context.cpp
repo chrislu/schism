@@ -118,6 +118,8 @@ render_context::apply()
 {
     gl_assert(opengl_api(), entering render_context::apply());
 
+    assert(state().ok());
+
     apply_texture_units();
     apply_frame_buffer();
     apply_vertex_input();
@@ -311,7 +313,12 @@ render_context::apply_vertex_input()
 
     // bind the vertex_array
     if (_current_state._vertex_array != _applied_state._vertex_array) {
-        _current_state._vertex_array->bind(*this);
+        if (_current_state._vertex_array) {
+            _current_state._vertex_array->bind(*this);
+        }
+        else {
+            _applied_state._vertex_array->unbind(*this);
+        }
         _applied_state._vertex_array = _current_state._vertex_array;
     }
 
@@ -697,6 +704,8 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 
     math::vec2ui min_drawable_region = math::min(in_draw_buffer->drawable_region(),
                                                  in_read_buffer->drawable_region());
+
+    gl_assert(glapi, render_context::resolve_multi_sample_buffer() before glBlitFramebuffer);
 
     glapi.glBlitFramebuffer(0, 0, min_drawable_region.x, min_drawable_region.y,
                             0, 0, min_drawable_region.x, min_drawable_region.y,
