@@ -14,11 +14,11 @@ file_core::~file_core()
 }
 
 // fixed functionality
-file_core::size_type
-file_core::seek(size_type                  off,
+file_core::offset_type
+file_core::seek(offset_type                off,
                 std::ios_base::seek_dir    way)
 {
-    size_type       next_pos    = -1;
+    offset_type  next_pos    = -1;
 
     switch (way) {
         case std::ios_base::beg:
@@ -68,14 +68,14 @@ file_core::volume_sector_size() const
     return (_volume_sector_size);
 }
 
-file_core::size_type
-file_core::vss_align_floor(const size_type in_val) const
+file_core::offset_type
+file_core::vss_align_floor(const offset_type in_val) const
 {
     return((in_val / _volume_sector_size) * _volume_sector_size);
 }
 
-file_core::size_type
-file_core::vss_align_ceil(const size_type in_val) const
+file_core::offset_type
+file_core::vss_align_ceil(const offset_type in_val) const
 {
     return ( ((in_val / _volume_sector_size)
             + (in_val % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size);

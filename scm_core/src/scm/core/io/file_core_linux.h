@@ -35,7 +35,7 @@ public:
     size_type                   write(const char_type*const input_buffer,
                                       size_type             num_bytes_to_write);
 
-	size_type			        set_end_of_file();
+	offset_type			        set_end_of_file();
     // end file_core interface
 
 }; // class file_core_linux

@@ -13,6 +13,7 @@ class file_core : boost::noncopyable
 {
 public:
     typedef file::size_type     size_type;
+    typedef file::offset_type   offset_type;
     typedef file::char_type     char_type;
 
 public:
@@ -32,10 +33,10 @@ public:
     virtual size_type           write(const char_type*const input_buffer,
                                       size_type             num_bytes_to_write) = 0;
 
-	virtual size_type			set_end_of_file() = 0;
+	virtual offset_type         set_end_of_file() = 0;
 
     // fixed functionality
-    size_type                   seek(size_type                  off,
+    offset_type                 seek(offset_type                off,
                                      std::ios_base::seek_dir    way);
     size_type                   optimal_buffer_size() const;
 
@@ -43,15 +44,15 @@ public:
     const std::string&          file_path() const;
 
     scm::int32                  volume_sector_size() const;
-    size_type                   vss_align_floor(const size_type in_val) const;
-    size_type                   vss_align_ceil(const size_type in_val) const;
+    offset_type                 vss_align_floor(const offset_type in_val) const;
+    offset_type                 vss_align_ceil(const offset_type in_val) const;
 
 protected:
     virtual void                reset_values();
     virtual bool                async_io_mode() const;
 
 protected:
-    size_type                   _position;
+    offset_type                 _position;
 
     std::string                 _file_path;
     size_type                   _file_size;

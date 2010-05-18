@@ -81,7 +81,7 @@ file::write(const char_type*const input_buffer,
     return (_file_core->write(input_buffer, num_bytes_to_write));
 }
 
-file::size_type
+file::offset_type
 file::set_end_of_file()
 {
     assert(_file_core);
@@ -89,8 +89,8 @@ file::set_end_of_file()
 }
 
 // fixed functionality
-file::size_type
-file::seek(size_type                  off,
+file::offset_type
+file::seek(offset_type                off,
            std::ios_base::seek_dir    way)
 {
     assert(_file_core);

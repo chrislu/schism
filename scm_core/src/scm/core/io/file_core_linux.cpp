@@ -47,7 +47,7 @@ file_core_linux::write(const char_type*const input_buffer,
     return (0);
 }
 
-file_core_linux::size_type
+file_core_linux::offset_type
 file_core_linux::set_end_of_file()
 {
     return (0);

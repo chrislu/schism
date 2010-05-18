@@ -46,7 +46,7 @@ public:
     size_type                   write(const char_type*const input_buffer,
                                       size_type             num_bytes_to_write);
 
-	size_type			        set_end_of_file();
+	offset_type                 set_end_of_file();
     // end file_core interface
 
 private:
@@ -64,7 +64,7 @@ private:
     void                        cancel_async_io() const;
 
     size_type                   actual_file_size() const;
-    bool                        set_file_pointer(size_type new_pos);
+    bool                        set_file_pointer(offset_type new_pos);
 
     void                        reset_values();
 

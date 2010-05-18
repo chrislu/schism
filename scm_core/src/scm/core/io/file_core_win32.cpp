@@ -39,8 +39,8 @@ struct overlapped_ext : public OVERLAPPED
     overlapped_ext(const file_core::size_type size);
     ~overlapped_ext(); // needs to be non-virtual
 
-    void                                            position(const file_core::size_type pos);
-    file_core::size_type                            position() const;
+    void                                            position(const file_core::offset_type pos);
+    file_core::offset_type                          position() const;
 
     void                                            bytes_to_process(const file_core::size_type size);
     file_core::size_type                            bytes_to_process() const;
@@ -70,7 +70,7 @@ overlapped_ext::~overlapped_ext()
 }
 
 void
-overlapped_ext::position(const file_core::size_type pos)
+overlapped_ext::position(const file_core::offset_type pos)
 {
     LARGE_INTEGER   l;
     l.QuadPart = pos;
@@ -79,7 +79,7 @@ overlapped_ext::position(const file_core::size_type pos)
     this->OffsetHigh    = l.HighPart;
 }
 
-file_core::size_type
+file_core::offset_type
 overlapped_ext::position() const
 {
     LARGE_INTEGER   l;
@@ -476,7 +476,7 @@ file_core_win32::write(const char_type*const input_buffer,
     return (bytes_written);
 }
 
-file_core_win32::size_type
+file_core_win32::offset_type
 file_core_win32::set_end_of_file()
 {
     if (is_open()) {
@@ -999,7 +999,7 @@ file_core_win32::actual_file_size() const
 }
 
 bool
-file_core_win32::set_file_pointer(size_type new_pos)
+file_core_win32::set_file_pointer(offset_type new_pos)
 {
     assert(_file_handle);
     assert(_file_handle.get() != INVALID_HANDLE_VALUE);

@@ -7,6 +7,8 @@
 #include <scm/core/numeric_types.h>
 #include <scm/core/pointer_types.h>
 
+#include <scm/core/io/io_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
@@ -24,8 +26,9 @@ class file_core;
 class __scm_export(core) file
 {
 public:
-    typedef char                char_type;
-    typedef scm::int64          size_type;
+    typedef char                    char_type;
+    typedef scm::io::size_type      size_type;
+    typedef scm::io::offset_type    offset_type;
 
 public:
     file();
@@ -45,9 +48,9 @@ public:
                                      size_type       num_bytes_to_read);
     size_type                   write(const char_type*const input_buffer,
                                       size_type             num_bytes_to_write);
-    size_type                   seek(size_type                  off,
+    offset_type                 seek(offset_type                off,
                                      std::ios_base::seek_dir    way);
-	size_type			        set_end_of_file();
+	offset_type                 set_end_of_file();
 
     size_type                   optimal_buffer_size() const;
 
@@ -68,7 +71,7 @@ namespace std {
 
 inline void
 swap(scm::io::file& lhs,
-    scm::io::file& rhs)
+     scm::io::file& rhs)
 {
     lhs.swap(rhs);
 }
