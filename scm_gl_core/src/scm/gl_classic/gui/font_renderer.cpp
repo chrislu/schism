@@ -1,0 +1,144 @@
+
+#include "font_renderer.h"
+
+#include <scm/core/utilities/foreach.h>
+
+#include <scm/gl_classic/opengl.h>
+#include <scm/gl_classic/textures/texture_2d_rect.h>
+
+namespace {
+
+void draw_quad(const scm::math::vec2i& lower_left,
+               const scm::math::vec2i& upper_right,
+               const scm::math::vec2i& tex_lower_left,
+               const scm::math::vec2i& tex_upper_right)
+{
+    glBegin(GL_QUADS);
+        glTexCoord2i(tex_lower_left.x,  tex_lower_left.y);
+        glVertex2i(  lower_left.x,      lower_left.y);
+
+        glTexCoord2i(tex_upper_right.x, tex_lower_left.y);
+        glVertex2i(  upper_right.x,     lower_left.y);
+
+        glTexCoord2i(tex_upper_right.x, tex_upper_right.y);
+        glVertex2i(  upper_right.x,     upper_right.y);
+
+        glTexCoord2i(tex_lower_left.x,  tex_upper_right.y);
+        glVertex2i(  lower_left.x,      upper_right.y);
+    glEnd();
+}
+
+} // namespace
+
+namespace scm {
+namespace gl_classic {
+namespace gui {
+
+font_renderer::font_renderer()
+{
+}
+
+font_renderer::~font_renderer()
+{
+}
+
+void font_renderer::draw_string(const scm::math::vec2i&      pos,
+                                const std::string&           txt,
+                                const scm::math::vec4f&      col,
+                                bool                         unl,
+                                scm::font::face::style_type  stl) const
+{
+    using namespace scm::math;
+
+    if (!_active_font) {
+        return;
+    }
+
+    const gl_classic::face& act_f = *boost::static_pointer_cast<gl_classic::face>(_active_font);
+
+
+    const scm::gl_classic::texture_2d_rect& cur_style_tex = act_f.get_glyph_texture(stl);
+    const scm::font::face_style&    cur_style     = act_f.get_face_style(stl);
+
+    // save states which we change in here
+    glPushAttrib(  GL_LIGHTING_BIT
+                 | GL_DEPTH_BUFFER_BIT
+                 | GL_COLOR_BUFFER_BIT
+                 | GL_LINE_BIT);
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
+    // setup blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    cur_style_tex.bind();
+
+    vec2i current_pos = pos;
+
+    unsigned char       prev        = 0;
+    const vec2i         shadow_off  = vec2i(1, -1);
+
+    foreach (unsigned char c, txt) {
+        const scm::font::glyph& cur_glyph = cur_style.get_glyph(c);
+
+        // kerning
+        if (_use_kerning && prev) {
+            current_pos.x += cur_style.get_kerning(prev, c);
+        }
+
+        // draw shadow first
+        if (_draw_shadow) {
+            glColor4f(_shadow_color.x, _shadow_color.y, _shadow_color.z, col.w);
+            draw_quad(current_pos + shadow_off + cur_glyph._bearing,
+                      current_pos + shadow_off + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
+                      cur_glyph._tex_lower_left,
+                      cur_glyph._tex_upper_right);
+        }
+
+        // draw glyph
+        glColor4fv(col.data_array);
+        draw_quad(current_pos + cur_glyph._bearing,
+                  current_pos + cur_glyph._bearing + cur_glyph._tex_upper_right - cur_glyph._tex_lower_left,
+                  cur_glyph._tex_lower_left,
+                  cur_glyph._tex_upper_right);
+
+        // advance the position
+        current_pos.x += cur_glyph._advance;
+
+        // remember just drawn glyph for kerning
+        prev = c;
+    }
+    
+    cur_style_tex.unbind();
+    
+    if (unl) {
+        glLineWidth(static_cast<float>(cur_style.get_underline_thickness()));
+        // draw underline shadow first
+        if (_draw_shadow) {
+            glColor4f(_shadow_color.x, _shadow_color.y, _shadow_color.z, col.w);
+            glBegin(GL_LINES);
+                glVertex2i(pos.x + shadow_off.x,
+                           pos.y + shadow_off.y + cur_style.get_underline_position());
+                glVertex2i(current_pos.x + shadow_off.x,
+                           current_pos.y + shadow_off.y + cur_style.get_underline_position());
+            glEnd();
+        }
+
+        // draw underline
+        glColor4fv(col.data_array);
+        glBegin(GL_LINES);
+            glVertex2i(pos.x, pos.y + cur_style.get_underline_position());
+            glVertex2i(current_pos.x, pos.y + cur_style.get_underline_position());
+        glEnd();
+    }
+
+    // restore saved states
+    glPopAttrib();
+
+}
+
+} // namespace gui
+} // namespace gl_classic
+} // namespace scm

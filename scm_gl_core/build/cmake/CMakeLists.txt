@@ -1,6 +1,9 @@
 
 project(scm_gl_core)
 
+option(OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     ON)
+
+
 include(schism_macros)
 include(schism_boost)
 
@@ -49,6 +52,51 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/state_objects *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/texture_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/texture_objects *.h *.inl)
 
+if (OPT_BUILD_deprecated_classic_scm_gl)
+## gl_classic #####################################################################################
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/buffer_object *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/buffer_object *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/font *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/font *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/framebuffer_object *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/framebuffer_object *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/gui *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/gui *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/module *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/module *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/primitives *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/primitives *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/render_context *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/render_context *.h *.inl)
+#scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/render_context/detail *.cpp)
+#scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/render_context/detail *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/shader_objects *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/shader_objects *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/textures *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/textures *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/time *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/time *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/utilities *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/utilities *.h *.inl)
+
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/vertexbuffer_object *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/vertexbuffer_object *.h *.inl)
+## gl_classic #####################################################################################
+endif (OPT_BUILD_deprecated_classic_scm_gl)
+
 # include header and inline files in source files for visual studio projects
 if (WIN32)
     if (MSVC)
@@ -88,6 +136,14 @@ if (WIN32)
         optimized libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_REL}         debug libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 endif (WIN32)
+
+if (OPT_BUILD_deprecated_classic_scm_gl)
+     target_link_libraries(${PROJECT_NAME}
+        glew32
+    )
+endif (OPT_BUILD_deprecated_classic_scm_gl)
+
+
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
         GLEW

@@ -70,8 +70,8 @@ void look_at_matrix_inv(mat<scal_type, 4, 4>& m,
                         const vec<scal_type, 3>& center,
                         const vec<scal_type, 3>& up);
 
-void get_gl_matrix(const int type, mat<float, 4, 4>& m);
-void get_gl_matrix(const int type, mat<double, 4, 4>& m);
+//void get_gl_matrix(const int type, mat<float, 4, 4>& m);
+//void get_gl_matrix(const int type, mat<double, 4, 4>& m);
 
 } // namespace math
 } // namespace scm
