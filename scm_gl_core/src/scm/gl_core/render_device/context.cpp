@@ -218,6 +218,26 @@ render_context::reset_uniform_buffers()
 }
 
 void
+render_context::bind_unpack_buffer(const buffer_ptr& in_buffer)
+{
+    if (_unpack_buffer != in_buffer) {
+        if (in_buffer) {
+            in_buffer->bind(*this, BIND_PIXEL_UNPACK_BUFFER);
+        }
+        else {
+            _unpack_buffer->unbind(*this, BIND_PIXEL_UNPACK_BUFFER);
+        }
+        _unpack_buffer = in_buffer;
+    }
+}
+
+const buffer_ptr&
+render_context::current_unpack_buffer() const
+{
+    return (_unpack_buffer);
+}
+
+void
 render_context::bind_vertex_array(const vertex_array_ptr& in_vertex_array)
 {
     _current_state._vertex_array = in_vertex_array;
@@ -428,6 +448,23 @@ render_context::reset_texture_units()
     std::fill(_current_state._texture_units.begin(),
               _current_state._texture_units.end(),
               texture_unit_binding());
+}
+
+bool
+render_context::update_sub_texture(const texture_ptr&    in_texture,
+                                   const texture_region& in_region,
+                                   const unsigned        in_level,
+                                   const size_t          in_offset)
+{
+    assert(_unpack_buffer);
+    if (!in_texture->image_sub_data(*this, in_region, in_level, BUFFER_OFFSET(in_offset))) {
+        glerr() << log::error
+                << "render_context::update_sub_texture(): "
+                << "error during sub texture update (check update region)."
+                << log::end;
+        return (false);
+    }
+    return (true);
 }
 
 void

@@ -57,7 +57,10 @@ protected:
                                        const texture_1d_desc&    in_desc,
                                        const data_format         in_initial_data_format,
                                        const std::vector<void*>& in_initial_mip_level_data);
-    bool                    image_sub_data();
+    bool                    image_sub_data(const render_context& in_context,
+                                           const texture_region& in_region,
+                                           const unsigned        in_level,
+                                           const void*const      in_data);
 
 protected:
     texture_1d_desc         _descriptor;

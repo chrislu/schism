@@ -294,9 +294,91 @@ texture_2d::image_data(const render_device&      in_device,
 }
 
 bool
-texture_2d::image_sub_data()
+texture_2d::image_sub_data(const render_context& in_context,
+                           const texture_region& in_region,
+                           const unsigned        in_level,
+                           const void*const      in_data)
 {
-    return (false);
+    assert(state().ok());
+
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    util::gl_error          glerror(glapi);
+    
+    unsigned gl_base_format = util::gl_base_format(_descriptor._format);
+    unsigned gl_base_type   = util::gl_base_type(_descriptor._format);
+
+    if (_descriptor._array_layers == 1) {
+        if (in_region._origin.z != 0) {
+            assert(in_region._origin.z == 0);
+            return (false);
+        }
+        if (in_region._dimensions.z != 1) {
+            assert(in_region._dimensions.z == 1);
+            return (false);
+        }
+
+        if (_descriptor._samples == 1) {
+#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            glapi.glBindTexture(object_target(), object_id());
+#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            glapi.glTextureSubImage2DEXT(object_id(), object_target(),
+                                         in_level,
+                                         in_region._origin.x,     in_region._origin.y,
+                                         in_region._dimensions.x, in_region._dimensions.y,
+                                         gl_base_format,
+                                         gl_base_type,
+                                         in_data);
+#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            glapi.glTexSubImage2D(object_target(),
+                                  in_level,
+                                  in_region._origin.x,     in_region._origin.y,
+                                  in_region._dimensions.x, in_region._dimensions.y,
+                                  gl_base_format,
+                                  gl_base_type,
+                                  in_data);
+#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            gl_assert(glapi, texture_2d::image_sub_data() after glTexSubImage2D());
+        }
+        else {
+            return (false);
+        }
+    }
+    else if (_descriptor._array_layers > 1) {
+        if (_descriptor._samples == 1) {
+
+#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            glapi.glBindTexture(object_target(), object_id());
+#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            glapi.glTextureSubImage3DEXT(object_id(), object_target(),
+                                         in_level,
+                                         in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                         in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                         gl_base_format,
+                                         gl_base_type,
+                                         in_data);
+#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            glapi.glTexSubImage3D(object_target(),
+                                  in_level,
+                                  in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                  in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                  gl_base_format,
+                                  gl_base_type,
+                                  in_data);
+#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            gl_assert(glapi, texture_2d::image_sub_data() after glTexSubImage3D());
+        }
+        else {
+            return (false);
+        }
+    }
+
+    return (true);
 }
 
 data_format

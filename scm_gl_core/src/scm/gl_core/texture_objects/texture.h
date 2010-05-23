@@ -8,6 +8,8 @@
 
 #include <scm/core/math.h>
 
+#include <scm/gl_core/data_types.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
@@ -37,6 +39,11 @@ protected:
     void            unbind(const render_context& in_context, int in_unit) const;
 
     unsigned        texture_binding() const;
+
+    virtual bool    image_sub_data(const render_context& in_context,
+                                   const texture_region& in_region,
+                                   const unsigned        in_level,
+                                   const void*const      in_data) = 0;
 
 protected:
     unsigned        _gl_texture_binding;

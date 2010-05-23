@@ -76,6 +76,26 @@ private:
     const render_context::buffer_binding_array  _save_uniform_buffers;
 }; // class context_uniform_buffer_guard
 
+class context_unpack_buffer_guard : boost::noncopyable
+{
+public:
+    context_unpack_buffer_guard(const render_context_ptr& in_context)
+        : _guarded_context(in_context),
+          _save_unpack_buffer(in_context->current_unpack_buffer())
+    {
+    }
+    ~context_unpack_buffer_guard()
+    {
+        restore();
+    }
+    void restore()
+    {
+        _guarded_context->bind_unpack_buffer(_save_unpack_buffer);
+    }
+private:
+    const render_context_ptr&   _guarded_context;
+    const buffer_ptr&           _save_unpack_buffer;
+}; // class context_unpack_buffer_guard
 
 class context_state_objects_guard : boost::noncopyable
 {
@@ -168,6 +188,7 @@ public:
       : _p_guard(in_context),
         _v_guard(in_context),
         _u_guard(in_context),
+        _up_guard(in_context),
         _s_guard(in_context),
         _t_guard(in_context),
         _f_guard(in_context)
@@ -180,6 +201,7 @@ private:
     context_program_guard           _p_guard;
     context_vertex_input_guard      _v_guard;
     context_uniform_buffer_guard    _u_guard;
+    context_unpack_buffer_guard     _up_guard;
     context_state_objects_guard     _s_guard;
     context_texture_units_guard     _t_guard;
     context_framebuffer_guard       _f_guard;

@@ -13,6 +13,7 @@ gl_buffer_targets(const buffer_binding b)
         case BIND_VERTEX_BUFFER:                return (GL_ARRAY_BUFFER);
         case BIND_INDEX_BUFFER:                 return (GL_ELEMENT_ARRAY_BUFFER);
         case BIND_PIXEL_BUFFER:                 return (GL_PIXEL_PACK_BUFFER);
+        case BIND_PIXEL_UNPACK_BUFFER:          return (GL_PIXEL_UNPACK_BUFFER);
         case BIND_UNIFORM_BUFFER:               return (GL_UNIFORM_BUFFER);
         case BIND_TRANSFORM_FEEDBACK_BUFFER:    return (GL_TRANSFORM_FEEDBACK_BUFFER);
         default:                                return (0);                       
@@ -27,6 +28,7 @@ gl_buffer_bindings(const buffer_binding b)
         case BIND_VERTEX_BUFFER:                return (GL_ARRAY_BUFFER_BINDING);
         case BIND_INDEX_BUFFER:                 return (GL_ELEMENT_ARRAY_BUFFER_BINDING);
         case BIND_PIXEL_BUFFER:                 return (GL_PIXEL_PACK_BUFFER_BINDING);
+        case BIND_PIXEL_UNPACK_BUFFER:          return (GL_PIXEL_UNPACK_BUFFER_BINDING);
         case BIND_UNIFORM_BUFFER:               return (GL_UNIFORM_BUFFER_BINDING);
         case BIND_TRANSFORM_FEEDBACK_BUFFER:    return (GL_TRANSFORM_FEEDBACK_BUFFER_BINDING);
         default:                                return (0);                       

@@ -101,6 +101,9 @@ public:
     void                        set_uniform_buffers(const buffer_binding_array& in_buffers);
     const buffer_binding_array& current_uniform_buffers() const;
 
+    void                        bind_unpack_buffer(const buffer_ptr& in_buffer);
+    const buffer_ptr&           current_unpack_buffer() const;
+
     void                        reset_uniform_buffers();
 
     void                        bind_vertex_array(const vertex_array_ptr& in_vertex_array);
@@ -141,6 +144,11 @@ public:
     const texture_unit_array&   current_texture_unit_state() const;
 
     void                        reset_texture_units();
+
+    bool                        update_sub_texture(const texture_ptr&    in_texture,
+                                                   const texture_region& in_region,
+                                                   const unsigned        in_level,
+                                                   const size_t          in_offset);
 
 protected:
     void                        apply_texture_units();
@@ -212,6 +220,8 @@ private:
 
     binding_state_type          _current_state;
     binding_state_type          _applied_state;
+
+    buffer_ptr                  _unpack_buffer;
 
     boost::unordered_map<unsigned, query_ptr> _active_queries;
 

@@ -2,6 +2,8 @@
 #ifndef SCM_GL_CORE_DATA_TYPES_H_INCLUDED
 #define SCM_GL_CORE_DATA_TYPES_H_INCLUDED
 
+#include <scm/core/math.h>
+
 #include <scm/core/platform/platform.h>
 
 namespace scm {
@@ -56,6 +58,19 @@ bool is_integer_type(data_type d);
 bool is_float_type(data_type d);
 
 __scm_export(gl_core) const char* type_string(data_type d);
+
+struct texture_region
+{
+    texture_region()
+    {}
+    texture_region(const math::vec3ui& o,
+                   const math::vec3ui& d)
+      : _origin(o), _dimensions(d)
+    {}
+
+    math::vec3ui    _origin;
+    math::vec3ui    _dimensions;
+}; // struct texture_region
 
 } // namespace gl
 } // namespace scm

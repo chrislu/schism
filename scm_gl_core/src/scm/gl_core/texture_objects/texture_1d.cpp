@@ -220,7 +220,10 @@ texture_1d::image_data(const render_device&      in_device,
 }
 
 bool
-texture_1d::image_sub_data()
+texture_1d::image_sub_data(const render_context& in_context,
+                           const texture_region& in_region,
+                           const unsigned        in_level,
+                           const void*const      in_data)
 {
     return (false);
 }
