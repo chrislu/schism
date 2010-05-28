@@ -74,6 +74,13 @@ quad_geometry::~quad_geometry()
 }
 
 void
+quad_geometry::update(const render_context_ptr& in_context,
+                      const math::vec2f&        in_min_vertex,
+                      const math::vec2f&        in_max_vertex)
+{
+}
+
+void
 quad_geometry::draw(const render_context_ptr& in_context,
                     const draw_mode in_draw_mode) const
 {

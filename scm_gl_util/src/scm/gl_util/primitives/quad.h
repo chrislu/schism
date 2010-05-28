@@ -21,6 +21,9 @@ public:
                   const math::vec2f&       in_max_vertex);
     virtual ~quad_geometry();
 
+    void                update(const render_context_ptr& in_context,
+                               const math::vec2f&        in_min_vertex,
+                               const math::vec2f&        in_max_vertex);
     void                draw(const render_context_ptr& in_context,
                              const draw_mode           in_draw_mode = MODE_SOLID) const;
 
