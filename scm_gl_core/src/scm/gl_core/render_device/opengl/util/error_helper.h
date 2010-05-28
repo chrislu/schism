@@ -4,6 +4,9 @@
 
 #include <string>
 
+#include <scm/core/platform/platform.h>
+#include <scm/core/utilities/platform_warning_disable.h>
+
 namespace scm {
 namespace gl {
 
@@ -15,7 +18,7 @@ class gl3_core;
 
 namespace util {
 
-class gl_error
+class __scm_export(gl_core) gl_error
 {
     mutable unsigned        _error;
     const opengl::gl3_core& _glcore;
@@ -36,5 +39,7 @@ public:
 } // namespace util
 } // namespace gl
 } // namespace scm
+
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SCM_GL_CORE_OPENGL_ERROR_HELPER_H_INCLUDED

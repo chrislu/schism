@@ -16,9 +16,9 @@ namespace gl {
 class __scm_export(gl_core) viewport
 {
 public:
-    viewport(const math::vec2ui& in_lower_left,
-             const math::vec2ui& in_dimensions,
-             const math::vec2f&  in_depth_range = math::vec2f(0.0f, 1.0f));
+    explicit viewport(const math::vec2ui& in_lower_left,
+                      const math::vec2ui& in_dimensions,
+                      const math::vec2f&  in_depth_range = math::vec2f(0.0f, 1.0f));
 
     bool operator==(const viewport& rhs) const;
     bool operator!=(const viewport& rhs) const;
