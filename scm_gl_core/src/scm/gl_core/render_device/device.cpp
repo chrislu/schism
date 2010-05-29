@@ -92,6 +92,12 @@ render_device::main_context() const
     return (_main_context);
 }
 
+render_context_ptr
+render_device::create_context()
+{
+    return (render_context_ptr(new render_context(*this)));
+}
+
 const render_device::device_capabilities&
 render_device::capabilities() const
 {

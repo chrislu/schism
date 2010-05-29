@@ -60,6 +60,9 @@ public:
     const render_device_ptr&        device() const;
     const render_context_ptr&       context() const;
 
+    const viewer_settings&          settings() const;
+    viewer_settings&                settings();
+
     const window_context&           graphics_context() const;
 
     const camera&                   main_camera() const;
@@ -93,7 +96,7 @@ public:
     void                            send_mouse_move(mouse_button button, int x, int y);
 
 protected:
-    math::vec2f                     norm_viewport_coords(const math::vec2ui& pos) const;
+    math::vec2f                     norm_viewport_coords(const math::vec2i& pos) const;
 
 protected:
     // framestamp

@@ -77,6 +77,7 @@ public:
     // device /////////////////////////////////////////////////////////////////////////////////////
     const opengl::gl3_core&         opengl3_api() const;
     render_context_ptr              main_context() const;
+    render_context_ptr              create_context();
     const device_capabilities&      capabilities() const;
 
     virtual void                    print_device_informations(std::ostream& os) const;

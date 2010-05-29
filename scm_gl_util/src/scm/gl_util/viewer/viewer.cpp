@@ -63,6 +63,7 @@ viewer::viewer(const math::vec2ui&              vp_dim,
     glout() << *_device << scm::log::end;
 
     _trackball.dolly(3.0f);
+    _camera.view(_trackball.transform_matrix());
 }
 
 viewer::~viewer()
@@ -83,6 +84,18 @@ const render_context_ptr&
 viewer::context() const
 {
     return (_context);
+}
+
+const viewer::viewer_settings&
+viewer::settings() const
+{
+    return (_settings);
+}
+
+viewer::viewer_settings&
+viewer::settings()
+{
+    return (_settings);
 }
 
 const window_context&
@@ -229,7 +242,7 @@ viewer::send_mouse_double_click(mouse_button button, int x, int y)
 void
 viewer::send_mouse_press(mouse_button button, int x, int y)
 {
-    _trackball_start_pos    = norm_viewport_coords(math::vec2ui(x, y));
+    _trackball_start_pos    = norm_viewport_coords(math::vec2i(x, y));
     _trackball_button       = button;
 
     if (_mouse_press_func) {
@@ -250,7 +263,7 @@ viewer::send_mouse_release(mouse_button button, int x, int y)
 void
 viewer::send_mouse_move(mouse_button button, int x, int y)
 {
-    math::vec2f cur_pos = norm_viewport_coords(math::vec2ui(x, y));
+    math::vec2f cur_pos = norm_viewport_coords(math::vec2i(x, y));
 
     if (_trackball_button == viewer::left_button) {
         _trackball.rotation(_trackball_start_pos.x,
@@ -274,7 +287,7 @@ viewer::send_mouse_move(mouse_button button, int x, int y)
 }
 
 math::vec2f
-viewer::norm_viewport_coords(const math::vec2ui& pos) const
+viewer::norm_viewport_coords(const math::vec2i& pos) const
 {
     float x     = static_cast<float>(pos.x);
     float y     = static_cast<float>(pos.y);
