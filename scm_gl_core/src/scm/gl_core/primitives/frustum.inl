@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include <scm/gl_core/primitives/box.h>
+#include <scm/gl_core/primitives/rect.h>
 
 namespace scm {
 namespace gl {
@@ -120,7 +121,7 @@ frustum_impl<s>::transform_preinverted(const typename frustum_impl<s>::mat4_type
 
 template<typename s>
 typename frustum_impl<s>::classification_result
-frustum_impl<s>::classify(const typename frustum_impl<s>::box_type& b) const
+frustum_impl<s>::classify(const box_type& b) const
 {
     bool plane_intersect = false;
 
@@ -131,12 +132,33 @@ frustum_impl<s>::classify(const typename frustum_impl<s>::box_type& b) const
         if (cur_plane_res == plane::back) {
             return (outside);
         }
-        else if (cur_plane_res == plane::intersect) {
+        else if (cur_plane_res == plane::intersecting) {
             plane_intersect = true;
         }
     }
 
-    return (plane_intersect ? intersect : inside);
+    return (plane_intersect ? intersecting : inside);
+}
+
+template<typename s>
+typename frustum_impl<s>::classification_result
+frustum_impl<s>::classify(const rect_type& b) const
+{
+    bool plane_intersect = false;
+
+    // normals of frustum_impl planes point inside the frustum_impl
+    for (unsigned i = 0; i < 6; ++i) {
+        plane::classification_result cur_plane_res = _planes[i].classify(b);
+
+        if (cur_plane_res == plane::back) {
+            return (outside);
+        }
+        else if (cur_plane_res == plane::intersecting) {
+            plane_intersect = true;
+        }
+    }
+
+    return (plane_intersect ? intersecting : inside);
 }
 
 } // namespace gl

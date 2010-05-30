@@ -26,15 +26,20 @@ public:
     camera();
     virtual ~camera();
 
-    const math::mat4f&      projection() const;
     void                    projection_perspective(float fovy, float aspect, float near_z, float far_z);
     void                    projection_ortho(float left, float right, float bottom, float top, float near_z, float far_z);
     void                    projection_ortho_2d(float left, float right, float bottom, float top);
     void                    projection_frustum(float left, float right, float bottom, float top, float near_z, float far_z);
 
-    const math::mat4f&      view() const;
-    void                    view(const math::mat4f& v);
+    void                    view_matrix(const math::mat4f& v);
+
+    const math::mat4f&      projection_matrix() const;
+    const math::mat4f&      projection_matrix_inverse() const;
+    const math::mat4f&      view_matrix() const;
+    const math::mat4f&      view_matrix_inverse() const;
+    const math::mat4f&      view_matrix_inverse_transpose() const;
     const math::mat4f&      view_projection_matrix() const;
+    const math::mat4f&      view_projection_matrix_inverse() const;
 
     const frustumf&         view_frustum() const;
 
@@ -42,6 +47,8 @@ public:
     float                   aspect_ratio() const;
     float                   near_plane() const;
     float                   far_plane() const;
+
+    ray                     generate_ray(const math::vec2f& nrm_coord) const;
 
     projection_type         type() const;
 
@@ -59,8 +66,14 @@ protected:
     projection_type         _type;
 
     math::mat4f             _projection_matrix;
+    math::mat4f             _projection_matrix_inverse;
+
     math::mat4f             _view_matrix; // world to camera/eye space
+    math::mat4f             _view_matrix_inverse;
+    math::mat4f             _view_matrix_inverse_transpose;
+
     math::mat4f             _view_projection_matrix;
+    math::mat4f             _view_projection_matrix_inverse;
 
 }; // class camera
 

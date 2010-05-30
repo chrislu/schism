@@ -63,7 +63,7 @@ viewer::viewer(const math::vec2ui&              vp_dim,
     glout() << *_device << scm::log::end;
 
     _trackball.dolly(3.0f);
-    _camera.view(_trackball.transform_matrix());
+    _camera.view_matrix(_trackball.transform_matrix());
 }
 
 viewer::~viewer()
@@ -278,7 +278,7 @@ viewer::send_mouse_move(mouse_button button, int x, int y)
         _trackball.translation(cur_pos.x - _trackball_start_pos.x,
                                cur_pos.y - _trackball_start_pos.y);
     }
-    _camera.view(_trackball.transform_matrix());
+    _camera.view_matrix(_trackball.transform_matrix());
     _trackball_start_pos = cur_pos;
 
     if (_mouse_move_func) {

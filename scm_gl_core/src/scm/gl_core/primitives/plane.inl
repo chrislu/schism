@@ -38,6 +38,10 @@ plane_impl<s>::plane_impl(const vec3_type& p0, const vec3_type& p1, const vec3_t
 
     vec3_type   n = math::normalize(cross(p2 - p1, p0 - p1));
     scal_type   d = -dot(n, p1);
+    // describing plane equation
+    //  - a*x + b*y + c*z + d = 0
+    // hessesche normal form dot(n, p) - d = 0; so we use inverted d
+    //  - so d gives you the distance of the origin related to the plane!
 
     _vector = vec4_type(n, d);
     update_corner_indices();
@@ -154,7 +158,24 @@ plane_impl<s>::classify(const box_type& b, scal_type e) const
         return (front);
     }
     else if (distance(b.corner(_p_corner)) > e) {
-        return (intersect);
+        return (intersecting);
+    }
+    else {
+        return (back);
+    }
+}
+
+template<typename s>
+typename plane_impl<s>::classification_result
+plane_impl<s>::classify(const rect_type& b, scal_type e) const
+{
+    using namespace scm::math;
+
+    if (distance(b.corner(_n_corner)) > e) {
+        return (front);
+    }
+    else if (distance(b.corner(_p_corner)) > e) {
+        return (intersecting);
     }
     else {
         return (back);
@@ -176,8 +197,28 @@ plane_impl<s>::classify(const vec3_type& p, scal_type e) const
         return (back);
     }
     else {
-        return (coincide);
+        return (coinciding);
     }
+}
+
+template<typename s>
+bool
+plane_impl<s>::intersect(const ray_type& r, vec3_type& hit, scal_type e) const
+{
+    using namespace scm::math;
+
+    vec3_type  n      = normal();
+    scal_type  dot_nd = dot(n, r.direction());
+    if (abs(dot_nd) < e) {
+        return (false); // we are parallel to the plane
+    }
+    scal_type  dot_no = dot(n, r.origin());
+    scal_type  t      = -(_vector.w + dot_no) / dot_nd;
+
+    // calculate the intersection point for return
+    hit = r.origin() + t * r.direction();
+
+    return (t > scal_type(0));
 }
 
 template<typename s>

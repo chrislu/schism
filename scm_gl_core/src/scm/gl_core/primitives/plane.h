@@ -24,12 +24,14 @@ public:
     typedef scm::math::vec<s, 3>    vec3_type;
     typedef scm::math::mat<s, 4, 4> mat4_type;
     typedef box_impl<s>             box_type;
+    typedef rect_impl<s>            rect_type;
+    typedef ray_impl<s>             ray_type;
 
     typedef enum {
         front,
         back,
-        coincide,
-        intersect
+        coinciding,
+        intersecting
     } classification_result;
 
 public:
@@ -57,7 +59,10 @@ public:
     unsigned                n_corner() const;
 
     classification_result   classify(const box_type& b, scal_type e = epsilon<scal_type>::value()) const;
+    classification_result   classify(const rect_type& b, scal_type e = epsilon<scal_type>::value()) const;
     classification_result   classify(const vec3_type& p, scal_type e = epsilon<scal_type>::value()) const;
+
+    bool                    intersect(const ray_type& r, vec3_type& hit, scal_type e = epsilon<scal_type>::value()) const;
 
 protected:
     void                    normalize();

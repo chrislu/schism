@@ -21,6 +21,7 @@ class frustum_impl
 public:
     typedef scm::math::mat<s, 4, 4> mat4_type;
     typedef box_impl<s>             box_type;
+    typedef rect_impl<s>            rect_type;
     typedef plane_impl<s>           plane_type;
 
 public:
@@ -36,7 +37,7 @@ public:
     typedef enum {
         inside,
         outside,
-        intersect
+        intersecting
     } classification_result;
 
 public:
@@ -53,6 +54,7 @@ public:
     void                    transform_preinverted(const mat4_type& t);
 
     classification_result   classify(const box_type& b) const;
+    classification_result   classify(const rect_type& b) const;
 
 protected:
     std::vector<plane_type> _planes;

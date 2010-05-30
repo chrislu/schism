@@ -22,7 +22,7 @@ public:
     typedef enum {
         inside,
         outside,
-        overlap
+        overlaping
     } classification_result;
 
 public:

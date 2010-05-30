@@ -2,6 +2,7 @@
 #include "camera.h"
 
 #include <scm/gl_core/math.h>
+#include <scm/gl_core/primitives/ray.h>
 
 namespace scm {
 namespace gl {
@@ -20,12 +21,6 @@ camera::camera()
 
 camera::~camera()
 {
-}
-
-const math::mat4f&
-camera::projection() const
-{
-    return (_projection_matrix);
 }
 
 void
@@ -79,22 +74,52 @@ camera::projection_frustum(float left, float right, float bottom, float top, flo
 }
 
 const math::mat4f&
-camera::view() const
+camera::projection_matrix() const
+{
+    return (_projection_matrix);
+}
+
+const math::mat4f&
+camera::projection_matrix_inverse() const
+{
+    return (_projection_matrix_inverse);
+}
+
+const math::mat4f&
+camera::view_matrix() const
 {
     return (_view_matrix);
 }
 
-void
-camera::view(const math::mat4f& v)
+const math::mat4f&
+camera::view_matrix_inverse() const
 {
-    _view_matrix = v;
-    update();
+    return (_view_matrix_inverse);
+}
+
+const math::mat4f&
+camera::view_matrix_inverse_transpose() const
+{
+    return (_view_matrix_inverse_transpose);
 }
 
 const math::mat4f&
 camera::view_projection_matrix() const
 {
     return (_view_projection_matrix);
+}
+
+const math::mat4f&
+camera::view_projection_matrix_inverse() const
+{
+    return (_view_projection_matrix_inverse);
+}
+
+void
+camera::view_matrix(const math::mat4f& v)
+{
+    _view_matrix = v;
+    update();
 }
 
 const frustumf&
@@ -112,7 +137,18 @@ camera::field_of_view() const
 void
 camera::update()
 {
-    _view_projection_matrix = _projection_matrix * _view_matrix;
+    using namespace scm::math;
+
+    //_projection_matrix;
+    _projection_matrix_inverse      = inverse(_projection_matrix);
+
+    // _view_matrix;
+    _view_matrix_inverse            = inverse(_view_matrix);
+    _view_matrix_inverse_transpose  = transpose(_view_matrix_inverse);
+
+    _view_projection_matrix         = _projection_matrix * _view_matrix;
+    _view_projection_matrix_inverse = inverse(_view_projection_matrix);
+
     _view_frustum.update(_view_projection_matrix);
 }
 
@@ -132,6 +168,20 @@ float
 camera::far_plane() const
 {
     return (_far_plane);
+}
+
+ray
+camera::generate_ray(const math::vec2f& nrm_coord) const
+{
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    vec4f p = inverse(_view_projection_matrix) * vec4f(nrm_coord.x, nrm_coord.y, -1.0f, 1.0f);
+    p /= p.w;
+
+    vec4f o = inverse(_view_matrix).column(3);
+
+    return (ray(o, p - o));
 }
 
 camera::projection_type

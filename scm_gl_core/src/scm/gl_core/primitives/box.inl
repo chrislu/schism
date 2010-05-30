@@ -75,21 +75,21 @@ box_impl<s>::corner(unsigned ind) const
 
 template<typename s>
 void
-box_impl<s>::min_vertex(const typename box_impl<s>::vec3_type& vert)
+box_impl<s>::min_vertex(const vec3_type& vert)
 {
     _min_vertex = vert;
 }
 
 template<typename s>
 void
-box_impl<s>::max_vertex(const typename box_impl<s>::vec3_type& vert)
+box_impl<s>::max_vertex(const vec3_type& vert)
 {
     _max_vertex = vert;
 }
 
 template<typename s>
 typename box_impl<s>::classification_result
-box_impl<s>::classify(const typename box_impl<s>::vec3_type& p) const
+box_impl<s>::classify(const vec3_type& p) const
 {
     for (unsigned i = 0; i < 3; ++i) {
         if (   _min_vertex[i] > p[i]
@@ -111,14 +111,14 @@ box_impl<s>::classify(const box_impl<s>& a) const
         }
     }
 
-    return (overlap);
+    return (overlaping);
 }
 
 template<typename s>
 bool
 box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
-                       typename box_impl<s>::vec3_type& entry,
-                       typename box_impl<s>::vec3_type& exit) const
+                       vec3_type& entry,
+                       vec3_type& exit) const
 {
     vec3_type::value_type tmin, tmax, tymin, tymax, tzmin, tzmax;
 
