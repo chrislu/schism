@@ -18,12 +18,17 @@ class __scm_export(gl_util) quad_geometry : public geometry
 public:
     quad_geometry(const render_device_ptr& in_device,
                   const math::vec2f&       in_min_vertex,
-                  const math::vec2f&       in_max_vertex);
+                  const math::vec2f&       in_max_vertex,
+                  const math::vec2f&       in_min_texcoord = math::vec2f(0.0f, 0.0f),
+                  const math::vec2f&       in_max_texcoord = math::vec2f(1.0f, 1.0f));
     virtual ~quad_geometry();
 
     void                update(const render_context_ptr& in_context,
                                const math::vec2f&        in_min_vertex,
-                               const math::vec2f&        in_max_vertex);
+                               const math::vec2f&        in_max_vertex,
+                               const math::vec2f&        in_min_texcoord,
+                               const math::vec2f&        in_max_texcoord);
+
     void                draw(const render_context_ptr& in_context,
                              const draw_mode           in_draw_mode = MODE_SOLID) const;
 

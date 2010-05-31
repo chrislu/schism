@@ -2,6 +2,7 @@
 #ifndef SCM_GL_CORE_TEXTURE_H_INCLUDED
 #define SCM_GL_CORE_TEXTURE_H_INCLUDED
 
+#include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/frame_buffer_objects/render_target.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_core/render_device/device_resource.h>
@@ -43,6 +44,7 @@ protected:
     virtual bool    image_sub_data(const render_context& in_context,
                                    const texture_region& in_region,
                                    const unsigned        in_level,
+                                   const data_format     in_data_format,
                                    const void*const      in_data) = 0;
 
 protected:

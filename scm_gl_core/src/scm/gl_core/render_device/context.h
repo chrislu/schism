@@ -11,6 +11,7 @@
 
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_types.h>
+#include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 #include <scm/gl_core/render_device/device_child.h>
@@ -148,7 +149,13 @@ public:
     bool                        update_sub_texture(const texture_ptr&    in_texture,
                                                    const texture_region& in_region,
                                                    const unsigned        in_level,
+                                                   const data_format     in_data_format,
                                                    const size_t          in_offset);
+    bool                        update_sub_texture(const texture_ptr&    in_texture,
+                                                   const texture_region& in_region,
+                                                   const unsigned        in_level,
+                                                   const data_format     in_data_format,
+                                                   const void*const      in_data);
 
 protected:
     void                        apply_texture_units();

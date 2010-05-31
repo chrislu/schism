@@ -454,10 +454,29 @@ bool
 render_context::update_sub_texture(const texture_ptr&    in_texture,
                                    const texture_region& in_region,
                                    const unsigned        in_level,
+                                   const data_format     in_data_format,
                                    const size_t          in_offset)
 {
     assert(_unpack_buffer);
-    if (!in_texture->image_sub_data(*this, in_region, in_level, BUFFER_OFFSET(in_offset))) {
+    if (!in_texture->image_sub_data(*this, in_region, in_level, in_data_format, BUFFER_OFFSET(in_offset))) {
+        glerr() << log::error
+                << "render_context::update_sub_texture(): "
+                << "error during sub texture update (check update region)."
+                << log::end;
+        return (false);
+    }
+    return (true);
+}
+
+bool
+render_context::update_sub_texture(const texture_ptr&    in_texture,
+                                   const texture_region& in_region,
+                                   const unsigned        in_level,
+                                   const data_format     in_data_format,
+                                   const void*const      in_data)
+{
+    assert(!_unpack_buffer);
+    if (!in_texture->image_sub_data(*this, in_region, in_level, in_data_format, in_data)) {
         glerr() << log::error
                 << "render_context::update_sub_texture(): "
                 << "error during sub texture update (check update region)."

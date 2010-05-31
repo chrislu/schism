@@ -297,6 +297,7 @@ bool
 texture_2d::image_sub_data(const render_context& in_context,
                            const texture_region& in_region,
                            const unsigned        in_level,
+                           const data_format     in_data_format,
                            const void*const      in_data)
 {
     assert(state().ok());
@@ -304,8 +305,11 @@ texture_2d::image_sub_data(const render_context& in_context,
     const opengl::gl3_core& glapi = in_context.opengl_api();
     util::gl_error          glerror(glapi);
     
-    unsigned gl_base_format = util::gl_base_format(_descriptor._format);
-    unsigned gl_base_type   = util::gl_base_type(_descriptor._format);
+    //unsigned gl_base_format = util::gl_base_format(_descriptor._format);
+    //unsigned gl_base_type   = util::gl_base_type(_descriptor._format);
+
+    unsigned gl_base_format = util::gl_base_format(in_data_format);
+    unsigned gl_base_type   = util::gl_base_type(in_data_format);
 
     if (_descriptor._array_layers == 1) {
         if (in_region._origin.z != 0) {

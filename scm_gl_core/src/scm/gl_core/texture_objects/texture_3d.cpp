@@ -169,6 +169,7 @@ bool
 texture_3d::image_sub_data(const render_context& in_context,
                            const texture_region& in_region,
                            const unsigned        in_level,
+                           const data_format     in_data_format,
                            const void*const      in_data)
 {
     return (false);

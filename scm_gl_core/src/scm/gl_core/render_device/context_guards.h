@@ -94,7 +94,7 @@ public:
     }
 private:
     const render_context_ptr&   _guarded_context;
-    const buffer_ptr&           _save_unpack_buffer;
+    const buffer_ptr            _save_unpack_buffer;
 }; // class context_unpack_buffer_guard
 
 class context_state_objects_guard : boost::noncopyable

@@ -18,7 +18,9 @@ namespace gl {
 
 quad_geometry::quad_geometry(const render_device_ptr& in_device,
                              const math::vec2f& in_min_vertex,
-                             const math::vec2f& in_max_vertex)
+                             const math::vec2f& in_max_vertex,
+                             const math::vec2f& in_min_texcoord,
+                             const math::vec2f& in_max_texcoord)
   : geometry(in_device),
     _min_vertex(in_min_vertex),
     _max_vertex(in_max_vertex)
@@ -43,10 +45,13 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
     const vec2f& o = in_min_vertex;
     const vec2f& l = in_max_vertex;
 
-    data[0].pos = vec3f(o.x, o.y, 0.0f); data[0].tex = vec2f(0.0f, 0.0f);
-    data[1].pos = vec3f(l.x, o.y, 0.0f); data[1].tex = vec2f(1.0f, 0.0f);
-    data[2].pos = vec3f(o.x, l.y, 0.0f); data[2].tex = vec2f(0.0f, 1.0f);
-    data[3].pos = vec3f(l.x, l.y, 0.0f); data[3].tex = vec2f(1.0f, 1.0f);
+    const vec2f& ot = in_min_texcoord;
+    const vec2f& lt = in_max_texcoord;
+
+    data[0].pos = vec3f(o.x, o.y, 0.0f); data[0].tex = vec2f(ot.x, ot.y);
+    data[1].pos = vec3f(l.x, o.y, 0.0f); data[1].tex = vec2f(lt.x, ot.y);
+    data[2].pos = vec3f(o.x, l.y, 0.0f); data[2].tex = vec2f(ot.x, lt.y);
+    data[3].pos = vec3f(l.x, l.y, 0.0f); data[3].tex = vec2f(lt.x, lt.y);
     
     ctx->unmap_buffer(_vertices);
 
@@ -76,7 +81,9 @@ quad_geometry::~quad_geometry()
 void
 quad_geometry::update(const render_context_ptr& in_context,
                       const math::vec2f&        in_min_vertex,
-                      const math::vec2f&        in_max_vertex)
+                      const math::vec2f&        in_max_vertex,
+                      const math::vec2f&        in_min_texcoord,
+                      const math::vec2f&        in_max_texcoord)
 {
 }
 
