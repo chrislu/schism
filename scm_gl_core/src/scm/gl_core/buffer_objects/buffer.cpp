@@ -163,7 +163,7 @@ buffer::map_range(const render_context& in_context,
     unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
     unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
 
-    util::buffer_binding_guard(glapi, gl_buffer_target, gl_buffer_binding);
+    util::buffer_binding_guard save_guard(glapi, gl_buffer_target, gl_buffer_binding);
 
     glapi.glBindBuffer(gl_buffer_target, _gl_buffer_id);
     return_value = glapi.glMapBufferRange(gl_buffer_target, in_offset, in_size, access_flags);
@@ -204,7 +204,7 @@ buffer::unmap(const render_context& in_context)
     unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
     unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
 
-    util::buffer_binding_guard(glapi, gl_buffer_target, gl_buffer_binding);
+    util::buffer_binding_guard save_guard(glapi, gl_buffer_target, gl_buffer_binding);
 
     glapi.glBindBuffer(gl_buffer_target, _gl_buffer_id);
     return_value = (GL_TRUE == glapi.glUnmapBuffer(gl_buffer_target));
@@ -244,7 +244,7 @@ buffer::buffer_data(      render_device&     ren_dev,
     unsigned gl_buffer_target  = util::gl_buffer_targets(buffer_desc._bindings);
     unsigned gl_buffer_binding = util::gl_buffer_bindings(buffer_desc._bindings);
 
-    util::buffer_binding_guard(glcore, gl_buffer_target, gl_buffer_binding);
+    util::buffer_binding_guard save_guard(glcore, gl_buffer_target, gl_buffer_binding);
 
     glcore.glBindBuffer(gl_buffer_target, _gl_buffer_id);
     glcore.glBufferData(gl_buffer_target,
@@ -304,7 +304,7 @@ buffer::buffer_sub_data(render_device&  ren_dev,
     unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
     unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
 
-    util::buffer_binding_guard(glcore, gl_buffer_target, gl_buffer_binding);
+    util::buffer_binding_guard save_guard(glcore, gl_buffer_target, gl_buffer_binding);
 
     glcore.glBindBuffer(gl_buffer_target, _gl_buffer_id);
     glcore.glBufferSubData(gl_buffer_target, offset, size, data);

@@ -42,7 +42,7 @@ void program::uniform(const std::string& name, const utype& value)
         }
     }
     else {
-        SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
+       // SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
     }
 }
 

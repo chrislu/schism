@@ -138,7 +138,7 @@ texture_2d::image_data(const render_device&      in_device,
             _gl_texture_binding = GL_TEXTURE_BINDING_2D;
 
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
             glapi.glBindTexture(object_target(), object_id());
             
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
@@ -182,7 +182,7 @@ texture_2d::image_data(const render_device&      in_device,
                 _gl_object_target   = GL_TEXTURE_2D_MULTISAMPLE;
                 _gl_texture_binding = GL_TEXTURE_BINDING_2D_MULTISAMPLE;
 
-                util::texture_binding_guard(glapi, object_target(), texture_binding());
+                util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
                 glapi.glBindTexture(object_target(), object_id());
                 glapi.glTexImage2DMultisample(object_target(),
                                               in_desc._samples,
@@ -215,7 +215,7 @@ texture_2d::image_data(const render_device&      in_device,
             _gl_texture_binding = GL_TEXTURE_BINDING_2D_ARRAY;
 
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
             glapi.glBindTexture(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
             for (unsigned i = 0; i < init_mip_levels; ++i) {
@@ -259,7 +259,7 @@ texture_2d::image_data(const render_device&      in_device,
                 _gl_object_target   = GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
                 _gl_texture_binding = GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY;
 
-                util::texture_binding_guard(glapi, object_target(), texture_binding());
+                util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
                 glapi.glBindTexture(object_target(), object_id());
                 glapi.glTexImage3DMultisample(object_target(),
                                               in_desc._samples,
@@ -323,7 +323,7 @@ texture_2d::image_sub_data(const render_context& in_context,
 
         if (_descriptor._samples == 1) {
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
             glapi.glBindTexture(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
@@ -354,7 +354,7 @@ texture_2d::image_sub_data(const render_context& in_context,
         if (_descriptor._samples == 1) {
 
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            util::texture_binding_guard(glapi, object_target(), texture_binding());
+            util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
             glapi.glBindTexture(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 

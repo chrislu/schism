@@ -127,7 +127,7 @@ texture_1d::image_data(const render_device&      in_device,
         _gl_texture_binding = GL_TEXTURE_BINDING_1D;
 
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        util::texture_binding_guard(glapi, object_target(), texture_binding());
+        util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
         glapi.glBindTexture(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
@@ -171,7 +171,7 @@ texture_1d::image_data(const render_device&      in_device,
         _gl_texture_binding = GL_TEXTURE_BINDING_1D_ARRAY;
 
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        util::texture_binding_guard(glapi, object_target(), texture_binding());
+        util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
         glapi.glBindTexture(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 

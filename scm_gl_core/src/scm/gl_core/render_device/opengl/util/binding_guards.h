@@ -16,7 +16,7 @@ namespace util {
 class texture_binding_guard
 {
 public:
-    texture_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit texture_binding_guard(const opengl::gl3_core& in_glapi,
                           unsigned                in_target,
                           unsigned                in_binding);
     virtual ~texture_binding_guard();
@@ -32,7 +32,7 @@ private:
 class buffer_binding_guard
 {
 public:
-    buffer_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit buffer_binding_guard(const opengl::gl3_core& in_glapi,
                          unsigned                in_target,
                          unsigned                in_binding);
     virtual ~buffer_binding_guard();
@@ -46,7 +46,7 @@ private:
 class vertex_array_binding_guard
 {
 public:
-    vertex_array_binding_guard(const opengl::gl3_core& in_glapi);
+    explicit vertex_array_binding_guard(const opengl::gl3_core& in_glapi);
     virtual ~vertex_array_binding_guard();
 private:
     int             _save;
@@ -56,7 +56,7 @@ private:
 class framebuffer_binding_guard
 {
 public:
-    framebuffer_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit framebuffer_binding_guard(const opengl::gl3_core& in_glapi,
                               unsigned                in_target,
                               unsigned                in_binding);
     virtual ~framebuffer_binding_guard();
