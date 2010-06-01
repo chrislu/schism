@@ -7,7 +7,7 @@
 
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_core/render_device/device.h>
+#include <scm/gl_core/render_device.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
@@ -91,6 +91,8 @@ void
 quad_geometry::draw(const render_context_ptr& in_context,
                     const draw_mode in_draw_mode) const
 {
+    context_vertex_input_guard vig(in_context);
+
     in_context->bind_vertex_array(_vertex_array);
     in_context->bind_index_buffer(_solid_indices, PRIMITIVE_TRIANGLE_STRIP, TYPE_USHORT);
     in_context->apply();
