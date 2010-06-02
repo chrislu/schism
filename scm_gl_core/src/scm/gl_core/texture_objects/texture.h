@@ -41,6 +41,7 @@ protected:
 
     unsigned        texture_binding() const;
 
+    void            generate_mipmaps(const render_context& in_context);
     virtual bool    image_sub_data(const render_context& in_context,
                                    const texture_region& in_region,
                                    const unsigned        in_level,

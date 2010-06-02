@@ -6,6 +6,7 @@
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
+#include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
 namespace scm {
@@ -51,6 +52,13 @@ texture::bind(const render_context& in_context, int in_unit) const
 #else  // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     glapi.glActiveTexture(GL_TEXTURE0 + in_unit);
     glapi.glBindTexture(object_target(), object_id());
+
+    //glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
     //glapi.glEnable(object_target());
     glapi.glActiveTexture(GL_TEXTURE0);
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
@@ -83,6 +91,24 @@ unsigned
 texture::texture_binding() const
 {
     return (_gl_texture_binding);
+}
+
+void
+texture::generate_mipmaps(const render_context& in_context)
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+
+#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+    glapi.glGenerateTextureMipmapEXT(object_id(), object_target());
+#else
+    {
+        util::texture_binding_guard save_guard(glapi, object_target(), texture_binding());
+        glapi.glBindTexture(object_target(), object_id());
+        glapi.glGenerateMipmap(object_target());
+    }
+
+#endif
+    gl_assert(glapi, leaving texture::generate_mipmaps());
 }
 
 } // namespace gl
