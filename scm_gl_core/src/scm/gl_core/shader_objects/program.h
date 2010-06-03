@@ -3,6 +3,7 @@
 #define SCM_GL_CORE_PROGRAM_H_INCLUDED
 
 #include <list>
+#include <vector>
 #include <string>
 
 #include <boost/unordered_map.hpp>
@@ -12,6 +13,7 @@
 #include <scm/core/numeric_types.h>
 #include <scm/core/pointer_types.h>
 
+#include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_types.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/render_device/device_child.h>
@@ -26,6 +28,12 @@ namespace gl {
 class __scm_export(gl_core) program : public render_device_child
 {
 public:
+    typedef boost::unordered_map<std::string, int>                  name_location_map;
+    typedef std::pair<std::string, int>                             named_location;
+    typedef std::list<named_location>                               named_location_list;
+    typedef std::list<const shader_ptr>                             shader_list;
+
+    // program information
     struct variable_type {
         variable_type() : _location(-1), _type(TYPE_UNKNOWN), _elements(0) {}
         variable_type(const std::string& n, int l, unsigned e, data_type t) : _name(n), _location(l), _type(t), _elements(e) {}
@@ -49,15 +57,20 @@ public:
         unsigned        _binding;
         mutable bool    _update_required;
     };
+    struct subroutine_uniform_type {
+        subroutine_uniform_type()  : _location(-1)/*, _selected_routine(-1)*/ {}
+        subroutine_uniform_type(const std::string& n, int l) : _name(n), _location(l)/*, _selected_routine(-1)*/ {}
+        std::string         _name;
+        int                 _location;
+        //name_location_map   _routine_indices;
+        std::string         _selected_routine;
+        //int                 _selected_routine;
+    };
 
-    typedef boost::unordered_map<std::string, variable_type>        name_variable_map;
-    typedef boost::unordered_map<std::string, uniform_type>         name_uniform_map;
-    typedef boost::unordered_map<std::string, uniform_block_type>   name_uniform_block_map;
-    typedef boost::unordered_map<std::string, int>                  name_location_map;
-    typedef std::list<const shader_ptr>                             shader_list;
-
-    typedef std::pair<std::string, int>                             named_location;
-    typedef std::list<named_location>                               named_location_list;
+    typedef boost::unordered_map<std::string, variable_type>            name_variable_map;
+    typedef boost::unordered_map<std::string, uniform_type>             name_uniform_map;
+    typedef boost::unordered_map<std::string, uniform_block_type>       name_uniform_block_map;
+    typedef boost::unordered_map<std::string, subroutine_uniform_type>  name_subroutine_map;
 
 public:
     virtual ~program();
@@ -67,6 +80,7 @@ public:
     template<typename utype>
     void                        uniform(const std::string& name, const utype& value);
     void                        uniform_buffer(const std::string& name, const unsigned binding);
+    void                        uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine);
     //void                        uniform(const std::string& name, float value);
     //void                        uniform(const std::string& name, const math::vec2f& value);
     //void                        uniform(const std::string& name, const math::vec3f& value);
@@ -113,6 +127,9 @@ protected:
     name_uniform_block_map      _uniform_blocks;
     name_variable_map           _attributes;
     name_location_map           _samplers;
+    //name_subroutine_map         _subroutines[SHADER_STAGE_COUNT];
+
+    //std::vector<unsigned>       _subroutines[SHADER_STAGE_COUNT];
 
     unsigned                    _gl_program_obj;
     std::string                 _info_log;

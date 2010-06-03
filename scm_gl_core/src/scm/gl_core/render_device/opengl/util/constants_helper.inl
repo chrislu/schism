@@ -1,6 +1,8 @@
 
 #include <cassert>
 
+#include <scm/gl_core/config.h>
+
 namespace scm {
 namespace gl {
 namespace util {
@@ -105,14 +107,18 @@ int
 gl_shader_types(const shader_stage s)
 {
     static int shader_types[] = {
-        0,                  // STAGE_UNKNOWN            = 0x00,
-        GL_VERTEX_SHADER,   // STAGE_VERTEX_SHADER      = 0x01,
+        GL_VERTEX_SHADER,   // STAGE_VERTEX_SHADER      = 0x00,
         GL_GEOMETRY_SHADER, // STAGE_GEOMETRY_SHADER
         GL_FRAGMENT_SHADER  // STAGE_FRAGMENT_SHADER
+#if SCM_GL_CORE_OPENGL_40
+        ,
+        GL_TESS_EVALUATION_SHADER,  // STAGE_TESS_EVALUATION_SHADER,
+        GL_TESS_CONTROL_SHADER      // STAGE_TESS_CONTROL_SHADER
+#endif
     };
 
     assert((sizeof(shader_types) / sizeof(int)) == SHADER_STAGE_COUNT);
-    assert(STAGE_UNKNOWN <= s && s < SHADER_STAGE_COUNT);
+    assert(STAGE_VERTEX_SHADER <= s && s < SHADER_STAGE_COUNT);
 
     return (shader_types[s]);
 }

@@ -68,6 +68,9 @@ public:
     const camera&                   main_camera() const;
     camera&                         main_camera();
 
+    void                            enable_main_manipulator(const bool f);
+    math::vec2f                     norm_viewport_coords(const math::vec2i& pos) const;
+
     void                            clear_color() const;
     void                            clear_depth_stencil() const;
 
@@ -96,9 +99,6 @@ public:
     void                            send_mouse_move(mouse_button button, int x, int y);
 
 protected:
-    math::vec2f                     norm_viewport_coords(const math::vec2i& pos) const;
-
-protected:
     // framestamp
     // stats (frametime etc.)
 
@@ -115,6 +115,7 @@ protected:
     trackball_manipulator           _trackball;
     math::vec2f                     _trackball_start_pos;
     mouse_button                    _trackball_button;
+    bool                            _trackball_enabled;
 
     // callbacks
     update_func                     _update_func;

@@ -802,7 +802,10 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 void
 render_context::generate_mipmaps(const texture_ptr& in_texture) const
 {
+    const opengl::gl3_core& glapi = opengl_api();
+
     in_texture->generate_mipmaps(*this);
+
     gl_assert(glapi, leaving render_context::generate_mipmaps());
 }
 

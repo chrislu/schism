@@ -4,6 +4,8 @@
 
 #include <scm/core/math.h>
 
+#include <scm/gl_core/config.h>
+
 #include <scm/core/platform/platform.h>
 
 namespace scm {
@@ -27,6 +29,24 @@ enum data_type {
     TYPE_MAT3X4F,
     TYPE_MAT4X2F,
     TYPE_MAT4X3F,
+
+#if SCM_GL_CORE_OPENGL_40
+    TYPE_DOUBLE,
+    TYPE_VEC2D,
+    TYPE_VEC3D,
+    TYPE_VEC4D,
+
+    TYPE_MAT2D,
+    TYPE_MAT3D,
+    TYPE_MAT4D,
+
+    TYPE_MAT2X3D,
+    TYPE_MAT2X4D,
+    TYPE_MAT3X2D,
+    TYPE_MAT3X4D,
+    TYPE_MAT4X2D,
+    TYPE_MAT4X3D,
+#endif
 
     TYPE_INT,
     TYPE_VEC2I,

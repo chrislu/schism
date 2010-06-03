@@ -689,7 +689,85 @@ gl3_core::init_entry_points()
     // non which concern core profile
     version_3_3_available = version_3_2_available && init_success;
 
-    // EXT_direct_state_access
+    // version 4.0 ////////////////////////////////////////////////////////////////////////////////
+    init_success = true;
+    // use ARB_draw_buffers_blend
+    SCM_INIT_GL_ENTRY(PFNGLBLENDEQUATIONIPROC, glBlendEquationi, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBLENDEQUATIONSEPARATEIPROC, glBlendEquationSeparatei, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBLENDFUNCIPROC, glBlendFunci, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBLENDFUNCSEPARATEIPROC, glBlendFuncSeparatei, init_success);
+    // use ARB_draw_indirect
+    SCM_INIT_GL_ENTRY(PFNGLDRAWARRAYSINDIRECTPROC, glDrawArraysIndirect, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDRAWELEMENTSINDIRECTPROC, glDrawElementsIndirect, init_success);
+    // use ARB_gpu_shader5
+    // use ARB_gpu_shader_fp64
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM1DPROC, glUniform1d, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM2DPROC, glUniform2d, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM3DPROC, glUniform3d, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM4DPROC, glUniform4d, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM1DVPROC, glUniform1dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM2DVPROC, glUniform2dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM3DVPROC, glUniform3dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORM4DVPROC, glUniform4dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX2DVPROC, glUniformMatrix2dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX3DVPROC, glUniformMatrix3dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX4DVPROC, glUniformMatrix4dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX2X3DVPROC, glUniformMatrix2x3dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX2X4DVPROC, glUniformMatrix2x4dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX3X2DVPROC, glUniformMatrix3x2dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX3X4DVPROC, glUniformMatrix3x4dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX4X2DVPROC, glUniformMatrix4x2dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMMATRIX4X3DVPROC, glUniformMatrix4x3dv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETUNIFORMDVPROC, glGetUniformdv, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM1DEXTPROC, glProgramUniform1dEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM2DEXTPROC, glProgramUniform2dEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM3DEXTPROC, glProgramUniform3dEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM4DEXTPROC, glProgramUniform4dEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM1DVEXTPROC, glProgramUniform1dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM2DVEXTPROC, glProgramUniform2dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM3DVEXTPROC, glProgramUniform3dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORM4DVEXTPROC, glProgramUniform4dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX2DVEXTPROC, glProgramUniformMatrix2dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX3DVEXTPROC, glProgramUniformMatrix3dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX4DVEXTPROC, glProgramUniformMatrix4dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX2X3DVEXTPROC, glProgramUniformMatrix2x3dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX2X4DVEXTPROC, glProgramUniformMatrix2x4dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX3X2DVEXTPROC, glProgramUniformMatrix3x2dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX3X4DVEXTPROC, glProgramUniformMatrix3x4dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX4X2DVEXTPROC, glProgramUniformMatrix4x2dvEXT, init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMMATRIX4X3DVEXTPROC, glProgramUniformMatrix4x3dvEXT, init_success);
+    // use ARB_sample_shading
+    SCM_INIT_GL_ENTRY(PFNGLMINSAMPLESHADINGPROC, glMinSampleShading, init_success);
+    // use ARB_shader_subroutine
+    SCM_INIT_GL_ENTRY(PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC, glGetSubroutineUniformLocation, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETSUBROUTINEINDEXPROC, glGetSubroutineIndex, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC, glGetActiveSubroutineUniformiv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC, glGetActiveSubroutineUniformName, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETACTIVESUBROUTINENAMEPROC, glGetActiveSubroutineName, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMSUBROUTINESUIVPROC, glUniformSubroutinesuiv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETUNIFORMSUBROUTINEUIVPROC, glGetUniformSubroutineuiv, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMSTAGEIVPROC, glGetProgramStageiv, init_success);
+    // use ARB_tessellation_shader
+    SCM_INIT_GL_ENTRY(PFNGLPATCHPARAMETERIPROC, glPatchParameteri, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPATCHPARAMETERFVPROC, glPatchParameterfv, init_success);
+    // use ARB_texture_buffer_object_rgb32
+    // use ARB_texture_cube_map_array
+    // use ARB_transform_feedback2
+    SCM_INIT_GL_ENTRY(PFNGLBINDTRANSFORMFEEDBACKPROC, glBindTransformFeedback, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDELETETRANSFORMFEEDBACKSPROC, glDeleteTransformFeedbacks, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGENTRANSFORMFEEDBACKSPROC, glGenTransformFeedbacks, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISTRANSFORMFEEDBACKPROC, glIsTransformFeedback, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPAUSETRANSFORMFEEDBACKPROC, glPauseTransformFeedback, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLRESUMETRANSFORMFEEDBACKPROC, glResumeTransformFeedback, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDRAWTRANSFORMFEEDBACKPROC, glDrawTransformFeedback, init_success);
+    // use ARB_transform_feedback3
+    SCM_INIT_GL_ENTRY(PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC, glDrawTransformFeedbackStream, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBEGINQUERYINDEXEDPROC, glBeginQueryIndexed, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLENDQUERYINDEXEDPROC, glEndQueryIndexed, init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETQUERYINDEXEDIVPROC, glGetQueryIndexediv, init_success);
+    version_4_0_available = version_3_3_available && init_success;
+
+    // EXT_direct_state_access ////////////////////////////////////////////////////////////////////
     init_success = true;
     bool    extension_EXT_direct_state_access_available;
     // use GL_EXT_draw_buffers2

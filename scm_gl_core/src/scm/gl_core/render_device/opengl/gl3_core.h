@@ -472,7 +472,81 @@ public:
 
     // version 4.0 ////////////////////////////////////////////////////////////////////////////////
     bool    version_4_0_available;
-    // work in progress
+    // use ARB_draw_buffers_blend
+    PFNGLBLENDEQUATIONIPROC                         glBlendEquationi;
+    PFNGLBLENDEQUATIONSEPARATEIPROC                 glBlendEquationSeparatei;
+    PFNGLBLENDFUNCIPROC                             glBlendFunci;
+    PFNGLBLENDFUNCSEPARATEIPROC                     glBlendFuncSeparatei;
+    // use ARB_draw_indirect
+    PFNGLDRAWARRAYSINDIRECTPROC                     glDrawArraysIndirect;
+    PFNGLDRAWELEMENTSINDIRECTPROC                   glDrawElementsIndirect;
+    // use ARB_gpu_shader5
+    // use ARB_gpu_shader_fp64
+    PFNGLUNIFORM1DPROC                              glUniform1d;
+    PFNGLUNIFORM2DPROC                              glUniform2d;
+    PFNGLUNIFORM3DPROC                              glUniform3d;
+    PFNGLUNIFORM4DPROC                              glUniform4d;
+    PFNGLUNIFORM1DVPROC                             glUniform1dv;
+    PFNGLUNIFORM2DVPROC                             glUniform2dv;
+    PFNGLUNIFORM3DVPROC                             glUniform3dv;
+    PFNGLUNIFORM4DVPROC                             glUniform4dv;
+    PFNGLUNIFORMMATRIX2DVPROC                       glUniformMatrix2dv;
+    PFNGLUNIFORMMATRIX3DVPROC                       glUniformMatrix3dv;
+    PFNGLUNIFORMMATRIX4DVPROC                       glUniformMatrix4dv;
+    PFNGLUNIFORMMATRIX2X3DVPROC                     glUniformMatrix2x3dv;
+    PFNGLUNIFORMMATRIX2X4DVPROC                     glUniformMatrix2x4dv;
+    PFNGLUNIFORMMATRIX3X2DVPROC                     glUniformMatrix3x2dv;
+    PFNGLUNIFORMMATRIX3X4DVPROC                     glUniformMatrix3x4dv;
+    PFNGLUNIFORMMATRIX4X2DVPROC                     glUniformMatrix4x2dv;
+    PFNGLUNIFORMMATRIX4X3DVPROC                     glUniformMatrix4x3dv;
+    PFNGLGETUNIFORMDVPROC                           glGetUniformdv;
+    PFNGLPROGRAMUNIFORM1DEXTPROC                    glProgramUniform1dEXT;
+    PFNGLPROGRAMUNIFORM2DEXTPROC                    glProgramUniform2dEXT;
+    PFNGLPROGRAMUNIFORM3DEXTPROC                    glProgramUniform3dEXT;
+    PFNGLPROGRAMUNIFORM4DEXTPROC                    glProgramUniform4dEXT;
+    PFNGLPROGRAMUNIFORM1DVEXTPROC                   glProgramUniform1dvEXT;
+    PFNGLPROGRAMUNIFORM2DVEXTPROC                   glProgramUniform2dvEXT;
+    PFNGLPROGRAMUNIFORM3DVEXTPROC                   glProgramUniform3dvEXT;
+    PFNGLPROGRAMUNIFORM4DVEXTPROC                   glProgramUniform4dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX2DVEXTPROC             glProgramUniformMatrix2dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX3DVEXTPROC             glProgramUniformMatrix3dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX4DVEXTPROC             glProgramUniformMatrix4dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX2X3DVEXTPROC           glProgramUniformMatrix2x3dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX2X4DVEXTPROC           glProgramUniformMatrix2x4dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX3X2DVEXTPROC           glProgramUniformMatrix3x2dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX3X4DVEXTPROC           glProgramUniformMatrix3x4dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX4X2DVEXTPROC           glProgramUniformMatrix4x2dvEXT;
+    PFNGLPROGRAMUNIFORMMATRIX4X3DVEXTPROC           glProgramUniformMatrix4x3dvEXT;
+    // use ARB_sample_shading
+    PFNGLMINSAMPLESHADINGPROC                       glMinSampleShading;
+    // use ARB_shader_subroutine
+    PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC           glGetSubroutineUniformLocation;
+    PFNGLGETSUBROUTINEINDEXPROC                     glGetSubroutineIndex;
+    PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC           glGetActiveSubroutineUniformiv;
+    PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC         glGetActiveSubroutineUniformName;
+    PFNGLGETACTIVESUBROUTINENAMEPROC                glGetActiveSubroutineName;
+    PFNGLUNIFORMSUBROUTINESUIVPROC                  glUniformSubroutinesuiv;
+    PFNGLGETUNIFORMSUBROUTINEUIVPROC                glGetUniformSubroutineuiv;
+    PFNGLGETPROGRAMSTAGEIVPROC                      glGetProgramStageiv;
+    // use ARB_tessellation_shader
+    PFNGLPATCHPARAMETERIPROC                        glPatchParameteri;
+    PFNGLPATCHPARAMETERFVPROC                       glPatchParameterfv;
+    // use ARB_texture_buffer_object_rgb32
+    // use ARB_texture_cube_map_array
+    // use ARB_transform_feedback2
+    PFNGLBINDTRANSFORMFEEDBACKPROC                  glBindTransformFeedback;
+    PFNGLDELETETRANSFORMFEEDBACKSPROC               glDeleteTransformFeedbacks;
+    PFNGLGENTRANSFORMFEEDBACKSPROC                  glGenTransformFeedbacks;
+    PFNGLISTRANSFORMFEEDBACKPROC                    glIsTransformFeedback;
+    PFNGLPAUSETRANSFORMFEEDBACKPROC                 glPauseTransformFeedback;
+    PFNGLRESUMETRANSFORMFEEDBACKPROC                glResumeTransformFeedback;
+    PFNGLDRAWTRANSFORMFEEDBACKPROC                  glDrawTransformFeedback;
+    // use ARB_transform_feedback3
+    PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC            glDrawTransformFeedbackStream;
+    PFNGLBEGINQUERYINDEXEDPROC                      glBeginQueryIndexed;
+    PFNGLENDQUERYINDEXEDPROC                        glEndQueryIndexed;
+    PFNGLGETQUERYINDEXEDIVPROC                      glGetQueryIndexediv;
+
 
     // EXT_direct_state_access
     bool    extension_EXT_direct_state_access_available;

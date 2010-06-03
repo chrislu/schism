@@ -2,6 +2,8 @@
 #ifndef SCM_GL_CORE_CONSTANTS_H_INCLUDED
 #define SCM_GL_CORE_CONSTANTS_H_INCLUDED
 
+#include <scm/gl_core/config.h>
+
 namespace scm {
 namespace gl {
 
@@ -74,11 +76,13 @@ enum interger_handling
 
 enum shader_stage
 {
-    STAGE_UNKNOWN            = 0x00,
-    STAGE_VERTEX_SHADER      = 0x01,
+    STAGE_VERTEX_SHADER      = 0x00,
     STAGE_GEOMETRY_SHADER,
     STAGE_FRAGMENT_SHADER,
-
+#if SCM_GL_CORE_OPENGL_40
+    STAGE_TESS_EVALUATION_SHADER,
+    STAGE_TESS_CONTROL_SHADER,
+#endif
     SHADER_STAGE_COUNT
 }; // enum shader_stage
 

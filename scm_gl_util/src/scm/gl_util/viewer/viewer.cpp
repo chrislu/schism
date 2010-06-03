@@ -33,7 +33,8 @@ viewer::viewer_settings::viewer_settings()
 viewer::viewer(const math::vec2ui&              vp_dim,
                const window_context::wnd_handle wnd,
                const context_format&            format)
-  : _viewport(math::vec2ui(0, 0), vp_dim)
+  : _viewport(math::vec2ui(0, 0), vp_dim),
+    _trackball_enabled(true)
 {
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
@@ -242,8 +243,10 @@ viewer::send_mouse_double_click(mouse_button button, int x, int y)
 void
 viewer::send_mouse_press(mouse_button button, int x, int y)
 {
-    _trackball_start_pos    = norm_viewport_coords(math::vec2i(x, y));
-    _trackball_button       = button;
+    if (_trackball_enabled) {
+        _trackball_start_pos    = norm_viewport_coords(math::vec2i(x, y));
+        _trackball_button       = button;
+    }
 
     if (_mouse_press_func) {
         _mouse_press_func(button, x, y);
@@ -253,7 +256,9 @@ viewer::send_mouse_press(mouse_button button, int x, int y)
 void
 viewer::send_mouse_release(mouse_button button, int x, int y)
 {
-    _trackball_button = viewer::no_button;
+    if (_trackball_enabled) {
+        _trackball_button = viewer::no_button;
+    }
 
     if (_mouse_release_func) {
         _mouse_release_func(button, x, y);
@@ -263,23 +268,25 @@ viewer::send_mouse_release(mouse_button button, int x, int y)
 void
 viewer::send_mouse_move(mouse_button button, int x, int y)
 {
-    math::vec2f cur_pos = norm_viewport_coords(math::vec2i(x, y));
+    if (_trackball_enabled) {
+        math::vec2f cur_pos = norm_viewport_coords(math::vec2i(x, y));
 
-    if (_trackball_button == viewer::left_button) {
-        _trackball.rotation(_trackball_start_pos.x,
-                            _trackball_start_pos.y,
-                            cur_pos.x,
-                            cur_pos.y);
+        if (_trackball_button == viewer::left_button) {
+            _trackball.rotation(_trackball_start_pos.x,
+                                _trackball_start_pos.y,
+                                cur_pos.x,
+                                cur_pos.y);
+        }
+        if (_trackball_button == viewer::right_button) {
+            _trackball.dolly(/*dolly_sens*/1.0f * (cur_pos.y - _trackball_start_pos.y));
+        }
+        if (_trackball_button == viewer::middle_button) {
+            _trackball.translation(cur_pos.x - _trackball_start_pos.x,
+                                   cur_pos.y - _trackball_start_pos.y);
+        }
+        _camera.view_matrix(_trackball.transform_matrix());
+        _trackball_start_pos = cur_pos;
     }
-    if (_trackball_button == viewer::right_button) {
-        _trackball.dolly(/*dolly_sens*/1.0f * (cur_pos.y - _trackball_start_pos.y));
-    }
-    if (_trackball_button == viewer::middle_button) {
-        _trackball.translation(cur_pos.x - _trackball_start_pos.x,
-                               cur_pos.y - _trackball_start_pos.y);
-    }
-    _camera.view_matrix(_trackball.transform_matrix());
-    _trackball_start_pos = cur_pos;
 
     if (_mouse_move_func) {
         _mouse_move_func(button, x, y);
@@ -298,6 +305,11 @@ viewer::norm_viewport_coords(const math::vec2i& pos) const
                         2.0f * (dim_y - y - dim_y * 0.5f) / dim_y));
 }
 
+void
+viewer::enable_main_manipulator(const bool f)
+{
+    _trackball_enabled = f;
+}
 
 } // namespace gl
 } // namespace scm

@@ -31,6 +31,24 @@ from_gl_data_type(unsigned gl_type)
         case GL_FLOAT_MAT4x2:           return (TYPE_MAT4X2F);break;
         case GL_FLOAT_MAT4x3:           return (TYPE_MAT4X3F);break;
 
+#if SCM_GL_CORE_OPENGL_40
+        case GL_DOUBLE:                  return (TYPE_DOUBLE);break;
+        case GL_DOUBLE_VEC2:             return (TYPE_VEC2D);break;
+        case GL_DOUBLE_VEC3:             return (TYPE_VEC3D);break;
+        case GL_DOUBLE_VEC4:             return (TYPE_VEC4D);break;
+
+        case GL_DOUBLE_MAT2:             return (TYPE_MAT2D);break;
+        case GL_DOUBLE_MAT3:             return (TYPE_MAT3D);break;
+        case GL_DOUBLE_MAT4:             return (TYPE_MAT4D);break;
+
+        case GL_DOUBLE_MAT2x3:           return (TYPE_MAT2X3D);break;
+        case GL_DOUBLE_MAT2x4:           return (TYPE_MAT2X4D);break;
+        case GL_DOUBLE_MAT3x2:           return (TYPE_MAT3X2D);break;
+        case GL_DOUBLE_MAT3x4:           return (TYPE_MAT3X4D);break;
+        case GL_DOUBLE_MAT4x2:           return (TYPE_MAT4X2D);break;
+        case GL_DOUBLE_MAT4x3:           return (TYPE_MAT4X3D);break;
+#endif
+
         case GL_INT:                    return (TYPE_INT);break;
         case GL_INT_VEC2:               return (TYPE_VEC2I);break;
         case GL_INT_VEC3:               return (TYPE_VEC3I);break;
@@ -127,6 +145,16 @@ gl_base_type(const data_type d)
         GL_FLOAT, GL_FLOAT, GL_FLOAT,
         GL_FLOAT, GL_FLOAT, GL_FLOAT,
         GL_FLOAT, GL_FLOAT, GL_FLOAT,
+
+#if SCM_GL_CORE_OPENGL_40
+        // double
+        GL_DOUBLE, GL_DOUBLE, GL_DOUBLE, GL_DOUBLE,
+        // matrices
+        GL_DOUBLE, GL_DOUBLE, GL_DOUBLE,
+        GL_DOUBLE, GL_DOUBLE, GL_DOUBLE,
+        GL_DOUBLE, GL_DOUBLE, GL_DOUBLE,
+#endif
+
         // int
         GL_INT, GL_INT, GL_INT, GL_INT,
         // unsigned int

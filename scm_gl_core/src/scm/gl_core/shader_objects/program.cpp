@@ -15,6 +15,7 @@
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
+#include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/shader_objects/shader.h>
@@ -38,7 +39,15 @@ public:
     void operator()(const math::mat2f& m) const     { _glapi.glUniformMatrix2fv(_uniform._location, _uniform._elements, false, m.data_array); }
     void operator()(const math::mat3f& m) const     { _glapi.glUniformMatrix3fv(_uniform._location, _uniform._elements, false, m.data_array); }
     void operator()(const math::mat4f& m) const     { _glapi.glUniformMatrix4fv(_uniform._location, _uniform._elements, false, m.data_array); }
-
+#if SCM_GL_CORE_OPENGL_40
+    void operator()(const double v) const           { _glapi.glUniform1dv(_uniform._location, _uniform._elements, &v); }
+    void operator()(const math::vec2d& v) const     { _glapi.glUniform2dv(_uniform._location, _uniform._elements, v.data_array); }
+    void operator()(const math::vec3d& v) const     { _glapi.glUniform3dv(_uniform._location, _uniform._elements, v.data_array); }
+    void operator()(const math::vec4d& v) const     { _glapi.glUniform4dv(_uniform._location, _uniform._elements, v.data_array); }
+    void operator()(const math::mat2d& m) const     { _glapi.glUniformMatrix2dv(_uniform._location, _uniform._elements, false, m.data_array); }
+    void operator()(const math::mat3d& m) const     { _glapi.glUniformMatrix3dv(_uniform._location, _uniform._elements, false, m.data_array); }
+    void operator()(const math::mat4d& m) const     { _glapi.glUniformMatrix4dv(_uniform._location, _uniform._elements, false, m.data_array); }
+#endif
     void operator()(const int v) const              { _glapi.glUniform1iv(_uniform._location, _uniform._elements, &v); }
     void operator()(const math::vec2i& v) const     { _glapi.glUniform2iv(_uniform._location, _uniform._elements, v.data_array); }
     void operator()(const math::vec3i& v) const     { _glapi.glUniform3iv(_uniform._location, _uniform._elements, v.data_array); }
@@ -66,6 +75,16 @@ public:
     void operator()(const math::mat2f& m) const     { _glapi.glProgramUniformMatrix2fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
     void operator()(const math::mat3f& m) const     { _glapi.glProgramUniformMatrix3fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
     void operator()(const math::mat4f& m) const     { _glapi.glProgramUniformMatrix4fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
+
+#if SCM_GL_CORE_OPENGL_40
+    void operator()(const double v) const           { assert(0); }
+    void operator()(const math::vec2d& v) const     { assert(0); }
+    void operator()(const math::vec3d& v) const     { assert(0); }
+    void operator()(const math::vec4d& v) const     { assert(0); }
+    void operator()(const math::mat2d& m) const     { assert(0); }
+    void operator()(const math::mat3d& m) const     { assert(0); }
+    void operator()(const math::mat4d& m) const     { assert(0); }
+#endif
 
     void operator()(const int v) const              { _glapi.glProgramUniform1ivEXT(_program, _uniform._location, _uniform._elements, &v); }
     void operator()(const math::vec2i& v) const     { _glapi.glProgramUniform2ivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
@@ -240,8 +259,36 @@ program::bind_uniforms(render_context& ren_ctx) const
             }
         }
     }
-
-
+#if 0
+    { // subroutines
+        for (int s = 0; s < 3; ++s) {
+            name_subroutine_map::const_iterator b = _subroutines[s].begin();
+            name_subroutine_map::const_iterator e = _subroutines[s].end();
+            int in_size = static_cast<int>(_subroutines[s].size()) + 1;
+            std::cout << _subroutines[s].size() << std::endl;
+            scoped_array<unsigned>  indices(new unsigned[in_size]); // to catch empty routines
+            for (; b != e; ++b) {
+                int       l  = b->second._location;
+                if (!b->second._selected_routine.empty()) {
+                    std::cout << b->second._selected_routine << std::endl;
+                    //unsigned  rl = glapi.glGetSubroutineIndex(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(s)),
+                    //                                          b->second._selected_routine.c_str());
+                    //unsigned  rl = glapi.glGetSubroutineIndex(_gl_program_obj, GL_FRAGMENT_SHADER,
+                    //                                          "output_blended_color");
+                    //rl = glapi.glGetSubroutineIndex(_gl_program_obj, GL_FRAGMENT_SHADER,
+                    //                                          "output_blended_page_coordinate");
+                    indices[l] = 0;
+                }
+                else {
+                    indices[l] = 0;
+                }
+            }
+            if (1 < in_size) {
+                glapi.glUniformSubroutinesuiv(util::gl_shader_types(static_cast<shader_stage>(s)), in_size - 1, indices.get());
+            }
+        }
+    }
+#endif
     gl_assert(glapi, leaving program::bind_uniforms());
 }
 
@@ -392,6 +439,66 @@ program::retrieve_uniform_information(render_device& ren_dev)
                                                                       actual_uniform_size);
         }
     }
+#if 0 //SCM_GL_CORE_OPENGL_40
+    { // subroutines
+        for (int stge = 0; stge < SHADER_STAGE_COUNT; ++stge) {
+            int act_routines = 0;
+            int act_routine_uniform_max_len = 0;
+            int act_routine_max_len = 0;
+            scoped_array<char>  temp_name;
+            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                      GL_ACTIVE_SUBROUTINE_UNIFORMS, &act_routines);
+            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                      GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &act_routine_uniform_max_len);
+            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                      GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &act_routine_max_len);
+            int max_act_routine_len = math::max(act_routine_uniform_max_len, act_routine_max_len);
+            if (max_act_routine_len > 0) {
+                temp_name.reset(new char[max_act_routine_len + 1]); // reserve for null termination
+            }
+            for (int i = 0; i < act_routines; ++i) {
+                std::string         actual_routine_name;
+                int                 actual_routine_location = -1;
+                int                 num_comp_routines = 0;
+                scoped_array<int>   comp_routines;
+
+                glapi.glGetActiveSubroutineUniformName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                       i, max_act_routine_len, 0, temp_name.get());
+                actual_routine_name.assign(temp_name.get());
+
+                actual_routine_location = 
+                    glapi.glGetSubroutineUniformLocation(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                         actual_routine_name.c_str());
+
+                // init the subroutine struct
+                subroutine_uniform_type actual_routine(actual_routine_name, actual_routine_location);
+                _subroutines[stge][actual_routine_name] = actual_routine;
+#if 0
+                // compatible routines
+                //glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                //                                     i, GL_NUM_COMPATIBLE_SUBROUTINES, &num_comp_routines);
+
+                num_comp_routines = 1000;
+
+                if (0 < num_comp_routines) {
+                    comp_routines.reset(new int[num_comp_routines]);
+                    glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                         i, GL_COMPATIBLE_SUBROUTINES, comp_routines.get());
+                }
+
+                for (int r = 0; r < num_comp_routines; ++r) {
+                    std::string rname;
+                    glapi.glGetActiveSubroutineName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                    comp_routines[r], max_act_routine_len, 0, temp_name.get());
+                    rname.assign(temp_name.get());
+                    actual_routine._routine_indices[rname] = comp_routines[r];
+                }
+                _subroutines[i][actual_routine_name] = actual_routine;
+#endif
+            }
+        }
+    }
+#endif
 
     gl_assert(glapi, leaving program::retrieve_uniform_information());
 }
@@ -410,6 +517,21 @@ program::uniform_buffer(const std::string& name, const unsigned binding)
     else {
         SCM_GL_DGB("program::uniform_buffer(): unable to find uniform buffer ('" << name << "').");
     }
+}
+
+void
+program::uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine)
+{
+#if 0
+    name_subroutine_map::iterator r = _subroutines[stage].find(name);
+
+    if (r != _subroutines[stage].end()) {
+        r->second._selected_routine = routine;
+    }
+    else {
+        SCM_GL_DGB("program::uniform_subroutine(): unable to find subroutine ('" << name << "').");
+    }
+#endif
 }
 
 #if 0
