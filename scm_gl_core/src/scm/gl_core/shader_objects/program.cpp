@@ -15,6 +15,7 @@
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
+#include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -144,6 +145,8 @@ program::program(render_device&                 ren_dev,
 
         // retrieve information
         if (ok()) {
+            util::program_binding_guard save_guard(glapi);
+            glapi.glUseProgram(_gl_program_obj);
             retrieve_attribute_information(ren_dev);
             retrieve_fragdata_information(ren_dev);
             retrieve_uniform_information(ren_dev);
@@ -261,30 +264,20 @@ program::bind_uniforms(render_context& ren_ctx) const
     }
 #if 0
     { // subroutines
-        for (int s = 0; s < 3; ++s) {
-            name_subroutine_map::const_iterator b = _subroutines[s].begin();
-            name_subroutine_map::const_iterator e = _subroutines[s].end();
-            int in_size = static_cast<int>(_subroutines[s].size()) + 1;
-            std::cout << _subroutines[s].size() << std::endl;
-            scoped_array<unsigned>  indices(new unsigned[in_size]); // to catch empty routines
+        for (int s = 0; s < SHADER_STAGE_COUNT; ++s) {
+            name_subroutine_uniform_map::const_iterator b = _subroutine_uniforms[s].begin();
+            name_subroutine_uniform_map::const_iterator e = _subroutine_uniforms[s].end();
+            int indices_size = static_cast<int>(_subroutine_uniforms[s].size());
+            scoped_array<unsigned>  indices;
+            if (0 < indices_size) {
+                indices.reset(new unsigned[indices_size]);
+            }
             for (; b != e; ++b) {
                 int       l  = b->second._location;
-                if (!b->second._selected_routine.empty()) {
-                    std::cout << b->second._selected_routine << std::endl;
-                    //unsigned  rl = glapi.glGetSubroutineIndex(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(s)),
-                    //                                          b->second._selected_routine.c_str());
-                    //unsigned  rl = glapi.glGetSubroutineIndex(_gl_program_obj, GL_FRAGMENT_SHADER,
-                    //                                          "output_blended_color");
-                    //rl = glapi.glGetSubroutineIndex(_gl_program_obj, GL_FRAGMENT_SHADER,
-                    //                                          "output_blended_page_coordinate");
-                    indices[l] = 0;
-                }
-                else {
-                    indices[l] = 0;
-                }
+                indices[l] = b->second._selected_routine;
             }
-            if (1 < in_size) {
-                glapi.glUniformSubroutinesuiv(util::gl_shader_types(static_cast<shader_stage>(s)), in_size - 1, indices.get());
+            if (0 < indices_size) {
+                glapi.glUniformSubroutinesuiv(util::gl_shader_types(static_cast<shader_stage>(s)), indices_size, indices.get());
             }
         }
     }
@@ -442,60 +435,92 @@ program::retrieve_uniform_information(render_device& ren_dev)
 #if 0 //SCM_GL_CORE_OPENGL_40
     { // subroutines
         for (int stge = 0; stge < SHADER_STAGE_COUNT; ++stge) {
-            int act_routines = 0;
-            int act_routine_uniform_max_len = 0;
-            int act_routine_max_len = 0;
-            scoped_array<char>  temp_name;
-            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                      GL_ACTIVE_SUBROUTINE_UNIFORMS, &act_routines);
-            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                      GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &act_routine_uniform_max_len);
-            glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                      GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &act_routine_max_len);
-            int max_act_routine_len = math::max(act_routine_uniform_max_len, act_routine_max_len);
-            if (max_act_routine_len > 0) {
-                temp_name.reset(new char[max_act_routine_len + 1]); // reserve for null termination
+            { // subrountine uniforms
+                int act_routines = 0;
+                int act_routine_max_len = 0;
+                scoped_array<char>  temp_name;
+                glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                          GL_ACTIVE_SUBROUTINE_UNIFORMS, &act_routines);
+                glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                          GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &act_routine_max_len);
+                if (act_routine_max_len > 0) {
+                    temp_name.reset(new char[act_routine_max_len + 1]); // reserve for null termination
+                }
+                for (int i = 0; i < act_routines; ++i) {
+                    std::string         actual_routine_name;
+                    int                 actual_routine_location = -1;
+
+                    glapi.glGetActiveSubroutineUniformName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                           i, act_routine_max_len, 0, temp_name.get());
+                    actual_routine_name.assign(temp_name.get());
+
+                    actual_routine_location = 
+                        glapi.glGetSubroutineUniformLocation(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                             actual_routine_name.c_str());
+                    // init the subroutine struct
+                    subroutine_uniform_type actual_routine(actual_routine_name, actual_routine_location);
+                    _subroutine_uniforms[stge][actual_routine_name] = actual_routine;
+                }
+                gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
             }
-            for (int i = 0; i < act_routines; ++i) {
-                std::string         actual_routine_name;
-                int                 actual_routine_location = -1;
-                int                 num_comp_routines = 0;
-                scoped_array<int>   comp_routines;
+            { // subroutines
+                int act_routines = 0;
+                int act_routine_max_len = 0;
+                char*  temp_name = 0;
+                glapi.glGetProgramStageiv(_gl_program_obj, GL_FRAGMENT_SHADER,//util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                          GL_ACTIVE_SUBROUTINES, &act_routines);
+                glapi.glGetProgramStageiv(_gl_program_obj, GL_FRAGMENT_SHADER,//util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                          GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &act_routine_max_len);
+                if (act_routine_max_len > 0) {
+                    temp_name = new char[act_routine_max_len + 1]; // reserve for null termination
+                }
+                for (int i = 0; i < act_routines; ++i) {
+                    std::string         actual_routine_name;
+                    unsigned            actual_routine_index = 0;
 
-                glapi.glGetActiveSubroutineUniformName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                       i, max_act_routine_len, 0, temp_name.get());
-                actual_routine_name.assign(temp_name.get());
+                    int ret_size = 0;
 
-                actual_routine_location = 
-                    glapi.glGetSubroutineUniformLocation(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                         actual_routine_name.c_str());
+                    glapi.glGetActiveSubroutineName(_gl_program_obj, GL_FRAGMENT_SHADER,//util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                    unsigned(i), act_routine_max_len, &ret_size, temp_name);
+                    //actual_routine_name.assign(temp_name);
+                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
 
-                // init the subroutine struct
-                subroutine_uniform_type actual_routine(actual_routine_name, actual_routine_location);
-                _subroutines[stge][actual_routine_name] = actual_routine;
+                    actual_routine_index = 
+                        glapi.glGetSubroutineIndex(_gl_program_obj, GL_FRAGMENT_SHADER,//util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                   temp_name);
+                                                   //actual_routine_name.c_str());
+                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
+                    // init the subroutine struct
+                    subroutine_type actual_routine(actual_routine_name, actual_routine_index);
+                    _subroutines[stge][actual_routine_name] = actual_routine;
+                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
+                }
+                delete [] temp_name;
+            }
 #if 0
                 // compatible routines
-                //glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                //                                     i, GL_NUM_COMPATIBLE_SUBROUTINES, &num_comp_routines);
+                int                 num_comp_routines = 0;
+                scoped_array<int>   comp_routines;
+                glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                     i, GL_NUM_COMPATIBLE_SUBROUTINES, &num_comp_routines);
 
-                num_comp_routines = 1000;
-
+    gl_assert(glapi, leaving program::retrieve_uniform_information());
                 if (0 < num_comp_routines) {
                     comp_routines.reset(new int[num_comp_routines]);
                     glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
                                                          i, GL_COMPATIBLE_SUBROUTINES, comp_routines.get());
                 }
 
+    gl_assert(glapi, leaving program::retrieve_uniform_information());
                 for (int r = 0; r < num_comp_routines; ++r) {
                     std::string rname;
                     glapi.glGetActiveSubroutineName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
                                                     comp_routines[r], max_act_routine_len, 0, temp_name.get());
+    gl_assert(glapi, leaving program::retrieve_uniform_information());
                     rname.assign(temp_name.get());
                     actual_routine._routine_indices[rname] = comp_routines[r];
                 }
-                _subroutines[i][actual_routine_name] = actual_routine;
 #endif
-            }
         }
     }
 #endif
@@ -523,10 +548,16 @@ void
 program::uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine)
 {
 #if 0
-    name_subroutine_map::iterator r = _subroutines[stage].find(name);
+    name_subroutine_uniform_map::iterator subr = _subroutine_uniforms[stage].find(name);
+    name_subroutine_map::iterator         rout = _subroutines[stage].find(routine);
 
-    if (r != _subroutines[stage].end()) {
-        r->second._selected_routine = routine;
+    if (subr != _subroutine_uniforms[stage].end()) {
+        if (rout != _subroutines[stage].end()) {
+            subr->second._selected_routine = rout->second._index;
+        }
+        else {
+            SCM_GL_DGB("program::uniform_subroutine(): unable to find routine ('" << name << "').");
+        }
     }
     else {
         SCM_GL_DGB("program::uniform_subroutine(): unable to find subroutine ('" << name << "').");

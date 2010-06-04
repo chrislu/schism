@@ -28,6 +28,15 @@ private:
     const opengl::gl3_core& _gl_api;
 };
 
+class program_binding_guard
+{
+public:
+    explicit program_binding_guard(const opengl::gl3_core& in_glapi);
+    virtual ~program_binding_guard();
+private:
+    int                     _active_program;
+    const opengl::gl3_core& _gl_api;
+};
 
 class buffer_binding_guard
 {

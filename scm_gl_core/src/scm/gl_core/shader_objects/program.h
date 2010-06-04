@@ -58,19 +58,25 @@ public:
         mutable bool    _update_required;
     };
     struct subroutine_uniform_type {
-        subroutine_uniform_type()  : _location(-1)/*, _selected_routine(-1)*/ {}
-        subroutine_uniform_type(const std::string& n, int l) : _name(n), _location(l)/*, _selected_routine(-1)*/ {}
+        subroutine_uniform_type()  : _location(-1), _selected_routine(-1) {}
+        subroutine_uniform_type(const std::string& n, int l) : _name(n), _location(l), _selected_routine(0) {}
         std::string         _name;
         int                 _location;
         //name_location_map   _routine_indices;
-        std::string         _selected_routine;
-        //int                 _selected_routine;
+        unsigned            _selected_routine;
+    };
+    struct subroutine_type {
+        subroutine_type() : _index(0) {}
+        subroutine_type(const std::string& n, unsigned l) : _name(n), _index(l) {}
+        std::string         _name;
+        unsigned            _index;
     };
 
     typedef boost::unordered_map<std::string, variable_type>            name_variable_map;
     typedef boost::unordered_map<std::string, uniform_type>             name_uniform_map;
     typedef boost::unordered_map<std::string, uniform_block_type>       name_uniform_block_map;
-    typedef boost::unordered_map<std::string, subroutine_uniform_type>  name_subroutine_map;
+    typedef boost::unordered_map<std::string, subroutine_uniform_type>  name_subroutine_uniform_map;
+    typedef boost::unordered_map<std::string, subroutine_type>          name_subroutine_map;
 
 public:
     virtual ~program();
@@ -127,9 +133,8 @@ protected:
     name_uniform_block_map      _uniform_blocks;
     name_variable_map           _attributes;
     name_location_map           _samplers;
-    //name_subroutine_map         _subroutines[SHADER_STAGE_COUNT];
-
-    //std::vector<unsigned>       _subroutines[SHADER_STAGE_COUNT];
+    name_subroutine_uniform_map _subroutine_uniforms[SHADER_STAGE_COUNT];
+    name_subroutine_map         _subroutines[SHADER_STAGE_COUNT];
 
     unsigned                    _gl_program_obj;
     std::string                 _info_log;

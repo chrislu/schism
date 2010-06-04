@@ -38,6 +38,24 @@ texture_binding_guard::~texture_binding_guard()
     gl_assert(_gl_api, leaving texture_binding_guard::~texture_binding_guard());
 }
 
+program_binding_guard::program_binding_guard(const opengl::gl3_core& in_glapi)
+  : _gl_api(in_glapi)
+{
+    gl_assert(_gl_api, entering program_binding_guard::program_binding_guard());
+
+    _gl_api.glGetIntegerv(GL_CURRENT_PROGRAM, &_active_program);
+
+    gl_assert(_gl_api, leaving program_binding_guard::program_binding_guard());
+}
+
+program_binding_guard::~program_binding_guard()
+{
+    gl_assert(_gl_api, entering program_binding_guard::~program_binding_guard());
+
+    _gl_api.glUseProgram(_active_program);
+
+    gl_assert(_gl_api, leaving program_binding_guard::~program_binding_guard());
+}
 
 buffer_binding_guard::buffer_binding_guard(const opengl::gl3_core& in_glapi,
                                            unsigned                in_target,
