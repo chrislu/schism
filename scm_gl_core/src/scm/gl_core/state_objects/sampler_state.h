@@ -21,7 +21,7 @@ struct __scm_export(gl_core) sampler_state_desc
                        texture_wrap_mode    in_wrap_t = WRAP_CLAMP_TO_EDGE,
                        texture_wrap_mode    in_wrap_r = WRAP_CLAMP_TO_EDGE,
                        unsigned             in_max_anisotropy = 1,
-                       float                in_min_lod = (std::numeric_limits<float>::lowest)(),
+                       float                in_min_lod = -(std::numeric_limits<float>::max)(),
                        float                in_max_lod = (std::numeric_limits<float>::max)(),
                        float                in_lod_bias = 0.0f,
                        compare_func         in_compare_func = COMPARISON_LESS_EQUAL,
@@ -56,7 +56,7 @@ protected:
     void                        bind(const render_context&     in_context,
                                      const int                 in_unit) const;
     void                        unbind(const render_context&   in_context,
-                                       const int                 in_unit) const;
+                                       const int               in_unit) const;
 
 protected:
     sampler_state_desc          _descriptor;
