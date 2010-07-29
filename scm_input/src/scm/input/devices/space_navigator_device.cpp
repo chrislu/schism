@@ -189,13 +189,13 @@ space_navigator_impl::update()
 void
 space_navigator_impl::init_com()
 {
-    HRESULT hr=::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY);
+    HRESULT hr = ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY);
     if (!SUCCEEDED(hr)) {
         CString strError;
         strError.FormatMessage (_T("Error 0x%x"), hr);
-        scm::err() << log::error
+        scm::err() << scm::log::error
                    << "space_navigator_impl::space_navigator_impl()"
-                   << "CoInitializeEx failed: " << strError << log::end;
+                   << "CoInitializeEx failed: " << strError << scm::log::end;
     }
 
     CComPtr<IUnknown> _3DxDevice;
@@ -204,9 +204,9 @@ space_navigator_impl::init_com()
     if (!SUCCEEDED(hr)) {
         CString strError;
         strError.FormatMessage (_T("Error 0x%x"), hr);
-        scm::err() << log::error
+        scm::err() << scm::log::error
                    << "space_navigator_impl::space_navigator_impl()"
-                   << "_3DxDevice.CoCreateInstance failed: " << strError << log::end;
+                   << "_3DxDevice.CoCreateInstance failed: " << strError << scm::log::end;
     }
     else {
         CComPtr<ISimpleDevice> _3DxSimpleDevice;
@@ -215,9 +215,9 @@ space_navigator_impl::init_com()
         if (!SUCCEEDED(hr)) {
             CString strError;
             strError.FormatMessage (_T("Error 0x%x"), hr);
-            scm::err() << log::error
+            scm::err() << scm::log::error
                        << "space_navigator_impl::space_navigator_impl()"
-                       << "_3DxDevice.QueryInterface failed: " << strError << log::end;
+                       << "_3DxDevice.QueryInterface failed: " << strError << scm::log::end;
         }
         else {
             // Get the interfaces to the sensor and the keyboard;
@@ -241,12 +241,12 @@ space_navigator_impl::init_com()
             if (!SUCCEEDED(hr)) {
                 CString strError;
                 strError.FormatMessage (_T("Error 0x%x"), hr);
-                scm::err() << log::error
+                scm::err() << scm::log::error
                            << "space_navigator_impl::space_navigator_impl()"
-                           << "_3DxSimpleDevice.Connect failed: " << strError << log::end;
+                           << "_3DxSimpleDevice.Connect failed: " << strError << scm::log::end;
             }
             else {
-                scm::out() << "space_navigator_impl::space_navigator_impl(): successfully connected to _3DxSimpleDevice driver" << log::end;
+                scm::out() << "space_navigator_impl::space_navigator_impl(): successfully connected to _3DxSimpleDevice driver" << scm::log::end;
             }
         }
         //_3DxDevice.Release();
