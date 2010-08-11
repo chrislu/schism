@@ -148,11 +148,15 @@ window_context_win32::setup(const wnd_handle hwnd,
 		if(desc.version_major() > 2) {
             ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_major());
             ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(desc.version_minor());
+            int ctx_flags = 0;
             if (desc.forward_compatible()) {
-                ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
+                ctx_flags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
             }
             if (desc.debug()) {
-                ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
+                ctx_flags |= WGL_CONTEXT_DEBUG_BIT_ARB;
+            }
+            if (0 != ctx_flags) {
+                ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(ctx_flags);
             }
             if (_wgl->is_supported("WGL_ARB_create_context_profile")) {
                 if (desc.compatibility_profile()) {

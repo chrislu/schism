@@ -458,7 +458,7 @@ public:
     PFNGLGETSAMPLERPARAMETERIVPROC                  glGetSamplerParameteriv;
     PFNGLGETSAMPLERPARAMETERIIVPROC                 glGetSamplerParameterIiv;
     PFNGLGETSAMPLERPARAMETERFVPROC                  glGetSamplerParameterfv;
-    PFNGLGETSAMPLERPARAMETERIFVPROC                 glGetSamplerParameterIfv;
+    //PFNGLGETSAMPLERPARAMETERIFVPROC                 glGetSamplerParameterIfv;
     // use GL_ARB_texture_rgb10_a2ui
     // use GL_ARB_texture_swizzle
     // use ARB_timer_query
@@ -547,6 +547,136 @@ public:
     PFNGLENDQUERYINDEXEDPROC                        glEndQueryIndexed;
     PFNGLGETQUERYINDEXEDIVPROC                      glGetQueryIndexediv;
 
+    // version 4.1 ////////////////////////////////////////////////////////////////////////////////
+    bool    version_4_1_available;
+    // use  ARB_ES2_compatibility
+    PFNGLRELEASESHADERCOMPILERPROC                  glReleaseShaderCompiler;
+    PFNGLSHADERBINARYPROC                           glShaderBinary;
+    PFNGLGETSHADERPRECISIONFORMATPROC               glGetShaderPrecisionFormat;
+    PFNGLDEPTHRANGEFPROC                            glDepthRangef;
+    PFNGLCLEARDEPTHFPROC                            glClearDepthf;
+    // use ARB_get_program_binary
+    PFNGLGETPROGRAMBINARYPROC                       glGetProgramBinary;
+    PFNGLPROGRAMBINARYPROC                          glProgramBinary;
+    PFNGLPROGRAMPARAMETERIPROC                      glProgramParameteri;
+    // use ARB_separate_shader_objects
+    PFNGLUSEPROGRAMSTAGESPROC                       glUseProgramStages;
+    PFNGLACTIVESHADERPROGRAMPROC                    glActiveShaderProgram;
+    PFNGLCREATESHADERPROGRAMVPROC                   glCreateShaderProgramv;
+    PFNGLBINDPROGRAMPIPELINEPROC                    glBindProgramPipeline;
+    PFNGLDELETEPROGRAMPIPELINESPROC                 glDeleteProgramPipelines;
+    PFNGLGENPROGRAMPIPELINESPROC                    glGenProgramPipelines;
+    PFNGLISPROGRAMPIPELINEPROC                      glIsProgramPipeline;
+    PFNGLGETPROGRAMPIPELINEIVPROC                   glGetProgramPipelineiv;
+    PFNGLPROGRAMUNIFORM1IPROC                       glProgramUniform1i;
+    PFNGLPROGRAMUNIFORM1IVPROC                      glProgramUniform1iv;
+    PFNGLPROGRAMUNIFORM1FPROC                       glProgramUniform1f;
+    PFNGLPROGRAMUNIFORM1FVPROC                      glProgramUniform1fv;
+    PFNGLPROGRAMUNIFORM1DPROC                       glProgramUniform1d;
+    PFNGLPROGRAMUNIFORM1DVPROC                      glProgramUniform1dv;
+    PFNGLPROGRAMUNIFORM1UIPROC                      glProgramUniform1ui;
+    PFNGLPROGRAMUNIFORM1UIVPROC                     glProgramUniform1uiv;
+    PFNGLPROGRAMUNIFORM2IPROC                       glProgramUniform2i;
+    PFNGLPROGRAMUNIFORM2IVPROC                      glProgramUniform2iv;
+    PFNGLPROGRAMUNIFORM2FPROC                       glProgramUniform2f;
+    PFNGLPROGRAMUNIFORM2FVPROC                      glProgramUniform2fv;
+    PFNGLPROGRAMUNIFORM2DPROC                       glProgramUniform2d;
+    PFNGLPROGRAMUNIFORM2DVPROC                      glProgramUniform2dv;
+    PFNGLPROGRAMUNIFORM2UIPROC                      glProgramUniform2ui;
+    PFNGLPROGRAMUNIFORM2UIVPROC                     glProgramUniform2uiv;
+    PFNGLPROGRAMUNIFORM3IPROC                       glProgramUniform3i;
+    PFNGLPROGRAMUNIFORM3IVPROC                      glProgramUniform3iv;
+    PFNGLPROGRAMUNIFORM3FPROC                       glProgramUniform3f;
+    PFNGLPROGRAMUNIFORM3FVPROC                      glProgramUniform3fv;
+    PFNGLPROGRAMUNIFORM3DPROC                       glProgramUniform3d;
+    PFNGLPROGRAMUNIFORM3DVPROC                      glProgramUniform3dv;
+    PFNGLPROGRAMUNIFORM3UIPROC                      glProgramUniform3ui;
+    PFNGLPROGRAMUNIFORM3UIVPROC                     glProgramUniform3uiv;
+    PFNGLPROGRAMUNIFORM4IPROC                       glProgramUniform4i;
+    PFNGLPROGRAMUNIFORM4IVPROC                      glProgramUniform4iv;
+    PFNGLPROGRAMUNIFORM4FPROC                       glProgramUniform4f;
+    PFNGLPROGRAMUNIFORM4FVPROC                      glProgramUniform4fv;
+    PFNGLPROGRAMUNIFORM4DPROC                       glProgramUniform4d;
+    PFNGLPROGRAMUNIFORM4DVPROC                      glProgramUniform4dv;
+    PFNGLPROGRAMUNIFORM4UIPROC                      glProgramUniform4ui;
+    PFNGLPROGRAMUNIFORM4UIVPROC                     glProgramUniform4uiv;
+    PFNGLPROGRAMUNIFORMMATRIX2FVPROC                glProgramUniformMatrix2fv;
+    PFNGLPROGRAMUNIFORMMATRIX3FVPROC                glProgramUniformMatrix3fv;
+    PFNGLPROGRAMUNIFORMMATRIX4FVPROC                glProgramUniformMatrix4fv;
+    PFNGLPROGRAMUNIFORMMATRIX2DVPROC                glProgramUniformMatrix2dv;
+    PFNGLPROGRAMUNIFORMMATRIX3DVPROC                glProgramUniformMatrix3dv;
+    PFNGLPROGRAMUNIFORMMATRIX4DVPROC                glProgramUniformMatrix4dv;
+    PFNGLPROGRAMUNIFORMMATRIX2X3FVPROC              glProgramUniformMatrix2x3fv;
+    PFNGLPROGRAMUNIFORMMATRIX3X2FVPROC              glProgramUniformMatrix3x2fv;
+    PFNGLPROGRAMUNIFORMMATRIX2X4FVPROC              glProgramUniformMatrix2x4fv;
+    PFNGLPROGRAMUNIFORMMATRIX4X2FVPROC              glProgramUniformMatrix4x2fv;
+    PFNGLPROGRAMUNIFORMMATRIX3X4FVPROC              glProgramUniformMatrix3x4fv;
+    PFNGLPROGRAMUNIFORMMATRIX4X3FVPROC              glProgramUniformMatrix4x3fv;
+    PFNGLPROGRAMUNIFORMMATRIX2X3DVPROC              glProgramUniformMatrix2x3dv;
+    PFNGLPROGRAMUNIFORMMATRIX3X2DVPROC              glProgramUniformMatrix3x2dv;
+    PFNGLPROGRAMUNIFORMMATRIX2X4DVPROC              glProgramUniformMatrix2x4dv;
+    PFNGLPROGRAMUNIFORMMATRIX4X2DVPROC              glProgramUniformMatrix4x2dv;
+    PFNGLPROGRAMUNIFORMMATRIX3X4DVPROC              glProgramUniformMatrix3x4dv;
+    PFNGLPROGRAMUNIFORMMATRIX4X3DVPROC              glProgramUniformMatrix4x3dv;
+    PFNGLVALIDATEPROGRAMPIPELINEPROC                glValidateProgramPipeline;
+    PFNGLGETPROGRAMPIPELINEINFOLOGPROC              glGetProgramPipelineInfoLog;
+    // use ARB_shader_precision (no entry points)
+    // use ARB_vertex_attrib_64bit
+    PFNGLVERTEXATTRIBL1DPROC                        glVertexAttribL1d;
+    PFNGLVERTEXATTRIBL2DPROC                        glVertexAttribL2d;
+    PFNGLVERTEXATTRIBL3DPROC                        glVertexAttribL3d;
+    PFNGLVERTEXATTRIBL4DPROC                        glVertexAttribL4d;
+    PFNGLVERTEXATTRIBL1DVPROC                       glVertexAttribL1dv;
+    PFNGLVERTEXATTRIBL2DVPROC                       glVertexAttribL2dv;
+    PFNGLVERTEXATTRIBL3DVPROC                       glVertexAttribL3dv;
+    PFNGLVERTEXATTRIBL4DVPROC                       glVertexAttribL4dv;
+    PFNGLVERTEXATTRIBLPOINTERPROC                   glVertexAttribLPointer;
+    PFNGLGETVERTEXATTRIBLDVPROC                     glGetVertexAttribLdv;
+    // use ARB_viewport_array
+    PFNGLVIEWPORTARRAYVPROC                         glViewportArrayv;
+    PFNGLVIEWPORTINDEXEDFPROC                       glViewportIndexedf;
+    PFNGLVIEWPORTINDEXEDFVPROC                      glViewportIndexedfv;
+    PFNGLSCISSORARRAYVPROC                          glScissorArrayv;
+    PFNGLSCISSORINDEXEDPROC                         glScissorIndexed;
+    PFNGLSCISSORINDEXEDVPROC                        glScissorIndexedv;
+    PFNGLDEPTHRANGEARRAYVPROC                       glDepthRangeArrayv;
+    PFNGLDEPTHRANGEINDEXEDPROC                      glDepthRangeIndexed;
+    PFNGLGETFLOATI_VPROC                            glGetFloati_v;
+    PFNGLGETDOUBLEI_VPROC                           glGetDoublei_v;
+
+    // ARB_cl_event
+    bool extension_ARB_cl_event;
+    PFNGLCREATESYNCFROMCLEVENTARBPROC               glCreateSyncFromCLeventARB;
+
+    // ARB_debug_output
+    bool extension_ARB_debug_output;
+    PFNGLDEBUGMESSAGECONTROLARBPROC                 glDebugMessageControlARB;
+    PFNGLDEBUGMESSAGEINSERTARBPROC                  glDebugMessageInsertARB;
+    PFNGLDEBUGMESSAGECALLBACKARBPROC                glDebugMessageCallbackARB;
+    PFNGLGETDEBUGMESSAGELOGARBPROC                  glGetDebugMessageLogARB;
+
+    // ARB_robustness
+    bool extension_ARB_robustness;
+    PFNGLGETGRAPHICSRESETSTATUSARBPROC              glGetGraphicsResetStatusARB;
+    PFNGLGETNMAPDVARBPROC                           glGetnMapdvARB;
+    PFNGLGETNMAPFVARBPROC                           glGetnMapfvARB;
+    PFNGLGETNMAPIVARBPROC                           glGetnMapivARB;
+    PFNGLGETNPIXELMAPFVARBPROC                      glGetnPixelMapfvARB;
+    PFNGLGETNPIXELMAPUIVARBPROC                     glGetnPixelMapuivARB;
+    PFNGLGETNPIXELMAPUSVARBPROC                     glGetnPixelMapusvARB;
+    PFNGLGETNPOLYGONSTIPPLEARBPROC                  glGetnPolygonStippleARB;
+    PFNGLGETNCOLORTABLEARBPROC                      glGetnColorTableARB;
+    PFNGLGETNCONVOLUTIONFILTERARBPROC               glGetnConvolutionFilterARB;
+    PFNGLGETNSEPARABLEFILTERARBPROC                 glGetnSeparableFilterARB;
+    PFNGLGETNHISTOGRAMARBPROC                       glGetnHistogramARB;
+    PFNGLGETNMINMAXARBPROC                          glGetnMinmaxARB;
+    PFNGLGETNTEXIMAGEARBPROC                        glGetnTexImageARB;
+    PFNGLREADNPIXELSARBPROC                         glReadnPixelsARB;
+    PFNGLGETNCOMPRESSEDTEXIMAGEARBPROC              glGetnCompressedTexImageARB;
+    PFNGLGETNUNIFORMFVARBPROC                       glGetnUniformfvARB;
+    PFNGLGETNUNIFORMIVARBPROC                       glGetnUniformivARB;
+    PFNGLGETNUNIFORMUIVARBPROC                      glGetnUniformuivARB;
+    PFNGLGETNUNIFORMDVARBPROC                       glGetnUniformdvARB;
 
     // EXT_direct_state_access
     bool    extension_EXT_direct_state_access_available;
