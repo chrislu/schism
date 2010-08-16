@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include <boost/function.hpp>
 #include <boost/unordered_map.hpp>
 
 #include <scm/core/math.h>
@@ -87,6 +88,16 @@ public:
     void                        apply();
 
     void                        reset();
+
+    // debug api //////////////////////////////////////////////////////////////////////////////////
+public:
+    // set debug callback
+    typedef boost::function<void (const std::string&)> debug_function;
+    void                        register_debug_callback();
+    // get debug log
+    // enable synchronous reporting
+
+protected:
 
     // buffer api /////////////////////////////////////////////////////////////////////////////////
 public:

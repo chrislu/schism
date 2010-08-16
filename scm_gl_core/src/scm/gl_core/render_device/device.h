@@ -105,6 +105,7 @@ public:
     void                            add_include_path(const std::string& p);
     void                            add_macro_define(const shader_macro& d);
     shader_ptr                      create_shader(shader_stage t, const std::string& s);
+    shader_ptr                      create_shader_from_file(shader_stage t, const std::string& f);
     program_ptr                     create_program(const shader_list& in_shaders);
     //shader_ptr                      create_shader(shader::stage_type t, const std::string& s, const shader_macro_list& m, std::ostream& err_os = std::cerr);
     //shader_ptr                      create_shader(shader::stage_type t, const std::string& s, const shader_include_list& i, std::ostream& err_os = std::cerr);

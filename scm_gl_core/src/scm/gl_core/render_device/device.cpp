@@ -6,6 +6,9 @@
 #include <sstream>
 
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+
+#include <scm/core/io/tools.h>
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/log.h>
@@ -212,10 +215,12 @@ render_device::create_shader(shader_stage       t,
     if (new_shader->fail()) {
         if (new_shader->bad()) {
             glerr() << "render_device::create_shader(): unable to create shader object ("
+                    << "stage: " << shader_stage_string(t) << ", "
                     << new_shader->state().state_string() << ")." << log::end;
         }
         else {
             glerr() << "render_device::create_shader(): unable to compile shader ("
+                    << "stage: " << shader_stage_string(t) << ", "
                     << new_shader->state().state_string() << "):" << log::nline
                     << new_shader->info_log() << log::end;
         }
@@ -223,7 +228,46 @@ render_device::create_shader(shader_stage       t,
     }
     else {
         if (!new_shader->info_log().empty()) {
-            glout() << log::info << "render_device::create_shader(): compiler info" << log::nline
+            glout() << log::info << "render_device::create_shader(): compiler info"
+                    << "(stage: " << shader_stage_string(t) << ")" << log::nline
+                    << new_shader->info_log() << log::end;
+        }
+        return (new_shader);
+    }
+}
+
+shader_ptr
+render_device::create_shader_from_file(shader_stage       t,
+                                       const std::string& f)
+{
+    namespace bfs = boost::filesystem;
+    bfs::path       file_path(f, bfs::native);
+    std::string     source_string;
+
+    if (   !io::read_text_file(f, source_string)) {
+        glerr() << "render_device::create_shader_from_file(): error reading shader file " << f << log::end;
+        return (shader_ptr());
+    }
+
+    shader_ptr new_shader(new shader(*this, t, source_string));
+    if (new_shader->fail()) {
+        if (new_shader->bad()) {
+            glerr() << "render_device::create_shader_from_file(): unable to create shader object" << log::nline
+                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ", "
+                    << new_shader->state().state_string() << ")" << log::end;
+        }
+        else {
+            glerr() << "render_device::create_shader_from_file(): unable to compile shader" << log::nline
+                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ", "
+                    << new_shader->state().state_string() << "):" << log::nline
+                    << new_shader->info_log() << log::end;
+        }
+        return (shader_ptr());
+    }
+    else {
+        if (!new_shader->info_log().empty()) {
+            glout() << log::info << "render_device::create_shader_from_file(): compiler info" << log::nline
+                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ")" << log::nline
                     << new_shader->info_log() << log::end;
         }
         return (new_shader);

@@ -2,6 +2,8 @@
 #ifndef SCM_GL_CORE_CONSTANTS_H_INCLUDED
 #define SCM_GL_CORE_CONSTANTS_H_INCLUDED
 
+#include <scm/core/platform/platform.h>
+
 #include <scm/gl_core/config.h>
 
 namespace scm {
@@ -85,6 +87,8 @@ enum shader_stage
 #endif
     SHADER_STAGE_COUNT
 }; // enum shader_stage
+
+__scm_export(gl_core) const char* shader_stage_string(shader_stage s);
 
 // state objects //////////////////////////////////////////////////////////////////////////////////
 
@@ -247,5 +251,7 @@ enum frame_buffer_target {
 
 } // namespace gl
 } // namespace scm
+
+#include "constants.inl"
 
 #endif // SCM_GL_CORE_CONSTANTS_H_INCLUDED
