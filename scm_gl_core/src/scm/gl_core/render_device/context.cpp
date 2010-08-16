@@ -99,6 +99,8 @@ render_context::render_context(render_device& in_device)
     glapi.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glapi.glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
+    _debug_synchronous_reporting = true;
+
     gl_assert(glapi, leaving render_context::render_context());
 }
 
@@ -139,6 +141,162 @@ render_context::reset()
     reset_state_objects();
     reset_uniform_buffers();
     reset_program();
+}
+
+// debug api //////////////////////////////////////////////////////////////////////////////////
+void
+render_context::register_debug_callback(const debug_output_ptr& f)
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    if (!glapi.is_supported("GL_ARB_debug_output")) {
+        glout() << log::warning << "render_context::register_debug_callback(): "
+                << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
+        return;
+    }
+
+    assert(f);
+
+    if (_debug_outputs.empty()) {
+        // register the debug callback
+        glapi.glDebugMessageCallbackARB(&render_context::gl_debug_callback, this);
+        gl_assert(glapi, render_context::register_debug_callback() after glDebugMessageCallbackARB());
+
+        if (_debug_synchronous_reporting) {
+            glapi.glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        }
+        else {
+            glapi.glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        }
+    }
+
+    _debug_outputs.insert(f);
+
+    //glapi.glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_ERROR_ARB, 0, GL_DEBUG_SEVERITY_HIGH_ARB, 4, "test");
+    //glapi.glEnable(GL_VERTEX_SHADER);
+
+    gl_assert(glapi, leaving render_context::register_debug_callback());
+
+    //glout() << "registered callback" << log::end;
+}
+
+void
+render_context::unregister_debug_callback(const debug_output_ptr& f)
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    if (!glapi.is_supported("GL_ARB_debug_output")) {
+        glout() << log::warning << "render_context::unregister_debug_callback(): "
+                << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
+        return;
+    }
+
+    assert(f);
+
+    boost::unordered_set<debug_output_ptr>::const_iterator dbg_out = _debug_outputs.find(f);
+
+    if (dbg_out != _debug_outputs.end()) {
+        _debug_outputs.quick_erase(dbg_out);
+    }
+
+    if (_debug_outputs.empty()) {
+        // unregister the gl callback
+        glapi.glDebugMessageCallbackARB(0, 0);
+        gl_assert(glapi, render_context::unregister_debug_callback() after glDebugMessageCallbackARB());
+    }
+}
+
+const std::string
+render_context::retrieve_debug_log() const
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    if (!glapi.is_supported("GL_ARB_debug_output")) {
+        glout() << log::warning << "render_context::retrieve_debug_log(): "
+                << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
+        return (std::string(""));
+    }
+
+    //glapi.glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_ERROR_ARB, 0, GL_DEBUG_SEVERITY_HIGH_ARB, 5, "test");
+    //glapi.glEnable(GL_VERTEX_SHADER);
+
+    int num_messages     = 0;
+    int max_mmessage_len = 0;
+
+    glapi.glGetIntegerv(GL_DEBUG_LOGGED_MESSAGES_ARB, &num_messages);
+    glapi.glGetIntegerv(GL_MAX_DEBUG_MESSAGE_LENGTH_ARB, &max_mmessage_len);
+
+    scoped_array<unsigned>  sources(new unsigned[num_messages]);
+    scoped_array<unsigned>  types(new unsigned[num_messages]);
+    scoped_array<unsigned>  ids(new unsigned[num_messages]);
+    scoped_array<unsigned>  severities(new unsigned[num_messages]);
+    scoped_array<int>       lengths(new int[num_messages]);
+    scoped_array<char>      messages(new char[num_messages * max_mmessage_len]);
+
+    unsigned ret_messages = glapi.glGetDebugMessageLogARB(num_messages, num_messages * max_mmessage_len,
+                                                          sources.get(), types.get(), ids.get(), severities.get(), lengths.get(), messages.get());
+
+    std::stringstream output;
+    int message_pos = 0;
+    for (unsigned i = 0; i < ret_messages; ++i) {
+        output << "<source: " << debug_source_string(util::gl_to_debug_source(sources[i]))
+               << ", id: " << ids[i]
+               << ", type: " << debug_type_string(util::gl_to_debug_type(types[i]))
+               << ", severity: " << debug_severity_string(util::gl_to_debug_severity(severities[i])) << "> "
+               << &messages[message_pos] << std::endl;
+        message_pos += lengths[i];
+    }
+
+    return (output.str());
+}
+
+void
+render_context::synchronous_reporting(bool e)
+{
+    if (e != _debug_synchronous_reporting) {
+        _debug_synchronous_reporting = e;
+
+        const opengl::gl3_core& glapi = opengl_api();
+        if (_debug_synchronous_reporting) {
+            glapi.glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        }
+        else {
+            glapi.glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        }
+    }
+}
+
+bool
+render_context::synchronous_reporting() const
+{
+    return (_debug_synchronous_reporting);
+}
+
+/*static*/
+void
+render_context::gl_debug_callback(unsigned src, unsigned type, unsigned id, unsigned severity,
+                                  int msg_length, const char* msg, void* user_param)
+{
+    if (0 != user_param) {
+        static_cast<render_context*>(user_param)->gl_debug_dispatch(src, type, severity, msg_length, msg);
+    }
+}
+
+void
+render_context::gl_debug_dispatch(unsigned src, unsigned type, unsigned severity, int msg_length, const char* msg)
+{
+    boost::unordered_set<debug_output_ptr>::iterator b = _debug_outputs.begin();
+    boost::unordered_set<debug_output_ptr>::iterator e = _debug_outputs.end();
+
+    std::string dbg_message;
+
+    if (b != e) { // not empty
+        dbg_message.assign(msg, msg_length);
+    }
+
+    for (; b != e; ++b) {
+        (*b)->operator()(util::gl_to_debug_source(src), util::gl_to_debug_type(type), util::gl_to_debug_severity(severity), dbg_message);
+    }
 }
 
 // buffer api /////////////////////////////////////////////////////////////////////////////////

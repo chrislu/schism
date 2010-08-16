@@ -4,8 +4,8 @@
 
 #include <vector>
 
-#include <boost/function.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
 
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
@@ -91,13 +91,21 @@ public:
 
     // debug api //////////////////////////////////////////////////////////////////////////////////
 public:
-    // set debug callback
-    typedef boost::function<void (const std::string&)> debug_function;
-    void                        register_debug_callback();
-    // get debug log
-    // enable synchronous reporting
+    struct debug_output {
+        virtual void operator()(debug_source, debug_type, debug_severity, const std::string&) const = 0;
+    }; // struct debug_filter
+    typedef shared_ptr<debug_output> debug_output_ptr;
+
+    void                        register_debug_callback(const debug_output_ptr& f);
+    void                        unregister_debug_callback(const debug_output_ptr& f);
+    const std::string           retrieve_debug_log() const;
+    void                        synchronous_reporting(bool e);
+    bool                        synchronous_reporting() const;
 
 protected:
+    static void                 gl_debug_callback(unsigned src, unsigned type, unsigned id, unsigned severity,
+                                                  int msg_length, const char* msg, void* user_param);
+    void                        gl_debug_dispatch(unsigned src, unsigned type, unsigned severity, int msg_length, const char* msg);
 
     // buffer api /////////////////////////////////////////////////////////////////////////////////
 public:
@@ -241,7 +249,10 @@ private:
 
     buffer_ptr                  _unpack_buffer;
 
-    boost::unordered_map<unsigned, query_ptr> _active_queries;
+    boost::unordered_set<debug_output_ptr>      _debug_outputs;
+    bool                                        _debug_synchronous_reporting;
+    
+    boost::unordered_map<unsigned, query_ptr>   _active_queries;
 
     // defaults
     // TODO

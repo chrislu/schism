@@ -388,6 +388,48 @@ gl_frame_buffer_target(const frame_buffer_target s)
     return (framebuffer_targets[s]);
 }
 
+inline
+debug_source
+gl_to_debug_source(unsigned s)
+{
+    switch (s) {
+    case GL_DEBUG_SOURCE_API_ARB:               return DEBUG_SOURCE_API; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB:     return DEBUG_SOURCE_WINDOW_SYSTEM; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER_ARB:   return DEBUG_SOURCE_SHADER_COMPILER; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY_ARB:       return DEBUG_SOURCE_THIRD_PARTY; break;
+    case GL_DEBUG_SOURCE_APPLICATION_ARB:       return DEBUG_SOURCE_APPLICATION; break;
+    case GL_DEBUG_SOURCE_OTHER_ARB:             return DEBUG_SOURCE_OTHER; break;
+    default:                                    return DEBUG_SOURCE_OTHER; break;
+    }
+}
+
+inline
+debug_type
+gl_to_debug_type(unsigned t)
+{
+    switch (t) {
+    case GL_DEBUG_TYPE_ERROR_ARB:               return DEBUG_TYPE_ERROR; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB: return DEBUG_TYPE_DEPRECATED_BEHAVIOR; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB:  return DEBUG_TYPE_UNDEFINED_BEHAVIOR; break;
+    case GL_DEBUG_TYPE_PORTABILITY_ARB:         return DEBUG_TYPE_PORTABILITY; break;
+    case GL_DEBUG_TYPE_PERFORMANCE_ARB:         return DEBUG_TYPE_PERFORMANCE; break;
+    case GL_DEBUG_TYPE_OTHER_ARB:               return DEBUG_TYPE_OTHER; break;
+    default:                                    return DEBUG_TYPE_OTHER; break;
+    }
+}
+
+inline
+debug_severity
+gl_to_debug_severity(unsigned s)
+{
+    switch (s) {
+    case GL_DEBUG_SEVERITY_HIGH_ARB:            return DEBUG_SEVERITY_HIGH; break;
+    case GL_DEBUG_SEVERITY_MEDIUM_ARB:          return DEBUG_SEVERITY_MEDIUM; break;
+    case GL_DEBUG_SEVERITY_LOW_ARB:             return DEBUG_SEVERITY_LOW; break;
+    default:                                    return DEBUG_SEVERITY_LOW; break;
+    }
+}
+
 } // namespace util
 } // namespace gl
 } // namespace scm

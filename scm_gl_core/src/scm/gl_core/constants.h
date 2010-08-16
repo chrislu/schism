@@ -74,6 +74,44 @@ enum interger_handling
     INT_FLOAT_NORMALIZE
 };
 
+// debugging //////////////////////////////////////////////////////////////////////////////////////
+enum debug_source
+{
+    DEBUG_SOURCE_API = 0x00,
+    DEBUG_SOURCE_WINDOW_SYSTEM,
+    DEBUG_SOURCE_SHADER_COMPILER,
+    DEBUG_SOURCE_THIRD_PARTY,
+    DEBUG_SOURCE_APPLICATION,
+    DEBUG_SOURCE_OTHER,
+
+    DEBUG_SOURCE_COUNT
+}; // enum debug_source
+
+enum debug_type
+{
+    DEBUG_TYPE_ERROR =0x00,
+    DEBUG_TYPE_DEPRECATED_BEHAVIOR,
+    DEBUG_TYPE_UNDEFINED_BEHAVIOR,
+    DEBUG_TYPE_PORTABILITY,
+    DEBUG_TYPE_PERFORMANCE,
+    DEBUG_TYPE_OTHER,
+
+    DEBUG_TYPE_COUNT
+}; // enum debug_type
+            
+enum debug_severity
+{
+    DEBUG_SEVERITY_HIGH = 0x00,
+    DEBUG_SEVERITY_MEDIUM,
+    DEBUG_SEVERITY_LOW,
+
+    DEBUG_SEVERITY_COUNT
+}; // enum debug_severity
+
+__scm_export(gl_core) const char* debug_source_string(debug_source s);
+__scm_export(gl_core) const char* debug_type_string(debug_type s);
+__scm_export(gl_core) const char* debug_severity_string(debug_severity s);
+
 // shader /////////////////////////////////////////////////////////////////////////////////////////
 
 enum shader_stage
