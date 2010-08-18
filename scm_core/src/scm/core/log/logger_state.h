@@ -20,8 +20,8 @@ class __scm_export(core) logger_format_saver : boost::noncopyable
     typedef logger_type::char_type      char_type;
 
 public:
-    explicit logger_format_saver(logger_type& l);
-    explicit logger_format_saver(out_stream& los);
+    logger_format_saver(logger_type& l);
+    logger_format_saver(out_stream& los);
     ~logger_format_saver();
 
     void                restore();

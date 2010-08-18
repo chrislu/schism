@@ -2,6 +2,7 @@
 #ifndef SCM_IO_FILE_H_INCLUDED
 #define SCM_IO_FILE_H_INCLUDED
 
+#include <ios>
 #include <string>
 
 #include <scm/core/numeric_types.h>

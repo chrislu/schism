@@ -6,6 +6,7 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
+#include <ios>
 #include <vector>
 
 #include <scm/core/pointer_types.h>

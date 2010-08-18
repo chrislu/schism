@@ -3,6 +3,9 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
+namespace scm {
+namespace io {
+
 file_core_linux::file_core_linux()
 {
 }

@@ -70,7 +70,8 @@ message::decorate_message(const string_type& decoration,
         decorated_message << raw_msg_line << std::endl;
         indent_decoration = true;
     }
-    out_message.swap(decorated_message.str());
+    decorated_message.str().swap(out_message);
+    //out_message.swap(decorated_message.str());
 }
 
 const message::string_type&

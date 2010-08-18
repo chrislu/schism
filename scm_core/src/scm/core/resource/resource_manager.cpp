@@ -119,4 +119,5 @@ void resource_manager_base::clear_resources()
 } // namespace res
 } // namespace scm
 
-#endif 0
+#endif // 0
+
