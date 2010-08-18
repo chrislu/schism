@@ -10,18 +10,18 @@ namespace scm {
                                                                                                         \
 namespace scm {                                                                                         \
                                                                                                         \
-template<>                                                                                              \
-boost::mutex singleton<SCM_CLASS>::_lock;                                                               \
+template<class managed_type>                                                                            \
+boost::mutex singleton<managed_type>::_lock;                                                            \
                                                                                                         \
-template<>                                                                                              \
-typename singleton<SCM_CLASS>::instance_ptr_type singleton<SCM_CLASS>::_single_instance = 0;            \
+template<class managed_type>                                                                            \
+typename singleton<managed_type>::instance_ptr_type singleton<managed_type>::_single_instance = 0;      \
                                                                                                         \
-template<>                                                                                              \
-bool singleton<SCM_CLASS>::_dead = false;                                                               \
+template<class managed_type>                                                                            \
+bool singleton<managed_type>::_dead = false;                                                            \
                                                                                                         \
-template<>                                                                                              \
-__scm_export(SCM_MODULE) SCM_CLASS&                                                                     \
-singleton<SCM_CLASS>::get()                                                                             \
+template<class managed_type>                                                                            \
+managed_type&                                                                                           \
+singleton<managed_type>::get()                                                                          \
 {                                                                                                       \
     if (_single_instance == 0) { /* race condition */                                                   \
         create();/*system("pause");*/                                                                   \
@@ -30,9 +30,9 @@ singleton<SCM_CLASS>::get()                                                     
     return (*_single_instance);                                                                         \
 }                                                                                                       \
                                                                                                         \
-template<>                                                                                              \
-__scm_export(SCM_MODULE) void                                                                           \
-singleton<SCM_CLASS>::create()                                                                          \
+template<class managed_type>                                                                            \
+void                                                                                                    \
+singleton<managed_type>::create()                                                                       \
 {                                                                                                       \
     boost::mutex::scoped_lock   lock(_lock);                                                            \
                                                                                                         \
@@ -43,16 +43,16 @@ singleton<SCM_CLASS>::create()                                                  
         throw std::logic_error("fatal error: trying to recreate allready dead singleton instance");     \
     }                                                                                                   \
     if (_single_instance == 0) { /* race condition resolved */                                          \
-        _single_instance = new SCM_CLASS();                                                             \
+        _single_instance = new managed_type();                                                          \
     }                                                                                                   \
                                                                                                         \
     /* schedule destruction */                                                                          \
     std::atexit(&destroy);                                                                              \
 }                                                                                                       \
                                                                                                         \
-template<>                                                                                              \
-__scm_export(SCM_MODULE) void                                                                           \
-singleton<SCM_CLASS>::destroy()                                                                         \
+template<class managed_type>                                                                            \
+void                                                                                                    \
+singleton<managed_type>::destroy()                                                                      \
 {                                                                                                       \
     boost::mutex::scoped_lock   lock(_lock);                                                            \
                                                                                                         \
@@ -70,4 +70,6 @@ singleton<SCM_CLASS>::destroy()                                                 
 }                                                                                                       \
                                                                                                         \
 } /* namespace scm */                                                                                   \
+                                                                                                        \
+template class __scm_export(SCM_MODULE) scm::singleton<SCM_CLASS>;                                      \
 
