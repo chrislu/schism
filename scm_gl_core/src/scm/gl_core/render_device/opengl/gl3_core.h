@@ -5,8 +5,8 @@
 #include <set>
 #include <string>
 
-#include <scm/gl_core/render_device/opengl/gl/gl3.h>
-#include <scm/gl_core/render_device/opengl/gl/glext.h>
+#include <scm/gl_core/render_device/opengl/GL/gl3.h>
+#include <scm/gl_core/render_device/opengl/GL/glext.h>
 
 // temporary
 //#include <scm/core/platform/platform.h>

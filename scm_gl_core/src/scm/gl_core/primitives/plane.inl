@@ -226,10 +226,10 @@ void
 plane_impl<s>::normalize()
 {
     using namespace scm::math;
-    vec4_type::value_type inv_len =   vec4_type::value_type(1)
-                                    / sqrt(  _vector.x * _vector.x
-                                           + _vector.y * _vector.y
-                                           + _vector.z * _vector.z);
+    typename vec4_type::value_type inv_len = typename  vec4_type::value_type(1)
+                                                     / sqrt(  _vector.x * _vector.x
+                                                            + _vector.y * _vector.y
+                                                            + _vector.z * _vector.z);
     _vector *= inv_len;
     update_corner_indices();
 }

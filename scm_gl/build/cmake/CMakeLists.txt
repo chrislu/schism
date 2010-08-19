@@ -80,36 +80,17 @@ if (WIN32)
 endif (WIN32)
 
 # set include and lib directories
-include_directories(
-    ${SCM_ROOT_DIR}/scm_core/src
-    ${SCM_ROOT_DIR}/scm_gl/src
-)
-# set include directories for windows external dependencies
-if (WIN32)
-    include_directories(
-        ${GLOBAL_EXT_DIR}/inc
-        ${GLOBAL_EXT_DIR}/inc/boost
-    )
-elseif (UNIX)
-    include_directories(
-        /opt/boost/latest/inc
-    )
-endif (WIN32)
+scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
+                                      ${SCM_ROOT_DIR}/scm_gl/src
+                                      ${SCM_BOOST_INC_DIR})
+scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
+#scm_project_include_directories(UNIX )
 
 # set library directories
-link_directories(
-    ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
-)
-# set library directories for windows external dependencies
-if (WIN32)
-    link_directories(
-        ${GLOBAL_EXT_DIR}/lib
-    )
-elseif (UNIX)
-    link_directories(
-        /opt/boost/latest/lib
-    )
-endif (WIN32)
+scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
+                                   ${SCM_BOOST_LIB_DIR})
+scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
+#scm_project_link_directories(UNIX )
 
 if (WIN32)
     # add preprocessor defines
@@ -128,7 +109,7 @@ if (WIN32)
         glew32
         glut32
         opengl32
-        optimized libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_REL}           debug libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_REL}        debug libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_REL}         debug libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
 endif (WIN32)

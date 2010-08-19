@@ -1,6 +1,7 @@
 
 #include "assert.h"
 
+#include <cstdlib>
 #include <iostream>
 
 #include <scm/gl_core/render_device/opengl/util/assert.h>

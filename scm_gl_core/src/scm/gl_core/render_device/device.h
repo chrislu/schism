@@ -65,7 +65,7 @@ private:
     };
     typedef std::list<shader_macro>             shader_macro_list;
     typedef std::list<std::string>              shader_include_list;
-    typedef std::list<const shader_ptr>         shader_list;
+    typedef std::list<shader_ptr>               shader_list;
 
     typedef std::vector<buffer_ptr>             buffer_array;
 

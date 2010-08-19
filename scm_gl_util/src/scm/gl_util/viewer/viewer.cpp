@@ -39,9 +39,6 @@ viewer::viewer(const math::vec2ui&              vp_dim,
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
     _graphics_context.reset(new window_context_win32());
-#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-#error "not yet implemented"
-#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
     if (!_graphics_context->setup(wnd, format)) {
         std::stringstream msg;
@@ -49,6 +46,9 @@ viewer::viewer(const math::vec2ui&              vp_dim,
         glerr() << msg.str() << log::end;
         throw(std::runtime_error(msg.str()));
     }
+#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+//#error "not yet implemented"
+#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
     try {
         _device.reset(new render_device());

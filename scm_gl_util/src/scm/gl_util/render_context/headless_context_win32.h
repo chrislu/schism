@@ -2,12 +2,15 @@
 #ifndef SCM_GL_UTIL_HEADLESS_CONTEXT_WIN32_H_INCLUDED
 #define SCM_GL_UTIL_HEADLESS_CONTEXT_WIN32_H_INCLUDED
 
+#include <scm/core/platform/platform.h>
+
+#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+
 #include <scm/core/pointer_types.h>
 
 #include <scm/gl_util/render_context/detail/wgl.h>
 #include <scm/gl_util/render_context/headless_context.h>
 
-#include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
@@ -36,4 +39,6 @@ protected:
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
+#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 #endif // SCM_GL_UTIL_HEADLESS_CONTEXT_WIN32_H_INCLUDED
+

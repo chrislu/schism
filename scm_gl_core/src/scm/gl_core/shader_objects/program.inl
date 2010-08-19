@@ -25,8 +25,8 @@ public:
 template<typename utype>
 void program::uniform(const std::string& name, const utype& value)
 {
-    typedef boost::mpl::find<uniform_types, utype>::type type_iter;
-    BOOST_MPL_ASSERT((boost::is_same<boost::mpl::deref<type_iter>::type, utype>));
+    typedef typename boost::mpl::find<scm::gl::uniform_types, utype>::type type_iter;
+    BOOST_MPL_ASSERT((boost::is_same<typename boost::mpl::deref<type_iter>::type, utype>));
 
     name_uniform_map::iterator  u = _uniforms.find(name);
 

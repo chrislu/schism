@@ -120,7 +120,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
                        vec3_type& entry,
                        vec3_type& exit) const
 {
-    vec3_type::value_type tmin, tmax, tymin, tymax, tzmin, tzmax;
+    typename vec3_type::value_type tmin, tmax, tymin, tymax, tzmin, tzmax;
 
     const vec3_type& org = r.origin();
     const vec3_type& dir = r.direction();
@@ -128,7 +128,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
     const vec3_type& b_min = _min_vertex;
     const vec3_type& b_max = _max_vertex;
 
-    vec3_type rec_dir(vec3_type(vec3_type::value_type(1)) / dir);
+    vec3_type rec_dir(vec3_type(typename vec3_type::value_type(1)) / dir);
 
     if (dir.x >= vec3_type::value_type(0)) {
         tmin = (b_min.x - org.x) * rec_dir.x;
@@ -187,7 +187,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
 
     //return ((tmin < t1) && (tmax > t0));
     
-    return (tmin > vec3_type::value_type(0));
+    return (tmin > typename vec3_type::value_type(0));
 }
 
 } // namespace gl

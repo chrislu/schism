@@ -12,6 +12,8 @@
 #include <scm/core/module/initializer.h>
 #include <scm/gl_classic/opengl.h>
 
+SCM_SINGLETON_PLACEMENT(gl_core, scm::gl_classic::gl_module)
+
 namespace {
 
 static void init_module()
@@ -23,8 +25,6 @@ static void init_module()
 static scm::module::static_initializer  static_initialize(init_module);
 
 } // namespace
-
-SCM_SINGLETON_PLACEMENT(gl_core, scm::gl_classic::gl_module)
 
 namespace scm {
 namespace gl_classic {

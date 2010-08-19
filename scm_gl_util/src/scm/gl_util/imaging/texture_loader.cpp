@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <freeimage/FreeImagePlus.h>
+#include <FreeImagePlus.h>
 
 #include <scm/core/math.h>
 #include <scm/core/pointer_types.h>

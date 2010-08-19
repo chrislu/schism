@@ -31,7 +31,7 @@ public:
     typedef boost::unordered_map<std::string, int>                  name_location_map;
     typedef std::pair<std::string, int>                             named_location;
     typedef std::list<named_location>                               named_location_list;
-    typedef std::list<const shader_ptr>                             shader_list;
+    typedef std::list<shader_ptr>                             shader_list;
 
     // program information
     struct variable_type {

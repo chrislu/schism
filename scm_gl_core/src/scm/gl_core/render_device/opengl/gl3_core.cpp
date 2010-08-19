@@ -122,7 +122,7 @@ gl3_core::initialize()
     if (is_initialized()) {
         return (true);
     }
-    log::logger_format_saver save_indent(glout());
+    log::logger_format_saver save_indent(log::out_stream t = glout());
     glout() << log::info << "gl3_core::initialize(): starting to initialize gl core:" << log::end;
     glout() << log::indent;
 
@@ -294,7 +294,7 @@ gl3_core::init_entry_points()
         glout() << log::warning << "- missing entry point (source: " << (ctx_str) << ", function: " << #fun << ")." << log::end; \
     }
 
-    log::logger_format_saver save_indent(glout());
+    log::logger_format_saver save_indent(log::out_stream t = glout());
     glout() << log::info << "initializing function entry points..." << log::end;
     glout() << log::indent;
 

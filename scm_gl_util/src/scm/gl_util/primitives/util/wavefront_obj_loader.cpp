@@ -21,7 +21,7 @@
 #include <cassert>
 #include <fstream>
 #include <string>
-#include <strstream>
+#include <sstream>
 #include <vector>
 
 #include <scm/core/io/tools.h>
@@ -56,7 +56,7 @@ bool load_material_lib(const std::string& filename, wavefront_model& out_obj)
 
     while (std::getline(mtl_file, cur_line)) {
         
-        std::istrstream line(cur_line.c_str());
+        std::istringstream line(cur_line.c_str());
 
         char line_id;
         line.get(line_id);
@@ -184,7 +184,7 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     // collect data about file
     while (std::getline(obj_file, cur_line)) {
 
-        std::istrstream line(cur_line.c_str());
+        std::istringstream line(cur_line.c_str());
 
         char line_id;
         line.get(line_id);
@@ -340,7 +340,7 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     obj_file.seekg(0);
 
     while (std::getline(obj_file, cur_line)) {
-        std::istrstream line(cur_line.c_str());
+        std::istringstream line(cur_line.c_str());
 
         char line_id;
         line.get(line_id);

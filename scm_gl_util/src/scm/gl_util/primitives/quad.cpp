@@ -13,6 +13,13 @@
 #include <scm/gl_core/buffer_objects/vertex_array.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
 
+namespace {
+    struct vertex {
+        scm::math::vec3f pos;
+        scm::math::vec2f tex;
+    };
+} // namespace
+
 namespace scm {
 namespace gl {
 
@@ -28,11 +35,6 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
     using namespace scm::math;
 
     int num_vertices            = 4;
-
-    struct vertex {
-        vec3f pos;
-        vec2f tex;
-    };
 
     scoped_array<vertex>            vert(new vertex[num_vertices]);
     scoped_array<unsigned short>    ind_s(new unsigned short[4]);

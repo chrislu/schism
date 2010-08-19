@@ -10,6 +10,8 @@
 
 #ifdef SCM_INPUT_DEVICE_SPACE_NAVIGATOR
 
+#include <scm/core/platform/platform.h>
+
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 // com stuff for the driver callbacks
@@ -54,8 +56,6 @@ using namespace ATL;
 
 #import "progid:TDxInput.Device" embedded_idl no_namespace
 // end com stuff
-
-#endif SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 [module(type=dll, name = "scm_input_sn")]
 class atl_scm_sn_module // The atl module class which the module attribute belongs to
@@ -277,6 +277,23 @@ space_navigator_impl::on_key_up(int k)
     return (S_OK);
 }
 
+
+#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+
+class space_navigator_impl
+{
+public:
+    space_navigator_impl(scm::inp::space_navigator*const d = 0) {};
+    virtual ~space_navigator_impl() {};
+
+public:
+    void                update() {};
+
+private:
+};
+
+#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+
 #else // SCM_INPUT_DEVICE_SPACE_NAVIGATOR
 
 class space_navigator_impl
@@ -345,3 +362,4 @@ space_navigator::translation() const
 
 } // namespace inp
 } // namespace scm
+

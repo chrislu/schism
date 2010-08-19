@@ -73,39 +73,17 @@ if (WIN32)
     endif (MSVC)
 endif (WIN32)
 
-# set include directories
-include_directories(
-    ${SCM_ROOT_DIR}/scm_core/src
-    # fixme, all gl dependent stuff has to go to scm_gl
-    #${SCM_ROOT_DIR}/scm_gl/src
-)
-# set include directories for windows external dependencies
-if (WIN32)
-    include_directories(
-        ${GLOBAL_EXT_DIR}/inc
-        ${GLOBAL_EXT_DIR}/inc/boost
-        ${GLOBAL_EXT_DIR}/inc/freetype
-    )
-elseif (UNIX)
-    include_directories(
-        /opt/boost/latest/inc
-        /usr/include/freetype2
-    )
-endif (WIN32)
+# set include and lib directories
+scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
+                                      ${SCM_BOOST_INC_DIR}
+                                      ${GLOBAL_EXT_DIR}/inc/freetype)
+scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
+scm_project_include_directories(UNIX  /usr/include/freetype2)
 
-# set library directories
-link_directories(
-)
-# set library directories for windows external dependencies
-if (WIN32)
-    link_directories(
-        ${GLOBAL_EXT_DIR}/lib
-    )
-elseif (UNIX)
-    link_directories(
-        /opt/boost/latest/lib
-    )
-endif (WIN32)
+scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
+                                   ${SCM_BOOST_LIB_DIR})
+scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
+#scm_project_link_directories(UNIX )
 
 if (WIN32)
     # add preprocessor defines
@@ -129,11 +107,12 @@ endif (WIN32)
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
-        boost_date_time
         rt
         freetype
-        boost_signals-${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_date_time${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_filesystem${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_program_options${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_signals${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_system${SCHISM_BOOST_LIB_POSTFIX_REL}
     )
 endif (UNIX)

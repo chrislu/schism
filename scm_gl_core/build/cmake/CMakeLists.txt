@@ -107,15 +107,16 @@ endif (WIN32)
 
 # set include and lib directories
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_gl_core/src)
-scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
-                                      ${GLOBAL_EXT_DIR}/inc/boost)
-scm_project_include_directories(UNIX  /opt/boost/latest/inc)
+                                      ${SCM_ROOT_DIR}/scm_gl_core/src
+                                      ${SCM_BOOST_INC_DIR})
+scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
+#scm_project_include_directories(UNIX )
 
 # set library directories
-scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM})
+scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
+                                   ${SCM_BOOST_LIB_DIR})
 scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
-scm_project_link_directories(UNIX  /opt/boost/latest/lib)
+#scm_project_link_directories(UNIX  )
 
 if (WIN32)
     # add preprocessor defines
@@ -135,22 +136,25 @@ if (WIN32)
         optimized libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_REL}        debug libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_REL}         debug libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
+    if (OPT_BUILD_deprecated_classic_scm_gl)
+        target_link_libraries(${PROJECT_NAME}
+            glew32
+        )
+    endif (OPT_BUILD_deprecated_classic_scm_gl)
 endif (WIN32)
-
-if (OPT_BUILD_deprecated_classic_scm_gl)
-     target_link_libraries(${PROJECT_NAME}
-        glew32
-    )
-endif (OPT_BUILD_deprecated_classic_scm_gl)
-
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
-        GLEW
-        glut
+        GL
     )
+    if (OPT_BUILD_deprecated_classic_scm_gl)
+        target_link_libraries(${PROJECT_NAME}
+            GLEW
+        )
+    endif (OPT_BUILD_deprecated_classic_scm_gl)
 endif (UNIX)
 
 add_dependencies(${PROJECT_NAME}
     scm_core
 )
+

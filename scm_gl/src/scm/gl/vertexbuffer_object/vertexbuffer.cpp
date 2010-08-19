@@ -36,7 +36,7 @@ void vertexbuffer::bind() const
                 glVertexPointer(static_cast<GLint>(elem._data_num_components),
                                 elem._data_elem_type,
                                 0,
-                                (GLvoid*)(NULL + _vertex_layout.offset(i) * _num_vertices));
+                                (GLvoid*)(0 + _vertex_layout.offset(i) * _num_vertices));
                 glEnableClientState(GL_VERTEX_ARRAY);
                 break;
             case vertex_element::normal:
@@ -44,7 +44,7 @@ void vertexbuffer::bind() const
 
                 glNormalPointer(elem._data_elem_type,
                                 0,
-                                (GLvoid*)(NULL + _vertex_layout.offset(i) * _num_vertices));
+                                (GLvoid*)(0 + _vertex_layout.offset(i) * _num_vertices));
                 glEnableClientState(GL_NORMAL_ARRAY);
                 break;
             case vertex_element::tex_coord:
@@ -53,7 +53,7 @@ void vertexbuffer::bind() const
                 glTexCoordPointer(static_cast<GLint>(elem._data_num_components),
                                   elem._data_elem_type,
                                   0,
-                                  (GLvoid*)(NULL + _vertex_layout.offset(i) * _num_vertices));
+                                  (GLvoid*)(0 + _vertex_layout.offset(i) * _num_vertices));
                 glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                 break;
             case vertex_element::color:

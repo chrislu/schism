@@ -10,7 +10,7 @@
 #include <scm/gl/graphics_device/opengl3/device_win32.h>
 #include <scm/gl/graphics_device/direct3d11/device.h>
 #else
-#error "currently unsupported platform"
+//#error "currently unsupported platform"
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 
