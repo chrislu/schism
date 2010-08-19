@@ -22,7 +22,7 @@ uniform_block<host_block_type>::uniform_block(const render_device_ptr& in_device
 
 template <class host_block_type>
 uniform_block<host_block_type>::uniform_block(const render_device_ptr& in_device, const host_block_type& in_block)
-  : _host_block(new host_block_type(in_block)),
+  : _host_block(new host_block_type(in_block))
 {
     _device_block = in_device->create_buffer(BIND_UNIFORM_BUFFER, USAGE_STREAM_DRAW, sizeof(host_block_type));
     commit_block(in_device->main_context());
