@@ -36,7 +36,7 @@ namespace scm {
 */
 
 template<class managed_type>
-class singleton : boost::noncopyable
+class singleton
 {
 public:
     typedef managed_type*               instance_ptr_type;
@@ -58,6 +58,8 @@ private:
     // private default constructor to prevent use as base class
     // declared never defined
     singleton();
+    singleton(const singleton&);
+    const singleton& operator=(const singleton&);
 
 }; // class singleton
 
