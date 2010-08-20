@@ -28,10 +28,10 @@ public:
     virtual bool                is_open() const = 0;
     virtual void                close() = 0;
 
-    virtual size_type           read(char_type*const output_buffer,
+    virtual size_type           read(void*           output_buffer,
                                      size_type       num_bytes_to_read) = 0;
-    virtual size_type           write(const char_type*const input_buffer,
-                                      size_type             num_bytes_to_write) = 0;
+    virtual size_type           write(const void*    input_buffer,
+                                      size_type      num_bytes_to_write) = 0;
 
 	virtual offset_type         set_end_of_file() = 0;
 

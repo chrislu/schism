@@ -19,6 +19,9 @@ namespace io {
 class file_core_linux : public file_core
 {
 public:
+    typedef shared_ptr<const int> handle;
+
+public:
     file_core_linux();
     virtual ~file_core_linux();
 
@@ -31,13 +34,22 @@ public:
     bool                        is_open() const;
     void                        close();
 
-    size_type                   read(char_type*const output_buffer,
+    size_type                   read(void*           output_buffer,
                                      size_type       num_bytes_to_read);
-    size_type                   write(const char_type*const input_buffer,
-                                      size_type             num_bytes_to_write);
+    size_type                   write(const void*    input_buffer,
+                                      size_type      num_bytes_to_write);
 
 	offset_type			        set_end_of_file();
     // end file_core interface
+
+private:
+    size_type                   actual_file_size() const;
+    bool                        set_file_pointer(offset_type new_pos);
+
+    void                        reset_values();
+
+private:
+    handle                      _file_handle;
 
 }; // class file_core_linux
 

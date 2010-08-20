@@ -45,10 +45,10 @@ public:
                                      scm::uint32              async_io_requests         = detail::default_asynchronous_requests);
     bool                        is_open() const;
     void                        close();
-    size_type                   read(char_type*const output_buffer,
+    size_type                   read(void*           output_buffer,
                                      size_type       num_bytes_to_read);
-    size_type                   write(const char_type*const input_buffer,
-                                      size_type             num_bytes_to_write);
+    size_type                   write(const void*    input_buffer,
+                                      size_type      num_bytes_to_write);
     offset_type                 seek(offset_type                off,
                                      std::ios_base::seek_dir    way);
 	offset_type                 set_end_of_file();

@@ -41,21 +41,21 @@ public:
     bool                        is_open() const;
     void                        close();
 
-    size_type                   read(char_type*const output_buffer,
-                                     size_type       num_bytes_to_read);
-    size_type                   write(const char_type*const input_buffer,
-                                      size_type             num_bytes_to_write);
+    size_type                   read(void*          output_buffer,
+                                     size_type      num_bytes_to_read);
+    size_type                   write(const void*   input_buffer,
+                                      size_type     num_bytes_to_write);
 
 	offset_type                 set_end_of_file();
     // end file_core interface
 
 private:
-    size_type                   read_async(char_type*const output_buffer,
-                                           size_type       num_bytes_to_read);
+    size_type                   read_async(void*        output_buffer,
+                                           size_type    num_bytes_to_read);
     bool                        read_async_request(const detail::request_ptr& req) const;
 
-    size_type                   write_async(const char_type*const input_buffer,
-                                            size_type             num_bytes_to_write);
+    size_type                   write_async(const void* input_buffer,
+                                            size_type   num_bytes_to_write);
     bool                        write_async_request(const detail::request_ptr& req) const;
 
     bool                        query_async_results(std::vector<detail::io_result>& res,

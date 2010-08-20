@@ -359,8 +359,8 @@ file_core_win32::close()
 }
 
 file_core_win32::size_type
-file_core_win32::read(char_type*const output_buffer,
-                      size_type       num_bytes_to_read)
+file_core_win32::read(void*     output_buffer,
+                      size_type num_bytes_to_read)
 {
     assert(_file_handle);
     assert(_file_handle.get() != INVALID_HANDLE_VALUE);
@@ -419,8 +419,8 @@ file_core_win32::read(char_type*const output_buffer,
 }
 
 file_core_win32::size_type
-file_core_win32::write(const char_type*const input_buffer,
-                       size_type             num_bytes_to_write)
+file_core_win32::write(const void* input_buffer,
+                       size_type   num_bytes_to_write)
 {
     assert(_file_handle);
     assert(_file_handle.get() != INVALID_HANDLE_VALUE);
@@ -548,15 +548,17 @@ file_core_win32::set_end_of_file()
                 return (-1);
             }
 		}
+
+        return (_position);
     }
 
-	return (_position);
+    return (-1);
 }
 
 
 file_core_win32::size_type
-file_core_win32::read_async(char_type*const output_buffer,
-                            size_type       num_bytes_to_read)
+file_core_win32::read_async(void*     output_buffer,
+                            size_type num_bytes_to_read)
 {
     assert(async_io_mode());
 
@@ -628,7 +630,7 @@ file_core_win32::read_async(char_type*const output_buffer,
 
             // evaluate io results
             foreach (const detail::io_result& result, results) {
-                
+
                 //request_processing_timer.start();
 
                 if (result._bytes_processed != result._ovl->bytes_to_process()) {
@@ -722,8 +724,8 @@ file_core_win32::read_async_request(const detail::request_ptr& req) const
 }
 
 file_core_win32::size_type
-file_core_win32::write_async(const char_type*const input_buffer,
-                             size_type             num_bytes_to_write)
+file_core_win32::write_async(const void* input_buffer,
+                             size_type   num_bytes_to_write)
 {
     assert(async_io_mode());
 
@@ -1013,7 +1015,7 @@ file_core_win32::set_file_pointer(offset_type new_pos)
         scm::err() << log::error
                    << "file_win::set_file_pointer(): "
                    << "error setting file pointer to position "
-                   << std::hex << new_pos 
+                   << std::hex << new_pos
                    << " on file '" << _file_path << "'" << log::end;
 
         return (false);
