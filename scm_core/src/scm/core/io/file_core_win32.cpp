@@ -570,6 +570,8 @@ file_core_win32::read_async(void*     output_buffer,
     request_ptr_queue       free_requests;
     request_ptr_map         running_requests;
 
+    char* output_byte_buffer   = reinterpret_cast<char*>(output_buffer);
+
     size_type   position_vss            = vss_align_floor(_position);
     size_type   file_size_vss           = vss_align_ceil(_file_size);
     size_type   bytes_to_read_vss       = vss_align_ceil(math::min(_position  - position_vss + num_bytes_to_read,
@@ -650,7 +652,7 @@ file_core_win32::read_async(void*     output_buffer,
                 size_type   copy_read_off   = math::max<size_type>(0, -target_off);
                 size_type   copy_read_bytes = math::min<size_type>(result._bytes_processed - copy_read_off, num_bytes_to_read - copy_write_off);
 
-                char_type*       copy_dst   = output_buffer               + copy_write_off;
+                char_type*       copy_dst   = output_byte_buffer          + copy_write_off;
                 const char_type* copy_src   = result._ovl->buffer().get() + copy_read_off;
 
                 if (memcpy(copy_dst, copy_src, copy_read_bytes) != copy_dst) {
@@ -737,6 +739,8 @@ file_core_win32::write_async(const void* input_buffer,
     request_ptr_queue       free_requests;
     request_ptr_map         running_requests;
 
+    const char* input_byte_buffer  = reinterpret_cast<const char*>(input_buffer);
+
     size_type   position_vss            = vss_align_floor(_position);
     size_type   position_end_vss        = vss_align_ceil(_position + num_bytes_to_write);
 
@@ -789,7 +793,7 @@ file_core_win32::write_async(const void* input_buffer,
             size_type   copy_write_off      = 0;
             size_type   copy_write_bytes    = request_bytes_to_write;
 
-            const char_type* copy_src       = input_buffer + copy_read_off;
+            const char_type* copy_src       = input_byte_buffer                 + copy_read_off;
             char_type*       copy_dst       = write_request_ovl->buffer().get() + copy_write_off;
 
             if (memcpy(copy_dst, copy_src, copy_write_bytes) != copy_dst) {
