@@ -202,6 +202,7 @@ render_context::unregister_debug_callback(const debug_output_ptr& f)
     if (_debug_outputs.empty()) {
         // unregister the gl callback
         glapi.glDebugMessageCallbackARB(0, 0);
+        glapi.glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
         gl_assert(glapi, render_context::unregister_debug_callback() after glDebugMessageCallbackARB());
     }
 }
