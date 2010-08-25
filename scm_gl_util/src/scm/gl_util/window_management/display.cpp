@@ -1,0 +1,30 @@
+
+#include "display.h"
+
+#include <exception>
+#include <stdexcept>
+
+#include <scm/gl_util/window_management/wm_win32/display_impl_win32.h>
+#include <scm/gl_util/window_management/wm_x/display_impl_x.h>
+
+namespace scm {
+namespace gl {
+namespace wm {
+
+display::display(const std::string& name)
+{
+    try {
+        _impl.reset(new display_impl(name));
+    }
+    catch(const std::exception& /*e*/) {
+    }
+}
+
+display::~display()
+{
+    _impl.reset();
+}
+
+} // namespace wm
+} // namepspace gl
+} // namepspace scm

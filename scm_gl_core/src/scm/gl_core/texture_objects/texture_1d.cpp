@@ -1,6 +1,7 @@
 
 #include "texture_1d.h"
 
+#include <scm/gl_core/log.h>
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
@@ -226,6 +227,8 @@ texture_1d::image_sub_data(const render_context& in_context,
                            const data_format     in_data_format,
                            const void*const      in_data)
 {
+    glerr() << log::error << "texture_1d::image_sub_data() not yet implemented" << log::end;
+
     return (false);
 }
 
