@@ -5,6 +5,8 @@
 
 #include <scm/log.h>
 
+#include <scm/gl_util/window_management/wm_win32/error_win32.h>
+
 namespace scm {
 namespace gl {
 namespace wm {
@@ -16,7 +18,10 @@ display::display_impl::display_impl(const std::string& name)
     if (!_hinstance) {
         err() << log::error
               << "display::display_impl::display_impl() <win32>: " 
-              << "unable to get module handle." << log::end;
+              << "unable to get module handle"
+              << " - system message: " << log::nline
+              << util::win32_error_message()
+              << log::end;
     }
 
     WNDCLASSEX wnd_class;
@@ -28,19 +33,25 @@ display::display_impl::display_impl(const std::string& name)
 
     _window_class = ::RegisterClassEx(&wnd_class);
 
-    if (!_window_class) {
+    if (0 == _window_class) {
         err() << log::error
               << "display::display_impl::display_impl() <win32>: " 
-              << "unable to register window class (" << name << ")" << log::end;
+              << "unable to register window class (" << name << ")"
+              << " - system message: " << log::nline
+              << util::win32_error_message()
+              << log::end;
     }
 }
 
 display::display_impl::~display_impl()
 {
-    if (!::UnregisterClass(reinterpret_cast<LPCSTR>(_window_class), _hinstance)) {
+    if (0 == ::UnregisterClass(reinterpret_cast<LPCSTR>(_window_class), _hinstance)) {
         err() << log::error
               << "display::display_impl::~display_impl() <win32>: " 
-              << "unable to unregister window class." << log::end;
+              << "unable to unregister window class"
+              << " - system message: " << log::nline
+              << util::win32_error_message()
+              << log::end;
     }
 }
 

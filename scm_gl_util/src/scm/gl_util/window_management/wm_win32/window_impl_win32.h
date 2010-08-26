@@ -6,6 +6,8 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
+#include <scm/core/platform/windows.h>
+
 #include <scm/core/pointer_types.h>
 
 #include <scm/gl_util/window_management/window.h>
@@ -16,8 +18,16 @@ namespace wm {
 
 struct window::window_impl
 {
-    window_impl();
+    window_impl(const display&           in_display,
+                const std::string&       in_title,
+                const math::vec2ui&      in_size,
+                const pixel_format_desc& in_pf);
     virtual ~window_impl();
+
+    void            show();
+    void            hide();
+
+    HWND            _window_handle;
 
 }; // class window_impl
 
