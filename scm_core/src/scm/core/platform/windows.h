@@ -5,6 +5,9 @@
 #include <scm/core/platform/platform.h>
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+#   ifndef NOMINMAX
+#       define NOMINMAX
+#   endif
 #   ifndef WIN32_LEAN_AND_MEAN
 #       define WIN32_LEAN_AND_MEAN 1
 #   endif
