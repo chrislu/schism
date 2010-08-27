@@ -59,13 +59,13 @@ window::pixel_format() const
 }
 
 void
-window::window::show()
+window::show()
 {
     _impl->show();
 }
 
 void
-window::window::hide()
+window::hide()
 {
     _impl->hide();
 }

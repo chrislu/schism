@@ -23,7 +23,7 @@ namespace wm {
 
 class display;
 
-class window
+class __scm_export(gl_util) window
 {
 public:
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS

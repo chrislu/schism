@@ -15,6 +15,7 @@ namespace gl {
 namespace wm {
 namespace util {
 
+inline
 std::string win32_error_message()
 {
     char* error_msg;
