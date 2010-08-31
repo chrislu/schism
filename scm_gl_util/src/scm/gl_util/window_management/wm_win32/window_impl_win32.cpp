@@ -26,7 +26,10 @@ window::window_impl::window_impl(const display&           in_display,
   : _window_handle(0)
 {
     bool fullscreen_window = false;
-    // fullscreen_window = in_size == in_display._impl->_screen_size or something
+
+    if (in_size == in_display._impl->_info->_screen_size) {
+        fullscreen_window = true;
+    }
 
     DWORD wnd_style;
     DWORD wnd_style_ex;
