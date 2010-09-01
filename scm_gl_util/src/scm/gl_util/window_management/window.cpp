@@ -17,13 +17,14 @@ namespace wm {
 
 window::window(const display&           in_display,
                const std::string&       in_title,
+               const math::vec2i&       in_position,
                const math::vec2ui&      in_size,
                const pixel_format_desc& in_pf)
   : _associated_display(in_display),
     _pixel_format(in_pf)
 {
     try {
-        _impl.reset(new window_impl(in_display, in_title, in_size, in_pf));
+        _impl.reset(new window_impl(in_display, in_title, in_position, in_size, in_pf));
     }
     catch(const std::exception& e) {
         err() << log::error

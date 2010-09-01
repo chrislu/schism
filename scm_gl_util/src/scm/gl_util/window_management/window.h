@@ -37,6 +37,7 @@ public:
 public:
     window(const display&           in_display,
            const std::string&       in_title,
+           const math::vec2i&       in_position,
            const math::vec2ui&      in_size,
            const pixel_format_desc& in_pf);
     virtual ~window();

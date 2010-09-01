@@ -5,9 +5,9 @@
 
 #include <exception>
 #include <stdexcept>
-#include <sstream>
 #include <string>
 
+#include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -114,15 +114,16 @@ display::display_impl::display_impl(const std::string& name)
               << log::end;
     }
 
-    std::stringstream class_name;
-    class_name << name << boost::uuids::random_generator()();
+    std::string class_name(name + boost::lexical_cast<std::string>(boost::uuids::random_generator()()));
 
     WNDCLASSEX wnd_class;
     ZeroMemory(&wnd_class, sizeof(WNDCLASSEX));
     wnd_class.cbSize        = sizeof(WNDCLASSEX);
+    wnd_class.lpfnWndProc   = &DefWindowProc;      
     wnd_class.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
     wnd_class.hInstance     = _hinstance;
-    wnd_class.lpszClassName = class_name.str().c_str();
+    wnd_class.hbrBackground = (HBRUSH)::GetStockObject(DKGRAY_BRUSH);
+    wnd_class.lpszClassName = class_name.c_str();
 
     _window_class = ::RegisterClassEx(&wnd_class);
 
@@ -130,12 +131,15 @@ display::display_impl::display_impl(const std::string& name)
         std::ostringstream s;
         s << log::error
           << "display::display_impl::display_impl() <win32>: " 
-          << "unable to register window class (" << name << ")"
+          << "unable to register window class (" << class_name << ")"
           << " - system message: " << std::endl
           << util::win32_error_message();
         err() << log::fatal << s.str() << log::end;
         throw(std::runtime_error(s.str()));
     }
+    //else {
+    //    std::cout << class_name << " registered" << std::endl;
+    //}
 
     detail::display_info_map display_infos;
 
