@@ -32,8 +32,12 @@ struct display::display_impl
     display_impl(const std::string& name);
     virtual ~display_impl();
 
+    void                        cleanup();
+
     HINSTANCE                   _hinstance;
+
     ATOM                        _window_class;
+    HDC                         _device_handle;
 
     shared_ptr<display_info>    _info;
 

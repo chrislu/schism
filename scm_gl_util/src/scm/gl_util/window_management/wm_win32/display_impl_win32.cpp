@@ -102,94 +102,125 @@ default_display_name()
 } // namespace detail
 
 display::display_impl::display_impl(const std::string& name)
+  : _hinstance(0),
+    _device_handle(0)
 {
-    _hinstance = ::GetModuleHandle(0);
+    try {
+        _hinstance = ::GetModuleHandle(0);
 
-    if (!_hinstance) {
-        err() << log::error
-              << "display::display_impl::display_impl() <win32>: " 
-              << "unable to get module handle"
-              << " - system message: " << log::nline
-              << util::win32_error_message()
-              << log::end;
-    }
+        if (!_hinstance) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: " 
+              << "unable to get module handle "
+              << "(system message: " << util::win32_error_message() << ")" << log::end;
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
 
-    std::string class_name(name + boost::lexical_cast<std::string>(boost::uuids::random_generator()()));
-
-    WNDCLASSEX wnd_class;
-    ZeroMemory(&wnd_class, sizeof(WNDCLASSEX));
-    wnd_class.cbSize        = sizeof(WNDCLASSEX);
-    wnd_class.lpfnWndProc   = &DefWindowProc;      
-    wnd_class.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-    wnd_class.hInstance     = _hinstance;
-    wnd_class.hbrBackground = (HBRUSH)::GetStockObject(DKGRAY_BRUSH);
-    wnd_class.lpszClassName = class_name.c_str();
-
-    _window_class = ::RegisterClassEx(&wnd_class);
-
-    if (0 == _window_class) {
-        std::ostringstream s;
-        s << log::error
-          << "display::display_impl::display_impl() <win32>: " 
-          << "unable to register window class (" << class_name << ")"
-          << " - system message: " << std::endl
-          << util::win32_error_message();
-        err() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
-    }
-    //else {
-    //    std::cout << class_name << " registered" << std::endl;
-    //}
-
-    detail::display_info_map display_infos;
-
-    if (!detail::enum_display_infos(display_infos)) {
-        std::ostringstream s;
-        s << log::error
-          << "display::display_impl::display_impl() <win32>: " 
-          << "unable to enumerate displays." << std::endl;
-        err() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
-    }
-
-    std::string disp_name;
-    if (!name.empty()) {
-        disp_name = name;
-    }
-    else {
-        disp_name = detail::default_display_name();
-    }
-
-    detail::display_info_map::const_iterator dsp = display_infos.find(name);
-
-    if (dsp == display_infos.end()) {
-        std::ostringstream s;
-        s << log::error
-          << "display::display_impl::display_impl() <win32>: " 
-          << "unable find display (" << name << ")" << std::endl
-          << "available displays:" << std::endl;
-        for (detail::display_info_map::const_iterator i = display_infos.begin();
-             i != display_infos.end(); ++i) {
-            s << i->first << std::endl;
         }
-        err() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
-    }
 
-    _info = dsp->second;
+        std::string class_name(name + boost::lexical_cast<std::string>(boost::uuids::random_generator()()));
+
+        WNDCLASSEX wnd_class;
+        ZeroMemory(&wnd_class, sizeof(WNDCLASSEX));
+        wnd_class.cbSize        = sizeof(WNDCLASSEX);
+        wnd_class.lpfnWndProc   = &DefWindowProc;      
+        wnd_class.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+        wnd_class.hInstance     = _hinstance;
+        wnd_class.hbrBackground = (HBRUSH)::GetStockObject(DKGRAY_BRUSH);
+        wnd_class.lpszClassName = class_name.c_str();
+
+        _window_class = ::RegisterClassEx(&wnd_class);
+
+        if (0 == _window_class) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: " 
+              << "unable to register window class (" << class_name << ") "
+              << "(system message: " << util::win32_error_message() << ")";
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+        //else {
+        //    std::cout << class_name << " registered" << std::endl;
+        //}
+
+        detail::display_info_map display_infos;
+
+        if (!detail::enum_display_infos(display_infos)) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: " 
+              << "unable to enumerate displays." << std::endl;
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+
+        std::string disp_name;
+        if (!name.empty()) {
+            disp_name = name;
+        }
+        else {
+            disp_name = detail::default_display_name();
+        }
+
+        detail::display_info_map::const_iterator dsp = display_infos.find(name);
+
+        if (dsp == display_infos.end()) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: " 
+              << "unable find display (" << name << ")" << std::endl
+              << "available displays:" << std::endl;
+            for (detail::display_info_map::const_iterator i = display_infos.begin();
+                 i != display_infos.end(); ++i) {
+                s << i->first << std::endl;
+            }
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+
+        _info           = dsp->second;
+        _device_handle  = ::CreateDC(TEXT("DISPLAY"), _info->_dev_name.c_str(), 0, NULL);
+
+        if (0 == _device_handle) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: "
+              << "unable to create device context "
+              << "(system message: " << util::win32_error_message() << ")";
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+    }
+    catch(...) {
+        cleanup();
+        throw;
+    }
 }
 
 display::display_impl::~display_impl()
 {
-    if (0 == ::UnregisterClass(reinterpret_cast<LPCSTR>(_window_class), _hinstance)) {
-        err() << log::error
-              << "display::display_impl::~display_impl() <win32>: " 
-              << "unable to unregister window class"
-              << " - system message: " << log::nline
-              << util::win32_error_message()
-              << log::end;
-    }
+    cleanup();
 }
+
+void
+display::display_impl::cleanup()
+{
+    if (_device_handle) {
+        if (0 == ::DeleteDC(_device_handle)) {
+            err() << log::error
+                  << "display::display_impl::~display_impl() <win32>: " 
+                  << "unable to delete device context "
+                  << "(system message: " << util::win32_error_message() << ")" << log::end;
+        }
+    }
+    if (_window_class) {
+        if (0 == ::UnregisterClass(reinterpret_cast<LPCSTR>(_window_class), _hinstance)) {
+            err() << log::error
+                  << "display::display_impl::~display_impl() <win32>: " 
+                  << "unable to unregister window class "
+                  << "(system message: " << util::win32_error_message() << ")" << log::end;
+        }
+    }
+    _info.reset();
+}
+
 
 } // namespace wm
 } // namepspace gl
