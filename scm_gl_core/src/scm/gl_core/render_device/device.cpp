@@ -153,6 +153,14 @@ render_device::init_capabilities()
     assert(_capabilities._max_combined_uniform_blocks > 0);
     assert(_capabilities._max_uniform_buffer_bindings > 0);
     assert(_capabilities._uniform_buffer_offset_alignment > 0);
+
+#if SCM_GL_CORE_OPENGL_41
+    glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
+#else // SCM_GL_CORE_OPENGL_41
+    _max_viewports = 1;
+#endif // SCM_GL_CORE_OPENGL_41
+
+    assert(_capabilities._max_viewports > 0);
 }
 
 buffer_ptr

@@ -53,6 +53,7 @@ public:
         int             _max_combined_uniform_blocks;
         int             _max_uniform_buffer_bindings;
         int             _uniform_buffer_offset_alignment;
+        int             _max_viewports;
     }; // struct device_capabilities
 
 private:

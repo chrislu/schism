@@ -77,7 +77,7 @@ private:
         frame_buffer_ptr                    _draw_framebuffer;
         frame_buffer_ptr                    _read_framebuffer;
         frame_buffer_target                 _default_framebuffer_target;
-        viewport                            _viewport;
+        viewport_array                      _viewports;
     }; // struct binding_state_type
 
 ////// methods ////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,8 @@ public:
     const frame_buffer_target   current_default_frame_buffer_target() const;
 
     void                        set_viewport(const viewport& in_vp);
-    const viewport&             current_viewport() const;
+    void                        set_viewports(const viewport_array& in_vp);
+    const viewport_array&       current_viewports() const;
 
     void                        reset_framebuffer();
 

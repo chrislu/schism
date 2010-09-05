@@ -145,7 +145,7 @@ public:
     }
 private:
     const render_context_ptr&                 _guarded_context;
-    const render_context::texture_unit_array& _save_texture_units;
+    const render_context::texture_unit_array  _save_texture_units;
 }; // class context_texture_units_guard
 
 
@@ -156,7 +156,7 @@ public:
       : _guarded_context(in_context),
         _save_framebuffer(in_context->current_frame_buffer()),
         _save_default_framebuffer_target(in_context->current_default_frame_buffer_target()),
-        _save_viewport(in_context->current_viewport())
+        _save_viewports(in_context->current_viewports())
     {
     }
     ~context_framebuffer_guard()
@@ -171,13 +171,13 @@ public:
         else {
             _guarded_context->set_default_frame_buffer(_save_default_framebuffer_target);
         }
-        _guarded_context->set_viewport(_save_viewport);
+        _guarded_context->set_viewports(_save_viewports);
     }
 private:
-    const render_context_ptr&       _guarded_context;
-    const frame_buffer_ptr          _save_framebuffer;
-    const frame_buffer_target       _save_default_framebuffer_target;
-    const viewport                  _save_viewport;
+    const render_context_ptr&               _guarded_context;
+    const frame_buffer_ptr                  _save_framebuffer;
+    const frame_buffer_target               _save_default_framebuffer_target;
+    const viewport_array                    _save_viewports;
 }; // class context_framebuffer_guard
 
 

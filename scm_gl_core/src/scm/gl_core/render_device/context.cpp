@@ -65,7 +65,7 @@ render_context::buffer_binding::operator!=(const buffer_binding& rhs) const
 render_context::binding_state_type::binding_state_type()
   : _stencil_ref_value(0),
     _default_framebuffer_target(FRAMEBUFFER_BACK),
-    _viewport(math::vec2ui(0, 0), math::vec2ui(10, 10))
+    _viewports(viewport(math::vec2ui(0, 0), math::vec2ui(10, 10)))
 {
 }
 
@@ -706,13 +706,24 @@ render_context::current_default_frame_buffer_target() const
 void
 render_context::set_viewport(const viewport& in_vp)
 {
-    _current_state._viewport = in_vp;
+    _current_state._viewports = viewport_array(in_vp);
 }
 
-const viewport&
-render_context::current_viewport() const
+void
+render_context::set_viewports(const viewport_array& in_vp)
 {
-    return (_current_state._viewport);
+    if (in_vp.size() > parent_device().capabilities()._max_viewports) {
+        glerr() << log::warning
+                << "render_context::set_viewports(): exceeded max number of supported viewports "
+                << "(max_viewports: " << parent_device().capabilities()._max_viewports << ")" << log::end;
+    }
+    _current_state._viewports = in_vp;
+}
+
+const viewport_array&
+render_context::current_viewports() const
+{
+    return (_current_state._viewports);
 }
 
 void
@@ -978,8 +989,8 @@ render_context::apply_frame_buffer()
 #if SCM_GL_DEBUG
         if (!_current_state._draw_framebuffer->check_completeness(*this)) {
             glerr() << log::error
-                    << "render_context::apply_frame_buffer(): incomplete framebuffer"
-                    << " ('" << state().state_string() << "')." << log::end;
+                    << "render_context::apply_frame_buffer(): incomplete framebuffer "
+                    << "('" << state().state_string() << "')." << log::end;
             return;
         }
 #endif // SCM_GL_DEBUG
@@ -1001,11 +1012,53 @@ render_context::apply_frame_buffer()
         }
     }
 
-    if (_current_state._viewport != _applied_state._viewport) {
-        glapi.glViewport(_current_state._viewport._lower_left.x, _current_state._viewport._lower_left.y,
-                         _current_state._viewport._dimensions.x, _current_state._viewport._dimensions.y);
-        glapi.glDepthRange(_current_state._viewport._depth_range.x, _current_state._viewport._depth_range.y);
-        _applied_state._viewport = _current_state._viewport;
+    if (_current_state._viewports != _applied_state._viewports) {
+#if SCM_GL_CORE_OPENGL_41
+        using namespace scm::math;
+        int vp_array_size = parent_device().capabilities()._max_viewports;
+        scoped_array<vec4f> vp_array(new vec4f[vp_array_size]);
+        scoped_array<vec2d> dr_array(new vec2d[vp_array_size]);
+
+        if (_current_state._viewports.size() == 1) {
+            for (int i = 0; i < vp_array_size; ++i) {
+                vp_array[i] = vec4f(_current_state._viewports.viewports()[0]._position,
+                                    _current_state._viewports.viewports()[0]._dimensions.x,
+                                    _current_state._viewports.viewports()[0]._dimensions.y);
+                dr_array[i] = _current_state._viewports.viewports()[0]._depth_range;
+            }
+        }
+        else {
+            for (int i = 0; i < _current_state._viewports.size(); ++i) {
+                vp_array[i] = vec4f(_current_state._viewports.viewports()[0]._position,
+                                    _current_state._viewports.viewports()[0]._dimensions.x,
+                                    _current_state._viewports.viewports()[0]._dimensions.y);
+                dr_array[i] = _current_state._viewports.viewports()[0]._depth_range;
+            }
+            for (int i = static_cast<int>(_current_state._viewports.size()); i < vp_array_size; ++i) {
+                vp_array[i] = vec4f(0.0f, 0.0f, 100.0f, 100.0f);
+                dr_array[i] = vec2d(0.0, 1.0);
+            }
+        }
+        glapi.glViewportArrayv(0, vp_array_size, vp_array[0].data_array);
+        glapi.glDepthRangeArrayv(0, vp_array_size, dr_array[0].data_array);
+#else // SCM_GL_CORE_OPENGL_41
+#if SCM_GL_DEBUG
+        if (_current_state._viewports.size() > 1) {
+            glerr() << log::warning
+                    << "render_context::apply_frame_buffer(): viewport array not supported. "
+                    << "applying first viewport "
+                    << "(build gl_core with OpenGL 4.1 configuration for enabled support) "
+                    << log::end;
+        }
+#endif// SCM_GL_DEBUG
+        glapi.glViewport(static_cast<unsigned>(_current_state._viewports.viewports()[0]._lower_left.x),
+                         static_cast<unsigned>(_current_state._viewports.viewports()[0]._lower_left.y),
+                         static_cast<unsigned>(_current_state._viewports.viewports()[0]._dimensions.x),
+                         static_cast<unsigned>(_current_state._viewports.viewports()[0]._dimensions.y));
+        glapi.glDepthRange(_current_state._viewports.viewports()[0]._depth_range.x,
+                           _current_state._viewports.viewports()[0]._depth_range.y);
+#endif // SCM_GL_CORE_OPENGL_41
+        _applied_state._viewports = _current_state._viewports;
     }
 
     gl_assert(glapi, leaving render_context::apply_frame_buffer());
