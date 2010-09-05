@@ -26,6 +26,8 @@ struct window::window_impl
     void            show();
     void            hide();
 
+    long            _window_handle;
+
 }; // class window_impl
 
 } // namespace wm

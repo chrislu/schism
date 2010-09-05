@@ -29,6 +29,7 @@ public:
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
     typedef HWND wnd_handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
+    typedef long wnd_handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
 #error "atm unsupported platform"
 #endif
