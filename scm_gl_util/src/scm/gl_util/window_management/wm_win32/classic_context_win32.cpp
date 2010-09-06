@@ -1,5 +1,5 @@
 
-#include "context_helper.h"
+#include "classic_context_win32.h"
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
@@ -7,7 +7,8 @@
 
 namespace scm {
 namespace gl {
-namespace detail {
+namespace wm {
+namespace util {
 
 classic_gl_context::classic_gl_context()
   : _hWnd(NULL),
@@ -37,33 +38,33 @@ classic_gl_context::create()
     wnd_class.lpfnWndProc       = (WNDPROC)DefWindowProc;
 	wnd_class.style			    = CS_OWNDC;
     wnd_class.lpszClassName	    = _wnd_class_name.c_str();
-    wnd_class.hInstance         = GetModuleHandle(NULL);
+    wnd_class.hInstance         = ::GetModuleHandle(NULL);
 
-    if (RegisterClassEx(&wnd_class) == 0)
-    {
+    if (::RegisterClassEx(&wnd_class) == 0) {
+        destroy();
         return (false);
     }
 
     // window
-    _hWnd = CreateWindow(  _wnd_class_name.c_str(),
+    _hWnd = ::CreateWindow(_wnd_class_name.c_str(),
 						   _wnd_class_name.c_str(),
-						   WS_POPUP,
-						   0, 0,
+						   WS_POPUP | WS_DISABLED,
+						   CW_USEDEFAULT, CW_USEDEFAULT,
 						   10,
 						   10,
 						   NULL,
 						   NULL,
-						   GetModuleHandle(NULL),
+						   ::GetModuleHandle(NULL),
 						   NULL);
 
-    if (_hWnd == 0)
-    {
+    if (0 == _hWnd) {
+        destroy();
         return (false);	
     }
 
-    _hDC = GetDC(_hWnd);
+    _hDC = ::GetDC(_hWnd);
 
-    if (_hDC == NULL) {
+    if (0 == _hDC) {
         destroy();
         return (false);
     }
@@ -72,6 +73,7 @@ classic_gl_context::create()
 #if SCM_WIN_VER >= SCM_WIN_VER_VISTA
     dwflags |= PFD_SUPPORT_COMPOSITION;
 #endif
+
     PIXELFORMATDESCRIPTOR pfd =  {
         sizeof(PIXELFORMATDESCRIPTOR),
         1,
@@ -89,26 +91,26 @@ classic_gl_context::create()
         0, 0, 0
     };
 
-    int pfmt = ChoosePixelFormat(_hDC, &pfd);
+    int pfmt = ::ChoosePixelFormat(_hDC, &pfd);
 
     if (pfmt < 1) {
         destroy();
         return (false);
     }
 
-    if (!SetPixelFormat(_hDC, pfmt, &pfd)) {
+    if (!::SetPixelFormat(_hDC, pfmt, &pfd)) {
         destroy();
         return (false);
     }
 
-    _hGLRC = wglCreateContext(_hDC);
+    _hGLRC = ::wglCreateContext(_hDC);
 
     if (_hGLRC == NULL) {
         destroy();
         return (false);
     }
 
-    wglMakeCurrent(_hDC,_hGLRC);
+    ::wglMakeCurrent(_hDC, _hGLRC);
 
     return (true);
 }
@@ -116,26 +118,27 @@ classic_gl_context::create()
 void
 classic_gl_context::destroy()
 {
-    if (_hGLRC != NULL) {
-        wglMakeCurrent(_hDC, NULL);
-        wglDeleteContext(_hGLRC);
+    if (0 != _hGLRC) {
+        ::wglMakeCurrent(_hDC, NULL);
+        ::wglDeleteContext(_hGLRC);
         _hGLRC = NULL;
     }
 
-    if (_hDC != NULL) {
-        ReleaseDC(_hWnd, _hDC);
+    if (0 != _hDC) {
+        ::ReleaseDC(_hWnd, _hDC);
         _hDC = NULL;
     }
 
-    if (_hWnd != NULL) {
-        DestroyWindow(_hWnd);
-        UnregisterClass(_wnd_class_name.c_str(), GetModuleHandle(NULL));
+    if (0 != _hWnd) {
+        ::DestroyWindow(_hWnd);
+        ::UnregisterClass(_wnd_class_name.c_str(), ::GetModuleHandle(NULL));
         _hWnd = NULL;
     }
 }
 
-} // namespace detail
-} // namespace gl
-} // namespace scm
+} // namespace util
+} // namespace wm
+} // namepspace gl
+} // namepspace scm
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS

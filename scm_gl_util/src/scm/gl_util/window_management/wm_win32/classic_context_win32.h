@@ -12,8 +12,8 @@
 
 namespace scm {
 namespace gl {
-
-namespace detail {
+namespace wm {
+namespace util {
 
 class classic_gl_context
 {
@@ -31,10 +31,10 @@ private:
     std::string _wnd_class_name;
 };
 
-} // namespace detail
-} // namespace gl
-} // namespace scm
+} // namespace util
+} // namespace wm
+} // namepspace gl
+} // namepspace scm
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
 #endif // SCM_GL_UTIL_OPENGL_CONTEXT_HELPER_H_INCLUDED

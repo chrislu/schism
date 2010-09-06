@@ -2,60 +2,52 @@
 #ifndef SCM_GL_UTIL_CONTEXT_H_INCLUDED
 #define SCM_GL_UTIL_CONTEXT_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
-
 #include <scm/core/pointer_types.h>
+
 #include <scm/core/platform/platform.h>
+#include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 
-class context : boost::noncopyable
+class display;
+class pixel_format_desc;
+class surface;
+
+class context
 {
 public:
-    typedef scm::shared_ptr<void>   handle;
-
-#if   SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-    typedef handle          device_handle;
-    typedef handle          surface_handle;
-#elif SCM_PLATFORM == SCM_PLATFORM_LINUX
-    typedef Display*        device_handle;
-    typedef XID             surface_handle;
-#elif SCM_PLATFORM == SCM_PLATFORM_APPLE
-#error "atm unsupported platform"
-#endif // SCM_PLATFORM
-
-    struct surface_descriptor
-    {
-        device_handle           _device;
-        surface_handle          _surface;
-    }; // struct surface_descriptor
 
 public:
-    context(const surface_descriptor&  srfce,
-            const context_format&      desc,
-            const context_base&        share_ctx = null_context());
+    context(const display&            in_display,
+            const pixel_format_desc&  in_pixel_format,
+            const context&            in_share_ctx);
     virtual ~context();
 
-    virtual bool            make_current(bool current = true) const = 0;
-    virtual void            swap_buffers(int interval = 0) const = 0;
-    virtual bool            empty() const = 0;
+    bool                        make_current(const surface& cur_surface) const;
+    bool                        make_current(const surface& draw_surface,
+                                             const surface& read_surface) const;
 
-    const context_format&   format() const;
-    static context&         null_context();
+    const display&              associated_display() const;
+    const pixel_format_desc&    pixel_format() const;
 
-protected:
-    context(); // create null context
+private:
+    struct context_impl;
+    shared_ptr<context_impl>    _impl;
 
-    context_format          _context_format;
+    const display&              _associated_display;
+    pixel_format_desc           _pixel_format;
 
-    handle                  _device;    // win/WGL: HDC,            linux/GLX: Display*
-    handle                  _drawable;  // win/WGL: HWND, HPBUFFER  linux/GLX: Window, GLXPbuffer
-    handle                  _context;   // win/WGL: HGLRC,          linux/GLX: GLXContext
+private:
+    // non_copyable
+    context(const context&);
+    context& operator=(const context&);
 
 }; // class context
 
 } // namepspace gl
 } // namepspace scm
+
+#include <scm/core/utilities/platform_warning_enable.h>
 
 #endif // SCM_GL_UTIL_CONTEXT_H_INCLUDED

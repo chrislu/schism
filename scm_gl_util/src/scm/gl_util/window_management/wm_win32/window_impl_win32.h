@@ -25,10 +25,13 @@ struct window::window_impl
                 const pixel_format_desc& in_pf);
     virtual ~window_impl();
 
+    void            cleanup();
+
     void            show();
     void            hide();
 
     HWND            _window_handle;
+    HDC             _device_handle;
 
 }; // class window_impl
 

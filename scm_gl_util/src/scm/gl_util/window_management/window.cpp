@@ -28,10 +28,8 @@ window::window(const display&           in_display,
     }
     catch(const std::exception& e) {
         err() << log::error
-                << "window::window(): " 
-                << "unable instantie window_impl: "
-                << e.what()
-                << log::end;
+              << "window::window(): "
+              << log::indent << e.what() << log::outdent << log::end;
         throw (e);
     }
 }

@@ -1,5 +1,5 @@
 
-#include "wgl.h"
+#include "wgl_extensions.h"
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
@@ -9,13 +9,14 @@
 
 #include <scm/gl_core/log.h>
 
-#include <scm/gl_util/render_context/detail/context_helper.h>
+#include <scm/gl_util/window_management/wm_win32/classic_context_win32.h>
 
 namespace scm {
 namespace gl {
-namespace detail {
+namespace wm {
+namespace util {
 
-wgl::wgl()
+wgl_extensions::wgl_extensions()
 {
     _initialized = false;
 
@@ -43,18 +44,18 @@ wgl::wgl()
 }
 
 bool
-wgl::initialize()
+wgl_extensions::initialize()
 {
     if (is_initialized()) {
         return (true);
     }
 
-    scm::scoped_ptr<detail::classic_gl_context> dummy_context;
+    scm::scoped_ptr<util::classic_gl_context> dummy_context;
     if (wglGetCurrentContext() == 0) {
-        dummy_context.reset(new detail::classic_gl_context);
+        dummy_context.reset(new util::classic_gl_context);
         if (!dummy_context->create()) {
             glerr() << log::error
-                    << "wgl::initialize(): unable to initialize dummy OpenGL context" << log::end;
+                    << "wgl_extensions::initialize(): unable to initialize dummy OpenGL context" << log::end;
             return (false);
         }
     }
@@ -64,7 +65,7 @@ wgl::initialize()
     
     if (wglGetExtensionsStringARB == 0) {
         glerr() << log::error
-                 << "wgl::initialize(): WGL_ARB_extensions_string not supported" << log::end;
+                 << "wgl_extensions::initialize(): WGL_ARB_extensions_string not supported" << log::end;
         return (false);
     }
 
@@ -72,7 +73,7 @@ wgl::initialize()
     HDC cur_hdc = wglGetCurrentDC();
     if (cur_hdc == 0) {
         glerr() << log::error
-                << "wgl::initialize(): unable to retrieve current HDC" << log::end;
+                << "wgl_extensions::initialize(): unable to retrieve current HDC" << log::end;
         return (false);
     }
     std::string wgl_ext_string = reinterpret_cast<const char*>(wglGetExtensionsStringARB(cur_hdc));
@@ -90,7 +91,7 @@ wgl::initialize()
     
     if (wglCreateContextAttribsARB == 0) {
         glerr() << log::error
-                << "wgl::initialize(): WGL_ARB_create_context not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_ARB_create_context not supported" << log::end;
         return (false);
     }
 
@@ -103,7 +104,7 @@ wgl::initialize()
         || wglGetPixelFormatAttribfvARB == 0
         || wglChoosePixelFormatARB == 0) {
         glerr() << log::error
-                << "wgl::initialize(): WGL_ARB_pixel_format not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_ARB_pixel_format not supported" << log::end;
         return (false);
     }
 
@@ -114,18 +115,18 @@ wgl::initialize()
     if (   wglSwapIntervalEXT == 0
         || wglGetSwapIntervalEXT == 0) {
         glerr() << log::error
-                << "wgl::initialize(): WGL_EXT_swap_control not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_EXT_swap_control not supported" << log::end;
         return (false);
     }
 
     if (  !is_supported("WGL_ARB_framebuffer_sRGB")
         ||!is_supported("WGL_EXT_framebuffer_sRGB")) {
         glout() << log::warning
-                << "wgl::initialize(): WGL_ARB_framebuffer_sRGB not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_ARB_framebuffer_sRGB not supported" << log::end;
     }
     if (!is_supported("WGL_ARB_multisample")) {
         glout() << log::warning
-                << "wgl::initialize(): WGL_ARB_multisample not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_ARB_multisample not supported" << log::end;
     }
 
     // WGL_ARB_pbuffer
@@ -141,7 +142,7 @@ wgl::initialize()
         || wglDestroyPbufferARB == 0
         || wglQueryPbufferARB == 0) {
         glerr() << log::error
-                << "wgl::initialize(): WGL_ARB_pbuffer not supported" << log::end;
+                << "wgl_extensions::initialize(): WGL_ARB_pbuffer not supported" << log::end;
         return (false);
     }
     _initialized = true;
@@ -150,13 +151,13 @@ wgl::initialize()
 }
 
 bool
-wgl::is_initialized() const
+wgl_extensions::is_initialized() const
 {
     return (_initialized);
 }
 
 bool
-wgl::is_supported(const std::string& ext) const
+wgl_extensions::is_supported(const std::string& ext) const
 {
     if (_wgl_extensions.find(ext) != _wgl_extensions.end()) {
         return (true);
@@ -166,8 +167,9 @@ wgl::is_supported(const std::string& ext) const
     }
 }
 
-} //namespace detail
-} // namespace gl
-} // namespace scm
+} // namespace util
+} // namespace wm
+} // namepspace gl
+} // namepspace scm
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS

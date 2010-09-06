@@ -15,9 +15,10 @@
 
 namespace scm {
 namespace gl {
-namespace detail {
+namespace wm {
+namespace util {
 
-class wgl
+class wgl_extensions
 {
 private:
     typedef std::set<std::string> string_set;
@@ -50,7 +51,7 @@ public:
     PFNWGLQUERYPBUFFERARBPROC               wglQueryPbufferARB;
 
 public:
-    wgl();
+    wgl_extensions();
 
     bool            initialize();
     bool            is_initialized() const;
@@ -60,12 +61,13 @@ private:
     string_set      _wgl_extensions;
     bool            _initialized;
 
-}; // class wgl
+}; // class wgl_extensions
 
-} // namespace detail
-} // namespace gl
-} // namespace scm
+} // namespace util
+} // namespace wm
+} // namepspace gl
+} // namepspace scm
+
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
 #endif // SCM_GL_UTIL_OPENGL_WGL_H_INCLUDED
