@@ -16,6 +16,12 @@ namespace scm {
 namespace gl {
 namespace wm {
 
+namespace util {
+
+class wgl_extensions;
+
+} // namespace util
+
 struct window::window_impl
 {
     window_impl(const display&           in_display,
@@ -32,6 +38,8 @@ struct window::window_impl
 
     HWND            _window_handle;
     HDC             _device_handle;
+
+    shared_ptr<util::wgl_extensions>  _wgl_extensions;
 
 }; // class window_impl
 

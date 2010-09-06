@@ -171,6 +171,37 @@ int size_of_format(data_format d)
     return (format_sizes[d]);
 }
 
+inline
+int
+size_of_depth_component(data_format d)
+{
+    assert(FORMAT_D16 <= d && d <= FORMAT_D32F_S8);
+    switch (d) {
+        case FORMAT_D16:        return (2);
+        case FORMAT_D24:        return (3);
+        case FORMAT_D32:        return (4);
+        case FORMAT_D32F:       return (4);
+        case FORMAT_D24_S8:     return (3);
+        case FORMAT_D32F_S8:    return (4);
+        default:                return (0);
+    }
+}
+
+inline
+int size_of_stencil_component(data_format d)
+{
+    assert(FORMAT_D16 <= d && d <= FORMAT_D32F_S8);
+    switch (d) {
+        case FORMAT_D16:        return (0);
+        case FORMAT_D24:        return (0);
+        case FORMAT_D32:        return (0);
+        case FORMAT_D32F:       return (0);
+        case FORMAT_D24_S8:     return (1);
+        case FORMAT_D32F_S8:    return (1);
+        default:                return (0);
+    }
+}
+
 } // namespace gl
 } // namespace scm
 

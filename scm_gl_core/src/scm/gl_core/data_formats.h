@@ -115,6 +115,9 @@ int channel_count(data_format d);
 int size_of_channel(data_format d);
 int size_of_format(data_format d);
 
+int size_of_depth_component(data_format d);
+int size_of_stencil_component(data_format d);
+
 __scm_export(gl_core) const char* format_string(data_format d);
 
 } // namespace gl

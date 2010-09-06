@@ -10,8 +10,8 @@
 #include <string>
 
 #include <scm/core/platform/windows.h>
-#include <scm/gl_util/render_context/GL/gl3.h>
-#include <scm/gl_util/render_context/GL/wglext.h>
+#include <GL/GL.h>
+#include <scm/gl_util/window_management/GL/wglext.h>
 
 namespace scm {
 namespace gl {

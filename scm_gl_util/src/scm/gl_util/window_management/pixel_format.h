@@ -16,7 +16,7 @@ namespace wm {
 struct __scm_export(gl_util) pixel_format_desc
 {
     data_format             _color_format;
-    data_format             _depth_stencil_foramt;
+    data_format             _depth_stencil_format;
 
     bool                    _double_buffer;
     bool                    _quad_buffer_stereo;

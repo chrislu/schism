@@ -68,6 +68,7 @@ classic_gl_context::create()
         destroy();
         return (false);
     }
+
     DWORD dwflags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER_DONTCARE | PFD_STEREO_DONTCARE;
 
 #if SCM_WIN_VER >= SCM_WIN_VER_VISTA
