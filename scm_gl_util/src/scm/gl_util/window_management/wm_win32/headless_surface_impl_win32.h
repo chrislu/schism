@@ -14,12 +14,11 @@
 
 #include <scm/gl_util/window_management/headless_surface.h>
 #include <scm/gl_util/window_management/window.h>
+#include <scm/gl_util/window_management/wm_win32/surface_impl_win32.h>
 
 namespace scm {
 namespace gl {
 namespace wm {
-
-class window;
 
 namespace util {
 
@@ -27,15 +26,14 @@ class wgl_extensions;
 
 } // namespace util
 
-struct headless_surface::headless_surface_impl
+struct headless_surface::headless_surface_impl : public surface::surface_impl
 {
-    headless_surface_impl(const window& in_parent_wnd);
+    headless_surface_impl(const window_ptr& in_parent_wnd);
     virtual ~headless_surface_impl();
 
     void            cleanup();
 
     HPBUFFERARB     _pbuffer_handle;
-    HDC             _device_handle;
 
     shared_ptr<util::wgl_extensions>  _wgl_extensions;
 

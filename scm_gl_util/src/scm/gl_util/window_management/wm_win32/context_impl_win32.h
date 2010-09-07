@@ -24,11 +24,18 @@ class wgl_extensions;
 
 struct context::context_impl
 {
-    context_impl(const surface&  in_surface,
-                 const context&  in_share_ctx);
+    context_impl(const surface_ptr&     in_surface,
+                 const attribute_desc&  in_attributes,
+                 const context_ptr&     in_share_ctx);
     virtual ~context_impl();
 
+    bool                    make_current(const surface_ptr& in_surface, bool current) const;
     void                    cleanup();
+
+    HGLRC                   _context_handle;
+    bool                    _swap_control_supported;
+
+    shared_ptr<util::wgl_extensions>  _wgl_extensions;
 
 }; // class context_impl
 

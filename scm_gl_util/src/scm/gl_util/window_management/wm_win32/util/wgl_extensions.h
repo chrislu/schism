@@ -51,6 +51,8 @@ public:
     PFNWGLDESTROYPBUFFERARBPROC             wglDestroyPbufferARB;
     PFNWGLQUERYPBUFFERARBPROC               wglQueryPbufferARB;
 
+    bool                                    _swap_control_supported;
+
 public:
     wgl_extensions();
 

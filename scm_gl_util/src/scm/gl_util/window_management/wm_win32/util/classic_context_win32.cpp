@@ -10,27 +10,13 @@ namespace gl {
 namespace wm {
 namespace util {
 
-classic_gl_context::classic_gl_context()
+
+classic_gl_window::classic_gl_window(const math::vec2i&       in_position,
+                                     const math::vec2ui&      in_size)
   : _hWnd(NULL),
     _hDC(NULL),
-    _hGLRC(NULL),
     _wnd_class_name("gl_dummy_for_wgl_stuff")
 {
-}
-
-classic_gl_context::~classic_gl_context()
-{
-    if (_hGLRC != NULL) {
-        destroy();
-    }
-}
-
-bool
-classic_gl_context::create()
-{
-    if (_hGLRC != NULL) {
-        destroy();
-    }
     // Register A Window Class
     WNDCLASSEX wnd_class;
     ZeroMemory (&wnd_class, sizeof (WNDCLASSEX));
@@ -42,16 +28,14 @@ classic_gl_context::create()
 
     if (::RegisterClassEx(&wnd_class) == 0) {
         destroy();
-        return (false);
     }
 
     // window
     _hWnd = ::CreateWindow(_wnd_class_name.c_str(),
 						   _wnd_class_name.c_str(),
 						   WS_POPUP | WS_DISABLED,
-						   CW_USEDEFAULT, CW_USEDEFAULT,
-						   10,
-						   10,
+						   in_position.x, in_position.y,
+						   in_size.x, in_size.y,
 						   NULL,
 						   NULL,
 						   ::GetModuleHandle(NULL),
@@ -59,16 +43,45 @@ classic_gl_context::create()
 
     if (0 == _hWnd) {
         destroy();
-        return (false);	
     }
 
     _hDC = ::GetDC(_hWnd);
 
     if (0 == _hDC) {
         destroy();
-        return (false);
+    }
+}
+
+classic_gl_window::~classic_gl_window()
+{
+    destroy();
+}
+
+bool
+classic_gl_window::valid() const
+{
+    return ((0 != _hWnd) && (0 != _hDC));
+}
+
+void
+classic_gl_window::destroy()
+{
+    if (0 != _hDC) {
+        ::ReleaseDC(_hWnd, _hDC);
+        _hDC = NULL;
     }
 
+    if (0 != _hWnd) {
+        ::DestroyWindow(_hWnd);
+        ::UnregisterClass(_wnd_class_name.c_str(), ::GetModuleHandle(NULL));
+        _hWnd = NULL;
+    }
+}
+
+classic_gl_context::classic_gl_context(const classic_gl_window& in_window)
+  : _hGLRC(0),
+    _window(in_window)
+{
     DWORD dwflags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER_DONTCARE | PFD_STEREO_DONTCARE;
 
 #if SCM_WIN_VER >= SCM_WIN_VER_VISTA
@@ -92,48 +105,45 @@ classic_gl_context::create()
         0, 0, 0
     };
 
-    int pfmt = ::ChoosePixelFormat(_hDC, &pfd);
+    int pfmt = ::ChoosePixelFormat(in_window._hDC, &pfd);
 
     if (pfmt < 1) {
         destroy();
-        return (false);
     }
 
-    if (!::SetPixelFormat(_hDC, pfmt, &pfd)) {
+    if (!::SetPixelFormat(in_window._hDC, pfmt, &pfd)) {
         destroy();
-        return (false);
     }
 
-    _hGLRC = ::wglCreateContext(_hDC);
+    _hGLRC = ::wglCreateContext(in_window._hDC);
 
     if (_hGLRC == NULL) {
         destroy();
-        return (false);
     }
 
-    ::wglMakeCurrent(_hDC, _hGLRC);
+    ::wglMakeCurrent(in_window._hDC, _hGLRC);
+}
 
-    return (true);
+classic_gl_context::~classic_gl_context()
+{
+    if (_hGLRC != NULL) {
+        destroy();
+    }
+}
+
+bool
+classic_gl_context::valid() const
+{
+    return (0 != _hGLRC);
 }
 
 void
 classic_gl_context::destroy()
 {
     if (0 != _hGLRC) {
-        ::wglMakeCurrent(_hDC, NULL);
+        ::wglMakeCurrent(_window._hDC, NULL);
         ::wglDeleteContext(_hGLRC);
         _hGLRC = NULL;
-    }
-
-    if (0 != _hDC) {
-        ::ReleaseDC(_hWnd, _hDC);
-        _hDC = NULL;
-    }
-
-    if (0 != _hWnd) {
-        ::DestroyWindow(_hWnd);
-        ::UnregisterClass(_wnd_class_name.c_str(), ::GetModuleHandle(NULL));
-        _hWnd = NULL;
     }
 }
 

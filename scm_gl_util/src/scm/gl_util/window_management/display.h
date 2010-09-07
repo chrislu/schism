@@ -4,15 +4,14 @@
 
 #include <scm/core/pointer_types.h>
 
+#include <scm/gl_util/window_management/wm_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
 namespace wm {
-
-class window;
-class headless_surface;
 
 class __scm_export(gl_util) display
 {
@@ -29,6 +28,7 @@ private:
     display(const display&);
     display& operator=(const display&);
 
+    friend class scm::gl::wm::context;
     friend class scm::gl::wm::window;
     friend class scm::gl::wm::headless_surface;
 }; // class display

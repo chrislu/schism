@@ -10,22 +10,20 @@
 #include <vector>
 
 #include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/pixel_format.h>
 #include <scm/gl_util/window_management/wm_win32/display_impl_win32.h>
-#include <scm/gl_util/window_management/wm_win32/error_win32.h>
-#include <scm/gl_util/window_management/wm_win32/wgl_extensions.h>
+#include <scm/gl_util/window_management/wm_win32/util/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>
 
 namespace scm {
 namespace gl {
 namespace wm {
 namespace util {
 
-bool
+int
 pixel_format_selector::choose(HDC                               in_device,
-                              const pixel_format_desc&          in_pfd,
+                              const surface::format_desc&       in_pfd,
                               const surface_type                in_surface_type,
                               const shared_ptr<wgl_extensions>& in_wgl,
-                              int&                              out_pf_num,
                               std::ostream&                     out_stream)
 {
     std::vector<int>  pixel_desc;
@@ -44,7 +42,7 @@ pixel_format_selector::choose(HDC                               in_device,
     else {
         out_stream << "pixel_format_selector::choose() <win32>: "
                    << "unknown surface type.";
-        return (false);
+        return (0);
     }
 
     pixel_desc.push_back(WGL_SUPPORT_OPENGL_ARB);
@@ -84,7 +82,7 @@ pixel_format_selector::choose(HDC                               in_device,
         out_stream << "pixel_format_selector::choose() <win32>: "
                    << "unable to determine pixel type of requested color format "
                    << "(requested: " << format_string(in_pfd._color_format) << ").";
-        return (false);
+        return (0);
     }
         
     // depth buffer
@@ -121,19 +119,17 @@ pixel_format_selector::choose(HDC                               in_device,
         out_stream << "pixel_format_selector::choose() <win32>: "
                    << "wglChoosePixelFormat failed - requested pixel format: " << std::endl
                    << in_pfd;
-        return (false);
+        return (0);
     }
 
     if (result_num_pixel_fmts < 1) {
         out_stream << "pixel_format_selector::choose() <win32>: "
                    << "wglChoosePixelFormat returned 0 matching pixel formats - requested pixel format: " << std::endl
                    << in_pfd;
-        return (false);
+        return (0);
     }
 
-    out_pf_num = result_pixel_fmts[0];
-
-    return (true);
+    return (result_pixel_fmts[0]);
 }
 
 } // namespace util

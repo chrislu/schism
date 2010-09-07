@@ -5,6 +5,7 @@
 
 #include <exception>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -16,7 +17,9 @@
 #include <scm/log.h>
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_util/window_management/wm_win32/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/classic_context_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>
 
 namespace scm {
 namespace gl {
@@ -27,16 +30,15 @@ namespace detail {
 typedef boost::unordered_map<std::string, shared_ptr<display_info> > display_info_map;
 
 bool
-enum_display_infos(display_info_map& display_infos)
+enum_display_infos(display_info_map& display_infos, std::ostream& os)
 {
     display_infos.clear();
 
     int num_output_devices = ::GetSystemMetrics(SM_CMONITORS);
 
     if (num_output_devices < 1) {
-        err() << log::error
-              << "display::display_impl::enum_display_infos() <win32>: " 
-              << "unable to determine number of monitor output devices in system" << log::end;
+        os << "display::display_impl::enum_display_infos() <win32>: " 
+           << "unable to determine number of monitor output devices in system";
         return (false);
     }
 
@@ -48,16 +50,14 @@ enum_display_infos(display_info_map& display_infos)
         disp_device.cb = sizeof(DISPLAY_DEVICE);
 
         if (0 == ::EnumDisplayDevices(NULL, i, &disp_device, 0)) {
-            err() << log::error
-                  << "display::display_impl::enum_display_infos() <win32>: " 
-                  << "EnumDisplayDevices failed for device num " + boost::lexical_cast<std::string>(i) << log::end;
+            os << "display::display_impl::enum_display_infos() <win32>: " 
+               << "EnumDisplayDevices failed for device num " + boost::lexical_cast<std::string>(i);
             return (false);
         }
 
         if (0 == ::EnumDisplaySettings(disp_device.DeviceName, ENUM_CURRENT_SETTINGS, &disp_mode)) {
-            err() << log::error
-                  << "display::display_impl::enum_display_infos() <win32>: " 
-                  << "EnumDisplaySettings failed for device num " + boost::lexical_cast<std::string>(i) << log::end;
+            os << "display::display_impl::enum_display_infos() <win32>: " 
+               << "EnumDisplaySettings failed for device num " + boost::lexical_cast<std::string>(i);
             return (false);
             
         }
@@ -90,8 +90,8 @@ default_display_name()
 
     if (0 == ::EnumDisplayDevices(NULL, 0, &disp_device, 0)) {
         err() << log::error
-                << "display::display_impl::default_display_name() <win32>: " 
-                << "EnumDisplayDevices failed for device num " + boost::lexical_cast<std::string>(0) << log::end;
+              << "display::display_impl::default_display_name() <win32>: " 
+              << "EnumDisplayDevices failed for device num " + boost::lexical_cast<std::string>(0) << log::end;
         return ("");
     }
     else {
@@ -103,7 +103,8 @@ default_display_name()
 
 display::display_impl::display_impl(const std::string& name)
   : _hinstance(0),
-    _device_handle(0)
+    _device_handle(0),
+    _wgl_extensions(new util::wgl_extensions())
 {
     try {
         _hinstance = ::GetModuleHandle(0);
@@ -145,10 +146,11 @@ display::display_impl::display_impl(const std::string& name)
 
         detail::display_info_map display_infos;
 
-        if (!detail::enum_display_infos(display_infos)) {
+        std::stringstream dsp_enum_err;
+        if (!detail::enum_display_infos(display_infos, dsp_enum_err)) {
             std::ostringstream s;
             s << "display::display_impl::display_impl() <win32>: " 
-              << "unable to enumerate displays." << std::endl;
+              << "unable to enumerate displays: " << dsp_enum_err.str() << std::endl;
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
         }
@@ -187,6 +189,40 @@ display::display_impl::display_impl(const std::string& name)
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
         }
+
+        // setup a dummy gl context to initialize the wgl extensions
+        scm::scoped_ptr<util::classic_gl_window>    dummy_window;
+        scm::scoped_ptr<util::classic_gl_context>   dummy_context;
+
+        dummy_window.reset(new util::classic_gl_window(_info->_screen_origin, math::vec2ui(10, 10)));
+        if (!dummy_window->valid()) {
+             std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: "
+              << "unable to create dummy window for WGL initialization.";
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+       }
+        dummy_context.reset(new util::classic_gl_context(*dummy_window));
+        if (!dummy_context->valid()) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: "
+              << "unable to create dummy window context for WGL initialization.";
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+
+        std::stringstream init_err;
+        if (!_wgl_extensions->initialize(init_err)) {
+            std::ostringstream s;
+            s << "display::display_impl::display_impl() <win32>: "
+              << "unable to initialize WGL ARB extensions, WGL init failed: "
+              << init_err.str();
+            //err() << log::fatal << s.str() << log::end;
+            throw(std::runtime_error(s.str()));
+        }
+
+        dummy_context.reset();
+        dummy_window.reset();
     }
     catch(...) {
         cleanup();

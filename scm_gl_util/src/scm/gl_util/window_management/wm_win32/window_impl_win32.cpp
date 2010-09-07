@@ -12,29 +12,28 @@
 #include <scm/gl_core/constants.h>
 
 #include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/pixel_format.h>
 #include <scm/gl_util/window_management/wm_win32/display_impl_win32.h>
-#include <scm/gl_util/window_management/wm_win32/error_win32.h>
-#include <scm/gl_util/window_management/wm_win32/pixel_format_selection_win32.h>
-#include <scm/gl_util/window_management/wm_win32/wgl_extensions.h>
+#include <scm/gl_util/window_management/wm_win32/util/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/pixel_format_selection_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>
 
 namespace scm {
 namespace gl {
 namespace wm {
 
-window::window_impl::window_impl(const display&           in_display,
+window::window_impl::window_impl(const display_ptr&       in_display,
                                  const std::string&       in_title,
                                  const math::vec2i&       in_position,
                                  const math::vec2ui&      in_size,
-                                 const pixel_format_desc& in_pf)
-  : _window_handle(0),
-    _device_handle(0),
-    _wgl_extensions(new util::wgl_extensions())
+                                 const format_desc&       in_sf)
+  : surface::surface_impl(),
+    _window_handle(0),
+    _wgl_extensions(in_display->_impl->_wgl_extensions)
 {
     try {
         bool fullscreen_window = false;
 
-        if (in_size == in_display._impl->_info->_screen_size) {
+        if (in_size == in_display->_impl->_info->_screen_size) {
             fullscreen_window = true;
         }
 
@@ -50,7 +49,7 @@ window::window_impl::window_impl(const display&           in_display,
             wnd_style_ex = 0;//WS_EX_OVERLAPPEDWINDOW; //WS_EX_STATICEDGE; //
         }
 
-        math::vec2i wnd_position = in_display._impl->_info->_screen_origin + in_position;
+        math::vec2i wnd_position = in_display->_impl->_info->_screen_origin + in_position;
         RECT        wnd_rect;
 
         ::SetRect(&wnd_rect, 0, 0, in_size.x, in_size.y);
@@ -64,12 +63,12 @@ window::window_impl::window_impl(const display&           in_display,
             throw(std::runtime_error(s.str()));
         }
 
-        _window_handle = ::CreateWindowEx(wnd_style_ex, reinterpret_cast<LPCSTR>(in_display._impl->_window_class),
+        _window_handle = ::CreateWindowEx(wnd_style_ex, reinterpret_cast<LPCSTR>(in_display->_impl->_window_class),
                                             in_title.c_str(),
                                             wnd_style,
                                             wnd_position.x, wnd_position.y,
                                             wnd_rect.right - wnd_rect.left, wnd_rect.bottom - wnd_rect.top,
-                                            0, 0, in_display._impl->_hinstance,
+                                            0, 0, in_display->_impl->_hinstance,
                                             0);
 
         if (0 == _window_handle) {
@@ -92,34 +91,20 @@ window::window_impl::window_impl(const display&           in_display,
             throw(std::runtime_error(s.str()));
         }
 
-        std::stringstream init_err;
-        if (!_wgl_extensions->initialize(init_err)) {
-            std::ostringstream s;
-            s << "window::window_impl::window_impl() <win32>: "
-              << "unable to initialize WGL ARB extensions, WGL init failed: "
-              << init_err.str();
-            //err() << log::fatal << s.str() << log::end;
-            throw(std::runtime_error(s.str()));
-        }
-
-        if (channel_count(in_pf._color_format) < 3) {
+        if (channel_count(in_sf._color_format) < 3) {
             std::ostringstream s;
             s << "window::window_impl::window_impl() <win32>: "
               << "window pixel format must contain RGB or RGBA color format "
-              << "(requested: " << format_string(in_pf._color_format) << ").";
+              << "(requested: " << format_string(in_sf._color_format) << ").";
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
         }
 
-
-        int pfd_num = 0;
         std::stringstream pfd_err;
-        if (!util::pixel_format_selector::choose(in_display._impl->_device_handle,
-                                                 in_pf,
-                                                 util::pixel_format_selector::window_surface,
-                                                 _wgl_extensions,
-                                                 pfd_num,
-                                                 pfd_err)) {
+        int pfd_num = util::pixel_format_selector::choose(in_display->_impl->_device_handle,
+                                                 in_sf, util::pixel_format_selector::window_surface,
+                                                 _wgl_extensions, pfd_err);
+        if (0 == pfd_num) {
             std::ostringstream s;
             s << "window::window_impl::window_impl() <win32>: "
               << "unable select pixel format: "
@@ -167,6 +152,15 @@ window::window_impl::cleanup()
                   << "(system message: " << util::win32_error_message() << ")" << log::end;
         }
     }
+}
+
+void
+window::window_impl::swap_buffers(int interval) const
+{
+    if (_wgl_extensions->_swap_control_supported) {
+        _wgl_extensions->wglSwapIntervalEXT(interval);
+    }
+    ::SwapBuffers(_device_handle);
 }
 
 void

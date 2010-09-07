@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include <scm/core/math.h>
 #include <scm/core/platform/windows.h>
 
 namespace scm {
@@ -15,21 +16,32 @@ namespace gl {
 namespace wm {
 namespace util {
 
-class classic_gl_context
+struct classic_gl_window
 {
-public:
-    classic_gl_context();
-    virtual ~classic_gl_context();
-    bool create();
-    void destroy();
+    classic_gl_window(const math::vec2i&       in_position,
+                      const math::vec2ui&      in_size);
+    ~classic_gl_window();
 
-private:
+    bool    valid() const;
+    void    destroy();
+
     HWND    _hWnd;
     HDC     _hDC;
-    HGLRC   _hGLRC;
 
     std::string _wnd_class_name;
-};
+}; // class classic_gl_window
+
+struct classic_gl_context
+{
+    classic_gl_context(const classic_gl_window& in_window);
+    virtual ~classic_gl_context();
+
+    bool    valid() const;
+    void    destroy();
+
+    HGLRC                       _hGLRC;
+    const classic_gl_window&    _window;
+}; // classic_gl_context
 
 } // namespace util
 } // namespace wm

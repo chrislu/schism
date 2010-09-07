@@ -7,6 +7,7 @@
 #include <scm/core/math.h>
 #include <scm/core/pointer_types.h>
 
+#include <scm/gl_util/window_management/wm_fwd.h>
 #include <scm/gl_util/window_management/surface.h>
 
 #include <scm/core/platform/platform.h>
@@ -21,9 +22,6 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-class display;
-class headless_surface;
-
 class __scm_export(gl_util) window : public surface
 {
 public:
@@ -36,28 +34,26 @@ public:
 #endif
 
 public:
-    window(const display&           in_display,
+    window(const display_ptr&       in_display,
            const std::string&       in_title,
            const math::vec2i&       in_position,
            const math::vec2ui&      in_size,
-           const pixel_format_desc& in_pf);
+           const format_desc&       in_sf);
     virtual ~window();
 
+    void                        swap_buffers(int interval = 0) const;
     const wnd_handle            window_handle() const;
    
     void                        show();
     void                        hide();
 
-private:
+protected:
     struct window_impl;
-    shared_ptr<window_impl>     _impl;
 
 private:
     // non_copyable
     window(const window&);
     window& operator=(const window&);
-
-    friend class scm::gl::wm::headless_surface;
 }; // class window
 
 } // namespace wm

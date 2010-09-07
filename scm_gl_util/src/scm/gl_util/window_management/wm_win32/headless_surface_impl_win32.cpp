@@ -12,13 +12,12 @@
 #include <scm/gl_core/constants.h>
 
 #include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/pixel_format.h>
 #include <scm/gl_util/window_management/window.h>
 #include <scm/gl_util/window_management/wm_win32/display_impl_win32.h>
 #include <scm/gl_util/window_management/wm_win32/window_impl_win32.h>
-#include <scm/gl_util/window_management/wm_win32/error_win32.h>
-#include <scm/gl_util/window_management/wm_win32/pixel_format_selection_win32.h>
-#include <scm/gl_util/window_management/wm_win32/wgl_extensions.h>
+#include <scm/gl_util/window_management/wm_win32/util/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/pixel_format_selection_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>
 
 namespace scm {
 namespace gl {
@@ -31,14 +30,14 @@ const int fixed_pbuffer_height  = 1;
 
 } // namespace detail
 
-headless_surface::headless_surface_impl::headless_surface_impl(const window& in_parent_wnd)
-  : _pbuffer_handle(0),
-    _device_handle(0),
-    _wgl_extensions(in_parent_wnd._impl->_wgl_extensions)
+headless_surface::headless_surface_impl::headless_surface_impl(const window_ptr& in_parent_wnd)
+  : surface::surface_impl(),
+    _pbuffer_handle(0),
+    _wgl_extensions(in_parent_wnd->associated_display()->_impl->_wgl_extensions)
 {
     try {
-        const pixel_format_desc&            pfd  = in_parent_wnd.pixel_format();
-        const display&                      disp = in_parent_wnd.associated_display();
+        const surface::format_desc&         pfd  = in_parent_wnd->surface_format();
+        const display_ptr&                  disp = in_parent_wnd->associated_display();
 
         if (!_wgl_extensions) {
             std::ostringstream s;
@@ -48,14 +47,11 @@ headless_surface::headless_surface_impl::headless_surface_impl(const window& in_
             throw(std::runtime_error(s.str()));
         }
 
-        int pfd_num = 0;
         std::stringstream pfd_err;
-        if (!util::pixel_format_selector::choose(disp._impl->_device_handle,
-                                                 pfd,
-                                                 util::pixel_format_selector::pbuffer_surface,
-                                                 _wgl_extensions,
-                                                 pfd_num,
-                                                 pfd_err)) {
+        int pfd_num = util::pixel_format_selector::choose(disp->_impl->_device_handle,
+                                                          pfd, util::pixel_format_selector::pbuffer_surface,
+                                                          _wgl_extensions, pfd_err);
+        if (0 == pfd_num) {
             std::ostringstream s;
             s << "headless_surface::headless_surface_impl::headless_surface_impl() <win32>: "
               << "unable select pixel format: "
@@ -64,7 +60,7 @@ headless_surface::headless_surface_impl::headless_surface_impl(const window& in_
             throw(std::runtime_error(s.str()));
         }
 
-        _pbuffer_handle = _wgl_extensions->wglCreatePbufferARB(in_parent_wnd._impl->_device_handle,
+        _pbuffer_handle = _wgl_extensions->wglCreatePbufferARB(in_parent_wnd->_impl->_device_handle,
                                                  pfd_num,
                                                  detail::fixed_pbuffer_width,
                                                  detail::fixed_pbuffer_height,

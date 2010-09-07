@@ -7,7 +7,7 @@
 
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_util/window_management/wm_win32/classic_context_win32.h>
+#include <scm/gl_util/window_management/wm_win32/util/classic_context_win32.h>
 
 namespace scm {
 namespace gl {
@@ -39,6 +39,8 @@ wgl_extensions::wgl_extensions()
     wglReleasePbufferDCARB          = 0;
     wglDestroyPbufferARB            = 0;
     wglQueryPbufferARB              = 0;
+
+    _swap_control_supported         = false;
 }
 
 bool
@@ -47,14 +49,10 @@ wgl_extensions::initialize(std::ostream& os)
     if (is_initialized()) {
         return (true);
     }
-
-    scm::scoped_ptr<util::classic_gl_context> dummy_context;
-    if (wglGetCurrentContext() == 0) {
-        dummy_context.reset(new util::classic_gl_context);
-        if (!dummy_context->create()) {
-            os << "wgl_extensions::initialize(): unable to initialize dummy OpenGL context";
-            return (false);
-        }
+    
+    if (0 == wglGetCurrentContext()) {
+        os << "wgl_extensions::initialize(): no OpenGL context present, unable to initialize WGL extensions.";
+        return (false);
     }
 
     // WGL_ARB_extensions_string
@@ -134,6 +132,11 @@ wgl_extensions::initialize(std::ostream& os)
         os << "wgl_extensions::initialize(): WGL_ARB_pbuffer not supported";
         return (false);
     }
+
+    if (is_supported("WGL_EXT_swap_control")) {
+        _swap_control_supported = true;
+    }
+
     _initialized = true;
 
     return (true);

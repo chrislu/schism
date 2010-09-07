@@ -4,6 +4,7 @@
 
 #include <scm/core/pointer_types.h>
 
+#include <scm/gl_util/window_management/wm_fwd.h>
 #include <scm/gl_util/window_management/surface.h>
 
 #include <scm/core/platform/platform.h>
@@ -13,17 +14,14 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-class window;
-
 class __scm_export(gl_util) headless_surface : public surface
 {
 public:
-    headless_surface(const window& in_parent_wnd);
+    headless_surface(const window_ptr& in_parent_wnd);
     virtual ~headless_surface();
 
-private:
+protected:
     struct headless_surface_impl;
-    shared_ptr<headless_surface_impl>     _impl;
 
 private:
     // non_copyable

@@ -17,6 +17,12 @@ namespace scm {
 namespace gl {
 namespace wm {
 
+namespace util {
+
+class wgl_extensions;
+
+} // namespace util
+
 struct display_info {
     std::string         _dev_name;
     std::string         _dev_string;
@@ -39,7 +45,8 @@ struct display::display_impl
     ATOM                        _window_class;
     HDC                         _device_handle;
 
-    shared_ptr<display_info>    _info;
+    shared_ptr<display_info>            _info;
+    shared_ptr<util::wgl_extensions>    _wgl_extensions;
 
 }; // class display_impl
 

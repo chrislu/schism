@@ -10,7 +10,9 @@
 #include <ostream>
 
 #include <scm/core/pointer_types.h>
-#include <scm/gl_util/window_management/wm_win32/wgl_extensions.h>
+
+#include <scm/gl_util/window_management/surface.h>
+#include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>
 
 namespace scm {
 namespace gl {
@@ -29,12 +31,11 @@ public:
         pbuffer_surface
     } surface_type;
 
-    static bool choose(HDC                               in_device,
-                       const pixel_format_desc&          in_pfd,
-                       const surface_type                in_surface_type,
-                       const shared_ptr<wgl_extensions>& in_wgl,
-                       int&                              out_pf_num,
-                       std::ostream&                     out_stream);
+    static int choose(HDC                               in_device,
+                      const surface::format_desc&       in_pfd,
+                      const surface_type                in_surface_type,
+                      const shared_ptr<wgl_extensions>& in_wgl,
+                      std::ostream&                     out_stream);
 
 }; // class pixel_format_selector
 

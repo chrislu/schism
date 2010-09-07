@@ -4,7 +4,8 @@
 
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_util/window_management/pixel_format.h>
+#include <scm/gl_util/window_management/wm_fwd.h>
+#include <scm/gl_util/window_management/surface.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -13,25 +14,40 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-class display;
-class surface;
-
 class __scm_export(gl_util) context
 {
 public:
-    context(const surface&  in_surface,
-            const context&  in_share_ctx);
+    struct __scm_export(gl_util) attribute_desc {
+        int             _version_major;
+        int             _version_minor;
+        bool            _compatibility_profile;
+        bool            _debug;
+        bool            _forward_compatible;
+
+        attribute_desc(int version_major, int version_minor,
+                       bool compatibility = false, bool debug = false, bool forward = false);
+    }; // struct attribute_desc
+public:
+    context(const surface_ptr&      in_surface,
+            const attribute_desc&   in_attributes,
+            const context_ptr&      in_share_ctx = context_ptr());
     virtual ~context();
 
-    const display&              associated_display() const;
-    const pixel_format_desc&    pixel_format() const;
+    bool                        make_current(const surface_ptr& in_surface, bool current = true);
+
+    const display_ptr&          associated_display() const;
+    const surface::format_desc& surface_format() const;
+    const attribute_desc&       context_attributes() const;
 
 private:
     struct context_impl;
     shared_ptr<context_impl>    _impl;
 
-    const display&              _associated_display;
-    pixel_format_desc           _pixel_format;
+    const display_ptr&          _associated_display;
+    surface::format_desc        _surface_format;
+    attribute_desc              _attributes;
+
+    weak_ptr<surface>           _current_surface;
 
 private:
     // non_copyable

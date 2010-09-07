@@ -18,8 +18,9 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-context::context_impl::context_impl(const surface&  in_surface,
-                                    const context&  in_share_ctx)
+context::context_impl::context_impl(const surface&         in_surface,
+                                    const attribute_desc&  in_attributes,
+                                    const context&         in_share_ctx)
 {
     try {
     }
