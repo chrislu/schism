@@ -1,32 +1,27 @@
 
-#ifndef SCM_GL_UTIL_CONTEXT_H_INCLUDED
-#define SCM_GL_UTIL_CONTEXT_H_INCLUDED
+#ifndef SCM_GL_UTIL_WM_CONTEXT_H_INCLUDED
+#define SCM_GL_UTIL_WM_CONTEXT_H_INCLUDED
 
 #include <scm/core/pointer_types.h>
+
+#include <scm/gl_util/window_management/pixel_format.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
+namespace wm {
 
 class display;
-class pixel_format_desc;
 class surface;
 
-class context
+class __scm_export(gl_util) context
 {
 public:
-
-public:
-    context(const display&            in_display,
-            const pixel_format_desc&  in_pixel_format,
-            const context&            in_share_ctx);
+    context(const surface&  in_surface,
+            const context&  in_share_ctx);
     virtual ~context();
-
-    bool                        make_current(const surface& cur_surface) const;
-    bool                        make_current(const surface& draw_surface,
-                                             const surface& read_surface) const;
 
     const display&              associated_display() const;
     const pixel_format_desc&    pixel_format() const;
@@ -45,9 +40,10 @@ private:
 
 }; // class context
 
+} // namespace wm
 } // namepspace gl
 } // namepspace scm
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
-#endif // SCM_GL_UTIL_CONTEXT_H_INCLUDED
+#endif // SCM_GL_UTIL_WM_CONTEXT_H_INCLUDED

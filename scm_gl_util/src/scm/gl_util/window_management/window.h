@@ -7,7 +7,7 @@
 #include <scm/core/math.h>
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_util/window_management/pixel_format.h>
+#include <scm/gl_util/window_management/surface.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -22,8 +22,9 @@ namespace gl {
 namespace wm {
 
 class display;
+class headless_surface;
 
-class __scm_export(gl_util) window
+class __scm_export(gl_util) window : public surface
 {
 public:
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
@@ -34,7 +35,6 @@ public:
 #error "atm unsupported platform"
 #endif
 
-
 public:
     window(const display&           in_display,
            const std::string&       in_title,
@@ -44,8 +44,6 @@ public:
     virtual ~window();
 
     const wnd_handle            window_handle() const;
-    const display&              associated_display() const;
-    const pixel_format_desc&    pixel_format() const;
    
     void                        show();
     void                        hide();
@@ -54,14 +52,12 @@ private:
     struct window_impl;
     shared_ptr<window_impl>     _impl;
 
-    const display&              _associated_display;
-    pixel_format_desc           _pixel_format;
-
 private:
     // non_copyable
     window(const window&);
     window& operator=(const window&);
 
+    friend class scm::gl::wm::headless_surface;
 }; // class window
 
 } // namespace wm

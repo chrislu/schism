@@ -15,8 +15,8 @@
 #include <scm/gl_util/window_management/pixel_format.h>
 #include <scm/gl_util/window_management/wm_win32/display_impl_win32.h>
 #include <scm/gl_util/window_management/wm_win32/error_win32.h>
+#include <scm/gl_util/window_management/wm_win32/pixel_format_selection_win32.h>
 #include <scm/gl_util/window_management/wm_win32/wgl_extensions.h>
-#include <scm/gl_util/window_management/wm_x/display_impl_x.h>
 
 namespace scm {
 namespace gl {
@@ -92,10 +92,12 @@ window::window_impl::window_impl(const display&           in_display,
             throw(std::runtime_error(s.str()));
         }
 
-        if (!_wgl_extensions->initialize()) {
+        std::stringstream init_err;
+        if (!_wgl_extensions->initialize(init_err)) {
             std::ostringstream s;
             s << "window::window_impl::window_impl() <win32>: "
-              << "unable to initialize WGL ARB extensions, WGL init failed.";
+              << "unable to initialize WGL ARB extensions, WGL init failed: "
+              << init_err.str();
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
         }
@@ -109,103 +111,27 @@ window::window_impl::window_impl(const display&           in_display,
             throw(std::runtime_error(s.str()));
         }
 
-        std::vector<int>  pixel_desc;
 
-        pixel_desc.push_back(WGL_ACCELERATION_ARB);
-        pixel_desc.push_back(WGL_FULL_ACCELERATION_ARB);
-        
-        pixel_desc.push_back(WGL_DRAW_TO_WINDOW_ARB);
-        pixel_desc.push_back(GL_TRUE);
-        
-        pixel_desc.push_back(WGL_SUPPORT_OPENGL_ARB);
-        pixel_desc.push_back(GL_TRUE);
-        
-        pixel_desc.push_back(WGL_SWAP_METHOD_ARB);
-        pixel_desc.push_back(WGL_SWAP_EXCHANGE_ARB);
-
-        // color buffer
-        pixel_desc.push_back(WGL_COLOR_BITS_ARB);
-        pixel_desc.push_back(size_of_format(in_pf._color_format) * 8);
-        
-        pixel_desc.push_back(WGL_ALPHA_BITS_ARB);
-        if ((channel_count(in_pf._color_format) > 3)) {
-            pixel_desc.push_back(size_of_channel(in_pf._color_format) * 8);
-        }
-        else {
-            pixel_desc.push_back(0);
-        }
-
-        pixel_desc.push_back(WGL_PIXEL_TYPE_ARB);
-        if (is_integer_type(in_pf._color_format)) {
-            pixel_desc.push_back(WGL_TYPE_RGBA_ARB);
-        }
-        else if (is_packed_format(in_pf._color_format)) {
-            pixel_desc.push_back(WGL_TYPE_RGBA_UNSIGNED_FLOAT_EXT);
-        }
-        else if (is_float_type(in_pf._color_format)) {
-            pixel_desc.push_back(WGL_TYPE_RGBA_FLOAT_ARB);
-        }
-        else {
+        int pfd_num = 0;
+        std::stringstream pfd_err;
+        if (!util::pixel_format_selector::choose(in_display._impl->_device_handle,
+                                                 in_pf,
+                                                 util::pixel_format_selector::window_surface,
+                                                 _wgl_extensions,
+                                                 pfd_num,
+                                                 pfd_err)) {
             std::ostringstream s;
             s << "window::window_impl::window_impl() <win32>: "
-              << "unable to determine pixel type of requested color format "
-              << "(requested: " << format_string(in_pf._color_format) << ").";
-            //err() << log::fatal << s.str() << log::end;
-            throw(std::runtime_error(s.str()));
-        }
-        
-        // depth buffer
-        pixel_desc.push_back(WGL_DEPTH_BITS_ARB);
-        pixel_desc.push_back(size_of_depth_component(in_pf._depth_stencil_format) * 8);
-        
-        pixel_desc.push_back(WGL_STENCIL_BITS_ARB);
-        pixel_desc.push_back(size_of_stencil_component(in_pf._depth_stencil_format) * 8);
-        
-        // double, quad buffer
-        pixel_desc.push_back(WGL_DOUBLE_BUFFER_ARB);
-        pixel_desc.push_back(in_pf._double_buffer);
-        
-        pixel_desc.push_back(WGL_STEREO_ARB);
-        pixel_desc.push_back(in_pf._quad_buffer_stereo);
-
-        pixel_desc.push_back(WGL_SAMPLE_BUFFERS_ARB);   pixel_desc.push_back(GL_FALSE);//desc.max_samples() > 0 ? GL_TRUE : GL_FALSE);
-        pixel_desc.push_back(WGL_SAMPLES_ARB);          pixel_desc.push_back(0);//desc.max_samples());
-        pixel_desc.push_back(WGL_AUX_BUFFERS_ARB);      pixel_desc.push_back(0);
-
-        pixel_desc.push_back(0);                        pixel_desc.push_back(0); // terminate list
-
-        const int         query_max_formats = 20;
-        int               result_pixel_fmts[query_max_formats];
-        unsigned int      result_num_pixel_fmts = 0;
-
-        if (_wgl_extensions->wglChoosePixelFormatARB(_device_handle,
-                                          static_cast<const int*>(&(pixel_desc[0])),
-                                          NULL,
-                                          query_max_formats,
-                                          result_pixel_fmts,
-                                          &result_num_pixel_fmts) != TRUE)
-        {
-            std::ostringstream s;
-            s << "window::window_impl::window_impl() <win32>: "
-              << "wglChoosePixelFormat failed - requested pixel format: " << std::endl
-              << in_pf << std::endl;
+              << "unable select pixel format: "
+              << pfd_err.str();
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
         }
 
-        if (result_num_pixel_fmts < 1) {
+        if (TRUE != ::SetPixelFormat(_device_handle, pfd_num, NULL)) {
             std::ostringstream s;
             s << "window::window_impl::window_impl() <win32>: "
-              << "wglChoosePixelFormat returned 0 matching pixel formats - requested pixel format: " << std::endl
-              << in_pf << std::endl;
-            //err() << log::fatal << s.str() << log::end;
-            throw(std::runtime_error(s.str()));
-        }
-
-        if (TRUE != ::SetPixelFormat(_device_handle, result_pixel_fmts[0], NULL)) {
-            std::ostringstream s;
-            s << "window::window_impl::window_impl() <win32>: "
-              << "SetPixelFormat failed for format number: " << result_pixel_fmts[0] << " "
+              << "SetPixelFormat failed for format number: " << pfd_num << " "
               << "(system message: " << util::win32_error_message() << ")";
             //err() << log::fatal << s.str() << log::end;
             throw(std::runtime_error(s.str()));
@@ -234,7 +160,7 @@ window::window_impl::cleanup()
         }
     }
     if (_window_handle) {
-        if (0 == ::DestroyWindow(_window_handle)) {
+        if (FALSE == ::DestroyWindow(_window_handle)) {
             err() << log::error
                   << "window::window_impl::~window_impl() <win32>: " 
                   << "unable to destroy window "

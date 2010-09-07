@@ -1,11 +1,12 @@
 
-#ifndef SCM_GL_UTIL_OPENGL_WGL_H_INCLUDED
-#define SCM_GL_UTIL_OPENGL_WGL_H_INCLUDED
+#ifndef SCM_GL_UTIL_WM_WIN32_WGL_EXTENSIONS_H_INCLUDED
+#define SCM_GL_UTIL_WM_WIN32_WGL_EXTENSIONS_H_INCLUDED
 
 #include <scm/core/platform/platform.h>
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
+#include <ostream>
 #include <set>
 #include <string>
 
@@ -53,7 +54,7 @@ public:
 public:
     wgl_extensions();
 
-    bool            initialize();
+    bool            initialize(std::ostream& os);
     bool            is_initialized() const;
     bool            is_supported(const std::string& ext) const;
 
@@ -70,4 +71,4 @@ private:
 
 
 #endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-#endif // SCM_GL_UTIL_OPENGL_WGL_H_INCLUDED
+#endif // SCM_GL_UTIL_WM_WIN32_WGL_EXTENSIONS_H_INCLUDED

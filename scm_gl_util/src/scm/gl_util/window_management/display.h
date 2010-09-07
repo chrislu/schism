@@ -12,6 +12,7 @@ namespace gl {
 namespace wm {
 
 class window;
+class headless_surface;
 
 class __scm_export(gl_util) display
 {
@@ -29,6 +30,7 @@ private:
     display& operator=(const display&);
 
     friend class scm::gl::wm::window;
+    friend class scm::gl::wm::headless_surface;
 }; // class display
 
 } // namespace wm

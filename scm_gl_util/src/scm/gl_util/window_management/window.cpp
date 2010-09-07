@@ -20,8 +20,7 @@ window::window(const display&           in_display,
                const math::vec2i&       in_position,
                const math::vec2ui&      in_size,
                const pixel_format_desc& in_pf)
-  : _associated_display(in_display),
-    _pixel_format(in_pf)
+  : surface(in_display, in_pf)
 {
     try {
         _impl.reset(new window_impl(in_display, in_title, in_position, in_size, in_pf));
@@ -43,18 +42,6 @@ const window::wnd_handle
 window::window_handle() const
 {
     return (_impl->_window_handle);
-}
-
-const display&
-window::associated_display() const
-{
-    return (_associated_display);
-}
-
-const pixel_format_desc&
-window::pixel_format() const
-{
-    return (_pixel_format);
 }
 
 void

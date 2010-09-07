@@ -7,8 +7,6 @@
 
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_core/log.h>
-
 #include <scm/gl_util/window_management/wm_win32/classic_context_win32.h>
 
 namespace scm {
@@ -44,7 +42,7 @@ wgl_extensions::wgl_extensions()
 }
 
 bool
-wgl_extensions::initialize()
+wgl_extensions::initialize(std::ostream& os)
 {
     if (is_initialized()) {
         return (true);
@@ -54,8 +52,7 @@ wgl_extensions::initialize()
     if (wglGetCurrentContext() == 0) {
         dummy_context.reset(new util::classic_gl_context);
         if (!dummy_context->create()) {
-            glerr() << log::error
-                    << "wgl_extensions::initialize(): unable to initialize dummy OpenGL context" << log::end;
+            os << "wgl_extensions::initialize(): unable to initialize dummy OpenGL context";
             return (false);
         }
     }
@@ -64,16 +61,14 @@ wgl_extensions::initialize()
     wglGetExtensionsStringARB       = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
     
     if (wglGetExtensionsStringARB == 0) {
-        glerr() << log::error
-                 << "wgl_extensions::initialize(): WGL_ARB_extensions_string not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_extensions_string not supported";
         return (false);
     }
 
     // get and tokenize the extension strings
     HDC cur_hdc = wglGetCurrentDC();
     if (cur_hdc == 0) {
-        glerr() << log::error
-                << "wgl_extensions::initialize(): unable to retrieve current HDC" << log::end;
+        os << "wgl_extensions::initialize(): unable to retrieve current HDC";
         return (false);
     }
     std::string wgl_ext_string = reinterpret_cast<const char*>(wglGetExtensionsStringARB(cur_hdc));
@@ -90,8 +85,7 @@ wgl_extensions::initialize()
     wglCreateContextAttribsARB      = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     
     if (wglCreateContextAttribsARB == 0) {
-        glerr() << log::error
-                << "wgl_extensions::initialize(): WGL_ARB_create_context not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_create_context not supported";
         return (false);
     }
 
@@ -103,8 +97,7 @@ wgl_extensions::initialize()
     if (   wglGetPixelFormatAttribivARB == 0
         || wglGetPixelFormatAttribfvARB == 0
         || wglChoosePixelFormatARB == 0) {
-        glerr() << log::error
-                << "wgl_extensions::initialize(): WGL_ARB_pixel_format not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_pixel_format not supported";
         return (false);
     }
 
@@ -114,19 +107,16 @@ wgl_extensions::initialize()
 
     if (   wglSwapIntervalEXT == 0
         || wglGetSwapIntervalEXT == 0) {
-        glerr() << log::error
-                << "wgl_extensions::initialize(): WGL_EXT_swap_control not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_EXT_swap_control not supported";
         return (false);
     }
 
     if (  !is_supported("WGL_ARB_framebuffer_sRGB")
         ||!is_supported("WGL_EXT_framebuffer_sRGB")) {
-        glout() << log::warning
-                << "wgl_extensions::initialize(): WGL_ARB_framebuffer_sRGB not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_framebuffer_sRGB not supported";
     }
     if (!is_supported("WGL_ARB_multisample")) {
-        glout() << log::warning
-                << "wgl_extensions::initialize(): WGL_ARB_multisample not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_multisample not supported";
     }
 
     // WGL_ARB_pbuffer
@@ -141,8 +131,7 @@ wgl_extensions::initialize()
         || wglReleasePbufferDCARB == 0
         || wglDestroyPbufferARB == 0
         || wglQueryPbufferARB == 0) {
-        glerr() << log::error
-                << "wgl_extensions::initialize(): WGL_ARB_pbuffer not supported" << log::end;
+        os << "wgl_extensions::initialize(): WGL_ARB_pbuffer not supported";
         return (false);
     }
     _initialized = true;
