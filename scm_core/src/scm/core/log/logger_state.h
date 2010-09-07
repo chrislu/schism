@@ -21,7 +21,7 @@ class __scm_export(core) logger_format_saver : boost::noncopyable
 
 public:
     logger_format_saver(logger_type& l);
-    logger_format_saver(out_stream& los);
+    //logger_format_saver(out_stream& los); // todo rvalue ref
     ~logger_format_saver();
 
     void                restore();

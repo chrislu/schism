@@ -14,13 +14,13 @@ logger_format_saver::logger_format_saver(logger_type& l)
 {
 }
 
-logger_format_saver::logger_format_saver(out_stream& los)
-  : _logger(los.associated_logger()),
-    _s_indent_fill_char(los.associated_logger().indent_fill_char()),
-    _s_indent_level(los.associated_logger().indent_level()),
-    _s_indent_width(los.associated_logger().indent_width())
-{
-}
+//logger_format_saver::logger_format_saver(out_stream& los)
+//  : _logger(los.associated_logger()),
+//    _s_indent_fill_char(los.associated_logger().indent_fill_char()),
+//    _s_indent_level(los.associated_logger().indent_level()),
+//    _s_indent_width(los.associated_logger().indent_width())
+//{
+//}
 
 logger_format_saver::~logger_format_saver()
 {

@@ -39,7 +39,7 @@ core::core(int argc, char **argv)
     {
         //scm::log::out_stream x = scm::out();
         //log::logger_format_saver save_indent(x);
-        log::logger_format_saver save_indent(log::out_stream t = scm::out());
+        log::logger_format_saver save_indent(scm::out().associated_logger());
         scm::out() << log::info
                    << "initializing scm.core:" << log::end;
 
@@ -62,7 +62,7 @@ core::core(int argc, char **argv)
 core::~core()
 {
     {
-        log::logger_format_saver save_indent(log::out_stream t = scm::out());
+        log::logger_format_saver save_indent(scm::out().associated_logger());
         scm::out() << log::info
                    << "shutting down scm.core:" << log::end;
         scm::out() << log::indent;

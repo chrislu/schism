@@ -37,10 +37,10 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/viewer *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management *.h *.inl)
-#scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/detail *.cpp)
-#scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/detail *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32 *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32 *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32/util *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32/util *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.h *.inl)
 
