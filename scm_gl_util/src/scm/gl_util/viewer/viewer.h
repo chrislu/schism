@@ -61,8 +61,6 @@ public:
            const wm::window::handle             parent_wnd = 0,
            const wm::context::attribute_desc&   ctx_attrib = wm::context::default_attributes(),
            const wm::surface::format_desc&      win_fmt = wm::surface::default_format());
-           //const window_context::wnd_handle wnd,
-           //const context_format&            format = context_format::default_format());
     virtual~viewer();
 
     const render_device_ptr&        device() const;
@@ -120,7 +118,6 @@ protected:
     render_device_ptr               _device;
     render_context_ptr              _context;
 
-    //shared_ptr<window_context>      _graphics_context;
     wm::window_ptr                  _window;
     wm::context_ptr                 _window_context;
 

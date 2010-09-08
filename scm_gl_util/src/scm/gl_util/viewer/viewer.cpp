@@ -37,26 +37,9 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
                const wm::window::handle             parent_wnd,
                const wm::context::attribute_desc&   ctx_attrib,
                const wm::surface::format_desc&      win_fmt)
-               //const window_context::wnd_handle wnd,
-               //const context_format&            format)
   : _viewport(math::vec2ui(0, 0), vp_dim),
     _trackball_enabled(true)
 {
-
-//#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-//
-//    //_graphics_context.reset(new window_context_win32());
-//
-//    //if (!_graphics_context->setup(wnd, format)) {
-//    //    std::stringstream msg;
-//    //    msg << "viewer::viewer(): failed to initialize window rendering context";
-//    //    glerr() << msg.str() << log::end;
-//    //    throw(std::runtime_error(msg.str()));
-//    //}
-//#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-////#error "not yet implemented"
-//#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-
     try {
         wm::display_ptr     default_display(new wm::display(""));
         _window.reset(new wm::window(default_display, parent_wnd, "scm::gl::viewer", math::vec2i(0, 0), vp_dim, win_fmt));
@@ -115,13 +98,6 @@ viewer::settings()
     return (_settings);
 }
 
-//const window_context&
-//viewer::graphics_context() const
-//{
-//    assert(_graphics_context);
-//    return (*_graphics_context);
-//}
-
 const wm::window_ptr&
 viewer::window() const
 {
@@ -161,8 +137,6 @@ viewer::clear_depth_stencil() const
 void
 viewer::swap_buffers(int interval)
 {
-    //assert(_graphics_context);
-    //_graphics_context->swap_buffers(interval);
     _window->swap_buffers(interval);
 }
 
