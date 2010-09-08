@@ -10,7 +10,7 @@
 
 #include <scm/gl_util/window_management/headless_surface.h>
 #include <scm/gl_util/window_management/window.h>
-#include <scm/gl_util/window_management/wm_x2/surface_impl_x.h>
+#include <scm/gl_util/window_management/wm_x/surface_impl_x.h>
 
 namespace scm {
 namespace gl {

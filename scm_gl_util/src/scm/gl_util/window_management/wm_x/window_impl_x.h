@@ -6,6 +6,8 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
+#include <X11/Xlib.h>
+
 #include <scm/core/pointer_types.h>
 
 #include <scm/gl_util/window_management/window.h>

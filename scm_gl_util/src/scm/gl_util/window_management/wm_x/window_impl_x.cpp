@@ -13,7 +13,7 @@ window::window_impl::window_impl(const display_ptr&       in_display,
                                  const math::vec2i&       in_position,
                                  const math::vec2ui&      in_size,
                                  const format_desc&       in_sf)
-  : surface::surface_impl(),
+  : surface::surface_impl()
 {
 }
 

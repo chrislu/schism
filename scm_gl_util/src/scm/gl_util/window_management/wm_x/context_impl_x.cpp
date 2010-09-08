@@ -12,7 +12,6 @@
 #include <scm/gl_core/constants.h>
 
 #include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/pixel_format.h>
 
 namespace scm {
 namespace gl {

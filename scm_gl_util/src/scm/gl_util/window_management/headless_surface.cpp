@@ -9,6 +9,8 @@
 #include <scm/gl_util/window_management/window.h>
 #include <scm/gl_util/window_management/wm_win32/headless_surface_impl_win32.h>
 #include <scm/gl_util/window_management/wm_win32/window_impl_win32.h>
+#include <scm/gl_util/window_management/wm_x/headless_surface_impl_x.h>
+#include <scm/gl_util/window_management/wm_x/window_impl_x.h>
 
 namespace scm {
 namespace gl {
