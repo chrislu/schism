@@ -16,19 +16,14 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-namespace util {
-
-class wgl_extensions;
-
-} // namespace util
-
 struct context::context_impl
 {
-    context_impl(const surface&         in_surface,
+    context_impl(const surface_ptr&     in_surface,
                  const attribute_desc&  in_attributes,
-                 const context&         in_share_ctx);
+                 const context_ptr&     in_share_ctx);
     virtual ~context_impl();
 
+    bool                    make_current(const surface_ptr& in_surface, bool current) const;
     void                    cleanup();
 
 }; // class context_impl

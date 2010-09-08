@@ -9,19 +9,25 @@
 #include <scm/core/pointer_types.h>
 
 #include <scm/gl_util/window_management/window.h>
+#include <scm/gl_util/window_management/wm_x/surface_impl_x.h>
 
 namespace scm {
 namespace gl {
 namespace wm {
 
-struct window::window_impl
+struct window::window_impl : public surface::surface_impl
 {
-    window_impl(const display&           in_display,
+    window_impl(const display_ptr&       in_display,
+                const XID                in_parent,
                 const std::string&       in_title,
                 const math::vec2i&       in_position,
                 const math::vec2ui&      in_size,
-                const pixel_format_desc& in_pf);
+                const format_desc&       in_sf);
     virtual ~window_impl();
+
+    void            cleanup();
+
+    void            swap_buffers(int interval) const;
 
     void            show();
     void            hide();

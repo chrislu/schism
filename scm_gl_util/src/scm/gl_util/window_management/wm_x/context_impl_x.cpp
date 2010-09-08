@@ -18,9 +18,9 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-context::context_impl::context_impl(const surface&         in_surface,
+context::context_impl::context_impl(const surface_ptr&     in_surface,
                                     const attribute_desc&  in_attributes,
-                                    const context&         in_share_ctx)
+                                    const context_ptr&     in_share_ctx)
 {
     try {
     }
@@ -33,6 +33,11 @@ context::context_impl::context_impl(const surface&         in_surface,
 context::context_impl::~context_impl()
 {
     cleanup();
+}
+bool
+context::context_impl::make_current(const surface_ptr& in_surface, bool current) const
+{
+    return (false);
 }
 
 void

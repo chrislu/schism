@@ -7,15 +7,22 @@ namespace scm {
 namespace gl {
 namespace wm {
 
-window::window_impl::window_impl(const display&           in_display,
+window::window_impl::window_impl(const display_ptr&       in_display,
+                                 const XID                in_parent,
                                  const std::string&       in_title,
                                  const math::vec2i&       in_position,
                                  const math::vec2ui&      in_size,
-                                 const pixel_format_desc& in_pf)
+                                 const format_desc&       in_sf)
+  : surface::surface_impl(),
 {
 }
 
 window::window_impl::~window_impl()
+{
+}
+
+void
+window::window_impl::swap_buffers(int interval) const
 {
 }
 
