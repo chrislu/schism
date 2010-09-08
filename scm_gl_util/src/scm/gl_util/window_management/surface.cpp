@@ -55,6 +55,14 @@ surface::surface_format() const
     return (_format);
 }
 
+/*static*/
+const surface::format_desc&
+surface::default_format()
+{
+    static format_desc  default_fmt(FORMAT_RGBA_8, FORMAT_D24_S8, true, false);
+    return (default_fmt);
+}
+
 } // namespace wm
 } // namepspace gl
 } // namepspace scm

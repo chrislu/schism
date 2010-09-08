@@ -10,10 +10,15 @@
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
-#include <scm/gl_util/render_context/render_context_fwd.h>
-#include <scm/gl_util/render_context/context_format.h>
-#include <scm/gl_util/render_context/window_context.h>
+//#include <scm/gl_util/render_context/render_context_fwd.h>
+//#include <scm/gl_util/render_context/context_format.h>
+//#include <scm/gl_util/render_context/window_context.h>
+
 #include <scm/gl_util/viewer/camera.h>
+#include <scm/gl_util/window_management/wm_fwd.h>
+#include <scm/gl_util/window_management/surface.h>
+#include <scm/gl_util/window_management/window.h>
+#include <scm/gl_util/window_management/context.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -52,9 +57,12 @@ public:
     typedef boost::function<void (mouse_button, int, int)>      mouse_func;
 
 public:
-    viewer(const math::vec2ui&              vp_dim,
-           const window_context::wnd_handle wnd,
-           const context_format&            format = context_format::default_format());
+    viewer(const math::vec2ui&                  vp_dim,
+           const wm::window::handle             parent_wnd = 0,
+           const wm::context::attribute_desc&   ctx_attrib = wm::context::default_attributes(),
+           const wm::surface::format_desc&      win_fmt = wm::surface::default_format());
+           //const window_context::wnd_handle wnd,
+           //const context_format&            format = context_format::default_format());
     virtual~viewer();
 
     const render_device_ptr&        device() const;
@@ -63,7 +71,9 @@ public:
     const viewer_settings&          settings() const;
     viewer_settings&                settings();
 
-    const window_context&           graphics_context() const;
+    //const window_context&           graphics_context() const;
+    const wm::window_ptr&           window() const;
+    const wm::context_ptr&          window_context() const;
 
     const camera&                   main_camera() const;
     camera&                         main_camera();
@@ -110,7 +120,9 @@ protected:
     render_device_ptr               _device;
     render_context_ptr              _context;
 
-    shared_ptr<window_context>      _graphics_context;
+    //shared_ptr<window_context>      _graphics_context;
+    wm::window_ptr                  _window;
+    wm::context_ptr                 _window_context;
 
     trackball_manipulator           _trackball;
     math::vec2f                     _trackball_start_pos;

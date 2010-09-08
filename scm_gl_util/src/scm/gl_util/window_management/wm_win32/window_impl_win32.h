@@ -26,6 +26,7 @@ class wgl_extensions;
 struct window::window_impl : public surface::surface_impl
 {
     window_impl(const display_ptr&       in_display,
+                const HWND               in_parent,
                 const std::string&       in_title,
                 const math::vec2i&       in_position,
                 const math::vec2ui&      in_size,

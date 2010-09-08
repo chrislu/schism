@@ -40,7 +40,9 @@ public:
     const display_ptr&          associated_display() const;
     const format_desc&          surface_format() const;
 
-private:
+    static const format_desc&   default_format();
+
+protected:
     const display_ptr           _associated_display;
     format_desc                 _format;
 

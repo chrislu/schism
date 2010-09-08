@@ -23,7 +23,26 @@ window::window(const display_ptr&       in_display,
   : surface(in_display, in_sf)
 {
     try {
-        _impl.reset(new window_impl(in_display, in_title, in_position, in_size, in_sf));
+        _impl.reset(new window_impl(in_display, 0, in_title, in_position, in_size, in_sf));
+    }
+    catch(const std::exception& e) {
+        err() << log::error
+              << "window::window(): "
+              << log::indent << e.what() << log::outdent << log::end;
+        throw (e);
+    }
+}
+
+window::window(const display_ptr&       in_display,
+               const handle             in_parent,
+               const std::string&       in_title,
+               const math::vec2i&       in_position,
+               const math::vec2ui&      in_size,
+               const format_desc&       in_sf)
+  : surface(in_display, in_sf)
+{
+    try {
+        _impl.reset(new window_impl(in_display, in_parent, in_title, in_position, in_size, in_sf));
     }
     catch(const std::exception& e) {
         err() << log::error
@@ -44,7 +63,7 @@ window::swap_buffers(int interval) const
     boost::static_pointer_cast<window_impl>(_impl)->swap_buffers(interval);
 }
 
-const window::wnd_handle
+const window::handle
 window::window_handle() const
 {
     return (boost::static_pointer_cast<window_impl>(_impl)->_window_handle);

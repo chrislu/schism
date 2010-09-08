@@ -33,21 +33,24 @@ public:
             const context_ptr&      in_share_ctx = context_ptr());
     virtual ~context();
 
-    bool                        make_current(const surface_ptr& in_surface, bool current = true);
+    bool                            make_current(const surface_ptr& in_surface, bool current = true);
 
-    const display_ptr&          associated_display() const;
-    const surface::format_desc& surface_format() const;
-    const attribute_desc&       context_attributes() const;
+    const display_ptr&              associated_display() const;
+    const surface::format_desc&     surface_format() const;
+    const attribute_desc&           context_attributes() const;
+
+    static const attribute_desc&    default_attributes();
+
+protected:
+    const display_ptr&              _associated_display;
+    surface::format_desc            _surface_format;
+    attribute_desc                  _attributes;
+
+    weak_ptr<surface>               _current_surface;
 
 private:
     struct context_impl;
-    shared_ptr<context_impl>    _impl;
-
-    const display_ptr&          _associated_display;
-    surface::format_desc        _surface_format;
-    attribute_desc              _attributes;
-
-    weak_ptr<surface>           _current_surface;
+    shared_ptr<context_impl>        _impl;
 
 private:
     // non_copyable

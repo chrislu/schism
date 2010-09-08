@@ -22,6 +22,7 @@ namespace gl {
 namespace wm {
 
 window::window_impl::window_impl(const display_ptr&       in_display,
+                                 const HWND               in_parent,
                                  const std::string&       in_title,
                                  const math::vec2i&       in_position,
                                  const math::vec2ui&      in_size,
@@ -39,14 +40,21 @@ window::window_impl::window_impl(const display_ptr&       in_display,
 
         DWORD wnd_style     = 0;
         DWORD wnd_style_ex  = 0;
+        HWND parent_wnd = ::GetDesktopWindow();
 
         if (fullscreen_window) {
             wnd_style    = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP;
-            wnd_style_ex = WS_EX_TOPMOST; // WS_EX_APPWINDOW
+            wnd_style_ex = WS_EX_TOPMOST;
         }
         else {
-            wnd_style    = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;//WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME;//; //WS_OVERLAPPEDWINDOW;//WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX; //
-            wnd_style_ex = 0;//WS_EX_OVERLAPPEDWINDOW; //WS_EX_STATICEDGE; //
+            if (0 != in_parent) {
+                parent_wnd = in_parent;
+                wnd_style  = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_CHILD;
+            }
+            else {
+                wnd_style  = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP;
+            }
+            wnd_style_ex = 0;//WS_EX_OVERLAPPEDWINDOW; //0;//WS_EX_STATICEDGE; //
         }
 
         math::vec2i wnd_position = in_display->_impl->_info->_screen_origin + in_position;
@@ -63,12 +71,13 @@ window::window_impl::window_impl(const display_ptr&       in_display,
             throw(std::runtime_error(s.str()));
         }
 
+
         _window_handle = ::CreateWindowEx(wnd_style_ex, reinterpret_cast<LPCSTR>(in_display->_impl->_window_class),
                                             in_title.c_str(),
                                             wnd_style,
                                             wnd_position.x, wnd_position.y,
                                             wnd_rect.right - wnd_rect.left, wnd_rect.bottom - wnd_rect.top,
-                                            0, 0, in_display->_impl->_hinstance,
+                                            parent_wnd, 0, in_display->_impl->_hinstance,
                                             0);
 
         if (0 == _window_handle) {

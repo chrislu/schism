@@ -27,11 +27,6 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/primitives *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/primitives/util *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/primitives/util *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/render_context *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/render_context *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/render_context/detail *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/render_context/detail *.h *.inl)
-
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/viewer *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/viewer *.h *.inl)
 

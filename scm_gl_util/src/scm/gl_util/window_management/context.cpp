@@ -45,10 +45,10 @@ context::context(const surface_ptr&     in_surface,
 
 context::~context()
 {
-    surface_ptr lock_cur_surface = _current_surface.lock();
-    if (lock_cur_surface) {
-        _impl->make_current(lock_cur_surface, false);
-    }
+    //surface_ptr lock_cur_surface = _current_surface.lock();
+    //if (lock_cur_surface) {
+    //    _impl->make_current(lock_cur_surface, false);
+    //}
     _impl.reset();
 }
 
@@ -82,6 +82,14 @@ const context::attribute_desc&
 context::context_attributes() const
 {
     return (_attributes);
+}
+
+/*static*/
+const context::attribute_desc&
+context::default_attributes()
+{
+    static attribute_desc   default_attrib(0, 0);
+    return (default_attrib);
 }
 
 } // namespace wm

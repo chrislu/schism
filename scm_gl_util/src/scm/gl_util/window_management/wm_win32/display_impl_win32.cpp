@@ -125,9 +125,9 @@ display::display_impl::display_impl(const std::string& name)
         ZeroMemory(&wnd_class, sizeof(WNDCLASSEX));
         wnd_class.cbSize        = sizeof(WNDCLASSEX);
         wnd_class.lpfnWndProc   = &DefWindowProc;      
-        wnd_class.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+        wnd_class.style         = CS_OWNDC;// | CS_HREDRAW | CS_VREDRAW;
         wnd_class.hInstance     = _hinstance;
-        wnd_class.hbrBackground = (HBRUSH)::GetStockObject(DKGRAY_BRUSH);
+        wnd_class.hbrBackground = 0;//(HBRUSH)::GetStockObject(DKGRAY_BRUSH);
         wnd_class.lpszClassName = class_name.c_str();
 
         _window_class = ::RegisterClassEx(&wnd_class);
@@ -156,19 +156,19 @@ display::display_impl::display_impl(const std::string& name)
         }
 
         std::string disp_name;
-        if (!name.empty()) {
-            disp_name = name;
-        }
-        else {
+        if (name.empty()) {// == std::string("")) {
             disp_name = detail::default_display_name();
         }
+        else {
+            disp_name = name;
+        }
 
-        detail::display_info_map::const_iterator dsp = display_infos.find(name);
+        detail::display_info_map::const_iterator dsp = display_infos.find(disp_name);
 
         if (dsp == display_infos.end()) {
             std::ostringstream s;
             s << "display::display_impl::display_impl() <win32>: " 
-              << "unable find display (" << name << ")" << std::endl
+              << "unable find display (" << disp_name << ")" << std::endl
               << "available displays:" << std::endl;
             for (detail::display_info_map::const_iterator i = display_infos.begin();
                  i != display_infos.end(); ++i) {

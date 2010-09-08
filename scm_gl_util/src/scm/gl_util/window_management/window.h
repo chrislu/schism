@@ -26,9 +26,9 @@ class __scm_export(gl_util) window : public surface
 {
 public:
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-    typedef HWND wnd_handle;
+    typedef HWND handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-    typedef long wnd_handle;
+    typedef long handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
 #error "atm unsupported platform"
 #endif
@@ -39,10 +39,16 @@ public:
            const math::vec2i&       in_position,
            const math::vec2ui&      in_size,
            const format_desc&       in_sf);
+    window(const display_ptr&       in_display,
+           const handle             in_parent,
+           const std::string&       in_title,
+           const math::vec2i&       in_position,
+           const math::vec2ui&      in_size,
+           const format_desc&       in_sf);
     virtual ~window();
 
     void                        swap_buffers(int interval = 0) const;
-    const wnd_handle            window_handle() const;
+    const handle                window_handle() const;
    
     void                        show();
     void                        hide();

@@ -15,7 +15,10 @@
 
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
-#include <scm/gl_util/render_context/window_context_win32.h>
+//#include <scm/gl_util/render_context/window_context_win32.h>
+#include <scm/gl_util/window_management/context.h>
+#include <scm/gl_util/window_management/display.h>
+#include <scm/gl_util/window_management/window.h>
 
 namespace scm {
 namespace gl {
@@ -30,27 +33,36 @@ viewer::viewer_settings::viewer_settings()
 {
 }
 
-viewer::viewer(const math::vec2ui&              vp_dim,
-               const window_context::wnd_handle wnd,
-               const context_format&            format)
+viewer::viewer(const math::vec2ui&                  vp_dim,
+               const wm::window::handle             parent_wnd,
+               const wm::context::attribute_desc&   ctx_attrib,
+               const wm::surface::format_desc&      win_fmt)
+               //const window_context::wnd_handle wnd,
+               //const context_format&            format)
   : _viewport(math::vec2ui(0, 0), vp_dim),
     _trackball_enabled(true)
 {
 
-#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-    _graphics_context.reset(new window_context_win32());
-
-    if (!_graphics_context->setup(wnd, format)) {
-        std::stringstream msg;
-        msg << "viewer::viewer(): failed to initialize window rendering context";
-        glerr() << msg.str() << log::end;
-        throw(std::runtime_error(msg.str()));
-    }
-#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
-//#error "not yet implemented"
-#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+//#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+//
+//    //_graphics_context.reset(new window_context_win32());
+//
+//    //if (!_graphics_context->setup(wnd, format)) {
+//    //    std::stringstream msg;
+//    //    msg << "viewer::viewer(): failed to initialize window rendering context";
+//    //    glerr() << msg.str() << log::end;
+//    //    throw(std::runtime_error(msg.str()));
+//    //}
+//#else // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+////#error "not yet implemented"
+//#endif // SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
     try {
+        wm::display_ptr     default_display(new wm::display(""));
+        _window.reset(new wm::window(default_display, parent_wnd, "scm::gl::viewer", math::vec2i(0, 0), vp_dim, win_fmt));
+        _window_context.reset(new wm::context(_window, ctx_attrib));
+        _window_context->make_current(_window);
+
         _device.reset(new render_device());
         _context = _device->main_context();
     }
@@ -71,7 +83,11 @@ viewer::~viewer()
 {
     _context.reset();
     _device.reset();
-    _graphics_context.reset();
+
+    _window_context.reset();
+    _window.reset();
+
+    //_graphics_context.reset();
 }
 
 
@@ -99,11 +115,23 @@ viewer::settings()
     return (_settings);
 }
 
-const window_context&
-viewer::graphics_context() const
+//const window_context&
+//viewer::graphics_context() const
+//{
+//    assert(_graphics_context);
+//    return (*_graphics_context);
+//}
+
+const wm::window_ptr&
+viewer::window() const
 {
-    assert(_graphics_context);
-    return (*_graphics_context);
+    return (_window);
+}
+
+const wm::context_ptr&
+viewer::window_context() const
+{
+    return (_window_context);
 }
 
 const camera&
@@ -133,8 +161,9 @@ viewer::clear_depth_stencil() const
 void
 viewer::swap_buffers(int interval)
 {
-    assert(_graphics_context);
-    _graphics_context->swap_buffers(interval);
+    //assert(_graphics_context);
+    //_graphics_context->swap_buffers(interval);
+    _window->swap_buffers(interval);
 }
 
 
