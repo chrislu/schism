@@ -28,7 +28,7 @@ public:
 #if    SCM_PLATFORM == SCM_PLATFORM_WINDOWS
     typedef HWND handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_LINUX
-    typedef long handle;
+    typedef unsigned long handle;
 #elif  SCM_PLATFORM == SCM_PLATFORM_APPLE
 #error "atm unsupported platform"
 #endif
@@ -49,7 +49,7 @@ public:
 
     void                        swap_buffers(int interval = 0) const;
     const handle                window_handle() const;
-   
+
     void                        show();
     void                        hide();
 

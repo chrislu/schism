@@ -38,6 +38,8 @@ scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_win3
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32/util *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_x/util *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_x/util *.h *.inl)
 
 # include header and inline files in source files for visual studio projects
 if (WIN32)

@@ -6,7 +6,8 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
-#include <scm/core/platform/windows.h>
+#include <X11/Xlib.h>
+#include <GL/glx.h>
 
 #include <scm/gl_util/window_management/surface.h>
 
@@ -16,7 +17,10 @@ namespace wm {
 
 struct surface::surface_impl
 {
-    surface_impl() {}
+    surface_impl() : _fb_config(0), _drawable(0) {}
+
+    GLXFBConfig     _fb_config;
+    GLXDrawable     _drawable;
 }; // class surface_impl
 
 } // namespace wm

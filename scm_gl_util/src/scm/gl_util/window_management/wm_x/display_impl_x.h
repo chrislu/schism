@@ -6,6 +6,8 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
+#include <X11/Xlib.h>
+
 #include <scm/core/pointer_types.h>
 
 #include <scm/gl_util/window_management/display.h>
@@ -14,10 +16,23 @@ namespace scm {
 namespace gl {
 namespace wm {
 
+namespace util {
+
+class glx_extensions;
+
+} // namespace util
+
 struct display::display_impl
 {
     display_impl(const std::string& name);
     virtual ~display_impl();
+
+    void                        cleanup();
+
+    ::Display*      _display;
+    int             _default_screen;
+
+    shared_ptr<util::glx_extensions>  _glx_extensions;
 
 }; // class display_impl
 

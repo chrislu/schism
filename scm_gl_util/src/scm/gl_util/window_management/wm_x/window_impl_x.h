@@ -7,6 +7,7 @@
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 
 #include <X11/Xlib.h>
+#include <GL/glx.h>
 
 #include <scm/core/pointer_types.h>
 
@@ -17,10 +18,16 @@ namespace scm {
 namespace gl {
 namespace wm {
 
+namespace util {
+
+class glx_extensions;
+
+} // namespace util
+
 struct window::window_impl : public surface::surface_impl
 {
     window_impl(const display_ptr&       in_display,
-                const XID                in_parent,
+                const ::Window           in_parent,
                 const std::string&       in_title,
                 const math::vec2i&       in_position,
                 const math::vec2ui&      in_size,
@@ -34,7 +41,12 @@ struct window::window_impl : public surface::surface_impl
     void            show();
     void            hide();
 
-    long            _window_handle;
+    ::Window        _window_handle;
+    ::GLXWindow     _glx_window_handle;
+
+    ::Display*const _display;
+
+    shared_ptr<util::glx_extensions>  _glx_extensions;
 
 }; // class window_impl
 
