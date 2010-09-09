@@ -9,11 +9,11 @@ namespace gl {
 template<typename s>
 rect_impl<s>::rect_impl(const vec2_type& min_vert,
                         const vec2_type& max_vert)
-  : _min_vertex(min_vert, vec2_type::value_type(0)),
-    _max_vertex(max_vert, vec2_type::value_type(0)),
-    _poly_plane(vec3_type(min_vert, vec2_type::value_type(0)),
-                vec3_type(max_vert.x, min_vert.y, vec2_type::value_type(0)),
-                vec3_type(max_vert, vec2_type::value_type(0)))
+  : _min_vertex(min_vert, typename vec3_type::value_type(0)),
+    _max_vertex(max_vert, typename vec3_type::value_type(0)),
+    _poly_plane(vec3_type(min_vert, typename vec3_type::value_type(0)),
+                vec3_type(max_vert.x, min_vert.y, typename vec3_type::value_type(0)),
+                vec3_type(max_vert, typename vec3_type::value_type(0)))
 {
 }
 
