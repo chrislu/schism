@@ -6,8 +6,8 @@ namespace gl {
 
 template<typename s>
 ray_impl<s>::ray_impl()
-  : _origin(ray_impl::vec3_type::value_type(0)),
-    _direction(ray_impl::vec3_type::value_type(0))
+  : _origin(typename ray_impl::vec3_type::value_type(0)),
+    _direction(typename ray_impl::vec3_type::value_type(0))
 {
 }
 

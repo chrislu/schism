@@ -130,7 +130,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
 
     vec3_type rec_dir(vec3_type(typename vec3_type::value_type(1)) / dir);
 
-    if (dir.x >= vec3_type::value_type(0)) {
+    if (dir.x >= typename vec3_type::value_type(0)) {
         tmin = (b_min.x - org.x) * rec_dir.x;
         tmax = (b_max.x - org.x) * rec_dir.x;
     }
@@ -139,7 +139,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
         tmax = (b_min.x - org.x) * rec_dir.x;
     }
 
-    if (dir.y >= vec3_type::value_type(0)) {
+    if (dir.y >= typename vec3_type::value_type(0)) {
         tymin = (b_min.y - org.y) * rec_dir.y;
         tymax = (b_max.y - org.y) * rec_dir.y;
     }
@@ -160,7 +160,7 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
         tmax = tymax;
     }
 
-    if (dir.z >= vec3_type::value_type(0)) {
+    if (dir.z >= typename vec3_type::value_type(0)) {
         tzmin = (b_min.z - org.z) * rec_dir.z;
         tzmax = (b_max.z - org.z) * rec_dir.z;
     }
@@ -192,3 +192,4 @@ box_impl<s>::intersect(const typename box_impl<s>::ray_type& r,
 
 } // namespace gl
 } // namespace scm
+
