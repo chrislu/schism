@@ -96,9 +96,18 @@ quad_geometry::draw(const render_context_ptr& in_context,
     context_vertex_input_guard vig(in_context);
 
     in_context->bind_vertex_array(_vertex_array);
-    in_context->bind_index_buffer(_solid_indices, PRIMITIVE_TRIANGLE_STRIP, TYPE_USHORT);
-    in_context->apply();
 
+    if (in_draw_mode == MODE_SOLID) {
+        in_context->bind_index_buffer(_solid_indices, PRIMITIVE_TRIANGLE_STRIP, TYPE_USHORT);
+    }
+    else if (in_draw_mode == MODE_WIRE_FRAME) {
+        in_context->bind_index_buffer(_solid_indices, PRIMITIVE_LINE_LOOP, TYPE_USHORT);
+    }
+    else {
+        return;
+    }
+
+    in_context->apply();
     in_context->draw_elements(4);
 }
 

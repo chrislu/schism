@@ -31,10 +31,7 @@ public:
     // data definition
     union
     {
-        struct
-        {
-            scal_type m00;
-        };
+        scal_type  m00;
         scal_type  data_array[1];
     };
 
