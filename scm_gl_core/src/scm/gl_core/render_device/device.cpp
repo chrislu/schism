@@ -157,7 +157,7 @@ render_device::init_capabilities()
 #if SCM_GL_CORE_OPENGL_41
     glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
 #else // SCM_GL_CORE_OPENGL_41
-    _max_viewports = 1;
+    _capabilities._max_viewports = 1;
 #endif // SCM_GL_CORE_OPENGL_41
 
     assert(_capabilities._max_viewports > 0);

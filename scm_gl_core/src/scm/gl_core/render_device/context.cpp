@@ -1051,8 +1051,8 @@ render_context::apply_frame_buffer()
                     << log::end;
         }
 #endif// SCM_GL_DEBUG
-        glapi.glViewport(static_cast<unsigned>(_current_state._viewports.viewports()[0]._lower_left.x),
-                         static_cast<unsigned>(_current_state._viewports.viewports()[0]._lower_left.y),
+        glapi.glViewport(static_cast<unsigned>(_current_state._viewports.viewports()[0]._position.x),
+                         static_cast<unsigned>(_current_state._viewports.viewports()[0]._position.y),
                          static_cast<unsigned>(_current_state._viewports.viewports()[0]._dimensions.x),
                          static_cast<unsigned>(_current_state._viewports.viewports()[0]._dimensions.y));
         glapi.glDepthRange(_current_state._viewports.viewports()[0]._depth_range.x,
