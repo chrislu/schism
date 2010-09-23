@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <scm/core/math.h>
+
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
@@ -50,7 +52,9 @@ rasterizer_state::descriptor() const
 
 void
 rasterizer_state::apply(const render_context&   in_context,
-                        const rasterizer_state& in_applied_state) const
+                        const float             in_line_width,
+                        const rasterizer_state& in_applied_state,
+                        const float             in_applied_line_width) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
@@ -93,12 +97,16 @@ rasterizer_state::apply(const render_context&   in_context,
             glapi.glDisable(GL_LINE_SMOOTH);
         }
     }
+    if (in_line_width != in_applied_line_width) { // i do no care about float compare at this point
+        glapi.glLineWidth(math::max<float>(1.0f, in_line_width));
+    }
 
     gl_assert(glapi, leaving rasterizer_state::apply());
 }
 
 void
-rasterizer_state::force_apply(const render_context&   in_context) const
+rasterizer_state::force_apply(const render_context&   in_context,
+                              const float             in_line_width) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
@@ -129,6 +137,8 @@ rasterizer_state::force_apply(const render_context&   in_context) const
     else {
         glapi.glDisable(GL_LINE_SMOOTH);
     }
+
+    glapi.glLineWidth(math::max<float>(1.0f, in_line_width));
 
     gl_assert(glapi, leaving rasterizer_state::force_apply());
 }

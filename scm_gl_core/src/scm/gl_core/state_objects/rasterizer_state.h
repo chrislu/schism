@@ -42,8 +42,11 @@ protected:
                      const rasterizer_state_desc& in_desc);
 
     void                            apply(const render_context&   in_context,
-                                          const rasterizer_state& in_applied_state) const;
-    void                            force_apply(const render_context&   in_context) const;
+                                          const float             in_line_width,
+                                          const rasterizer_state& in_applied_state,
+                                          const float             in_applied_line_width) const;
+    void                            force_apply(const render_context&   in_context,
+                                                const float             in_line_width) const;
 
 protected:
     rasterizer_state_desc           _descriptor;

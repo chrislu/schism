@@ -36,6 +36,7 @@ protected:
     buffer_ptr          _vertices;
 
     buffer_ptr          _solid_indices;
+    buffer_ptr          _wire_indices;
 
     vertex_array_ptr    _vertex_array;
 

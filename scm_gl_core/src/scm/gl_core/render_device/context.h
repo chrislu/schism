@@ -69,6 +69,7 @@ private:
         unsigned                            _stencil_ref_value;
         // rasterizer state
         rasterizer_state_ptr                _rasterizer_state;
+        float                               _line_width;
         // blend state
         blend_state_ptr                     _blend_state;
         // texture units //////////////////////////////////////////////////////////////////////////
@@ -221,8 +222,9 @@ public:
     unsigned                        current_stencil_ref_value() const;
 
     // rasterizer state
-    void                            set_rasterizer_state(const rasterizer_state_ptr& in_rs_state);
+    void                            set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width = 1.0f);
     const rasterizer_state_ptr&     current_rasterizer_state() const;
+    float                           current_line_width() const;
 
     // blend state
     void                            set_blend_state(const blend_state_ptr& in_bl_state);

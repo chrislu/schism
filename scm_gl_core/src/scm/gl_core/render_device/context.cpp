@@ -63,15 +63,16 @@ render_context::buffer_binding::operator!=(const buffer_binding& rhs) const
 }
 
 render_context::binding_state_type::binding_state_type()
-  : _stencil_ref_value(0),
-    _default_framebuffer_target(FRAMEBUFFER_BACK),
-    _viewports(viewport(math::vec2ui(0, 0), math::vec2ui(10, 10)))
+  : _stencil_ref_value(0)
+  , _line_width(1.0f)
+  , _default_framebuffer_target(FRAMEBUFFER_BACK)
+  , _viewports(viewport(math::vec2ui(0, 0), math::vec2ui(10, 10)))
 {
 }
 
 render_context::render_context(render_device& in_device)
-  : render_device_child(in_device),
-    _opengl_api_core(in_device.opengl3_api())
+  : render_device_child(in_device)
+  , _opengl_api_core(in_device.opengl3_api())
 {
     const opengl::gl3_core& glapi = opengl_api();
 
@@ -81,7 +82,7 @@ render_context::render_context(render_device& in_device)
     _applied_state._depth_stencil_state = _default_depth_stencil_state;
 
     _default_rasterizer_state = in_device.create_rasterizer_state(rasterizer_state_desc());
-    _default_rasterizer_state->force_apply(*this);
+    _default_rasterizer_state->force_apply(*this, 1.0f);
     _current_state._rasterizer_state = _default_rasterizer_state;
     _applied_state._rasterizer_state = _default_rasterizer_state;
 
@@ -1085,15 +1086,22 @@ render_context::current_stencil_ref_value() const
 }
 
 void
-render_context::set_rasterizer_state(const rasterizer_state_ptr& in_rs_state)
+render_context::set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width)
 {
     _current_state._rasterizer_state = in_rs_state;
+    _current_state._line_width       = in_line_width;
 }
 
 const rasterizer_state_ptr&
 render_context::current_rasterizer_state() const
 {
     return (_current_state._rasterizer_state);
+}
+
+float
+render_context::current_line_width() const
+{
+    return (_current_state._line_width);
 }
 
 void
@@ -1127,9 +1135,12 @@ render_context::apply_state_objects()
         _applied_state._stencil_ref_value   = _current_state._stencil_ref_value;
     }
 
-    if ((_current_state._rasterizer_state != _applied_state._rasterizer_state)) {
-        _current_state._rasterizer_state->apply(*this, *(_applied_state._rasterizer_state));
+    if (   (_current_state._rasterizer_state != _applied_state._rasterizer_state)
+        || (_current_state._line_width       != _applied_state._line_width)) {
+        _current_state._rasterizer_state->apply(*this, _current_state._line_width,
+                                                *(_applied_state._rasterizer_state), _applied_state._line_width);
         _applied_state._rasterizer_state = _current_state._rasterizer_state;
+        _applied_state._line_width       = _current_state._line_width;
     }
 
     if ((_current_state._blend_state != _applied_state._blend_state)) {

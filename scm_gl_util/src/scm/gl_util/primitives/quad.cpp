@@ -38,6 +38,7 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
 
     scoped_array<vertex>            vert(new vertex[num_vertices]);
     scoped_array<unsigned short>    ind_s(new unsigned short[4]);
+    scoped_array<unsigned short>    ind_w(new unsigned short[4]);
 
     _vertices = in_device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STREAM_DRAW, num_vertices * sizeof(vertex), 0);
 
@@ -57,16 +58,23 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
     
     ctx->unmap_buffer(_vertices);
 
-    // wire indices
+    // solid indices
     ind_s[0]  =  0;
     ind_s[1]  =  1;
     ind_s[2]  =  2;
     ind_s[3]  =  3;
 
+    // wire indices
+    ind_w[0]  =  0;
+    ind_w[1]  =  1;
+    ind_w[2]  =  3;
+    ind_w[3]  =  2;
+
     using namespace scm::gl;
     using boost::assign::list_of;
 
     _solid_indices = in_device->create_buffer(BIND_INDEX_BUFFER, USAGE_STATIC_DRAW, num_vertices * sizeof(unsigned short), ind_s.get());
+    _wire_indices  = in_device->create_buffer(BIND_INDEX_BUFFER, USAGE_STATIC_DRAW, num_vertices * sizeof(unsigned short), ind_w.get());
 
     _vertex_array = in_device->create_vertex_array(vertex_format(0, 0, TYPE_VEC3F, sizeof(vertex))
                                                                 (0, 2, TYPE_VEC2F, sizeof(vertex)),
@@ -77,6 +85,7 @@ quad_geometry::~quad_geometry()
 {
     _vertex_array.reset();
     _solid_indices.reset();
+    _wire_indices.reset();
     _vertices.reset();
 }
 
@@ -101,7 +110,7 @@ quad_geometry::draw(const render_context_ptr& in_context,
         in_context->bind_index_buffer(_solid_indices, PRIMITIVE_TRIANGLE_STRIP, TYPE_USHORT);
     }
     else if (in_draw_mode == MODE_WIRE_FRAME) {
-        in_context->bind_index_buffer(_solid_indices, PRIMITIVE_LINE_LOOP, TYPE_USHORT);
+        in_context->bind_index_buffer(_wire_indices, PRIMITIVE_LINE_LOOP, TYPE_USHORT);
     }
     else {
         return;
