@@ -53,7 +53,7 @@ public:
                                   int, int)>                    resize_func;
     typedef boost::function<void (const render_context_ptr&)>   display_func;
 
-    typedef boost::function<void (int)>                         keyboard_func;
+    typedef boost::function<void (int, bool)>                   keyboard_func;
     typedef boost::function<void (mouse_button, int, int)>      mouse_func;
 
 public:
@@ -100,7 +100,7 @@ public:
     void                            send_render_display();
     void                            send_render_reshape(int width, int height);
 
-    void                            send_keyboard_input(int key);
+    void                            send_keyboard_input(int key, bool state);
     void                            send_mouse_double_click(mouse_button button, int x, int y);
     void                            send_mouse_press(mouse_button button, int x, int y);
     void                            send_mouse_release(mouse_button button, int x, int y);

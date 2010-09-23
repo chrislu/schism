@@ -228,10 +228,10 @@ viewer::send_render_reshape(int width, int height)
 }
 
 void
-viewer::send_keyboard_input(int key)
+viewer::send_keyboard_input(int key, bool state)
 {
     if (_keyboard_func) {
-        _keyboard_func(key);
+        _keyboard_func(key, state);
     }
 }
 
