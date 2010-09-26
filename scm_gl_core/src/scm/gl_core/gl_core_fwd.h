@@ -6,6 +6,7 @@
 
 #include <scm/gl_core/buffer_objects/buffer_objects_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/frame_buffer_objects_fwd.h>
+#include <scm/gl_core/primitives/primitives_fwd.h>
 #include <scm/gl_core/query_objects/query_objects_fwd.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_core/shader_objects/shader_objects_fwd.h>

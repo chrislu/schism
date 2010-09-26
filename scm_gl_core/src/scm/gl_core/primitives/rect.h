@@ -46,6 +46,8 @@ public:
     void                        min_vertex(const vec2_type& vert);
     void                        max_vertex(const vec2_type& vert);
 
+    const plane_type&           poly_plane() const;
+
     classification_result       classify(const vec3_type& p) const;
     classification_result       classify(const rect_impl& a) const;
 

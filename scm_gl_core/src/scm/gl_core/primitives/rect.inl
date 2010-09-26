@@ -84,6 +84,12 @@ rect_impl<s>::min_vertex(const vec2_type& vert)
 {
     _min_vertex = vec3_type(vert, vec2_type::value_type(0));
 }
+template<typename s>
+const typename rect_impl<s>::plane_type&
+rect_impl<s>::poly_plane() const
+{
+    return (_poly_plane);
+}
 
 template<typename s>
 void

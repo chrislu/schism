@@ -452,6 +452,7 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
     if (   (0 > in_first_index)
         || (0 > in_count)) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
+        SCM_GL_DGB("render_context::draw_arrays(): error invalid count or start index (< 0) " << "('" << state().state_string() << "')");
         return;
     }
 
@@ -470,6 +471,7 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
     if (   (0 > in_count)
         || (0 > in_start_index)) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
+        SCM_GL_DGB("render_context::draw_elements(): error invalid count or start index (< 0) " << "('" << state().state_string() << "')");
         return;
     }
 
