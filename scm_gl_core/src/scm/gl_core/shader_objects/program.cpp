@@ -432,7 +432,7 @@ program::retrieve_uniform_information(render_device& ren_dev)
                                                                       actual_uniform_size);
         }
     }
-#if 1 //SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_OPENGL_40
     { // subroutines
         for (int stge = 0; stge < SHADER_STAGE_COUNT; ++stge) {
             { // subrountine uniforms
