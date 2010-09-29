@@ -235,7 +235,7 @@ core::setup_logging(const std::string& log_file)
 
     // the default output logger
     log::logger::listener_ptr   cout_list(new log::listener_ostream(std::cout));
-    cout_list->style(scm::log::listener::log_plain);//log_full_decorated);//
+    cout_list->style(scm::log::listener::log_decorated);//log_full_decorated);//
 #if SCM_DEBUG
     logger("scm").log_level(log::ll_debug);
 #else

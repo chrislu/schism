@@ -16,6 +16,9 @@ scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/font *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/font *.h *.inl)
+
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/imaging *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/imaging *.h *.inl)
 
@@ -54,9 +57,12 @@ scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_BOOST_INC_DIR})
+
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
-                                      ${GLOBAL_EXT_DIR}/inc/freeimage)
-#scm_project_include_directories(UNIX  )
+                                      ${GLOBAL_EXT_DIR}/inc/freeimage
+                                      ${GLOBAL_EXT_DIR}/inc/freetype)
+
+scm_project_include_directories(UNIX  /usr/include/freetype2)
 
 # set library directories
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
@@ -80,11 +86,13 @@ target_link_libraries(${PROJECT_NAME}
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
         FreeImagePlus
+        freetype2
     )
 endif (WIN32)
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
         freeimageplus
+        freetype
     )
 endif (UNIX)
 
