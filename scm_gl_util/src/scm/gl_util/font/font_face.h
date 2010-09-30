@@ -6,76 +6,80 @@
 #include <map>
 #include <string>
 
+#include <boost/multi_array.hpp>
+
+#include <scm/core/math.h>
+
+#include <scm/gl_core/gl_core_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
 namespace gl {
-#if 0
+
 class __scm_export(gl_util) font_face
 {
 public:
+    typedef enum {
+        style_regular       = 0x00,
+        style_italic,
+        style_bold,
+        style_bold_italic,
+
+        style_count
+    } style_type;
     struct glyph_info {
         math::vec2i    _tex_lower_left;
         math::vec2i    _tex_upper_right;
 
         unsigned       _advance;
         math::vec2i    _bearing;
-    }; // struct glyph
+    }; // struct glyph_info
+
+protected:
     typedef std::vector<glyph_info>     glyph_container;
-    typedef 
-    struct style_info {
-        character_glyph_mapping         _glyph_mapping;
-        kerning_table                   _kerning_table;
-        int                             _underline_position;
-        unsigned                        _underline_thickness;
-        unsigned                        _line_spacing;
+    typedef boost::multi_array<char, 2> kerning_table;
+    struct font_style {
+        glyph_container _glyphs;
+        kerning_table   _kerning_table;
+        int             _underline_position;
+        unsigned        _underline_thickness;
+        unsigned        _line_spacing;
     }; // struct style_info
-
-    typedef std::map<unsigned, glyph_info>          character_glyph_mapping;
-    //typedef boost::multi_array<char, 2>             kerning_table;
+    typedef std::vector<font_style>     style_container;
 
 public:
-    face_style();
-    virtual ~face_style();
+    font_face(const render_device_ptr& device,                  
+              const std::string&       font_file,
+              unsigned                 point_size  = 12,
+              unsigned                 display_dpi = 72);
+    virtual ~font_face();
 
-    const glyph&                    get_glyph(unsigned char /*ind*/) const;
-    unsigned                        get_line_spacing() const;
-    int                             get_kerning(unsigned char /*left*/,
-                                                unsigned char /*right*/) const;
+    const std::string&              name() const;
+    unsigned                        size_at_72dpi() const;
+    bool                            has_style(style_type s) const;
 
-    int                             underline_position() const;
-    int                             underline_thickness() const;
+    const glyph_info&               glyph(char c, style_type s = style_regular) const;
+    unsigned                        line_spacing(style_type s = style_regular) const;
+    int                             kerning(char l, char r, style_type s = style_regular) const;
 
-    void                            clear();
-
-protected:
-
-private:
-    friend class face_loader;
-
-}; // class face_style
-protected:
-    typedef boost::shared_ptr<texture_2d_rect>      texture_ptr;
-    typedef std::map<font::face::style_type,
-                     texture_ptr>                   style_textur_container;
-
-public:
-    face();
-    virtual ~face();
-
-    const texture_2d_rect&          get_glyph_texture(font::face::style_type /*style*/ = regular) const;
+    int                             underline_position(style_type s = style_regular) const;
+    int                             underline_thickness(style_type s = style_regular) const;
 
 protected:
-    void                            cleanup_textures();
+    void                            cleanup();
 
-    style_textur_container          _style_textures;
+protected:
+    style_container                 _font_styles;
+    std::vector<bool>               _font_styles_available;
+    texture_2d_ptr                  _font_styles_texture_array;
 
-private:
-    friend class face_loader;
+    std::string                     _name;
+    unsigned                        _size_at_72dpi;
 
 }; // class font_face
-#endif
+
 } // namespace gl
 } // namespace scm
 

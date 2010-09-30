@@ -18,6 +18,8 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/font *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/font *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/font/detail *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/font/detail *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/imaging *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/imaging *.h *.inl)
