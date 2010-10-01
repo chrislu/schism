@@ -3,7 +3,9 @@
 
 #include <exception>
 #include <stdexcept>
+#include <set>
 #include <sstream>
+#include <string>
 
 #include <boost/filesystem.hpp>
 //#include <boost/tuple/tuple.hpp>
@@ -87,6 +89,68 @@ find_font_style_files(const std::string&         in_regular_font_file,
     }
 }
 
+unsigned
+available_72dpi_size(const std::string& file_name,
+                     unsigned           size,
+                     unsigned           disp_res)
+{
+    using namespace boost::filesystem;
+
+    path        font_file = path(file_name);
+
+    unsigned    font_size   = size;
+    unsigned    display_res = disp_res;
+
+    detail::ft_library  ft_lib;
+    detail::ft_face     ft_font(ft_lib, font_file.file_string());
+
+    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
+
+        font_size = (font_size * disp_res + 36) / 72;
+    }
+    else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+
+        std::set<int> available_sizes;
+
+        for (int i = 0; i < ft_font.get_face()->num_fixed_sizes; ++i) {
+            available_sizes.insert(ft_font.get_face()->available_sizes[i].height);
+        }
+
+        if (available_sizes.empty()) {
+            //scm::err() << log::error
+            //           << "scm::font::face_loader::available_72dpi_size(): "
+            //           << "specified font file ('" << font_file.file_string() << "') "
+            //           << "contains fixed size font but fails to report available sizes"
+            //           << log::end;
+            return (0);
+        }
+
+        // scale size to our current display resolution
+        font_size = (disp_res * font_size + 36) / 72;
+
+        // now find closest matching size
+        std::set<int>::const_iterator lower_bound = available_sizes.lower_bound(font_size); // first >=
+        std::set<int>::const_iterator upper_bound = available_sizes.upper_bound(font_size); // first >
+
+        if (   upper_bound == available_sizes.end()) {
+            font_size = *available_sizes.rbegin();
+        }
+        else {
+            font_size = *lower_bound;
+        }
+    }
+    else {
+        //scm::err() << log::error
+        //           << "scm::font::face_loader::available_72dpi_size(): "
+        //           << "specified font file ('" << font_file.file_string() << "') "
+        //           << "contains unsupported face type"
+        //           << log::end;
+        return (0);
+    }
+
+    return (font_size);
+}
+
 } // namesapce detail
 
 font_face::font_face(const render_device_ptr& device,
@@ -104,6 +168,7 @@ font_face::font_face(const render_device_ptr& device,
     using namespace scm::math;
 
     try {
+
         detail::ft_library  ft_lib;
 
         if (!detail::check_file(font_file)) {
@@ -112,6 +177,18 @@ font_face::font_face(const render_device_ptr& device,
               << "font file missing or is a directory ('" << font_file << "')";
             throw(std::runtime_error(s.str()));
         }
+
+        unsigned    font_size   = point_size;
+        font_size = detail::available_72dpi_size(font_file, point_size, display_dpi);
+
+        if (font_size == 0) {
+            std::ostringstream s;
+            s << "font_face::font_face(): "
+              << "unable to find suitable font size ('" << font_file << "')";
+            throw(std::runtime_error(s.str()));
+        }
+
+        font_size = (72 * font_size + display_dpi / 2) / display_dpi;
 
         std::vector<std::string>    font_style_files;
         detail::find_font_style_files(font_file, font_style_files);
@@ -122,7 +199,9 @@ font_face::font_face(const render_device_ptr& device,
             _font_styles_available[i] = !font_style_files[i].empty();
 
             std::string         cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
-            detail::ft_face     ft_font(ft_lib, cur_font_file, point_size, display_dpi);
+            detail::ft_face     ft_font(ft_lib, cur_font_file);
+
+            ft_font.set_size(font_size, display_dpi);
 
             // calculate kerning information
             _font_styles[i]._kerning_table.resize(boost::extents[256][256]);
@@ -187,7 +266,8 @@ font_face::font_face(const render_device_ptr& device,
             std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
             _font_styles[i]._glyphs.resize(256);
 
-            detail::ft_face     ft_font(ft_lib, cur_font_file, point_size, display_dpi);
+            detail::ft_face     ft_font(ft_lib, cur_font_file);
+            ft_font.set_size(font_size, display_dpi);
 
             for (unsigned c = 0; c < 256; ++c) {
                 glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];

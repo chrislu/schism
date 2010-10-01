@@ -30,11 +30,11 @@ class ft_face
 {
 public:
     ft_face(const ft_library&  /*lib*/,
-            const std::string& /*file*/,
-            unsigned           /*point_size*/,
-            unsigned           /*display_dpi*/);
+            const std::string& /*file*/);
     /*virtual*/ ~ft_face();
 
+    void                set_size(unsigned           /*point_size*/,
+                                 unsigned           /*display_dpi*/);
     void                load_glyph(char c);
     FT_GlyphSlot        get_glyph() const;
     char                get_kerning(char l, char r) const;

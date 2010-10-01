@@ -25,17 +25,21 @@ ft_library::~ft_library()
 }
 
 ft_face::ft_face(const ft_library&  lib,
-                 const std::string& file,
-                 unsigned           point_size,
-                 unsigned           display_dpi)
+                 const std::string& file)
   : _face(0)
 {
     if (FT_New_Face(lib.get_lib(), file.c_str(), 0, &_face) != 0) {
         throw(std::runtime_error(std::string("ft_face::ft_face() unable to open font - ") + file));
     }
+}
+
+void
+ft_face::set_size(unsigned point_size,
+                  unsigned display_dpi)
+{
     if (FT_Set_Char_Size(_face, 0, point_size << 6, 0, display_dpi) != 0) {
         std::ostringstream s;
-        s << "font_face::font_face(): unable to set character size (font: " << file << ", size: " << point_size << ")";
+        s << "font_face::font_face(): unable to set character size (size: " << point_size << ")";
         throw(std::runtime_error(s.str()));
     }
 }
