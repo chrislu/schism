@@ -23,8 +23,12 @@ public:
 
     void            draw(const render_context_ptr& context,
                          const math::vec2i&        pos,
-                         const text_ptr&           txt,
-                         const math::vec4f&        col = math::vec4f(1.0f)) const;
+                         const text_ptr&           txt) const;
+    void            draw_shadowed(const render_context_ptr& context,
+                                  const math::vec2i&        pos,
+                                  const text_ptr&           txt) const;
+
+    void            projection_matrix(const math::mat4f& m);
 
 protected:
     program_ptr                 _font_shader_program;
@@ -32,6 +36,8 @@ protected:
     depth_stencil_state_ptr     _font_dstate;
     rasterizer_state_ptr        _font_raster_state;
     blend_state_ptr             _font_blend_state;
+
+    math::mat4f                 _projection_matrix;
 
     //// temporary
     //quad_geometry_ptr           _quad;

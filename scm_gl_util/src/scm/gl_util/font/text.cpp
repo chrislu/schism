@@ -36,6 +36,10 @@ text::text(const render_device_ptr&     device,
   , _text_style(stl)
   , _text_string(str)
   , _text_kerning(true)
+  , _text_color(math::vec4f(1.0f))
+  , _text_shadow_color(math::vec4f(0.0f, 0.0f, 0.0f, 1.0f))
+  , _text_shadow_offset(math::vec2i(1, -1))
+  , _text_bounding_box(math::vec2i(0, 0))
   , _indices_count(0)
   , _topology(PRIMITIVE_TRIANGLE_LIST)
   , _glyph_capacity(20)
@@ -110,6 +114,48 @@ text::text_kerning(bool k)
     _text_kerning = k;
 }
 
+const math::vec4f&
+text::text_color() const
+{
+    return (_text_color);
+}
+
+void
+text::text_color(const math::vec4f& c)
+{
+    _text_color = c;
+}
+
+const math::vec4f&
+text::text_shadow_color() const
+{
+    return (_text_shadow_color);
+}
+
+void
+text::text_shadow_color(const math::vec4f& c)
+{
+    _text_shadow_color = c;
+}
+
+const math::vec2i&
+text::text_shadow_offset() const
+{
+    return (_text_shadow_offset);
+}
+
+void
+text::text_shadow_offset(const math::vec2i& o)
+{
+    _text_shadow_offset = o;
+}
+
+const math::vec2i&
+text::text_bounding_box() const
+{
+    return (_text_bounding_box);
+}
+
 void
 text::update()
 {
@@ -153,14 +199,16 @@ text::update()
             return;
         }
 
+        _text_bounding_box = vec2i(0, _font->line_advance(_text_style));
         assert(_text_string.size() < (6 * (std::numeric_limits<unsigned short>::max)()));
         unsigned short str_size = static_cast<unsigned short>( _text_string.size());
         for (unsigned short i = 0; i < str_size; ++i) {
             char  cur_char = _text_string[i];
 
             if (cur_char == '\n') {
-                current_pos.y -= _font->line_advance(_text_style);
-                prev_char      = 0;
+                current_pos.y        -= _font->line_advance(_text_style);
+                prev_char             = 0;
+                _text_bounding_box.y += _font->line_advance(_text_style);
                 continue;
             }
             const font_face::glyph_info& cur_glyph = _font->glyph(cur_char, _text_style);
@@ -192,7 +240,8 @@ text::update()
             index_data[i * 6 + 5] = i * 4 + 3;
 
             // advance the position
-            current_pos.x += cur_glyph._advance;
+            current_pos.x        += cur_glyph._advance;
+            _text_bounding_box.x += cur_glyph._advance;
 
             // remember just drawn glyph for kerning
             prev_char = cur_char;

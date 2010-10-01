@@ -2,6 +2,8 @@
 #ifndef SCM_GL_UTIL_TEXT_H_INCLUDED
 #define SCM_GL_UTIL_TEXT_H_INCLUDED
 
+#include <scm/core/math.h>
+
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/constants.h>
 
@@ -33,6 +35,15 @@ public:
     bool                        text_kerning() const;
     void                        text_kerning(bool k);
 
+    const math::vec4f&          text_color() const;
+    void                        text_color(const math::vec4f& c) ;
+    const math::vec4f&          text_shadow_color() const;
+    void                        text_shadow_color(const math::vec4f& c);
+    const math::vec2i&          text_shadow_offset() const;
+    void                        text_shadow_offset(const math::vec2i& o);
+
+    const math::vec2i&          text_bounding_box() const;
+
 protected:
     void                        update();
 
@@ -41,6 +52,12 @@ protected:
     font_face::style_type       _text_style;
     std::string                 _text_string;
     bool                        _text_kerning;
+
+    math::vec4f                 _text_color;
+    math::vec4f                 _text_shadow_color;
+    math::vec2i                 _text_shadow_offset;
+
+    math::vec2i                 _text_bounding_box;
 
     int                         _glyph_capacity;
     buffer_ptr                  _vertex_buffer;

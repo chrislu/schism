@@ -105,11 +105,6 @@ font_face::font_face(const render_device_ptr& device,
 
     try {
         detail::ft_library  ft_lib;
-        if (!ft_lib.open()) {
-            std::ostringstream s;
-            s << "font_face::font_face(): unable to initialize freetype library.";
-            throw(std::runtime_error(s.str()));
-        }
 
         if (!detail::check_file(font_file)) {
             std::ostringstream s;
@@ -125,21 +120,18 @@ font_face::font_face(const render_device_ptr& device,
         math::vec2ui max_glyph_size(0u, 0u); // to store the maximal glyph size over all styles
         for (int i = 0; i < style_count; ++i) {
             _font_styles_available[i] = !font_style_files[i].empty();
-            std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
 
-            detail::ft_face     ft_font;
+            std::string         cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
+            detail::ft_face     ft_font(ft_lib, cur_font_file, point_size, display_dpi);
 
-            if (!ft_font.open_face(ft_lib, cur_font_file)) {
-                std::ostringstream s;
-                s << "font_face::font_face(): error loading font file ('" << cur_font_file << "')";
-                throw(std::runtime_error(s.str()));
+            // calculate kerning information
+            _font_styles[i]._kerning_table.resize(boost::extents[256][256]);
+            for (unsigned l = 0; l < 256; ++l) {
+                for (unsigned r = 0; r < 256; ++r) {
+                    _font_styles[i]._kerning_table[l][r] = ft_font.get_kerning(l, r);
+                }
             }
 
-            if (FT_Set_Char_Size(ft_font.get_face(), 0, point_size << 6, 0, display_dpi) != 0) {
-                std::ostringstream s;
-                s << "font_face::font_face(): unable to set character size (font: " << cur_font_file << ", size: " << point_size << ")";
-                throw(std::runtime_error(s.str()));
-            }
             // retrieve the maximal bounding box of all glyphs in the face
             vec2f  font_bbox_x;
             vec2f  font_bbox_y;
@@ -180,27 +172,6 @@ font_face::font_face(const render_device_ptr& device,
             max_glyph_size.x = max<unsigned>(max_glyph_size.x, font_size.x);
             max_glyph_size.y = max<unsigned>(max_glyph_size.y, font_size.y);
 
-            // calculate kerning information
-            _font_styles[i]._kerning_table.resize(boost::extents[256][256]);
-
-            if (ft_font.get_face()->face_flags & FT_FACE_FLAG_KERNING) {
-                for (unsigned l = 0; l < 256; ++l) {
-                    FT_UInt l_glyph_index = FT_Get_Char_Index(ft_font.get_face(), l);
-                    for (unsigned r = 0; r < 256; ++r) {
-                        FT_UInt     r_glyph_index = FT_Get_Char_Index(ft_font.get_face(), r);
-                        FT_Vector   delta;
-                        FT_Get_Kerning(ft_font.get_face(), l_glyph_index, r_glyph_index, FT_KERNING_DEFAULT, &delta);
-                        _font_styles[i]._kerning_table[l][r] = static_cast<char>(delta.x >> 6);
-                    }
-                }
-            }
-            else {
-                for (unsigned l = 0; l < 256; ++l) {
-                    for (unsigned r = 0; r < 256; ++r) {
-                        _font_styles[i]._kerning_table[l][r] = 0;
-                    }
-                }
-            }
         }
         // end fill font styles
 
@@ -214,32 +185,15 @@ font_face::font_face(const render_device_ptr& device,
 
         for (int i = 0; i < style_count; ++i) {
             std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
-            _font_styles[i]._glyphs = glyph_container(256);
+            _font_styles[i]._glyphs.resize(256);
 
-            detail::ft_face     ft_font;
-
-            if (!ft_font.open_face(ft_lib, cur_font_file)) {
-                std::ostringstream s;
-                s << "font_face::font_face(): error loading font file ('" << cur_font_file << "')";
-                throw(std::runtime_error(s.str()));
-            }
-
-            if (FT_Set_Char_Size(ft_font.get_face(), 0, point_size << 6, 0, display_dpi) != 0) {
-                std::ostringstream s;
-                s << "font_face::font_face(): "
-                  << "unable to set character size (font: " << cur_font_file << ", size: " << point_size << ")";
-                throw(std::runtime_error(s.str()));
-            }
+            detail::ft_face     ft_font(ft_lib, cur_font_file, point_size, display_dpi);
 
             for (unsigned c = 0; c < 256; ++c) {
                 glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
 
-                if(FT_Load_Glyph(ft_font.get_face(), FT_Get_Char_Index(ft_font.get_face(), c),
-                                 //FT_LOAD_DEFAULT | FT_LOAD_TARGET_NORMAL)) {
-                                 FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT)) {
-                    continue;
-                }
-                if (FT_Render_Glyph(ft_font.get_face()->glyph,  FT_RENDER_MODE_LIGHT)) { // FT_RENDER_MODE_NORMAL)) { // 
+                ft_font.load_glyph(c);
+                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_LIGHT)) { // FT_RENDER_MODE_NORMAL)) { // 
                     continue;
                 }
                 FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
@@ -249,7 +203,6 @@ font_face::font_face(const render_device_ptr& device,
                 tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
                 tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
                 tex_array_dst.z = i;
-
                 
                 cur_glyph._box_size         = vec2i(bitmap.width, bitmap.rows);
                 cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,

@@ -106,8 +106,7 @@ text_renderer::~text_renderer()
 void
 text_renderer::draw(const render_context_ptr& context,
                     const math::vec2i&        pos,
-                    const text_ptr&           txt,
-                    const math::vec4f&        col) const
+                    const text_ptr&           txt) const
 {
     using namespace scm;
     using namespace scm::gl;
@@ -118,18 +117,15 @@ text_renderer::draw(const render_context_ptr& context,
     context_texture_units_guard tug(context);
     context_program_guard       cpg(context);
     
-    mat4f p = mat4f::identity();
-    //ortho_matrix(p, -960.0f, 960.0f, -600.0f, 600.0f, -1.0f, 1.0f);
-    ortho_matrix(p, 0.0f, 1600.0f, 0.0f, 1024.0f, -1.0f, 1.0f);
     mat4f v = mat4f::identity();
     translate(v, vec3f(vec2f(pos), 0.0f));
     //scale(v, static_cast<float>(txt->font()->styles_texture_array()->dimensions().x),
     //         static_cast<float>(txt->font()->styles_texture_array()->dimensions().y), 1.0f);
-    mat4f mvp = p * v;
+    mat4f mvp = _projection_matrix * v;
 
     _font_shader_program->uniform("in_mvp", mvp);
     _font_shader_program->uniform("in_font_array", 0);
-    _font_shader_program->uniform("in_color", col);
+    _font_shader_program->uniform("in_color", txt->text_color());
 
     context->set_depth_stencil_state(_font_dstate);
     context->set_rasterizer_state(_font_raster_state);
@@ -144,6 +140,64 @@ text_renderer::draw(const render_context_ptr& context,
     context->draw_elements(txt->_indices_count);
 
     //_quad->draw(context, geometry::MODE_SOLID);
+}
+
+void
+text_renderer::draw_shadowed(const render_context_ptr& context,
+                             const math::vec2i&        pos,
+                             const text_ptr&           txt) const
+{
+    using namespace scm;
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    context_vertex_input_guard  vig(context);
+    context_state_objects_guard csg(context);
+    context_texture_units_guard tug(context);
+    context_program_guard       cpg(context);
+    
+    _font_shader_program->uniform("in_font_array", 0);
+
+    context->set_depth_stencil_state(_font_dstate);
+    context->set_rasterizer_state(_font_raster_state);
+    context->set_blend_state(_font_blend_state);
+
+    context->bind_texture(txt->font()->styles_texture_array(), _font_sampler_state, 0);
+    context->bind_program(_font_shader_program);
+
+    context->bind_vertex_array(txt->_vertex_array);
+    context->bind_index_buffer(txt->_index_buffer, txt->_topology, TYPE_USHORT);
+
+    { // shadow
+        mat4f v = mat4f::identity();
+        translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
+        mat4f mvp = _projection_matrix * v;
+
+        _font_shader_program->uniform("in_mvp", mvp);
+        _font_shader_program->uniform("in_color", txt->text_shadow_color());
+
+        context->apply();
+        context->draw_elements(txt->_indices_count);
+    }
+    { // text
+        mat4f v = mat4f::identity();
+        translate(v, vec3f(vec2f(pos), 0.0f));
+        mat4f mvp = _projection_matrix * v;
+
+        _font_shader_program->uniform("in_mvp", mvp);
+        _font_shader_program->uniform("in_color", txt->text_color());
+
+        context->apply();
+        context->draw_elements(txt->_indices_count);
+    }
+
+    //_quad->draw(context, geometry::MODE_SOLID);
+}
+
+void
+text_renderer::projection_matrix(const math::mat4f& m)
+{
+    _projection_matrix = m;
 }
 
 } // namespace gl
