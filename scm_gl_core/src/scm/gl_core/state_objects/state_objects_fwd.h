@@ -19,10 +19,14 @@ class  rasterizer_state;
 struct sampler_state_desc;
 class sampler_state;
 
-typedef shared_ptr<depth_stencil_state> depth_stencil_state_ptr;
-typedef shared_ptr<blend_state>         blend_state_ptr;
-typedef shared_ptr<rasterizer_state>    rasterizer_state_ptr;
-typedef shared_ptr<sampler_state>       sampler_state_ptr;
+typedef shared_ptr<depth_stencil_state>         depth_stencil_state_ptr;
+typedef shared_ptr<const depth_stencil_state>   depth_stencil_state_cptr;
+typedef shared_ptr<blend_state>                 blend_state_ptr;
+typedef shared_ptr<const blend_state>           blend_state_cptr;
+typedef shared_ptr<rasterizer_state>            rasterizer_state_ptr;
+typedef shared_ptr<const rasterizer_state>      rasterizer_state_cptr;
+typedef shared_ptr<sampler_state>               sampler_state_ptr;
+typedef shared_ptr<const sampler_state>         sampler_state_cptr;
 
 } // namespace gl
 } // namespace scm

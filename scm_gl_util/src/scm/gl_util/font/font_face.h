@@ -5,12 +5,15 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <boost/multi_array.hpp>
 
 #include <scm/core/math.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
+
+#include <scm/gl_util/font/font_fwd.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -30,8 +33,8 @@ public:
         style_count
     } style_type;
     struct glyph_info {
-        math::vec2i    _tex_lower_left;
-        math::vec2i    _tex_upper_right;
+        math::vec2f    _tex_lower_left;
+        math::vec2f    _tex_upper_right;
 
         unsigned       _advance;
         math::vec2i    _bearing;
@@ -66,6 +69,8 @@ public:
 
     int                             underline_position(style_type s = style_regular) const;
     int                             underline_thickness(style_type s = style_regular) const;
+
+    const texture_2d_ptr&           styles_texture_array() const;
 
 protected:
     void                            cleanup();

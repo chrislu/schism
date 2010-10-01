@@ -12,10 +12,12 @@ class render_context;
 class render_device_child;
 class render_device_resource;
 
-typedef shared_ptr<render_device>   render_device_ptr;
-typedef weak_ptr<render_device>     render_device_weak_ptr;
-typedef shared_ptr<render_context>  render_context_ptr;
-typedef weak_ptr<render_context>    render_context_weak_ptr;
+typedef shared_ptr<render_device>           render_device_ptr;
+typedef shared_ptr<const render_device>     render_device_cptr;
+typedef weak_ptr<render_device>             render_device_wptr;
+typedef shared_ptr<render_context>          render_context_ptr;
+typedef shared_ptr<const render_context>    render_context_cptr;
+typedef weak_ptr<render_context>            render_context_wptr;
 
 class context_program_guard;
 class context_vertex_input_guard;

@@ -4,6 +4,8 @@
 
 #include <scm/gl_core/gl_core_fwd.h>
 
+#include <scm/gl_util/primitives/primitives_fwd.h>
+
 #include <scm/core/platform/platform.h>
 
 namespace scm {

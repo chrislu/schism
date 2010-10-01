@@ -10,8 +10,10 @@ namespace gl {
 class shader;
 class program;
 
-typedef shared_ptr<shader>  shader_ptr;
-typedef shared_ptr<program> program_ptr;
+typedef shared_ptr<shader>          shader_ptr;
+typedef shared_ptr<const shader>    shader_cptr;
+typedef shared_ptr<program>         program_ptr;
+typedef shared_ptr<const program>   program_cptr;
 
 } // namespace gl
 } // namespace scm

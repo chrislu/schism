@@ -11,9 +11,12 @@ class buffer;
 class vertex_format;
 class vertex_array;
 
-typedef shared_ptr<buffer>          buffer_ptr;
-typedef shared_ptr<vertex_format>   vertex_format_ptr;
-typedef shared_ptr<vertex_array>    vertex_array_ptr;
+typedef shared_ptr<buffer>              buffer_ptr;
+typedef shared_ptr<const buffer>        buffer_cptr;
+typedef shared_ptr<vertex_format>       vertex_format_ptr;
+typedef shared_ptr<const vertex_format> vertex_format_cptr;
+typedef shared_ptr<vertex_array>        vertex_array_ptr;
+typedef shared_ptr<const vertex_array>  vertex_array_cptr;
 
 } // namespace gl
 } // namespace scm

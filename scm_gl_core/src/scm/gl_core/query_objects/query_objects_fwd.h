@@ -10,8 +10,10 @@ namespace gl {
 class query;
 class timer_query;
 
-typedef shared_ptr<query>           query_ptr;
-typedef shared_ptr<timer_query>     timer_query_ptr;
+typedef shared_ptr<query>               query_ptr;
+typedef shared_ptr<const query>         query_cptr;
+typedef shared_ptr<timer_query>         timer_query_ptr;
+typedef shared_ptr<const timer_query>   timer_query_cptr;
 
 } // namespace gl
 } // namespace scm

@@ -10,6 +10,8 @@
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/data_types.h>
 #include <scm/gl_core/state_objects.h>
+
+#include <scm/gl_util/primitives/primitives_fwd.h>
 #include <scm/gl_util/primitives/geometry.h>
 
 #include <scm/core/platform/platform.h>

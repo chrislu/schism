@@ -16,9 +16,12 @@ class frame_buffer;
 
 class viewport;
 
-typedef shared_ptr<render_target>   render_target_ptr;
-typedef shared_ptr<render_buffer>   render_buffer_ptr;
-typedef shared_ptr<frame_buffer>    frame_buffer_ptr;
+typedef shared_ptr<render_target>       render_target_ptr;
+typedef shared_ptr<const render_target> render_target_cptr;
+typedef shared_ptr<render_buffer>       render_buffer_ptr;
+typedef shared_ptr<const render_buffer> render_buffer_cptr;
+typedef shared_ptr<frame_buffer>        frame_buffer_ptr;
+typedef shared_ptr<const frame_buffer>  frame_buffer_cptr;
 
 } // namespace gl
 } // namespace scm
