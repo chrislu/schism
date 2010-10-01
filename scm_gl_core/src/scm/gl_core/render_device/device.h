@@ -97,6 +97,7 @@ public:
                                                   buffer_usage   in_usage,
                                                   scm::size_t    in_size,
                                                   const void*    in_initial_data = 0);
+    bool                            resize_buffer(const buffer_ptr& in_buffer, scm::size_t in_size);
 
     vertex_array_ptr                create_vertex_array(const vertex_format& in_vert_fmt,
                                                         const buffer_array&  in_attrib_buffers,

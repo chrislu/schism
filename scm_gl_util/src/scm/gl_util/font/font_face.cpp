@@ -92,10 +92,13 @@ find_font_style_files(const std::string&         in_regular_font_file,
 font_face::font_face(const render_device_ptr& device,
                      const std::string&       font_file,
                      unsigned                 point_size,
+                     unsigned                 border_size,
                      unsigned                 display_dpi)
   : _font_styles(style_count)
   , _font_styles_available(style_count)
-  , _size_at_72dpi(0)
+  , _point_size(point_size)
+  , _border_size(border_size)
+  , _dpi(display_dpi)
 {
     using namespace scm::gl;
     using namespace scm::math;
@@ -247,11 +250,12 @@ font_face::font_face(const render_device_ptr& device,
                 tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
                 tex_array_dst.z = i;
 
-                vec2f actual_glyph_bbox(static_cast<float>(bitmap.width) / glyph_texture_dim.x,
-                                        static_cast<float>(bitmap.rows) / glyph_texture_dim.y);
-                cur_glyph._tex_lower_left   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
+                
+                cur_glyph._box_size         = vec2i(bitmap.width, bitmap.rows);
+                cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
                                                     static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
-                cur_glyph._tex_upper_right  = cur_glyph._tex_lower_left + actual_glyph_bbox;
+                cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
+                                                    static_cast<float>(cur_glyph._box_size.y) / glyph_texture_dim.y);
 
                 if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
                     // linearHoriAdvance contains the 16.16 representation of the horizontal advance
@@ -270,14 +274,12 @@ font_face::font_face(const render_device_ptr& device,
                     case FT_PIXEL_MODE_GRAY:
                         for (int dy = 0; dy < bitmap.rows; ++dy) {
                             unsigned src_off = dy * bitmap.pitch;
-                            //unsigned dst_off = dst_x + (dst_y + bitmap.rows - 1 - dy) * glyph_texture_dim.x;
                             unsigned dst_off =    tex_array_dst.x
                                                + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                + i * (glyph_texture_dim.x * glyph_texture_dim.y);
                             for (int dx = 0; dx < bitmap.width; ++dx) {
                                 glyph_texture[dst_off + dx][0] = bitmap.buffer[src_off + dx];
                             }
-                            //memcpy(glyph_texture.get() + dst_off, bitmap.buffer + src_off, bitmap.width);
                         }
                         break;
                     case FT_PIXEL_MODE_MONO:
@@ -317,6 +319,12 @@ font_face::font_face(const render_device_ptr& device,
 
         image_array_data_raw.clear();
         glyph_texture.reset();
+
+        using namespace boost::filesystem;
+
+        path            font_file_path = path(font_file);
+        std::string     font_file_base = basename(font_file_path);
+        _name = font_file_base;
     }
     catch(...) {
         cleanup();
@@ -336,9 +344,21 @@ font_face::name() const
 }
 
 unsigned
-font_face::size_at_72dpi() const
+font_face::point_size() const
 {
-    return (_size_at_72dpi);
+    return (_point_size);
+}
+
+unsigned
+font_face::border_size() const
+{
+    return (_border_size);
+}
+
+unsigned
+font_face::dpi() const
+{
+    return (_dpi);
 }
 
 bool
@@ -354,7 +374,7 @@ font_face::glyph(char c, style_type s) const
 }
 
 unsigned
-font_face::line_spacing(style_type s) const
+font_face::line_advance(style_type s) const
 {
     return (_font_styles[s]._line_spacing);
 }
@@ -393,79 +413,3 @@ font_face::styles_texture_array() const
 
 } // namespace gl
 } // namespace scm
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-#include <stdexcept>
-
-#include <scm/core.h>
-
-namespace scm {
-namespace gl_classic {
-
-// gl_font_face
-face::face()
-{
-}
-
-face::~face()
-{
-    cleanup_textures();
-}
-
-const texture_2d_rect& face::get_glyph_texture(font::face::style_type style) const
-{
-    style_textur_container::const_iterator style_it = _style_textures.find(style);
-
-    if (style_it == _style_textures.end()) {
-        style_it = _style_textures.find(font::face::regular);
-
-        if (style_it == _style_textures.end()) {
-            std::stringstream output;
-
-            output << "scm::gl_classic::face::get_glyph(): "
-                   << "unable to retrieve requested style (id = '" << style << "') "
-                   << "fallback to regular style failed!" << std::endl;
-
-            scm::err() << log::error
-                       << output.str();
-
-            throw std::runtime_error(output.str());
-        }
-    }
-
-    return (*style_it->second.get());
-}
-
-void face::cleanup_textures()
-{
-    //style_textur_container::iterator style_it;
-
-    //for (style_it  = _style_textures.begin();
-    //     style_it != _style_textures.end();
-    //     ++style_it) {
-    //    style_it->second.reset();
-    //}
-    _style_textures.clear();
-}
-
-} // namespace gl_classic
-} // namespace scm
-#endif

@@ -195,6 +195,21 @@ render_device::create_buffer(buffer_binding in_binding,
     return (create_buffer(buffer::descriptor_type(in_binding, in_usage, in_size), in_initial_data));
 }
 
+bool
+render_device::resize_buffer(const buffer_ptr& in_buffer, scm::size_t in_size)
+{
+    buffer::descriptor_type desc = in_buffer->descriptor();
+    desc._size = in_size;
+    if (!in_buffer->buffer_data(*this, desc, 0)) {
+        glerr() << log::error << "render_device::resize_buffer(): unable to reallocate buffer ("
+                << in_buffer->state().state_string() << ")." << log::end;
+        return (false);
+    }
+    else {
+        return (true);
+    }
+}
+
 vertex_array_ptr
 render_device::create_vertex_array(const vertex_format& in_vert_fmt,
                                    const buffer_array&  in_attrib_buffers,

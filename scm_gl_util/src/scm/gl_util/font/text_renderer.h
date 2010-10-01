@@ -1,6 +1,8 @@
 
-#ifndef SCM_GL_UTIL_FONT_RENDERER_H_INCLUDED
-#define SCM_GL_UTIL_FONT_RENDERER_H_INCLUDED
+#ifndef SCM_GL_UTIL_TEXT_RENDERER_H_INCLUDED
+#define SCM_GL_UTIL_TEXT_RENDERER_H_INCLUDED
+
+#include <scm/core/math.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
 
@@ -13,14 +15,16 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_util) font_renderer
+class __scm_export(gl_util) text_renderer
 {
 public:
-    font_renderer(const render_device_ptr& device);
-    virtual ~font_renderer();
+    text_renderer(const render_device_ptr& device);
+    virtual ~text_renderer();
 
     void            draw(const render_context_ptr& context,
-                         const font_face_cptr&     font) const;
+                         const math::vec2i&        pos,
+                         const text_ptr&           txt,
+                         const math::vec4f&        col = math::vec4f(1.0f)) const;
 
 protected:
     program_ptr                 _font_shader_program;
@@ -29,13 +33,13 @@ protected:
     rasterizer_state_ptr        _font_raster_state;
     blend_state_ptr             _font_blend_state;
 
-    // temporary
-    quad_geometry_ptr           _quad;
-}; // class font_renderer
+    //// temporary
+    //quad_geometry_ptr           _quad;
+}; // class text_renderer
 
 } // namespace gl
 } // namespace scm
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
-#endif // SCM_GL_UTIL_FONT_RENDERER_H_INCLUDED
+#endif // SCM_GL_UTIL_TEXT_RENDERER_H_INCLUDED

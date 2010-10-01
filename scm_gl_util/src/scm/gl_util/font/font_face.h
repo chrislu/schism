@@ -33,9 +33,10 @@ public:
         style_count
     } style_type;
     struct glyph_info {
-        math::vec2f    _tex_lower_left;
-        math::vec2f    _tex_upper_right;
+        math::vec2f    _texture_origin;
+        math::vec2f    _texture_box_size;
 
+        math::vec2i    _box_size;
         unsigned       _advance;
         math::vec2i    _bearing;
     }; // struct glyph_info
@@ -56,15 +57,18 @@ public:
     font_face(const render_device_ptr& device,                  
               const std::string&       font_file,
               unsigned                 point_size  = 12,
+              unsigned                 border_size = 1,
               unsigned                 display_dpi = 72);
     virtual ~font_face();
 
     const std::string&              name() const;
-    unsigned                        size_at_72dpi() const;
+    unsigned                        point_size() const;
+    unsigned                        border_size() const;
+    unsigned                        dpi() const;
     bool                            has_style(style_type s) const;
 
     const glyph_info&               glyph(char c, style_type s = style_regular) const;
-    unsigned                        line_spacing(style_type s = style_regular) const;
+    unsigned                        line_advance(style_type s = style_regular) const;
     int                             kerning(char l, char r, style_type s = style_regular) const;
 
     int                             underline_position(style_type s = style_regular) const;
@@ -81,7 +85,9 @@ protected:
     texture_2d_ptr                  _font_styles_texture_array;
 
     std::string                     _name;
-    unsigned                        _size_at_72dpi;
+    unsigned                        _point_size;
+    unsigned                        _border_size;
+    unsigned                        _dpi;
 
 }; // class font_face
 

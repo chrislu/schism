@@ -149,7 +149,7 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
         buffer_slot::slot_element_array::const_iterator elmt_end = slot->second._elements.end();
         const buffer_ptr& buf = slot->second._buffer;
 #ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        //util::buffer_binding_guard(glapi, GL_ARRAY_BUFFER, GL_ARRAY_BUFFER_BINDING);
+        //util::buffer_binding_guard bguard(glapi, GL_ARRAY_BUFFER, GL_ARRAY_BUFFER_BINDING);
         glapi.glBindBuffer(GL_ARRAY_BUFFER, buf->_gl_buffer_id);
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
