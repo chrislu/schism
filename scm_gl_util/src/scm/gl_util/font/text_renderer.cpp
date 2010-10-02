@@ -176,8 +176,10 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
         _font_shader_program->uniform("in_mvp", mvp);
         _font_shader_program->uniform("in_color", txt->text_shadow_color());
 
-        context->apply();
-        context->draw_elements(txt->_indices_count);
+        if (txt->_indices_count > 0) {
+            context->apply();
+            context->draw_elements(txt->_indices_count);
+        }
     }
     { // text
         mat4f v = mat4f::identity();
@@ -187,8 +189,10 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
         _font_shader_program->uniform("in_mvp", mvp);
         _font_shader_program->uniform("in_color", txt->text_color());
 
-        context->apply();
-        context->draw_elements(txt->_indices_count);
+        if (txt->_indices_count > 0) {
+            context->apply();
+            context->draw_elements(txt->_indices_count);
+        }
     }
 
     //_quad->draw(context, geometry::MODE_SOLID);
