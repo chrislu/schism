@@ -4,6 +4,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <scm/core/math.h>
+
 #include <scm/gl_core/render_device/context.h>
 
 namespace scm {
@@ -107,6 +109,7 @@ public:
       , _save_rasterizer_state(in_context->current_rasterizer_state())
       , _save_line_width(in_context->current_line_width())
       , _save_blend_state(in_context->current_blend_state())
+      , _save_blend_color(in_context->current_blend_color())
     {
     }
     ~context_state_objects_guard()
@@ -117,7 +120,7 @@ public:
     {
         _guarded_context->set_depth_stencil_state(_save_depth_stencil_state, _save_stencil_ref);
         _guarded_context->set_rasterizer_state(_save_rasterizer_state, _save_line_width);
-        _guarded_context->set_blend_state(_save_blend_state);
+        _guarded_context->set_blend_state(_save_blend_state, _save_blend_color);
     }
 private:
     const render_context_ptr&       _guarded_context;
@@ -126,6 +129,7 @@ private:
     const rasterizer_state_ptr      _save_rasterizer_state;
     const float                     _save_line_width;
     const blend_state_ptr           _save_blend_state;
+    const math::vec4f               _save_blend_color;
 }; // class context_state_objects_guard
 
 

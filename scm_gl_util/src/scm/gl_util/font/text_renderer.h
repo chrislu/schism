@@ -31,16 +31,18 @@ public:
     void            projection_matrix(const math::mat4f& m);
 
 protected:
-    program_ptr                 _font_shader_program;
+    program_ptr                 _font_program_gray;
+    program_ptr                 _font_program_lcd;
     sampler_state_ptr           _font_sampler_state;
     depth_stencil_state_ptr     _font_dstate;
     rasterizer_state_ptr        _font_raster_state;
-    blend_state_ptr             _font_blend_state;
+    blend_state_ptr             _font_blend_gray;
+    blend_state_ptr             _font_blend_lcd;
 
     math::mat4f                 _projection_matrix;
 
     //// temporary
-    //quad_geometry_ptr           _quad;
+    quad_geometry_ptr           _quad;
 }; // class text_renderer
 
 } // namespace gl

@@ -65,6 +65,7 @@ render_context::buffer_binding::operator!=(const buffer_binding& rhs) const
 render_context::binding_state_type::binding_state_type()
   : _stencil_ref_value(0)
   , _line_width(1.0f)
+  , _blend_color(math::vec4f(1.0f, 1.0f, 1.0f, 1.0f))
   , _default_framebuffer_target(FRAMEBUFFER_BACK)
   , _viewports(viewport(math::vec2ui(0, 0), math::vec2ui(10, 10)))
 {
@@ -77,17 +78,17 @@ render_context::render_context(render_device& in_device)
     const opengl::gl3_core& glapi = opengl_api();
 
     _default_depth_stencil_state = in_device.create_depth_stencil_state(depth_stencil_state_desc());
-    _default_depth_stencil_state->force_apply(*this, 0);
+    _default_depth_stencil_state->force_apply(*this, _current_state._stencil_ref_value);
     _current_state._depth_stencil_state = _default_depth_stencil_state;
     _applied_state._depth_stencil_state = _default_depth_stencil_state;
 
     _default_rasterizer_state = in_device.create_rasterizer_state(rasterizer_state_desc());
-    _default_rasterizer_state->force_apply(*this, 1.0f);
+    _default_rasterizer_state->force_apply(*this, _current_state._line_width);
     _current_state._rasterizer_state = _default_rasterizer_state;
     _applied_state._rasterizer_state = _default_rasterizer_state;
 
     _default_blend_state = in_device.create_blend_state(blend_state_desc());
-    _default_blend_state->force_apply(*this);
+    _default_blend_state->force_apply(*this, _current_state._blend_color);
     _current_state._blend_state = _default_blend_state;
     _applied_state._blend_state = _default_blend_state;
 
@@ -1107,15 +1108,22 @@ render_context::current_line_width() const
 }
 
 void
-render_context::set_blend_state(const blend_state_ptr& in_bl_state)
+render_context::set_blend_state(const blend_state_ptr& in_bl_state, const math::vec4f& in_blend_color)
 {
     _current_state._blend_state = in_bl_state;
+    _current_state._blend_color = in_blend_color;
 }
 
 const blend_state_ptr&
 render_context::current_blend_state() const
 {
     return (_current_state._blend_state);
+}
+
+const math::vec4f&
+render_context::current_blend_color() const
+{
+    return (_current_state._blend_color);
 }
 
 void
@@ -1145,9 +1153,12 @@ render_context::apply_state_objects()
         _applied_state._line_width       = _current_state._line_width;
     }
 
-    if ((_current_state._blend_state != _applied_state._blend_state)) {
-        _current_state._blend_state->apply(*this, *(_applied_state._blend_state));
+    if (   (_current_state._blend_state != _applied_state._blend_state)
+        || (_current_state._blend_color != _applied_state._blend_color)) {
+        _current_state._blend_state->apply(*this, _current_state._blend_color,
+                                           *(_applied_state._blend_state), _applied_state._blend_color);
         _applied_state._blend_state = _current_state._blend_state;
+        _applied_state._blend_color = _current_state._blend_color;
     }
     gl_assert(opengl_api(), leaving render_context::apply_state_objects());
 }

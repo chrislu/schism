@@ -37,7 +37,7 @@ public:
         smooth_lcd,
 
         smooth_count
-    };
+    } smooth_type;
     struct glyph_info {
         math::vec2f    _texture_origin;
         math::vec2f    _texture_box_size;
@@ -47,9 +47,10 @@ public:
         math::vec2i    _bearing;
     }; // struct glyph_info
 
-    static const unsigned       default_point_size  = 12;
-    static const unsigned       default_border_size = 0;
-    static const unsigned       default_display_dpi = 72;
+    static const unsigned       default_point_size   = 12;
+    static const unsigned       default_border_size  = 0;
+    static const unsigned       default_display_dpi  = 72;
+    static const smooth_type    default_smooth_style = smooth_normal;
 
 protected:
     typedef std::vector<glyph_info>     glyph_container;
@@ -68,6 +69,7 @@ public:
               const std::string&       font_file,
               unsigned                 point_size  = default_point_size,
               unsigned                 border_size = default_border_size,
+              smooth_type              smooth_type = default_smooth_style,
               unsigned                 display_dpi = default_display_dpi);
     virtual ~font_face();
 
@@ -75,6 +77,7 @@ public:
     unsigned                        point_size() const;
     unsigned                        border_size() const;
     unsigned                        dpi() const;
+    smooth_type                     smooth_style() const;
     bool                            has_style(style_type s) const;
 
     const glyph_info&               glyph(char c, style_type s = style_regular) const;
@@ -93,6 +96,7 @@ protected:
     style_container                 _font_styles;
     std::vector<bool>               _font_styles_available;
     texture_2d_ptr                  _font_styles_texture_array;
+    smooth_type                     _font_smooth_style;
 
     std::string                     _name;
     unsigned                        _point_size;

@@ -101,8 +101,8 @@ blend_state::descriptor() const
 }
 
 void
-blend_state::apply(const render_context& in_context,
-                   const blend_state&    in_applied_state) const
+blend_state::apply(const render_context& in_context, const math::vec4f& in_blend_color,
+                   const blend_state&    in_applied_state, const math::vec4f& in_applied_blend_color) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
@@ -113,6 +113,13 @@ blend_state::apply(const render_context& in_context,
         else {
             glapi.glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         }
+    }
+
+    if (in_blend_color != in_applied_blend_color) {
+        glapi.glBlendColor(in_blend_color.r,
+                           in_blend_color.g,
+                           in_blend_color.b,
+                           in_blend_color.a);
     }
 
     if (_descriptor._blend_ops.size() == 1) {
@@ -155,7 +162,7 @@ blend_state::apply(const render_context& in_context,
 }
 
 void
-blend_state::force_apply(const render_context& in_context) const
+blend_state::force_apply(const render_context& in_context, const math::vec4f& in_blend_color) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
@@ -165,6 +172,11 @@ blend_state::force_apply(const render_context& in_context) const
     else {
         glapi.glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     }
+
+    glapi.glBlendColor(in_blend_color.r,
+                       in_blend_color.g,
+                       in_blend_color.b,
+                       in_blend_color.a);
 
     if (_descriptor._blend_ops.size() == 1) {
         force_apply(in_context, _descriptor._blend_ops[0]);

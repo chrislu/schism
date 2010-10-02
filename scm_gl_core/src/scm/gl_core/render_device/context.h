@@ -72,6 +72,7 @@ private:
         float                               _line_width;
         // blend state
         blend_state_ptr                     _blend_state;
+        math::vec4f                         _blend_color;
         // texture units //////////////////////////////////////////////////////////////////////////
         texture_unit_array                  _texture_units;
         // framebuffer control ////////////////////////////////////////////////////////////////////
@@ -227,8 +228,9 @@ public:
     float                           current_line_width() const;
 
     // blend state
-    void                            set_blend_state(const blend_state_ptr& in_bl_state);
+    void                            set_blend_state(const blend_state_ptr& in_bl_state, const math::vec4f& in_blend_color = math::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     const blend_state_ptr&          current_blend_state() const;
+    const math::vec4f&              current_blend_color() const;
 
     void                            reset_state_objects();
 

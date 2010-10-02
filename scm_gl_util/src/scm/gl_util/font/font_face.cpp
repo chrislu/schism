@@ -157,9 +157,11 @@ font_face::font_face(const render_device_ptr& device,
                      const std::string&       font_file,
                      unsigned                 point_size,
                      unsigned                 border_size,
+                     smooth_type              smooth_type,
                      unsigned                 display_dpi)
   : _font_styles(style_count)
   , _font_styles_available(style_count)
+  , _font_smooth_style(smooth_type)
   , _point_size(point_size)
   , _border_size(border_size)
   , _dpi(display_dpi)
@@ -184,7 +186,7 @@ font_face::font_face(const render_device_ptr& device,
         if (font_size == 0) {
             std::ostringstream s;
             s << "font_face::font_face(): "
-              << "unable to find suitable font size ('" << font_file << "')";
+              << "unable to find suitable font size (font: " << font_file << ", requested size: " << point_size << ", dpi: " << display_dpi << ")";
             throw(std::runtime_error(s.str()));
         }
 
@@ -255,12 +257,35 @@ font_face::font_face(const render_device_ptr& device,
         // end fill font styles
 
         // generate texture image
-        // currently only supported is grey (1byte per pixel, mono fonts are also converted to grey)
-        typedef vec<unsigned char, 2> glyph_texel; // 2 components (core, border... TO BE DONE!, currently only first used)
+        int             glyph_components     = 0;
+        int             glyph_bitmap_ycomp   = 1;
+        FT_Render_Mode  glyph_render_mode    = FT_RENDER_MODE_NORMAL;
+        unsigned        glyph_load_flags     = FT_LOAD_DEFAULT;
+        data_format     glyph_texture_format = FORMAT_NULL;
+
+        switch (smooth_type) {
+            case smooth_normal: glyph_components     = 2;
+                                glyph_render_mode    = FT_RENDER_MODE_LIGHT;
+                                glyph_load_flags     = FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT;
+                                glyph_texture_format = FORMAT_RG_8;
+                                break;
+            case smooth_lcd:    glyph_components     = 3;
+                                glyph_bitmap_ycomp   = 3;
+                                glyph_render_mode    = FT_RENDER_MODE_LCD;
+                                glyph_load_flags     = FT_LOAD_TARGET_LCD;
+                                glyph_texture_format = FORMAT_RGB_8;
+                                FT_Library_SetLcdFilter(ft_lib.get_lib(), FT_LCD_FILTER_DEFAULT);
+                                break;
+            default:
+                std::ostringstream s;
+                s << "font_face::font_face(): unsupported smoothing style.";
+                throw(std::runtime_error(s.str()));
+        }
+        //typedef vec<unsigned char, 2> glyph_texel; // 2 components (core, border... TO BE DONE!, currently only first used)
         vec3ui                        glyph_texture_dim  = vec3ui(max_glyph_size * 16, style_count); // a 16x16 grid of 256 glyphs in 4 layers
         size_t                        glyph_texture_size = static_cast<size_t>(glyph_texture_dim.x) * glyph_texture_dim.y * glyph_texture_dim.z;
-        scoped_array<glyph_texel>     glyph_texture(new glyph_texel[glyph_texture_size]);
-        memset(glyph_texture.get(), 0u, glyph_texture_size * 2); // clear to black
+        scoped_array<unsigned char>   glyph_texture(new unsigned char[glyph_texture_size * glyph_components]);
+        memset(glyph_texture.get(), 0u, glyph_texture_size * glyph_components); // clear to black
 
         for (int i = 0; i < style_count; ++i) {
             std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
@@ -272,8 +297,8 @@ font_face::font_face(const render_device_ptr& device,
             for (unsigned c = 0; c < 256; ++c) {
                 glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
 
-                ft_font.load_glyph(c);
-                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_LIGHT)) { // FT_RENDER_MODE_NORMAL)) { // FT_RENDER_MODE_LCD)) {// FT_RENDER_MODE_LIGHT)) { // 
+                ft_font.load_glyph(c, glyph_load_flags);
+                if (FT_Render_Glyph(ft_font.get_glyph(), glyph_render_mode)) {
                     continue;
                 }
                 FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
@@ -284,7 +309,7 @@ font_face::font_face(const render_device_ptr& device,
                 tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
                 tex_array_dst.z = i;
                 
-                cur_glyph._box_size         = vec2i(bitmap.width, bitmap.rows);
+                cur_glyph._box_size         = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
                 cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
                                                     static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
                 cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
@@ -311,7 +336,7 @@ font_face::font_face(const render_device_ptr& device,
                                                + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                + i * (glyph_texture_dim.x * glyph_texture_dim.y);
                             for (int dx = 0; dx < bitmap.width; ++dx) {
-                                glyph_texture[dst_off + dx][0] = bitmap.buffer[src_off + dx];
+                                glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
                             }
                         }
                         break;
@@ -321,10 +346,10 @@ font_face::font_face(const render_device_ptr& device,
                             unsigned dst_off =    tex_array_dst.x
                                                + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                            for (int dx = 0; dx < bitmap.width / 3; ++dx) {
-                                glyph_texture[dst_off + dx][0] = bitmap.buffer[src_off + dx * 3];
-                                glyph_texture[dst_off + dx][1] = bitmap.buffer[src_off + dx * 3 + 1];
-                                glyph_texture[dst_off + dx][2] = bitmap.buffer[src_off + dx * 3 + 2];
+                            for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
+                                glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
+                                glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
+                                glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
                             }
                         }
                         break;
@@ -339,7 +364,9 @@ font_face::font_face(const render_device_ptr& device,
                                                               + i * (glyph_texture_dim.x * glyph_texture_dim.y);
                                     unsigned char   src_set = src_byte & (0x80 >> bx);
                                     unsigned char*  plah    = &src_byte;
-                                    glyph_texture[dst_off][0] = src_set ? 255u : 0u;
+                                    for (int l = 0; l < glyph_components; ++l) {
+                                        glyph_texture[dst_off * glyph_components + l] = src_set ? 255u : 0u;
+                                    }
                                 }
                             }
                         }
@@ -354,8 +381,8 @@ font_face::font_face(const render_device_ptr& device,
         image_array_data_raw.push_back(glyph_texture.get());
 
         _font_styles_texture_array = device->create_texture_2d(vec2ui(glyph_texture_dim.x, glyph_texture_dim.y),
-                                                               FORMAT_RG_8, 1, glyph_texture_dim.z, 1,
-                                                               FORMAT_RG_8, image_array_data_raw);
+                                                               glyph_texture_format, 1, glyph_texture_dim.z, 1,
+                                                               glyph_texture_format, image_array_data_raw);
 
         if (!_font_styles_texture_array) {
             std::ostringstream s;
@@ -405,6 +432,12 @@ unsigned
 font_face::dpi() const
 {
     return (_dpi);
+}
+
+font_face::smooth_type
+font_face::smooth_style() const
+{
+    return (_font_smooth_style);
 }
 
 bool

@@ -10,6 +10,7 @@
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
 #include FT_STROKER_H
+#include FT_LCD_FILTER_H
 
 namespace scm {
 namespace gl {
@@ -35,7 +36,7 @@ public:
 
     void                set_size(unsigned           /*point_size*/,
                                  unsigned           /*display_dpi*/);
-    void                load_glyph(char c);
+    void                load_glyph(char c, unsigned f);
     FT_GlyphSlot        get_glyph() const;
     char                get_kerning(char l, char r) const;
     const FT_Face       get_face() const { return (_face); }

@@ -37,7 +37,7 @@ std::string v_source = "\
     }\
     ";
 
-std::string f_source = "\
+std::string f_source_gray = "\
     #version 330\n\
     \
     in vec3 tex_coord;\
@@ -55,6 +55,24 @@ std::string f_source = "\
     }\
     ";
 
+std::string f_source_lcd = "\
+    #version 330\n\
+    \
+    in vec3 tex_coord;\
+    \
+    uniform vec4            in_color;\
+    uniform sampler2DArray  in_font_array;\
+    \
+    layout(location = 0) out vec4 out_color;\
+    \
+    void main()\
+    {\
+        vec3 core = texture(in_font_array, tex_coord).rgb;\
+        out_color.rgb = core.rgb * in_color.a;\
+        out_color.a   = 1.0;\
+    }\
+    ";
+
 } // namespace
 
 
@@ -68,21 +86,27 @@ text_renderer::text_renderer(const render_device_ptr& device)
     using namespace scm::math;
     using boost::assign::list_of;
 
-    _font_shader_program = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source))
-                                                         (device->create_shader(STAGE_FRAGMENT_SHADER, f_source)));
+    _font_program_gray = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source))
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_gray)));
+    _font_program_lcd  = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source))
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_lcd)));
 
-    if (!_font_shader_program) {
-        scm::err() << "font_renderer::font_renderer(): error creating shader program." << log::end;
-        throw (std::runtime_error("font_renderer::font_renderer(): error creating shader program."));
+    if (   !_font_program_gray
+        || !_font_program_lcd) {
+        scm::err() << "font_renderer::font_renderer(): error creating shader programs." << log::end;
+        throw (std::runtime_error("font_renderer::font_renderer(): error creating shader programs."));
     }
 
     _font_sampler_state = device->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
-    _font_blend_state   = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
+    _font_blend_gray    = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
+    _font_blend_lcd     = device->create_blend_state(true, FUNC_CONSTANT_COLOR, FUNC_ONE_MINUS_SRC_COLOR, FUNC_ONE, FUNC_ZERO);
+    //_font_blend_lcd     = device->create_blend_state(true, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
     _font_dstate        = device->create_depth_stencil_state(false, false, COMPARISON_LESS);
     _font_raster_state  = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true);
 
     if (   !_font_sampler_state
-        || !_font_blend_state
+        || !_font_blend_gray
+        || !_font_blend_lcd
         || !_font_dstate
         || !_font_raster_state) {
         scm::err() << "font_renderer::font_renderer(): error creating state objects." << log::end;
@@ -94,11 +118,13 @@ text_renderer::text_renderer(const render_device_ptr& device)
 
 text_renderer::~text_renderer()
 {
-    _font_shader_program.reset();
+    _font_program_gray.reset();
+    _font_program_lcd.reset();
     _font_sampler_state.reset();
     _font_dstate.reset();
     _font_raster_state.reset();
-    _font_blend_state.reset();
+    _font_blend_gray.reset();
+    _font_blend_lcd.reset();
 
     //_quad.reset();
 }
@@ -123,16 +149,30 @@ text_renderer::draw(const render_context_ptr& context,
     //         static_cast<float>(txt->font()->styles_texture_array()->dimensions().y), 1.0f);
     mat4f mvp = _projection_matrix * v;
 
-    _font_shader_program->uniform("in_mvp", mvp);
-    _font_shader_program->uniform("in_font_array", 0);
-    _font_shader_program->uniform("in_color", txt->text_color());
-
     context->set_depth_stencil_state(_font_dstate);
     context->set_rasterizer_state(_font_raster_state);
-    context->set_blend_state(_font_blend_state);
-
     context->bind_texture(txt->font()->styles_texture_array(), _font_sampler_state, 0);
-    context->bind_program(_font_shader_program);
+
+    switch (txt->font()->smooth_style()) {
+        case font_face::smooth_normal:
+            _font_program_gray->uniform("in_mvp", mvp);
+            _font_program_gray->uniform("in_font_array", 0);
+            _font_program_gray->uniform("in_color", txt->text_color());
+
+            context->set_blend_state(_font_blend_gray);
+            context->bind_program(_font_program_gray);
+           break;
+        case font_face::smooth_lcd:
+            _font_program_lcd->uniform("in_mvp", mvp);
+            _font_program_lcd->uniform("in_font_array", 0);
+            _font_program_lcd->uniform("in_color", txt->text_color());
+
+            context->set_blend_state(_font_blend_lcd, txt->text_color());
+            context->bind_program(_font_program_lcd);
+            break;
+        default:
+            return;
+    }
 
     context->bind_vertex_array(txt->_vertex_array);
     context->bind_index_buffer(txt->_index_buffer, txt->_topology, TYPE_USHORT);
@@ -156,43 +196,80 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
     context_texture_units_guard tug(context);
     context_program_guard       cpg(context);
     
-    _font_shader_program->uniform("in_font_array", 0);
 
     context->set_depth_stencil_state(_font_dstate);
     context->set_rasterizer_state(_font_raster_state);
-    context->set_blend_state(_font_blend_state);
-
     context->bind_texture(txt->font()->styles_texture_array(), _font_sampler_state, 0);
-    context->bind_program(_font_shader_program);
 
     context->bind_vertex_array(txt->_vertex_array);
     context->bind_index_buffer(txt->_index_buffer, txt->_topology, TYPE_USHORT);
 
-    { // shadow
-        mat4f v = mat4f::identity();
-        translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
-        mat4f mvp = _projection_matrix * v;
+    switch (txt->font()->smooth_style()) {
+        case font_face::smooth_normal:
+            _font_program_gray->uniform("in_font_array", 0);
+            context->set_blend_state(_font_blend_gray);
+            context->bind_program(_font_program_gray);
+            { // shadow
+                mat4f v = mat4f::identity();
+                translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
+                mat4f mvp = _projection_matrix * v;
 
-        _font_shader_program->uniform("in_mvp", mvp);
-        _font_shader_program->uniform("in_color", txt->text_shadow_color());
+                _font_program_gray->uniform("in_mvp", mvp);
+                _font_program_gray->uniform("in_color", txt->text_shadow_color());
 
-        if (txt->_indices_count > 0) {
-            context->apply();
-            context->draw_elements(txt->_indices_count);
-        }
-    }
-    { // text
-        mat4f v = mat4f::identity();
-        translate(v, vec3f(vec2f(pos), 0.0f));
-        mat4f mvp = _projection_matrix * v;
+                if (txt->_indices_count > 0) {
+                    context->apply();
+                    context->draw_elements(txt->_indices_count);
+                }
+            }
+            { // text
+                mat4f v = mat4f::identity();
+                translate(v, vec3f(vec2f(pos), 0.0f));
+                mat4f mvp = _projection_matrix * v;
 
-        _font_shader_program->uniform("in_mvp", mvp);
-        _font_shader_program->uniform("in_color", txt->text_color());
+                _font_program_gray->uniform("in_mvp", mvp);
+                _font_program_gray->uniform("in_color", txt->text_color());
 
-        if (txt->_indices_count > 0) {
-            context->apply();
-            context->draw_elements(txt->_indices_count);
-        }
+                if (txt->_indices_count > 0) {
+                    context->apply();
+                    context->draw_elements(txt->_indices_count);
+                }
+            }
+            break;
+        case font_face::smooth_lcd:
+            _font_program_lcd->uniform("in_font_array", 0);
+            context->bind_program(_font_program_lcd);
+            { // shadow
+                mat4f v = mat4f::identity();
+                translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
+                mat4f mvp = _projection_matrix * v;
+
+                _font_program_lcd->uniform("in_mvp", mvp);
+                _font_program_lcd->uniform("in_color", txt->text_shadow_color());
+                context->set_blend_state(_font_blend_lcd, txt->text_shadow_color());
+
+                if (txt->_indices_count > 0) {
+                    context->apply();
+                    context->draw_elements(txt->_indices_count);
+                }
+            }
+            { // text
+                mat4f v = mat4f::identity();
+                translate(v, vec3f(vec2f(pos), 0.0f));
+                mat4f mvp = _projection_matrix * v;
+
+                _font_program_lcd->uniform("in_mvp", mvp);
+                _font_program_lcd->uniform("in_color", txt->text_color());
+                context->set_blend_state(_font_blend_lcd, txt->text_color());
+
+                if (txt->_indices_count > 0) {
+                    context->apply();
+                    context->draw_elements(txt->_indices_count);
+                }
+            }
+            break;
+        default:
+            return;
     }
 
     //_quad->draw(context, geometry::MODE_SOLID);

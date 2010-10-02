@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include <scm/core/math.h>
+
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/render_device/device_child.h>
@@ -58,9 +60,9 @@ protected:
     blend_state(      render_device&    in_device,
                 const blend_state_desc& in_desc);
 
-    void                apply(const render_context& in_context,
-                              const blend_state&    in_applied_state) const;
-    void                force_apply(const render_context& in_context) const;
+    void                apply(const render_context& in_context, const math::vec4f& in_blend_color,
+                              const blend_state&    in_applied_state, const math::vec4f& in_applied_blend_color) const;
+    void                force_apply(const render_context& in_context, const math::vec4f& in_blend_color) const;
 
 
     void                force_apply(const render_context& in_context,

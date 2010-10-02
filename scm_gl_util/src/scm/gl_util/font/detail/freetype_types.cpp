@@ -45,11 +45,11 @@ ft_face::set_size(unsigned point_size,
 }
 
 void
-ft_face::load_glyph(char c)
+ft_face::load_glyph(char c, unsigned f)
 {
-    if(FT_Load_Glyph(_face, FT_Get_Char_Index(_face, c),
+    if(FT_Load_Glyph(_face, FT_Get_Char_Index(_face, c), f)) {
                         //FT_LOAD_DEFAULT)) { //| FT_LOAD_TARGET_NORMAL)) {
-                        FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT)) {
+                        //FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT)) {
         std::ostringstream s;
         s << "ft_face::load_glyph: unable to load character glyph (c: " << c << ")";
         throw(std::runtime_error(s.str()));
