@@ -32,6 +32,12 @@ public:
 
         style_count
     } style_type;
+    typedef enum {
+        smooth_normal   = 0x00,
+        smooth_lcd,
+
+        smooth_count
+    };
     struct glyph_info {
         math::vec2f    _texture_origin;
         math::vec2f    _texture_box_size;
@@ -40,6 +46,10 @@ public:
         unsigned       _advance;
         math::vec2i    _bearing;
     }; // struct glyph_info
+
+    static const unsigned       default_point_size  = 12;
+    static const unsigned       default_border_size = 0;
+    static const unsigned       default_display_dpi = 72;
 
 protected:
     typedef std::vector<glyph_info>     glyph_container;
@@ -56,9 +66,9 @@ protected:
 public:
     font_face(const render_device_ptr& device,                  
               const std::string&       font_file,
-              unsigned                 point_size  = 12,
-              unsigned                 border_size = 1,
-              unsigned                 display_dpi = 72);
+              unsigned                 point_size  = default_point_size,
+              unsigned                 border_size = default_border_size,
+              unsigned                 display_dpi = default_display_dpi);
     virtual ~font_face();
 
     const std::string&              name() const;

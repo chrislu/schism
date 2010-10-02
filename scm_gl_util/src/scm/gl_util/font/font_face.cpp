@@ -273,7 +273,7 @@ font_face::font_face(const render_device_ptr& device,
                 glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
 
                 ft_font.load_glyph(c);
-                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_NORMAL)) { // FT_RENDER_MODE_LIGHT)) { // 
+                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_LIGHT)) { // FT_RENDER_MODE_NORMAL)) { // FT_RENDER_MODE_LCD)) {// FT_RENDER_MODE_LIGHT)) { // 
                     continue;
                 }
                 FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
@@ -312,6 +312,19 @@ font_face::font_face(const render_device_ptr& device,
                                                + i * (glyph_texture_dim.x * glyph_texture_dim.y);
                             for (int dx = 0; dx < bitmap.width; ++dx) {
                                 glyph_texture[dst_off + dx][0] = bitmap.buffer[src_off + dx];
+                            }
+                        }
+                        break;
+                    case FT_PIXEL_MODE_LCD:
+                        for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            unsigned src_off = dy * bitmap.pitch;
+                            unsigned dst_off =    tex_array_dst.x
+                                               + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                               + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                            for (int dx = 0; dx < bitmap.width / 3; ++dx) {
+                                glyph_texture[dst_off + dx][0] = bitmap.buffer[src_off + dx * 3];
+                                glyph_texture[dst_off + dx][1] = bitmap.buffer[src_off + dx * 3 + 1];
+                                glyph_texture[dst_off + dx][2] = bitmap.buffer[src_off + dx * 3 + 2];
                             }
                         }
                         break;

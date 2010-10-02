@@ -4,9 +4,11 @@ namespace time {
 
 template<class timer_t>
 accumulate_timer<timer_t>::accumulate_timer()
-  : _accumulated_duration(),
+  : _accumulated_duration(duration_type()),
     _accumulation_count(0u)
 {
+    _timer.start();
+    _timer.stop();
 }
 
 template<class timer_t>

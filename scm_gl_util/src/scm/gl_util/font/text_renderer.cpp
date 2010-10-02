@@ -50,8 +50,8 @@ std::string f_source = "\
     void main()\
     {\
         float core = texture(in_font_array, tex_coord).r;\
-        out_color.rgb = in_color.rgb * core;\
-        out_color.a   = core;\
+        out_color.rgb = in_color.rgb;\
+        out_color.a   = core * in_color.a;\
     }\
     ";
 
