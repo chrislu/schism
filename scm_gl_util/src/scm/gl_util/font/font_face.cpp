@@ -273,7 +273,7 @@ font_face::font_face(const render_device_ptr& device,
                 glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
 
                 ft_font.load_glyph(c);
-                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_LIGHT)) { // FT_RENDER_MODE_NORMAL)) { // 
+                if (FT_Render_Glyph(ft_font.get_glyph(), FT_RENDER_MODE_NORMAL)) { // FT_RENDER_MODE_LIGHT)) { // 
                     continue;
                 }
                 FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
