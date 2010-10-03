@@ -1,6 +1,7 @@
 
 #include "font_face.h"
 
+#include <iostream>
 #include <exception>
 #include <stdexcept>
 #include <set>
@@ -209,6 +210,8 @@ font_face::font_face(const render_device_ptr& device,
             _font_styles[i]._kerning_table.resize(boost::extents[256][256]);
             for (unsigned l = 0; l < 256; ++l) {
                 for (unsigned r = 0; r < 256; ++r) {
+                    //if (l == 'T' && r == 'e')
+                    //    std::cout << "kerning: " << int(ft_font.get_kerning(l, r)) << std::endl;
                     _font_styles[i]._kerning_table[l][r] = ft_font.get_kerning(l, r);
                 }
             }
@@ -265,16 +268,16 @@ font_face::font_face(const render_device_ptr& device,
 
         switch (smooth_type) {
             case smooth_normal: glyph_components     = 2;
-                                glyph_render_mode    = FT_RENDER_MODE_LIGHT;
-                                glyph_load_flags     = FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT;
+                                glyph_render_mode    = FT_RENDER_MODE_NORMAL; //FT_RENDER_MODE_LIGHT; //
+                                glyph_load_flags     = FT_LOAD_DEFAULT; //FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT; //
                                 glyph_texture_format = FORMAT_RG_8;
                                 break;
             case smooth_lcd:    glyph_components     = 3;
                                 glyph_bitmap_ycomp   = 3;
                                 glyph_render_mode    = FT_RENDER_MODE_LCD;
-                                glyph_load_flags     = FT_LOAD_TARGET_LCD;
+                                glyph_load_flags     = FT_LOAD_TARGET_LCD;//FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT;
                                 glyph_texture_format = FORMAT_RGB_8;
-                                FT_Library_SetLcdFilter(ft_lib.get_lib(), FT_LCD_FILTER_DEFAULT);
+                                FT_Library_SetLcdFilter(ft_lib.get_lib(), FT_LCD_FILTER_LIGHT);
                                 break;
             default:
                 std::ostringstream s;
