@@ -60,14 +60,8 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/buffer_object *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/buffer_object *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/font *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/font *.h *.inl)
-
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/framebuffer_object *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/framebuffer_object *.h *.inl)
-
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/gui *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/gui *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/module *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/module *.h *.inl)

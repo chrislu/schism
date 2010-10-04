@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <scm/log.h>
-#include <scm/gl/math/math.h>
+#include <scm/gl_core/math.h>
 
 #include <scm/input/config.h>
 

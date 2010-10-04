@@ -15,16 +15,6 @@ scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/core *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/core *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/font *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/core/font *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/font/detail *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/core/font/detail *.h *.inl)
-
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/gui *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/core/gui *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/gui/detail *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/core/gui/detail *.h *.inl)
-
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/io *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/core/io *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/core/io/detail *.cpp)
@@ -75,10 +65,8 @@ endif (WIN32)
 
 # set include and lib directories
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_BOOST_INC_DIR}
-                                      ${GLOBAL_EXT_DIR}/inc/freetype)
+                                      ${SCM_BOOST_INC_DIR})
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
-scm_project_include_directories(UNIX  /usr/include/freetype2)
 
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                    ${SCM_BOOST_LIB_DIR})
@@ -96,7 +84,6 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 # link libraries
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
-        freetype2
         optimized libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_REL}  debug libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_thread-${SCHISM_BOOST_LIB_POSTFIX_REL}           debug libboost_thread-${SCHISM_BOOST_LIB_POSTFIX_DBG}
         optimized libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}        debug libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_DBG}
@@ -108,7 +95,6 @@ endif (WIN32)
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
         rt
-        freetype
         boost_date_time${SCHISM_BOOST_LIB_POSTFIX_REL}
         boost_filesystem${SCHISM_BOOST_LIB_POSTFIX_REL}
         boost_program_options${SCHISM_BOOST_LIB_POSTFIX_REL}
