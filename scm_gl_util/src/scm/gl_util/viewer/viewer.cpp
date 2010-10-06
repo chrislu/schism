@@ -132,7 +132,7 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
 
         initialize_render_target();
 
-        font_face_ptr counter_font(new font_face(_device, "../../../res/fonts/consola.ttf", 12, 0, font_face::smooth_lcd));
+        font_face_ptr counter_font(new font_face(_device, "../../../res/fonts/Consola.ttf", 12, 0, font_face::smooth_lcd));
         _text_renderer.reset(new text_renderer(_device));
         _frame_counter_text.reset(new text(_device, counter_font, font_face::style_regular, "sick, sad world..."));
         _frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
