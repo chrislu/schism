@@ -5,15 +5,16 @@
 #include <boost/function.hpp>
 
 #include <scm/core/math.h>
+#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/high_res_timer.h>
 
-#include <scm/gl_core/render_device/render_device_fwd.h>
+#include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
-//#include <scm/gl_util/render_context/render_context_fwd.h>
-//#include <scm/gl_util/render_context/context_format.h>
-//#include <scm/gl_util/render_context/window_context.h>
 
+#include <scm/gl_util/font/font_fwd.h>
+#include <scm/gl_util/primitives/primitives_fwd.h>
 #include <scm/gl_util/viewer/camera.h>
 #include <scm/gl_util/window_management/wm_fwd.h>
 #include <scm/gl_util/window_management/surface.h>
@@ -36,7 +37,14 @@ public:
         right_button
     }; // enum mouse_button
 
-    struct viewer_settings {
+    struct __scm_export(gl_util) viewer_attributes {
+        viewer_attributes();
+
+        unsigned        _multi_samples;
+        unsigned        _super_samples;
+    }; // struct viewer_attributes
+
+    struct __scm_export(gl_util) viewer_settings {
         viewer_settings();
 
         bool        _vsync;
@@ -44,7 +52,10 @@ public:
         math::vec3f _clear_color;
         float       _clear_depth;
         unsigned    _clear_stencil;
+        bool        _show_frame_times;
     }; // struct viewer_settings
+
+    typedef scm::time::accumulate_timer<scm::time::high_res_timer>  accum_timer_type;
 
     typedef boost::function<void (const render_device_ptr&,
                                   const render_context_ptr&)>   update_func;
@@ -59,6 +70,7 @@ public:
 public:
     viewer(const math::vec2ui&                  vp_dim,
            const wm::window::handle             parent_wnd = 0,
+           const viewer_attributes&             view_attrib = viewer_attributes(),
            const wm::context::attribute_desc&   ctx_attrib = wm::context::default_attributes(),
            const wm::surface::format_desc&      win_fmt = wm::surface::default_format());
     virtual~viewer();
@@ -107,6 +119,9 @@ public:
     void                            send_mouse_move(mouse_button button, int x, int y);
 
 protected:
+    bool                            initialize_render_target();
+
+protected:
     // framestamp
     // stats (frametime etc.)
 
@@ -120,6 +135,39 @@ protected:
 
     wm::window_ptr                  _window;
     wm::context_ptr                 _window_context;
+
+    viewer_attributes               _attributes;
+
+    struct render_target {
+        render_target();
+        ~render_target();
+        gl::program_ptr                 _color_present_program;
+        int                             _viewport_scale;
+        int                             _viewport_color_mip_level;
+
+        // frame buffer
+        gl::texture_2d_ptr              _color_buffer;
+        gl::texture_2d_ptr              _color_buffer_resolved;
+        gl::texture_2d_ptr              _depth_buffer;
+
+        gl::frame_buffer_ptr            _framebuffer;
+        gl::frame_buffer_ptr            _framebuffer_resolved;
+   
+        // state objects
+        gl::sampler_state_ptr           _filter_nearest;
+        gl::blend_state_ptr             _no_blend;
+        gl::depth_stencil_state_ptr     _dstate_no_zwrite;
+        gl::rasterizer_state_ptr        _cull_back;
+
+        // fullscreen quad geometry
+        shared_ptr<gl::quad_geometry>   _quad_geom;
+
+    };
+    shared_ptr<render_target>       _render_target;
+
+    accum_timer_type                _frame_time;
+    gl::text_renderer_ptr           _text_renderer;
+    gl::text_ptr                    _frame_counter_text;
 
     trackball_manipulator           _trackball;
     math::vec2f                     _trackball_start_pos;
