@@ -7,6 +7,7 @@
 
 #include <boost/utility.hpp>
 #include <boost/program_options/options_description.hpp>
+#include <boost/program_options/positional_options.hpp>
 #include <boost/program_options/variables_map.hpp>
 
 #include <scm/core/numeric_types.h>
@@ -32,10 +33,11 @@ public:
     };
 
 public:
-    typedef boost::program_options::options_description         command_line_option_descr;
-    typedef boost::program_options::variables_map               command_line_result;
+    typedef boost::program_options::options_description             command_line_option_desc;
+    typedef boost::program_options::positional_options_description  command_line_position_desc;
+    typedef boost::program_options::variables_map                   command_line_result;
 
-    typedef std::map<std::string, command_line_option_descr>    command_line_descr_container;
+    typedef std::map<std::string, command_line_option_desc>         command_line_desc_container;
 
 public:
     core(int argc, char **argv/*, app_type t = gui_application || console_application || etc.*/);
@@ -48,9 +50,10 @@ public:
 
     std::string                             version_string() const;
 
-    const command_line_option_descr&        command_line_options() const;
-    void                                    add_command_line_options(const command_line_option_descr& opt,
+    const command_line_option_desc&         command_line_options() const;
+    void                                    add_command_line_options(const command_line_option_desc& opt,
                                                                      const std::string& module);
+    command_line_position_desc&             command_line_positions();
 
 protected:
     bool                                    initialize(int argc, char **argv);
@@ -64,8 +67,9 @@ protected:
 protected:
     system_state_type                       _system_state;
 
-    command_line_option_descr               _command_line_options;
-    command_line_descr_container            _module_options;
+    command_line_option_desc                _command_line_options;
+    command_line_position_desc              _command_line_positions;
+    command_line_desc_container             _module_options;
     command_line_result                     _command_line;
 
 private:

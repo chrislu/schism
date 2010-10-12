@@ -123,26 +123,32 @@ core::version_string() const
     return (output);
 }
 
-const core::command_line_option_descr&
+const core::command_line_option_desc&
 core::command_line_options() const
 {
     return (_command_line_options);
 }
 
 void
-core::add_command_line_options(const core::command_line_option_descr&   opt,
-                               const std::string&                       module)
+core::add_command_line_options(const core::command_line_option_desc&   opt,
+                               const std::string&                      module)
 {
-    command_line_descr_container::iterator mod = _module_options.find(module);
+    command_line_desc_container::iterator mod = _module_options.find(module);
     if (mod != _module_options.end()) {
         // the options for this module are allready registered
         mod->second.add(opt);
     }
     else {
-        _module_options.insert(command_line_descr_container::value_type(module, opt));
+        _module_options.insert(command_line_desc_container::value_type(module, opt));
     }
 
     _command_line_options.add(opt);
+}
+
+core::command_line_position_desc&
+core::command_line_positions()
+{
+    return (_command_line_positions);
 }
 
 bool
@@ -259,8 +265,16 @@ core::parse_command_line(int argc, char **argv)
     try {
         namespace bpo = boost::program_options;
         
-        bpo::parsed_options      parsed_cmd_line =  bpo::parse_command_line(argc, argv, _command_line_options);
+        //bpo::parsed_options      parsed_cmd_line =  bpo::parse_command_line(argc, argv, _command_line_options);
 
+        //bpo::store(parsed_cmd_line, _command_line);
+        //bpo::notify(_command_line);
+
+        bpo::parsed_options parsed_cmd_line = bpo::command_line_parser(argc, argv)
+                                                   .options(_command_line_options)
+                                                   .positional(_command_line_positions)
+                                                   .allow_unregistered()
+                                                   .run();
         bpo::store(parsed_cmd_line, _command_line);
         bpo::notify(_command_line);
     }
@@ -288,7 +302,7 @@ core::parse_command_line(int argc, char **argv)
         if (_command_line.count("help-module")) {
             const string& mod = _command_line["help-module"].as<string>();
 
-            command_line_descr_container::iterator mod_iter = _module_options.find(mod);
+            command_line_desc_container::iterator mod_iter = _module_options.find(mod);
             if (mod_iter != _module_options.end()) {
                 cout << "module '" << mod << "' usage: " << log::end;
                 cout << mod_iter->second << log::end;
