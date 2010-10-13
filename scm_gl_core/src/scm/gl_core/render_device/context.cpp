@@ -65,6 +65,7 @@ render_context::buffer_binding::operator!=(const buffer_binding& rhs) const
 render_context::binding_state_type::binding_state_type()
   : _stencil_ref_value(0)
   , _line_width(1.0f)
+  , _point_size(1.0f)
   , _blend_color(math::vec4f(1.0f, 1.0f, 1.0f, 1.0f))
   , _default_framebuffer_target(FRAMEBUFFER_BACK)
   , _viewports(viewport(math::vec2ui(0, 0), math::vec2ui(10, 10)))
@@ -83,7 +84,7 @@ render_context::render_context(render_device& in_device)
     _applied_state._depth_stencil_state = _default_depth_stencil_state;
 
     _default_rasterizer_state = in_device.create_rasterizer_state(rasterizer_state_desc());
-    _default_rasterizer_state->force_apply(*this, _current_state._line_width);
+    _default_rasterizer_state->force_apply(*this, _current_state._line_width, _current_state._point_size);
     _current_state._rasterizer_state = _default_rasterizer_state;
     _applied_state._rasterizer_state = _default_rasterizer_state;
 
@@ -1089,10 +1090,11 @@ render_context::current_stencil_ref_value() const
 }
 
 void
-render_context::set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width)
+render_context::set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width, float in_point_size)
 {
     _current_state._rasterizer_state = in_rs_state;
     _current_state._line_width       = in_line_width;
+    _current_state._point_size       = in_point_size;
 }
 
 const rasterizer_state_ptr&
@@ -1105,6 +1107,12 @@ float
 render_context::current_line_width() const
 {
     return (_current_state._line_width);
+}
+
+float
+render_context::current_point_size() const
+{
+    return (_current_state._point_size);
 }
 
 void
@@ -1147,10 +1155,11 @@ render_context::apply_state_objects()
 
     if (   (_current_state._rasterizer_state != _applied_state._rasterizer_state)
         || (_current_state._line_width       != _applied_state._line_width)) {
-        _current_state._rasterizer_state->apply(*this, _current_state._line_width,
-                                                *(_applied_state._rasterizer_state), _applied_state._line_width);
+        _current_state._rasterizer_state->apply(*this, _current_state._line_width, _current_state._point_size,
+                                                *(_applied_state._rasterizer_state), _applied_state._line_width, _applied_state._point_size);
         _applied_state._rasterizer_state = _current_state._rasterizer_state;
         _applied_state._line_width       = _current_state._line_width;
+        _applied_state._point_size       = _current_state._point_size;
     }
 
     if (   (_current_state._blend_state != _applied_state._blend_state)

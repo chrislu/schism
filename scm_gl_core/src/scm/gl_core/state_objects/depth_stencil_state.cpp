@@ -47,7 +47,7 @@ stencil_ops::operator!=(const stencil_ops& rhs) const
 
 depth_stencil_state_desc::depth_stencil_state_desc(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                                                    bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
-                                                   stencil_ops in_stencil_ops)
+                                                   const stencil_ops& in_stencil_ops)
   : _depth_test(in_depth_test),
     _depth_mask(in_depth_mask),
     _depth_func(in_depth_func),
@@ -61,7 +61,7 @@ depth_stencil_state_desc::depth_stencil_state_desc(bool in_depth_test, bool in_d
 
 depth_stencil_state_desc::depth_stencil_state_desc(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                                                    bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
-                                                   stencil_ops in_stencil_front_ops, stencil_ops in_stencil_back_ops)
+                                                   const stencil_ops& in_stencil_front_ops, const stencil_ops& in_stencil_back_ops)
   : _depth_test(in_depth_test),
     _depth_mask(in_depth_mask),
     _depth_func(in_depth_func),

@@ -22,5 +22,8 @@
 // 'function': was declared deprecated (VC8 for some/all C calls)
 #pragma warning( disable: 4996)
 
+// C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+#pragma warning( disable: 4290)
+
 #endif //    SCM_COMPILER     == SCM_COMPILER_MSVC
        // && SCM_COMPILER_VER >= 1400

@@ -30,10 +30,10 @@ struct __scm_export(gl_core) stencil_ops {
 struct __scm_export(gl_core) depth_stencil_state_desc {
     depth_stencil_state_desc(bool in_depth_test = true, bool in_depth_mask = true, compare_func in_depth_func = COMPARISON_LESS,
                              bool in_stencil_test = false, unsigned in_stencil_rmask = ~0u, unsigned in_stencil_wmask = ~0u,
-                             stencil_ops in_stencil_ops = stencil_ops());
+                             const stencil_ops& in_stencil_ops = stencil_ops());
     depth_stencil_state_desc(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                              bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
-                             stencil_ops in_stencil_front_ops, stencil_ops in_stencil_back_ops);
+                             const stencil_ops& in_stencil_front_ops, const stencil_ops& in_stencil_back_ops);
 
     bool            _depth_test;
     bool            _depth_mask;

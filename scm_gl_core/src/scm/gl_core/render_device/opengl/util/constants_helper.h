@@ -19,6 +19,7 @@ unsigned gl_stencil_op(const stencil_op s);
 unsigned gl_fill_mode(const fill_mode s);
 unsigned gl_cull_mode(const cull_mode s);
 unsigned gl_polygon_orientation(const polygon_orientation s);
+unsigned gl_origin_mode(const enum origin_mode o);
 unsigned gl_blend_func(const blend_func s);
 unsigned gl_blend_equation(const blend_equation s);
 bool     masked(unsigned in_color_mask, const color_mask in_color);

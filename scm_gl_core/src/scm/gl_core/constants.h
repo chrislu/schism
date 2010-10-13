@@ -182,7 +182,15 @@ enum polygon_orientation
     ORIENT_CCW,
 
     POLY_ORIENT_COUNT
-};
+}; // enum polygon_orientation
+
+enum origin_mode
+{
+    ORIGIN_UPPER_LEFT = 0x00,
+    ORIGIN_LOWER_LEFT,
+
+    ORIGIN_MODE_COUNT
+}; // enum origin_mode
 
 enum blend_func
 {

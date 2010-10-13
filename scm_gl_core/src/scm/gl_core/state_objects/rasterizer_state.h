@@ -12,13 +12,28 @@
 namespace scm {
 namespace gl {
 
+struct __scm_export(gl_core) point_raster_state {
+    point_raster_state(bool            in_shader_point_size    = false,
+                       origin_mode     in_point_origin         = ORIGIN_LOWER_LEFT,
+                       float           in_point_fade_threshold = 1.0f);
+
+    bool operator==(const point_raster_state& rhs) const;
+    bool operator!=(const point_raster_state& rhs) const;
+
+    bool            _shader_point_size;
+    origin_mode     _point_origin_mode;
+    float           _point_fade_threshold;
+
+}; // struct point_raster_state
+
 struct __scm_export(gl_core) rasterizer_state_desc {
-    rasterizer_state_desc(fill_mode             in_fmode = FILL_SOLID,
-                          cull_mode             in_cmode = CULL_BACK,
-                          polygon_orientation   in_fface = ORIENT_CCW,
-                          bool                  in_msample = false,
-                          bool                  in_sctest = false,
-                          bool                  in_smlines = false);
+    rasterizer_state_desc(fill_mode                 in_fmode = FILL_SOLID,
+                          cull_mode                 in_cmode = CULL_BACK,
+                          polygon_orientation       in_fface = ORIENT_CCW,
+                          bool                      in_msample = false,
+                          bool                      in_sctest = false,
+                          bool                      in_smlines = false,
+                          const point_raster_state& in_point_state = point_raster_state());
 
     fill_mode               _fill_mode;
     cull_mode               _cull_mode;
@@ -28,6 +43,8 @@ struct __scm_export(gl_core) rasterizer_state_desc {
     bool                    _multi_sample;
     bool                    _scissor_test;
     bool                    _smooth_lines;
+
+    point_raster_state      _point_state;
 }; // struct depth_stencil_state_desc
 
 class __scm_export(gl_core) rasterizer_state : public render_device_child
@@ -43,10 +60,13 @@ protected:
 
     void                            apply(const render_context&   in_context,
                                           const float             in_line_width,
+                                          const float             in_point_size,
                                           const rasterizer_state& in_applied_state,
-                                          const float             in_applied_line_width) const;
+                                          const float             in_applied_line_width,
+                                          const float             in_applied_point_size) const;
     void                            force_apply(const render_context&   in_context,
-                                                const float             in_line_width) const;
+                                                const float             in_line_width,
+                                                const float             in_point_size) const;
 
 protected:
     rasterizer_state_desc           _descriptor;

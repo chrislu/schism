@@ -17,8 +17,9 @@
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
-#include <scm/gl_core/state_objects/depth_stencil_state.h>
 #include <scm/gl_core/state_objects/blend_state.h>
+#include <scm/gl_core/state_objects/depth_stencil_state.h>
+#include <scm/gl_core/state_objects/rasterizer_state.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -209,9 +210,12 @@ public:
     depth_stencil_state_ptr         create_depth_stencil_state(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                                                                bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
                                                                stencil_ops in_stencil_front_ops, stencil_ops in_stencil_back_ops);
+
     rasterizer_state_ptr            create_rasterizer_state(const rasterizer_state_desc& in_desc);
     rasterizer_state_ptr            create_rasterizer_state(fill_mode in_fmode, cull_mode in_cmode = CULL_BACK, polygon_orientation in_fface = ORIENT_CCW,
-                                                            bool in_msample = false, bool in_sctest = false, bool in_smlines = false);
+                                                            bool in_msample = false, bool in_sctest = false, bool in_smlines = false,
+                                                            const point_raster_state& in_point_state = point_raster_state());
+
     blend_state_ptr                 create_blend_state(const blend_state_desc& in_desc);
     blend_state_ptr                 create_blend_state(bool in_enabled,
                                                        blend_func in_src_rgb_func,   blend_func in_dst_rgb_func,

@@ -108,6 +108,7 @@ public:
       , _save_stencil_ref(in_context->current_stencil_ref_value())
       , _save_rasterizer_state(in_context->current_rasterizer_state())
       , _save_line_width(in_context->current_line_width())
+      , _save_point_size(in_context->current_point_size())
       , _save_blend_state(in_context->current_blend_state())
       , _save_blend_color(in_context->current_blend_color())
     {
@@ -119,7 +120,7 @@ public:
     void restore()
     {
         _guarded_context->set_depth_stencil_state(_save_depth_stencil_state, _save_stencil_ref);
-        _guarded_context->set_rasterizer_state(_save_rasterizer_state, _save_line_width);
+        _guarded_context->set_rasterizer_state(_save_rasterizer_state, _save_line_width, _save_point_size);
         _guarded_context->set_blend_state(_save_blend_state, _save_blend_color);
     }
 private:
@@ -128,6 +129,7 @@ private:
     const unsigned                  _save_stencil_ref;
     const rasterizer_state_ptr      _save_rasterizer_state;
     const float                     _save_line_width;
+    const float                     _save_point_size;
     const blend_state_ptr           _save_blend_state;
     const math::vec4f               _save_blend_color;
 }; // class context_state_objects_guard

@@ -637,10 +637,10 @@ render_device::create_rasterizer_state(const rasterizer_state_desc& in_desc)
 
 rasterizer_state_ptr
 render_device::create_rasterizer_state(fill_mode in_fmode, cull_mode in_cmode, polygon_orientation in_fface,
-                                       bool in_msample, bool in_sctest, bool in_smlines)
+                                       bool in_msample, bool in_sctest, bool in_smlines, const point_raster_state& in_point_state)
 {
     return (create_rasterizer_state(rasterizer_state_desc(in_fmode, in_cmode, in_fface,
-                                                          in_msample, in_sctest, in_smlines)));
+                                                          in_msample, in_sctest, in_smlines, in_point_state)));
 }
 
 blend_state_ptr

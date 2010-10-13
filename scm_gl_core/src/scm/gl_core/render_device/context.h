@@ -70,6 +70,7 @@ private:
         // rasterizer state
         rasterizer_state_ptr                _rasterizer_state;
         float                               _line_width;
+        float                               _point_size;
         // blend state
         blend_state_ptr                     _blend_state;
         math::vec4f                         _blend_color;
@@ -223,9 +224,10 @@ public:
     unsigned                        current_stencil_ref_value() const;
 
     // rasterizer state
-    void                            set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width = 1.0f);
+    void                            set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, float in_line_width = 1.0f, float in_point_size = 1.0f);
     const rasterizer_state_ptr&     current_rasterizer_state() const;
     float                           current_line_width() const;
+    float                           current_point_size() const;
 
     // blend state
     void                            set_blend_state(const blend_state_ptr& in_bl_state, const math::vec4f& in_blend_color = math::vec4f(1.0f, 1.0f, 1.0f, 1.0f));

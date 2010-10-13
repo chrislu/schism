@@ -214,6 +214,17 @@ gl_polygon_orientation(const polygon_orientation s)
 
 inline
 unsigned
+gl_origin_mode(const enum origin_mode o)
+{
+    switch (o) {
+    case ORIGIN_UPPER_LEFT: return (GL_UPPER_LEFT); break;
+    case ORIGIN_LOWER_LEFT: return (GL_LOWER_LEFT); break;
+    default:                assert(0 && (o < ORIGIN_MODE_COUNT));return (0);
+    }
+}
+
+inline
+unsigned
 gl_blend_func(const blend_func s)
 {
     static unsigned blend_funcs[] = {
