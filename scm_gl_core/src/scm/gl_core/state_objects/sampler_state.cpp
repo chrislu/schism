@@ -25,25 +25,25 @@ sampler_state_desc::sampler_state_desc(
     float                    in_lod_bias,
     compare_func             in_compare_func,
     texture_compare_mode     in_compare_mode)
-  : _filter(in_filter),
-    _max_anisotropy(in_max_anisotropy),
-    _wrap_s(in_wrap_s),
-    _wrap_t(in_wrap_t),
-    _wrap_r(in_wrap_r),
-    _min_lod(in_min_lod),
-    _max_lod(in_max_lod),
-    _lod_bias(in_lod_bias),
-    _compare_func(in_compare_func),
-    _compare_mode(in_compare_mode)
+  : _filter(in_filter)
+  , _max_anisotropy(in_max_anisotropy)
+  , _wrap_s(in_wrap_s)
+  , _wrap_t(in_wrap_t)
+  , _wrap_r(in_wrap_r)
+  , _min_lod(in_min_lod)
+  , _max_lod(in_max_lod)
+  , _lod_bias(in_lod_bias)
+  , _compare_func(in_compare_func)
+  , _compare_mode(in_compare_mode)
 {
 }
 
 // sampler_state //////////////////////////////////////////////////////////////////////////////////
 sampler_state::sampler_state(render_device&            in_device,
                              const sampler_state_desc& in_desc)
-  : render_device_child(in_device),
-    _descriptor(in_desc),
-    _gl_sampler_id(0)
+  : render_device_child(in_device)
+  , _descriptor(in_desc)
+  , _gl_sampler_id(0)
 {
     const opengl::gl3_core& glapi = in_device.opengl3_api();
 

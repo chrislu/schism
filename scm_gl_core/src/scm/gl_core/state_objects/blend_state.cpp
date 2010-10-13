@@ -25,14 +25,14 @@ blend_ops::blend_ops(bool            in_enabled,
                      blend_equation  in_rgb_equation,
                      blend_equation  in_alpha_equation,
                      unsigned        in_write_mask)
-  : _enabled(in_enabled),
-    _src_rgb_func(in_src_rgb_func),
-    _dst_rgb_func(in_dst_rgb_func),
-    _src_alpha_func(in_src_alpha_func),
-    _dst_alpha_func(in_dst_alpha_func),
-    _rgb_equation(in_rgb_equation),
-    _alpha_equation(in_alpha_equation),
-    _write_mask(in_write_mask)
+  : _enabled(in_enabled)
+  , _src_rgb_func(in_src_rgb_func)
+  , _dst_rgb_func(in_dst_rgb_func)
+  , _src_alpha_func(in_src_alpha_func)
+  , _dst_alpha_func(in_dst_alpha_func)
+  , _rgb_equation(in_rgb_equation)
+  , _alpha_equation(in_alpha_equation)
+  , _write_mask(in_write_mask)
 {
 }
 

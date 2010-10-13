@@ -20,10 +20,10 @@ stencil_ops::stencil_ops(compare_func in_stencil_func,
                          stencil_op   in_stencil_sfail,
                          stencil_op   in_stencil_dfail,
                          stencil_op   in_stencil_dpass)
-  : _stencil_func(in_stencil_func),
-    _stencil_sfail(in_stencil_sfail),
-    _stencil_dfail(in_stencil_dfail),
-    _stencil_dpass(in_stencil_dpass)
+  : _stencil_func(in_stencil_func)
+  , _stencil_sfail(in_stencil_sfail)
+  , _stencil_dfail(in_stencil_dfail)
+  , _stencil_dpass(in_stencil_dpass)
 {
 }
 
@@ -48,28 +48,28 @@ stencil_ops::operator!=(const stencil_ops& rhs) const
 depth_stencil_state_desc::depth_stencil_state_desc(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                                                    bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
                                                    const stencil_ops& in_stencil_ops)
-  : _depth_test(in_depth_test),
-    _depth_mask(in_depth_mask),
-    _depth_func(in_depth_func),
-    _stencil_test(in_stencil_test),
-    _stencil_rmask(in_stencil_rmask),
-    _stencil_wmask(in_stencil_wmask),
-    _stencil_front_ops(in_stencil_ops),
-    _stencil_back_ops(in_stencil_ops)
+  : _depth_test(in_depth_test)
+  , _depth_mask(in_depth_mask)
+  , _depth_func(in_depth_func)
+  , _stencil_test(in_stencil_test)
+  , _stencil_rmask(in_stencil_rmask)
+  , _stencil_wmask(in_stencil_wmask)
+  , _stencil_front_ops(in_stencil_ops)
+  , _stencil_back_ops(in_stencil_ops)
 {
 }
 
 depth_stencil_state_desc::depth_stencil_state_desc(bool in_depth_test, bool in_depth_mask, compare_func in_depth_func,
                                                    bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
                                                    const stencil_ops& in_stencil_front_ops, const stencil_ops& in_stencil_back_ops)
-  : _depth_test(in_depth_test),
-    _depth_mask(in_depth_mask),
-    _depth_func(in_depth_func),
-    _stencil_test(in_stencil_test),
-    _stencil_rmask(in_stencil_rmask),
-    _stencil_wmask(in_stencil_wmask),
-    _stencil_front_ops(in_stencil_front_ops),
-    _stencil_back_ops(in_stencil_back_ops)
+  : _depth_test(in_depth_test)
+  , _depth_mask(in_depth_mask)
+  , _depth_func(in_depth_func)
+  , _stencil_test(in_stencil_test)
+  , _stencil_rmask(in_stencil_rmask)
+  , _stencil_wmask(in_stencil_wmask)
+  , _stencil_front_ops(in_stencil_front_ops)
+  , _stencil_back_ops(in_stencil_back_ops)
 {
 }
 
