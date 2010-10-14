@@ -52,6 +52,8 @@ buffer::~buffer()
 void
 buffer::bind(render_context& ren_ctx, buffer_binding target) const
 {
+    gl_assert(glapi, entering buffer::bind());
+
     assert(_gl_buffer_id != 0);
     assert(state().ok());
 
@@ -65,6 +67,8 @@ buffer::bind(render_context& ren_ctx, buffer_binding target) const
 void
 buffer::unbind(render_context& ren_ctx, buffer_binding target) const
 {
+    gl_assert(glapi, entering buffer::unbind());
+
     const opengl::gl3_core& glapi = ren_ctx.opengl_api();
 
     glapi.glBindBuffer(util::gl_buffer_targets(target), 0);
@@ -79,6 +83,8 @@ buffer::bind_range(render_context&   in_context,
                    const scm::size_t in_offset,
                    const scm::size_t in_size)
 {
+    gl_assert(glapi, entering buffer::bind_range());
+
     assert(_gl_buffer_id != 0);
     assert(state().ok());
 
@@ -108,6 +114,8 @@ buffer::unbind_range(render_context&   in_context,
                      buffer_binding    in_target,
                      const unsigned    in_index)
 {
+    gl_assert(glapi, entering buffer::unbind_range());
+
     assert(state().ok());
 
     const opengl::gl3_core& glapi = in_context.opengl_api();
@@ -131,6 +139,8 @@ buffer::map_range(const render_context& in_context,
                   scm::size_t           in_size,
                   const buffer_access   in_access)
 {
+    gl_assert(glapi, entering buffer::map_range());
+
     assert(_gl_buffer_id != 0);
     assert(state().ok());
 
@@ -183,6 +193,8 @@ buffer::map_range(const render_context& in_context,
 bool
 buffer::unmap(const render_context& in_context)
 {
+    gl_assert(glapi, entering buffer::unmap());
+
     assert(_gl_buffer_id != 0);
     assert(state().ok());
 
@@ -224,6 +236,8 @@ buffer::buffer_data(      render_device&     ren_dev,
                     const descriptor_type&   buffer_desc,
                     const void*              initial_data)
 {
+    gl_assert(glapi, entering buffer::buffer_data());
+
     const opengl::gl3_core& glcore = ren_dev.opengl3_api();
     util::gl_error          glerror(glcore);
 
@@ -271,6 +285,8 @@ buffer::buffer_sub_data(render_device&  ren_dev,
                         scm::size_t     size,
                         const void*     data)
 {
+    gl_assert(glapi, entering buffer::buffer_sub_data());
+
     const opengl::gl3_core& glcore = ren_dev.opengl3_api();
     util::gl_error          glerror(glcore);
 

@@ -1,0 +1,122 @@
+
+#ifndef SCM_GL_CORE_UNIFORM_H_INCLUDED
+#define SCM_GL_CORE_UNIFORM_H_INCLUDED
+
+#include <string>
+
+#include <boost/call_traits.hpp>
+
+#include <scm/gl_core/config.h>
+#include <scm/gl_core/data_types.h>
+#include <scm/gl_core/render_device/render_device_fwd.h>
+#include <scm/gl_core/shader_objects/shader_objects_fwd.h>
+
+#include <scm/core/platform/platform.h>
+#include <scm/core/utilities/platform_warning_disable.h>
+
+namespace scm {
+namespace gl {
+
+class __scm_export(gl_core) uniform_base
+{
+public:
+    uniform_base(const std::string& n, const int l, const unsigned e, const data_type t);
+    virtual ~uniform_base();
+
+    const std::string&      name() const;
+    const int               location() const;
+    const unsigned          elements() const;
+    const data_type         type() const;
+
+    bool                    update_required() const;
+    virtual void            apply_value(const render_context& context, const program& p) = 0;
+
+protected:
+    std::string             _name;
+    int                     _location;
+    unsigned                _elements;
+    data_type               _type;
+
+    bool                    _update_required;
+
+private:
+    // declared, never defined
+    uniform_base(const uniform_base&);
+    const uniform_base& operator=(const uniform_base&);
+
+    friend class scm::gl::program;
+}; // class uniform_base
+
+template<typename T, data_type D>
+class uniform : public uniform_base
+{
+public:
+    typedef T       value_type;
+
+protected:
+    typedef typename boost::call_traits<value_type>::param_type value_param_type;
+
+public:
+    uniform(const std::string& n, const int l, const unsigned e, const data_type t);
+    virtual ~uniform();
+
+    value_param_type        value() const;
+    void                    value(value_param_type v);
+    
+    void                    apply_value(const render_context& context, const program& p);
+
+protected:
+    value_type              _value;
+
+}; // class uniform
+
+template<typename T>
+struct uniform_base_type {
+};
+
+#define SCM_UNIFORM_TYPE_DECLARE(type_raw, type_id, uniform_type_name)               \
+    typedef scm::gl::uniform<type_raw, type_id>          uniform_type_name;          \
+    typedef shared_ptr<scm::gl::uniform_type_name>       uniform_type_name##_ptr;    \
+    typedef shared_ptr<const scm::gl::uniform_type_name> uniform_type_name##_cptr;   \
+    template<> struct uniform_base_type<type_raw> { static const data_type  type = type_id; };
+
+SCM_UNIFORM_TYPE_DECLARE(float,             TYPE_FLOAT,  uniform_1f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2f,  TYPE_VEC2F,  uniform_vec2f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3f,  TYPE_VEC3F,  uniform_vec3f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4f,  TYPE_VEC4F,  uniform_vec4f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat2f,  TYPE_MAT2F,  uniform_mat2f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat3f,  TYPE_MAT3F,  uniform_mat3f)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4f,  TYPE_MAT4F,  uniform_mat4f)
+
+SCM_UNIFORM_TYPE_DECLARE(int,               TYPE_INT,    uniform_1i)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2i,  TYPE_VEC2I,  uniform_vec2i)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3i,  TYPE_VEC3I,  uniform_vec3i)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4i,  TYPE_VEC4I,  uniform_vec4i)
+
+typedef uniform_1i                                       uniform_sampler;
+typedef shared_ptr<scm::gl::uniform_sampler>             uniform_sampler_ptr;
+typedef shared_ptr<const scm::gl::uniform_sampler>       uniform_sampler_cptr;
+
+SCM_UNIFORM_TYPE_DECLARE(unsigned,          TYPE_UINT,   uniform_1ui)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2ui, TYPE_VEC2UI, uniform_vec2ui)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3ui, TYPE_VEC3UI, uniform_vec3ui)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4ui, TYPE_VEC4UI, uniform_vec4ui)
+
+#if SCM_GL_CORE_OPENGL_40
+SCM_UNIFORM_TYPE_DECLARE(double,            TYPE_DOUBLE, uniform_1d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2d,  TYPE_VEC2D,  uniform_vec2d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3d,  TYPE_VEC3D,  uniform_vec3d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4d,  TYPE_VEC4D,  uniform_vec4d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat2d,  TYPE_MAT2D,  uniform_mat2d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat3d,  TYPE_MAT3D,  uniform_mat3d)
+SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
+#endif // SCM_GL_CORE_OPENGL_40
+
+#undef SCM_UNIFORM_TYPE_DECLARE
+
+} // namespace gl
+} // namespace scm
+
+#include <scm/core/utilities/platform_warning_enable.h>
+
+#endif // SCM_GL_CORE_UNIFORM_H_INCLUDED

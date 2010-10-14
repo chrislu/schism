@@ -17,7 +17,8 @@
 #include <scm/gl_core/data_types.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/render_device/device_child.h>
-#include <scm/gl_core/shader_objects/program_uniform_types.h>
+#include <scm/gl_core/shader_objects/shader_objects_fwd.h>
+#include <scm/gl_core/shader_objects/uniform.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -28,10 +29,10 @@ namespace gl {
 class __scm_export(gl_core) program : public render_device_child
 {
 public:
-    typedef boost::unordered_map<std::string, int>                  name_location_map;
-    typedef std::pair<std::string, int>                             named_location;
-    typedef std::list<named_location>                               named_location_list;
-    typedef std::list<shader_ptr>                             shader_list;
+    typedef boost::unordered_map<std::string, int>  name_location_map;
+    typedef std::pair<std::string, int>             named_location;
+    typedef std::list<named_location>               named_location_list;
+    typedef std::list<shader_ptr>                   shader_list;
 
     // program information
     struct variable_type {
@@ -41,12 +42,6 @@ public:
         int             _location;
         unsigned        _elements;
         data_type       _type;
-    };
-    struct uniform_type : public variable_type {
-        uniform_type() : _update_required(false) {}
-        uniform_type(const std::string& n, int l, unsigned e, data_type t) : variable_type(n, l, e, t), _update_required(false) {}
-        boost::make_variant_over<uniform_types>::type   _data;
-        mutable bool                                    _update_required;
     };
     struct uniform_block_type {
         uniform_block_type() : _block_index(-1), _size(-1), _update_required(false) {}
@@ -73,7 +68,7 @@ public:
     };
 
     typedef boost::unordered_map<std::string, variable_type>            name_variable_map;
-    typedef boost::unordered_map<std::string, uniform_type>             name_uniform_map;
+    typedef boost::unordered_map<std::string, uniform_ptr>              name_uniform_map;
     typedef boost::unordered_map<std::string, uniform_block_type>       name_uniform_block_map;
     typedef boost::unordered_map<std::string, subroutine_uniform_type>  name_subroutine_uniform_map;
     typedef boost::unordered_map<std::string, subroutine_type>          name_subroutine_map;
@@ -83,30 +78,40 @@ public:
 
     const std::string&          info_log() const;
 
-    template<typename utype>
-    void                        uniform(const std::string& name, const utype& value);
+    template<typename T> void   uniform(const std::string& name, const T& v) const;
+
+    uniform_ptr                 uniform_raw(const std::string& name) const;
+
+    uniform_sampler_ptr         uniform_sampler(const std::string& name) const;
+
+    uniform_1f_ptr              uniform_1f(const std::string& name) const;
+    uniform_vec2f_ptr           uniform_vec2f(const std::string& name) const;
+    uniform_vec3f_ptr           uniform_vec3f(const std::string& name) const;
+    uniform_vec4f_ptr           uniform_vec4f(const std::string& name) const;
+    uniform_mat2f_ptr           uniform_mat2f(const std::string& name) const;
+    uniform_mat3f_ptr           uniform_mat3f(const std::string& name) const;
+    uniform_mat4f_ptr           uniform_mat4f(const std::string& name) const;
+
+    uniform_1i_ptr              uniform_1i(const std::string& name) const;
+    uniform_vec2i_ptr           uniform_vec2i(const std::string& name) const;
+    uniform_vec3i_ptr           uniform_vec3i(const std::string& name) const;
+    uniform_vec4i_ptr           uniform_vec4i(const std::string& name) const;
+
+    uniform_1ui_ptr             uniform_1ui(const std::string& name) const;
+    uniform_vec2ui_ptr          uniform_vec2ui(const std::string& name) const;
+    uniform_vec3ui_ptr          uniform_vec3ui(const std::string& name) const;
+    uniform_vec4ui_ptr          uniform_vec4ui(const std::string& name) const;
+
+    uniform_1d_ptr              uniform_1d(const std::string& name) const;
+    uniform_vec2d_ptr           uniform_vec2d(const std::string& name) const;
+    uniform_vec3d_ptr           uniform_vec3d(const std::string& name) const;
+    uniform_vec4d_ptr           uniform_vec4d(const std::string& name) const;
+    uniform_mat2d_ptr           uniform_mat2d(const std::string& name) const;
+    uniform_mat3d_ptr           uniform_mat3d(const std::string& name) const;
+    uniform_mat4d_ptr           uniform_mat4d(const std::string& name) const;
+
     void                        uniform_buffer(const std::string& name, const unsigned binding);
     void                        uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine);
-    //void                        uniform(const std::string& name, float value);
-    //void                        uniform(const std::string& name, const math::vec2f& value);
-    //void                        uniform(const std::string& name, const math::vec3f& value);
-    //void                        uniform(const std::string& name, const math::vec4f& value);
-
-    //void                        uniform(const std::string& name, int value);
-    //void                        uniform(const std::string& name, const math::vec2i& value);
-    //void                        uniform(const std::string& name, const math::vec3i& value);
-    //void                        uniform(const std::string& name, const math::vec4i& value);
-
-    //void                        uniform(const std::string& name, unsigned value);
-    //void                        uniform(const std::string& name, const math::vec2ui& value);
-    //void                        uniform(const std::string& name, const math::vec3ui& value);
-    //void                        uniform(const std::string& name, const math::vec4ui& value);
-
-    //void                        uniform(const std::string& name, const math::mat2f& value, bool transpose = false);
-    //void                        uniform(const std::string& name, const math::mat3f& value, bool transpose = false);
-    //void                        uniform(const std::string& name, const math::mat4f& value, bool transpose = false);
-
-    //void                        uniform_raw(uniform_type& u, const void *data, const int size);
 
     int                         attribute_location(const std::string& name) const;
 

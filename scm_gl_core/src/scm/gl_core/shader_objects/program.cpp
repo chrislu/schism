@@ -24,80 +24,6 @@
 namespace scm {
 namespace gl {
 namespace detail {
-
-class uniform_bind : public boost::static_visitor<>
-{
-    const opengl::gl3_core&         _glapi;
-    const program::variable_type&   _uniform;
-
-public:
-    uniform_bind(const opengl::gl3_core& api, const program::variable_type& u) : _glapi(api), _uniform(u) {}
-
-    void operator()(const float v) const            { _glapi.glUniform1fv(_uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2f& v) const     { _glapi.glUniform2fv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3f& v) const     { _glapi.glUniform3fv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4f& v) const     { _glapi.glUniform4fv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::mat2f& m) const     { _glapi.glUniformMatrix2fv(_uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat3f& m) const     { _glapi.glUniformMatrix3fv(_uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat4f& m) const     { _glapi.glUniformMatrix4fv(_uniform._location, _uniform._elements, false, m.data_array); }
-#if SCM_GL_CORE_OPENGL_40
-    void operator()(const double v) const           { _glapi.glUniform1dv(_uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2d& v) const     { _glapi.glUniform2dv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3d& v) const     { _glapi.glUniform3dv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4d& v) const     { _glapi.glUniform4dv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::mat2d& m) const     { _glapi.glUniformMatrix2dv(_uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat3d& m) const     { _glapi.glUniformMatrix3dv(_uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat4d& m) const     { _glapi.glUniformMatrix4dv(_uniform._location, _uniform._elements, false, m.data_array); }
-#endif
-    void operator()(const int v) const              { _glapi.glUniform1iv(_uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2i& v) const     { _glapi.glUniform2iv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3i& v) const     { _glapi.glUniform3iv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4i& v) const     { _glapi.glUniform4iv(_uniform._location, _uniform._elements, v.data_array); }
-
-    void operator()(const unsigned v) const         { _glapi.glUniform1uiv(_uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2ui& v) const    { _glapi.glUniform2uiv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3ui& v) const    { _glapi.glUniform3uiv(_uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4ui& v) const    { _glapi.glUniform4uiv(_uniform._location, _uniform._elements, v.data_array); }
-}; // class uniform_bind
-
-class uniform_bind_dsa : public boost::static_visitor<>
-{
-    const opengl::gl3_core&         _glapi;
-    unsigned                        _program;
-    const program::variable_type&   _uniform;
-
-public:
-    uniform_bind_dsa(const opengl::gl3_core& api, unsigned p, const program::variable_type& u) : _glapi(api), _program(p), _uniform(u) {}
-
-    void operator()(const float v) const            { _glapi.glProgramUniform1fvEXT(_program, _uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2f& v) const     { _glapi.glProgramUniform2fvEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3f& v) const     { _glapi.glProgramUniform3fvEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4f& v) const     { _glapi.glProgramUniform4fvEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::mat2f& m) const     { _glapi.glProgramUniformMatrix2fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat3f& m) const     { _glapi.glProgramUniformMatrix3fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
-    void operator()(const math::mat4f& m) const     { _glapi.glProgramUniformMatrix4fvEXT(_program, _uniform._location, _uniform._elements, false, m.data_array); }
-
-#if SCM_GL_CORE_OPENGL_40
-    void operator()(const double v) const           { assert(0); }
-    void operator()(const math::vec2d& v) const     { assert(0); }
-    void operator()(const math::vec3d& v) const     { assert(0); }
-    void operator()(const math::vec4d& v) const     { assert(0); }
-    void operator()(const math::mat2d& m) const     { assert(0); }
-    void operator()(const math::mat3d& m) const     { assert(0); }
-    void operator()(const math::mat4d& m) const     { assert(0); }
-#endif
-
-    void operator()(const int v) const              { _glapi.glProgramUniform1ivEXT(_program, _uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2i& v) const     { _glapi.glProgramUniform2ivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3i& v) const     { _glapi.glProgramUniform3ivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4i& v) const     { _glapi.glProgramUniform4ivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-
-    void operator()(const unsigned v) const         { _glapi.glProgramUniform1uivEXT(_program, _uniform._location, _uniform._elements, &v); }
-    void operator()(const math::vec2ui& v) const    { _glapi.glProgramUniform2uivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec3ui& v) const    { _glapi.glProgramUniform3uivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-    void operator()(const math::vec4ui& v) const    { _glapi.glProgramUniform4uivEXT(_program, _uniform._location, _uniform._elements, v.data_array); }
-}; // class uniform_bind_dsa
-
 } // namespace detail
 
 program::program(render_device&                 ren_dev,
@@ -237,17 +163,21 @@ program::bind_uniforms(render_context& ren_ctx) const
         name_uniform_map::const_iterator u = _uniforms.begin();
         name_uniform_map::const_iterator e = _uniforms.end();
         for (; u != e; ++u) {
-            if (u->second._update_required) {
-                //std::cout << u->second._name << std::endl;
-#if SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-                boost::apply_visitor(detail::uniform_bind_dsa(glapi, _gl_program_obj, u->second), u->second._data);
-#else
-                boost::apply_visitor(detail::uniform_bind(glapi, u->second), u->second._data);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-                gl_assert(glapi, program::bind_uniforms() after apply uniform);
-
-                u->second._update_required = false;
+            if (u->second->update_required()) {
+                u->second->apply_value(ren_ctx, *this);
+                u->second->_update_required = false;
             }
+            //if (u->second._update_required) {
+                //std::cout << u->second._name << std::endl;
+//#if SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+//                boost::apply_visitor(detail::uniform_bind_dsa(glapi, _gl_program_obj, u->second), u->second._data);
+//#else
+//                boost::apply_visitor(detail::uniform_bind(glapi, u->second), u->second._data);
+//#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            //    gl_assert(glapi, program::bind_uniforms() after apply uniform);
+
+            //    u->second._update_required = false;
+            //}
         }
     }
     { // uniform buffers
@@ -387,21 +317,46 @@ program::retrieve_uniform_information(render_device& ren_dev)
             if (!boost::starts_with(actual_uniform_name, "gl_")) {
                 actual_uniform_location = glapi.glGetUniformLocation(_gl_program_obj, actual_uniform_name.c_str());
 
-                //std::cout << "uniform:       " << actual_uniform_name << " loc: " << actual_uniform_location << std::endl;
-                
-                if (util::is_sampler_type(actual_uniform_type)) {
-                    // samplers as integer uniforms
-                    _uniforms[actual_uniform_name] = uniform_type(actual_uniform_name,
-                                                                  actual_uniform_location,
-                                                                  actual_uniform_size,
-                                                                  TYPE_INT);
+                uniform_ptr current_uniform;
+
+                if (util::is_sampler_type(actual_uniform_type)) { // samplers as integer uniforms
+                    current_uniform.reset(new scm::gl::uniform_sampler(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_INT));
                 }
                 else {
-                    assert(util::from_gl_data_type(actual_uniform_type) != TYPE_UNKNOWN);
-                    _uniforms[actual_uniform_name] = uniform_type(actual_uniform_name,
-                                                                  actual_uniform_location,
-                                                                  actual_uniform_size,
-                                                                  util::from_gl_data_type(actual_uniform_type));
+                    switch (actual_uniform_type) {
+                        case GL_FLOAT:                  current_uniform.reset(new scm::gl::uniform_1f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_VEC2:             current_uniform.reset(new scm::gl::uniform_vec2f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_VEC3:             current_uniform.reset(new scm::gl::uniform_vec3f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_VEC4:             current_uniform.reset(new scm::gl::uniform_vec4f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_MAT2:             current_uniform.reset(new scm::gl::uniform_mat2f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_MAT3:             current_uniform.reset(new scm::gl::uniform_mat3f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_FLOAT_MAT4:             current_uniform.reset(new scm::gl::uniform_mat4f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+#if SCM_GL_CORE_OPENGL_40
+                        case GL_DOUBLE:                 current_uniform.reset(new scm::gl::uniform_1d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_VEC2:            current_uniform.reset(new scm::gl::uniform_vec2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_VEC3:            current_uniform.reset(new scm::gl::uniform_vec3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_VEC4:            current_uniform.reset(new scm::gl::uniform_vec4d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_MAT2:            current_uniform.reset(new scm::gl::uniform_mat2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_MAT3:            current_uniform.reset(new scm::gl::uniform_mat3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_DOUBLE_MAT4:            current_uniform.reset(new scm::gl::uniform_mat4d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+#endif
+                        case GL_INT:                    current_uniform.reset(new scm::gl::uniform_1i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_INT_VEC2:               current_uniform.reset(new scm::gl::uniform_vec2i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_INT_VEC3:               current_uniform.reset(new scm::gl::uniform_vec3i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_INT_VEC4:               current_uniform.reset(new scm::gl::uniform_vec4i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+
+                        case GL_UNSIGNED_INT:           current_uniform.reset(new scm::gl::uniform_1ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_UNSIGNED_INT_VEC2:      current_uniform.reset(new scm::gl::uniform_vec2ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_UNSIGNED_INT_VEC3:      current_uniform.reset(new scm::gl::uniform_vec3ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_UNSIGNED_INT_VEC4:      current_uniform.reset(new scm::gl::uniform_vec4ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        default:
+                            glerr() << log::error << "program::retrieve_uniform_information(): "
+                                    << "unsupported uniform type for uniform '" << actual_uniform_name << "'." << log::end;
+                    }
+                }
+
+                if (current_uniform) {
+                    _uniforms[actual_uniform_name] = current_uniform;
                 }
             }
         }
@@ -555,6 +510,18 @@ program::retrieve_uniform_information(render_device& ren_dev)
     gl_assert(glapi, leaving program::retrieve_uniform_information());
 }
 
+uniform_ptr
+program::uniform_raw(const std::string& name) const
+{
+    name_uniform_map::const_iterator  u = _uniforms.find(name);
+    if (u != _uniforms.end()) {
+        return (u->second);
+    }
+    else {
+        return (uniform_ptr());
+    }
+}
+
 void
 program::uniform_buffer(const std::string& name, const unsigned binding)
 {
@@ -592,127 +559,8 @@ program::uniform_subroutine(const shader_stage stage, const std::string& name, c
 #endif
 }
 
-#if 0
-void
-program::uniform_raw(uniform_type& u, const void *data, const int size)
-{
-    //if (std::memcmp(u._data_array.get(), data, size)) {
-    //    if (std::memcpy(u._data_array.get(), data, size) != u._data_array.get()) {
-    //        SCM_GL_DGB("program::uniform_raw(): error copying uniform data.");
-    //    }
-    //    else {
-    //        u._update_required = true;
-    //    }
-    //}
-}
 
-void
-program::uniform(const std::string& name, float value)
-{
-    name_uniform_map::iterator  u = _uniforms.find(name);
 
-    if (u != _uniforms.end()) {
-        if (uniform_type_id<float>::id != u->second._type) {
-
-        }
-        if (u->second._type == TYPE_FLOAT) {
-            u->second._data = value;
-            //uniform_raw(u->second, &value, sizeof(value));
-        }
-        else {
-            SCM_GL_DGB("program::uniform(): found uniform not of type float ('" << name << "').");
-        }
-    }
-    else {
-        SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
-    }
-}
-
-void
-program::uniform(const std::string& name, const math::vec2f& value)
-{
-    name_uniform_map::iterator  u = _uniforms.find(name);
-
-    if (u != _uniforms.end()) {
-        if (u->second._type == TYPE_FLOAT) {
-            u->second._data = value;
-            //uniform_raw(u->second, &value, sizeof(value));
-        }
-        else {
-            SCM_GL_DGB("program::uniform(): found uniform not of type float ('" << name << "').");
-        }
-    }
-    else {
-        SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
-    }
-}
-
-void
-program::uniform(const std::string& name, const math::vec3f& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec4f& value)
-{
-}
-
-void
-program::uniform(const std::string& name, int value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec2i& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec3i& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec4i& value)
-{
-}
-
-void
-program::uniform(const std::string& name, unsigned value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec2ui& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec3ui& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::vec4ui& value)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::mat2f& value, bool transpose)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::mat3f& value, bool transpose)
-{
-}
-
-void
-program::uniform(const std::string& name, const math::mat4f& value, bool transpose)
-{
-}
-
-#endif
 
 } // namespace gl
 } // namespace scm

@@ -22,6 +22,10 @@ using boost::intrusive_ptr;
 using boost::make_shared;
 using boost::allocate_shared;
 
+using boost::static_pointer_cast;
+using boost::const_pointer_cast;
+using boost::dynamic_pointer_cast;
+
 } // namespace scm
 
 #endif // PTR_TYPES_H_INCLUDED

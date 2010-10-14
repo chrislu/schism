@@ -24,4 +24,10 @@ __scm_export(gl_core) log::out_stream  glerr();
 #define SCM_GL_DGB(X) static_cast<void>(0)
 #endif // SCM_GL_DEBUG
 
+#define SCM_GL_LOG_ONCE(L, X)                                                       \
+    static bool scm_gl_log_once_done = false;                                       \
+    if (!scm_gl_log_once_done) {                                                    \
+        scm::gl::glout() << BOOST_PP_EXPAND(L) << BOOST_PP_EXPAND(X) << log::end;   \
+    }
+
 #endif // SCM_GL_CORE_LOG_H_INCLUDED
