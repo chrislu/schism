@@ -10,6 +10,50 @@
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
+#include <scm/core/utilities/platform_warning_disable.h>
+
+// instantiate the uniform templates //////////////////////////////////////////////////////////////
+#define SCM_UNIFORM_TYPE_INSTANTIATE(type_raw, type_id, uniform_type_name)               \
+    template class __scm_export(gl_core)                 scm::gl::uniform<type_raw, type_id>;
+
+//namespace scm {
+//namespace gl {
+
+SCM_UNIFORM_TYPE_INSTANTIATE(float,             scm::gl::TYPE_FLOAT,  uniform_1f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2f,  scm::gl::TYPE_VEC2F,  uniform_vec2f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3f,  scm::gl::TYPE_VEC3F,  uniform_vec3f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4f,  scm::gl::TYPE_VEC4F,  uniform_vec4f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat2f,  scm::gl::TYPE_MAT2F,  uniform_mat2f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat3f,  scm::gl::TYPE_MAT3F,  uniform_mat3f)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4f,  scm::gl::TYPE_MAT4F,  uniform_mat4f)
+
+SCM_UNIFORM_TYPE_INSTANTIATE(int,               scm::gl::TYPE_INT,    uniform_1i)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2i,  scm::gl::TYPE_VEC2I,  uniform_vec2i)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3i,  scm::gl::TYPE_VEC3I,  uniform_vec3i)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4i,  scm::gl::TYPE_VEC4I,  uniform_vec4i)
+
+SCM_UNIFORM_TYPE_INSTANTIATE(unsigned,          scm::gl::TYPE_UINT,   uniform_1ui)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2ui, scm::gl::TYPE_VEC2UI, uniform_vec2ui)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3ui, scm::gl::TYPE_VEC3UI, uniform_vec3ui)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4ui, scm::gl::TYPE_VEC4UI, uniform_vec4ui)
+
+#if SCM_GL_CORE_OPENGL_40
+SCM_UNIFORM_TYPE_INSTANTIATE(double,            scm::gl::TYPE_DOUBLE, uniform_1d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2d,  scm::gl::TYPE_VEC2D,  uniform_vec2d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3d,  scm::gl::TYPE_VEC3D,  uniform_vec3d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4d,  scm::gl::TYPE_VEC4D,  uniform_vec4d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat2d,  scm::gl::TYPE_MAT2D,  uniform_mat2d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat3d,  scm::gl::TYPE_MAT3D,  uniform_mat3d)
+SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4d,  scm::gl::TYPE_MAT4D,  uniform_mat4d)
+#endif // SCM_GL_CORE_OPENGL_40
+
+//} // namespace gl
+//} // namespace scm
+
+#undef SCM_UNIFORM_TYPE_INSTANTIATE
+
+#include <scm/core/utilities/platform_warning_enable.h>
+
 namespace scm {
 namespace gl {
 
@@ -294,47 +338,5 @@ uniform_vec4ui::apply_value(const render_context& context, const program& p)
 } // namespace scm
 
 
-#include <scm/core/utilities/platform_warning_disable.h>
 
-// instantiate the uniform templates //////////////////////////////////////////////////////////////
-#define SCM_UNIFORM_TYPE_INSTANTIATE(type_raw, type_id, uniform_type_name)               \
-    template class __scm_export(gl_core)                 scm::gl::uniform<type_raw, type_id>;
-
-namespace scm {
-namespace gl {
-
-SCM_UNIFORM_TYPE_INSTANTIATE(float,             TYPE_FLOAT,  uniform_1f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2f,  TYPE_VEC2F,  uniform_vec2f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3f,  TYPE_VEC3F,  uniform_vec3f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4f,  TYPE_VEC4F,  uniform_vec4f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat2f,  TYPE_MAT2F,  uniform_mat2f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat3f,  TYPE_MAT3F,  uniform_mat3f)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4f,  TYPE_MAT4F,  uniform_mat4f)
-
-SCM_UNIFORM_TYPE_INSTANTIATE(int,               TYPE_INT,    uniform_1i)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2i,  TYPE_VEC2I,  uniform_vec2i)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3i,  TYPE_VEC3I,  uniform_vec3i)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4i,  TYPE_VEC4I,  uniform_vec4i)
-
-SCM_UNIFORM_TYPE_INSTANTIATE(unsigned,          TYPE_UINT,   uniform_1ui)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2ui, TYPE_VEC2UI, uniform_vec2ui)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3ui, TYPE_VEC3UI, uniform_vec3ui)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4ui, TYPE_VEC4UI, uniform_vec4ui)
-
-#if SCM_GL_CORE_OPENGL_40
-SCM_UNIFORM_TYPE_INSTANTIATE(double,            TYPE_DOUBLE, uniform_1d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2d,  TYPE_VEC2D,  uniform_vec2d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3d,  TYPE_VEC3D,  uniform_vec3d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4d,  TYPE_VEC4D,  uniform_vec4d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat2d,  TYPE_MAT2D,  uniform_mat2d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat3d,  TYPE_MAT3D,  uniform_mat3d)
-SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
-#endif // SCM_GL_CORE_OPENGL_40
-
-} // namespace gl
-} // namespace scm
-
-#undef SCM_UNIFORM_TYPE_INSTANTIATE
-
-#include <scm/core/utilities/platform_warning_enable.h>
 
