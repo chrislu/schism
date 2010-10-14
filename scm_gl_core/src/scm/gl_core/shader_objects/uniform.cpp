@@ -10,6 +10,41 @@
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
+namespace scm {
+namespace gl {
+
+template<typename T, data_type D>
+uniform<T, D>::uniform(const std::string& n, const int l, const unsigned e, const data_type t)
+  : uniform_base(n, l, e, t)
+{
+}
+
+template<typename T, data_type D>
+uniform<T, D>::~uniform()
+{
+}
+
+template<typename T, data_type D>
+typename uniform<T, D>::value_param_type
+uniform<T, D>::value() const
+{
+    return (_value);
+}
+
+template<typename T, data_type D>
+void
+uniform<T, D>::value(value_param_type v)
+{
+    if (v != _value) {
+        _value = v;
+        _update_required = true;
+    }
+}
+
+
+} // namespace gl
+} // namespace scm
+
 #include <scm/core/utilities/platform_warning_disable.h>
 
 // instantiate the uniform templates //////////////////////////////////////////////////////////////
@@ -51,8 +86,6 @@ SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4d,  scm::gl::TYPE_MAT4D,  uniform_ma
 //} // namespace scm
 
 #undef SCM_UNIFORM_TYPE_INSTANTIATE
-
-#include <scm/core/utilities/platform_warning_enable.h>
 
 namespace scm {
 namespace gl {
@@ -98,34 +131,6 @@ bool
 uniform_base::update_required() const
 {
     return (_update_required);
-}
-
-template<typename T, data_type D>
-uniform<T, D>::uniform(const std::string& n, const int l, const unsigned e, const data_type t)
-  : uniform_base(n, l, e, t)
-{
-}
-
-template<typename T, data_type D>
-uniform<T, D>::~uniform()
-{
-}
-
-template<typename T, data_type D>
-typename uniform<T, D>::value_param_type
-uniform<T, D>::value() const
-{
-    return (_value);
-}
-
-template<typename T, data_type D>
-void
-uniform<T, D>::value(value_param_type v)
-{
-    if (v != _value) {
-        _value = v;
-        _update_required = true;
-    }
 }
 
 // float types ////////////////////////////////////////////////////////////////////////////////////
@@ -334,9 +339,9 @@ uniform_vec4ui::apply_value(const render_context& context, const program& p)
     gl_assert(glapi, leaving uniform_vec4ui::apply_value());
 }
 
+
 } // namespace gl
 } // namespace scm
 
-
-
+#include <scm/core/utilities/platform_warning_enable.h>
 
