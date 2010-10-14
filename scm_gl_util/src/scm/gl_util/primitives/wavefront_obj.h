@@ -35,6 +35,8 @@ public:
 
     void                draw(const render_context_ptr& in_context,
                              const draw_mode           in_draw_mode = MODE_SOLID) const;
+    void                draw_raw(const render_context_ptr& in_context,
+                                 const draw_mode           in_draw_mode = MODE_SOLID) const;
 
 protected:
     buffer_ptr              _vertex_buffer;

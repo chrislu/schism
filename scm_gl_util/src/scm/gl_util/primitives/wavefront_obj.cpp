@@ -190,5 +190,30 @@ wavefront_obj_geometry::draw(const render_context_ptr& in_context,
     }
 }
 
+void
+wavefront_obj_geometry::draw_raw(const render_context_ptr& in_context,
+                                 const draw_mode in_draw_mode) const
+{
+    context_vertex_input_guard  cvg(in_context);
+    context_state_objects_guard csg(in_context);
+
+    in_context->bind_vertex_array(_vertex_array);
+
+    if (in_draw_mode == MODE_SOLID) {
+
+        in_context->bind_index_buffer(_index_buffer, PRIMITIVE_TRIANGLE_LIST, _index_type);
+
+        in_context->set_blend_state(_no_blend_state);
+        for (scm::size_t i = 0; i < _opaque_object_start_indices.size(); ++i) {
+            in_context->apply();
+            in_context->draw_elements(_opaque_object_indices_count[i], _opaque_object_start_indices[i]);
+        }
+        for (scm::size_t i = 0; i < _transparent_object_start_indices.size(); ++i) {
+            in_context->apply();
+            in_context->draw_elements(_transparent_object_indices_count[i], _transparent_object_start_indices[i]);
+        }
+    }
+}
+
 } // namespace gl
 } // namespace scm
