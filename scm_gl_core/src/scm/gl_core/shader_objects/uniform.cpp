@@ -303,8 +303,6 @@ uniform_vec4ui::apply_value(const render_context& context, const program& p)
 namespace scm {
 namespace gl {
 
-SCM_UNIFORM_TYPE_INSTANTIATE(int,               TYPE_INT,    uniform_sampler)
-
 SCM_UNIFORM_TYPE_INSTANTIATE(float,             TYPE_FLOAT,  uniform_1f)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2f,  TYPE_VEC2F,  uniform_vec2f)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3f,  TYPE_VEC3F,  uniform_vec3f)
