@@ -71,14 +71,19 @@ protected:
 }; // class uniform
 
 template<typename T>
-struct uniform_base_type {
+struct uniform_type {
 };
 
-#define SCM_UNIFORM_TYPE_DECLARE(type_raw, type_id, uniform_type_name)               \
-    typedef scm::gl::uniform<type_raw, type_id>          uniform_type_name;          \
-    typedef shared_ptr<scm::gl::uniform_type_name>       uniform_type_name##_ptr;    \
-    typedef shared_ptr<const scm::gl::uniform_type_name> uniform_type_name##_cptr;   \
-    template<> struct uniform_base_type<type_raw> { static const data_type  type = type_id; };
+template<typename T>
+struct uniform_data_type {
+};
+
+#define SCM_UNIFORM_TYPE_DECLARE(type_raw, type_id, uniform_type_name)                                  \
+    typedef scm::gl::uniform<type_raw, type_id>          uniform_type_name;                             \
+    typedef shared_ptr<scm::gl::uniform_type_name>       uniform_type_name##_ptr;                       \
+    typedef shared_ptr<const scm::gl::uniform_type_name> uniform_type_name##_cptr;                      \
+    template<> struct uniform_type<type_raw>      { typedef uniform_type_name  type; };                 \
+    template<> struct uniform_data_type<type_raw> { static const data_type  type = type_id; };
 
 SCM_UNIFORM_TYPE_DECLARE(float,             TYPE_FLOAT,  uniform_1f)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2f,  TYPE_VEC2F,  uniform_vec2f)
@@ -92,10 +97,6 @@ SCM_UNIFORM_TYPE_DECLARE(int,               TYPE_INT,    uniform_1i)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2i,  TYPE_VEC2I,  uniform_vec2i)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3i,  TYPE_VEC3I,  uniform_vec3i)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4i,  TYPE_VEC4I,  uniform_vec4i)
-
-typedef uniform_1i                                       uniform_sampler;
-typedef shared_ptr<scm::gl::uniform_sampler>             uniform_sampler_ptr;
-typedef shared_ptr<const scm::gl::uniform_sampler>       uniform_sampler_cptr;
 
 SCM_UNIFORM_TYPE_DECLARE(unsigned,          TYPE_UINT,   uniform_1ui)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2ui, TYPE_VEC2UI, uniform_vec2ui)
@@ -111,6 +112,14 @@ SCM_UNIFORM_TYPE_DECLARE(scm::math::mat2d,  TYPE_MAT2D,  uniform_mat2d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat3d,  TYPE_MAT3D,  uniform_mat3d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
 #endif // SCM_GL_CORE_OPENGL_40
+
+// convenience
+typedef uniform_1i                                       uniform_sampler;
+typedef shared_ptr<scm::gl::uniform_sampler>             uniform_sampler_ptr;
+typedef shared_ptr<const scm::gl::uniform_sampler>       uniform_sampler_cptr;
+
+template<> struct uniform_type<bool>      { typedef uniform_1i  type; };
+template<> struct uniform_data_type<bool> { static const data_type  type = TYPE_INT; };
 
 #undef SCM_UNIFORM_TYPE_DECLARE
 

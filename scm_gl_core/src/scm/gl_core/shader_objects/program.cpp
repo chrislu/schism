@@ -345,6 +345,11 @@ program::retrieve_uniform_information(render_device& ren_dev)
                         case GL_INT_VEC3:               current_uniform.reset(new scm::gl::uniform_vec3i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_INT_VEC4:               current_uniform.reset(new scm::gl::uniform_vec4i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
 
+                        case GL_BOOL:                   current_uniform.reset(new scm::gl::uniform_1i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_BOOL_VEC2:              current_uniform.reset(new scm::gl::uniform_vec2i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_BOOL_VEC3:              current_uniform.reset(new scm::gl::uniform_vec3i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+                        case GL_BOOL_VEC4:              current_uniform.reset(new scm::gl::uniform_vec4i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+
                         case GL_UNSIGNED_INT:           current_uniform.reset(new scm::gl::uniform_1ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_UNSIGNED_INT_VEC2:      current_uniform.reset(new scm::gl::uniform_vec2ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_UNSIGNED_INT_VEC3:      current_uniform.reset(new scm::gl::uniform_vec3ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;

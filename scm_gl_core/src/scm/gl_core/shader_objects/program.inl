@@ -13,13 +13,13 @@ void
 program::uniform(const std::string& name, const T& v) const {
     const uniform_ptr u = uniform_raw(name);
     if (u) {
-        typedef scm::gl::uniform<T, uniform_base_type<T>::type> uniform_type;
+        typedef scm::gl::uniform_type<T>::type uniform_type;
         const shared_ptr<uniform_type> ut = dynamic_pointer_cast<uniform_type>(u);
         if (ut) {
             ut->value(v);
         }
         else {
-            SCM_GL_DGB("program::uniform(): found non matching uniform type '" << type_string(uniform_base_type<T>::type)
+            SCM_GL_DGB("program::uniform(): found non matching uniform type '" << type_string(uniform_data_type<T>::type)
                                                                                << "' ('uniform: " << name << ", " << type_string(u->type()) << ").");
             //SCM_GL_LOG_ONCE(log::warning, "program::uniform(): found non matching uniform type '"
             //                              << type_string(uniform_base_type<T>::type)
