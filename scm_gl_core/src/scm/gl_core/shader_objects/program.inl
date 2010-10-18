@@ -13,8 +13,8 @@ void
 program::uniform(const std::string& name, const T& v) const {
     const uniform_ptr u = uniform_raw(name);
     if (u) {
-        typedef scm::gl::uniform_type<T>::type uniform_type;
-        const shared_ptr<uniform_type> ut = dynamic_pointer_cast<uniform_type>(u);
+        typedef typename scm::gl::uniform_type<T>::type cur_uniform_type;
+        const shared_ptr<cur_uniform_type> ut = dynamic_pointer_cast<cur_uniform_type>(u);
         if (ut) {
             ut->value(v);
         }
