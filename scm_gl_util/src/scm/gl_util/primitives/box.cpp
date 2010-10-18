@@ -7,9 +7,8 @@
 
 #include <scm/core/pointer_types.h>
 
-#include <scm/gl_core/render_device/device.h>
+#include <scm/gl_core/render_device.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
-#include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
 
@@ -145,6 +144,9 @@ void
 box_geometry::draw(const render_context_ptr& in_context,
                    const draw_mode in_draw_mode) const
 {
+    using namespace scm::gl;
+    context_vertex_input_guard vig(in_context);
+
     in_context->bind_vertex_array(_vertex_array);
 
     if (in_draw_mode == MODE_SOLID) {
