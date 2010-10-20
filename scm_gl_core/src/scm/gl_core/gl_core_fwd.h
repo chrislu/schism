@@ -4,6 +4,7 @@
 
 #include <scm/core/pointer_types.h>
 
+#include <scm/gl_core/config.h>
 #include <scm/gl_core/buffer_objects/buffer_objects_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/frame_buffer_objects_fwd.h>
 #include <scm/gl_core/primitives/primitives_fwd.h>
