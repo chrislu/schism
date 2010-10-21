@@ -44,12 +44,12 @@ public:
         data_type       _type;
     };
     struct uniform_block_type {
-        uniform_block_type() : _block_index(-1), _size(-1), _update_required(false) {}
-        uniform_block_type(const std::string& n, int i, scm::size_t s) : _name(n), _block_index(i), _size(s), _update_required(false) {}
+        uniform_block_type() : _block_index(-1), _size(-1), _binding(-1), _update_required(false) {}
+        uniform_block_type(const std::string& n, int i, scm::size_t s) : _name(n), _block_index(i), _size(s), _binding(-1), _update_required(false) {}
         std::string     _name;
         int             _block_index;
         scm::size_t     _size;
-        unsigned        _binding;
+        int             _binding;
         mutable bool    _update_required;
     };
     struct subroutine_uniform_type {
