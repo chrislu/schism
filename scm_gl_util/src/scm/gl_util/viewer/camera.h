@@ -41,6 +41,8 @@ public:
     const math::mat4f&      view_projection_matrix() const;
     const math::mat4f&      view_projection_matrix_inverse() const;
 
+    const math::vec4f       position() const;
+
     const frustumf&         view_frustum() const;
 
     float                   field_of_view() const;

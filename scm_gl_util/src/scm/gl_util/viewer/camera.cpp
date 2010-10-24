@@ -73,6 +73,13 @@ camera::projection_frustum(float left, float right, float bottom, float top, flo
     update();
 }
 
+void
+camera::view_matrix(const math::mat4f& v)
+{
+    _view_matrix = v;
+    update();
+}
+
 const math::mat4f&
 camera::projection_matrix() const
 {
@@ -115,11 +122,10 @@ camera::view_projection_matrix_inverse() const
     return (_view_projection_matrix_inverse);
 }
 
-void
-camera::view_matrix(const math::mat4f& v)
+const math::vec4f
+camera::position() const
 {
-    _view_matrix = v;
-    update();
+    return (_view_matrix_inverse.column(3));
 }
 
 const frustumf&
