@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& out_stream, const mat<scal_type, row_dim,
         for (unsigned r = 0; r < row_dim; ++r) {
             for (unsigned c = 0; c < col_dim; ++c) {
                 unsigned out_index = r + c * row_dim;
-                out_stream << (out_index != 0 ? "  " : "") << out_mat.data_array[out_index];
+                out_stream << (out_index != 0 ? " " : "") << out_mat.data_array[out_index];
             }
             if (r != row_dim - 1) out_stream << std::endl;
         }
