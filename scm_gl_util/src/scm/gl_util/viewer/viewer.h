@@ -88,6 +88,8 @@ public:
     const camera&                   main_camera() const;
     camera&                         main_camera();
 
+    const viewport&                 main_viewport() const;
+
     void                            enable_main_manipulator(const bool f);
     math::vec2f                     norm_viewport_coords(const math::vec2i& pos) const;
 
