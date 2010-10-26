@@ -58,7 +58,8 @@ texture_2d_ptr
 texture_loader::load_texture_2d(render_device&       in_device,
                                 const std::string&   in_image_path,
                                 bool                 in_create_mips,
-                                bool                 in_color_mips)
+                                bool                 in_color_mips,
+                                const data_format    in_force_internal_format)
 {
     scm::scoped_ptr<fipImage>   in_image(new fipImage);
 
@@ -168,6 +169,9 @@ texture_loader::load_texture_2d(render_device&       in_device,
         image_mip_data_raw.push_back(cur_data.get());
     }
 
+    if (in_force_internal_format != FORMAT_NULL) {
+        internal_format = in_force_internal_format;
+    }
     texture_2d_ptr new_tex = in_device.create_texture_2d(image_size, internal_format, num_mip_levels, 1, 1,
                                                          image_format, image_mip_data_raw);
 
