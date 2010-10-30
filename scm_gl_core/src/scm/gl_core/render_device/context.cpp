@@ -1034,10 +1034,10 @@ render_context::apply_frame_buffer()
         }
         else {
             for (int i = 0; i < _current_state._viewports.size(); ++i) {
-                vp_array[i] = vec4f(_current_state._viewports.viewports()[0]._position,
-                                    _current_state._viewports.viewports()[0]._dimensions.x,
-                                    _current_state._viewports.viewports()[0]._dimensions.y);
-                dr_array[i] = _current_state._viewports.viewports()[0]._depth_range;
+                vp_array[i] = vec4f(_current_state._viewports.viewports()[i]._position,
+                                    _current_state._viewports.viewports()[i]._dimensions.x,
+                                    _current_state._viewports.viewports()[i]._dimensions.y);
+                dr_array[i] = _current_state._viewports.viewports()[i]._depth_range;
             }
             for (int i = static_cast<int>(_current_state._viewports.size()); i < vp_array_size; ++i) {
                 vp_array[i] = vec4f(0.0f, 0.0f, 100.0f, 100.0f);
