@@ -16,8 +16,12 @@
 namespace scm {
 namespace gl {
 
-struct __scm_export(gl_core) blend_ops {
-    blend_ops(bool            in_enabled         = false,
+class blend_ops_array;
+
+class __scm_export(gl_core) blend_ops
+{
+public:
+    blend_ops(bool            in_enabled,
               blend_func      in_src_rgb_func    = FUNC_ONE,
               blend_func      in_dst_rgb_func    = FUNC_ZERO,
               blend_func      in_src_alpha_func  = FUNC_ONE,
@@ -26,9 +30,19 @@ struct __scm_export(gl_core) blend_ops {
               blend_equation  in_alpha_equation  = EQ_FUNC_ADD,
               unsigned        in_write_mask      = COLOR_ALL);
 
+    blend_ops_array      operator()(bool            in_enabled,
+                                    blend_func      in_src_rgb_func    = FUNC_ONE,
+                                    blend_func      in_dst_rgb_func    = FUNC_ZERO,
+                                    blend_func      in_src_alpha_func  = FUNC_ONE,
+                                    blend_func      in_dst_alpha_func  = FUNC_ZERO,
+                                    blend_equation  in_rgb_equation    = EQ_FUNC_ADD,
+                                    blend_equation  in_alpha_equation  = EQ_FUNC_ADD,
+                                    unsigned        in_write_mask      = COLOR_ALL);
+
     bool operator==(const blend_ops& rhs) const;
     bool operator!=(const blend_ops& rhs) const;
 
+public:
     bool            _enabled;
     blend_func      _src_rgb_func;
     blend_func      _dst_rgb_func;
@@ -37,12 +51,52 @@ struct __scm_export(gl_core) blend_ops {
     blend_func      _dst_alpha_func;
     blend_equation  _alpha_equation;
     unsigned        _write_mask;
-}; // struct blend_state_desc
 
-typedef std::vector<blend_ops> blend_ops_array;
+}; // class blend_state_desc
+
+class __scm_export(gl_core) blend_ops_array
+{
+public:
+    typedef std::vector<blend_ops> blend_ops_vector;
+
+public:
+    blend_ops_array(const blend_ops_array& in_blend_op_array);
+    blend_ops_array(const blend_ops& in_blend_ops);
+    blend_ops_array(bool            in_enabled,
+                    blend_func      in_src_rgb_func    = FUNC_ONE,
+                    blend_func      in_dst_rgb_func    = FUNC_ZERO,
+                    blend_func      in_src_alpha_func  = FUNC_ONE,
+                    blend_func      in_dst_alpha_func  = FUNC_ZERO,
+                    blend_equation  in_rgb_equation    = EQ_FUNC_ADD,
+                    blend_equation  in_alpha_equation  = EQ_FUNC_ADD,
+                    unsigned        in_write_mask      = COLOR_ALL);
+
+    blend_ops_array& operator()(const blend_ops& in_blend_ops);
+    blend_ops_array& operator()(bool            in_enabled,
+                                blend_func      in_src_rgb_func    = FUNC_ONE,
+                                blend_func      in_dst_rgb_func    = FUNC_ZERO,
+                                blend_func      in_src_alpha_func  = FUNC_ONE,
+                                blend_func      in_dst_alpha_func  = FUNC_ZERO,
+                                blend_equation  in_rgb_equation    = EQ_FUNC_ADD,
+                                blend_equation  in_alpha_equation  = EQ_FUNC_ADD,
+                                unsigned        in_write_mask      = COLOR_ALL);
+
+    const blend_ops& operator[](int in_index) const;
+
+    size_t                  size() const;
+    const blend_ops_vector& blend_operations() const;
+
+    bool operator==(const blend_ops_array& rhs) const;
+    bool operator!=(const blend_ops_array& rhs) const;
+
+private:
+    blend_ops_vector     _array;
+
+}; // class blend_ops_array
+
 
 struct __scm_export(gl_core) blend_state_desc {
-    blend_state_desc(const blend_ops& in_blend_ops = blend_ops(), bool in_alpha_to_coverage = false);
+    blend_state_desc(const blend_ops& in_blend_ops = blend_ops(false), bool in_alpha_to_coverage = false);
     blend_state_desc(const blend_ops_array& in_blend_ops, bool in_alpha_to_coverage = false);
 
     blend_ops_array         _blend_ops;
