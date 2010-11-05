@@ -187,6 +187,92 @@ texture_loader::load_texture_2d(render_device&       in_device,
     return (new_tex);
 }
 
+
+bool
+texture_loader::load_texture_image(const render_device_ptr& in_device,
+                                   const texture_2d_ptr&    in_texture,
+                                   const std::string&       in_image_path,
+                                   const texture_region&    in_region,
+                                   const unsigned           in_level)
+{
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    scm::scoped_ptr<fipImage>   in_image(new fipImage);
+
+    if (!in_image->load(in_image_path.c_str())) {
+        glerr() << log::error << "texture_loader::load_texture_image(): "
+                << "unable to open file: " << in_image_path << log::end;
+        return (false);
+    }
+
+    FREE_IMAGE_TYPE image_type = in_image->getImageType();
+    math::vec2ui    image_size(in_image->getWidth(), in_image->getHeight());
+    data_format     image_format = FORMAT_NULL;
+    
+    switch (image_type) {
+        case FIT_BITMAP: {
+            unsigned num_components = in_image->getBitsPerPixel() / 8;
+            switch (num_components) {
+                case 1: image_format = FORMAT_R_8; break;
+                case 2: image_format = FORMAT_RG_8; break;
+                case 3: image_format = FORMAT_BGR_8; FORMAT_RGB_8; break;
+                case 4: image_format = FORMAT_BGRA_8; FORMAT_RGBA_8; break;
+            }
+        } break;
+        case FIT_INT16:     image_format = FORMAT_R_16S; break;
+        case FIT_UINT16:    image_format = FORMAT_R_16; break;
+        case FIT_RGB16:     image_format = FORMAT_RGB_16; break;
+        case FIT_RGBA16:    image_format = FORMAT_RGBA_16; break;
+        case FIT_INT32:     break; 
+        case FIT_UINT32:    break;
+        case FIT_FLOAT:     image_format = FORMAT_R_32F; break;
+        case FIT_RGBF:      image_format = FORMAT_RGB_32F; break;
+        case FIT_RGBAF:     image_format = FORMAT_RGBA_32F; break;
+    }
+
+    if (image_format == FORMAT_NULL) {
+        glerr() << log::error << "texture_loader::load_texture_image(): "
+                << "unsupported color format: " << std::hex << in_image->getImageType() << log::end;
+        return (false);
+    }
+
+    if (in_region._dimensions.z != 1) {
+        glerr() << log::error << "texture_loader::load_texture_image(): "
+                << "requested volume region update (dimensions.z > 1), only 2d images supported." << log::end;
+        return (false);
+    }
+
+    texture_region update_region(in_region);
+    if (   (image_size.x != in_region._dimensions.x)
+        || (image_size.y != in_region._dimensions.y)) {
+        glout() << log::warning << "texture_loader::load_texture_image(): "
+                << "updated region size differs from image dimensions (image cropped or partially updated)." << log::end;
+        vec2ui min_size;
+        min_size.x = min<unsigned>(image_size.x, in_region._dimensions.x);
+        min_size.y = min<unsigned>(image_size.y, in_region._dimensions.y);
+        
+        if (   (min_size.x < image_size.x)
+            || (min_size.y < image_size.y)) {
+            in_image->crop(0, 0, min_size.x, min_size.y);
+        }
+        update_region._dimensions = min_size;
+    }
+
+    render_context_ptr context = in_device->main_context();
+
+    if (!context->update_sub_texture(in_texture, update_region, in_level, image_format, in_image->accessPixels()))
+    {
+        glerr() << log::error << "texture_loader::load_texture_image(): "
+                << "error updating texture sub region"
+                << "(origin: " << update_region._origin
+                << ", dimensions: " << update_region._dimensions << ")." << log::end;
+        return (false);
+    }
+
+    return (true);
+}
+
 } // namespace gl
 } // namespace scm
 
