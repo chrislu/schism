@@ -41,7 +41,6 @@ uniform<T, D>::value(value_param_type v)
     }
 }
 
-
 } // namespace gl
 } // namespace scm
 
@@ -94,7 +93,7 @@ uniform_base::uniform_base(const std::string& n, const int l, const unsigned e, 
   : _name(n)
   , _location(l)
   , _elements(e)
-  , _update_required(false)
+  , _update_required(true)
   , _type(t)
 {
 }
