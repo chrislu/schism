@@ -4,6 +4,8 @@
 #include <iostream>
 
 #include <scm/log.h>
+#include <scm/time.h>
+
 #include <scm/gl_core/math.h>
 
 #include <scm/input/config.h>
@@ -82,12 +84,18 @@ private:
     CComPtr<IKeyboard>  _3d_keyboard;
 
     scm::inp::space_navigator*const _device;
+
+    scm::time::high_res_timer       _timer;
 };
 
 space_navigator_impl::space_navigator_impl(scm::inp::space_navigator*const d)
   : _device(d)
 {
     init_com();
+
+    _timer.start();
+    _timer.stop();
+
 }
 
 space_navigator_impl::~space_navigator_impl()
@@ -145,21 +153,27 @@ space_navigator_impl::update()
     rotation->get_Angle(&rotation_angle);
     translation->get_Length(&translation_length);
 
-    _device->_rotation = mat4f::identity();
+    _device->_rotation    = mat4f::identity();
     _device->_translation = mat4f::identity();
 
-    if (   rotation_angle > 0.0
-        || translation_length > 0.0) {
-        double time_factor = 1.0;
+    if (   (rotation_angle     > 0.0)
+        || (translation_length > 0.0)) {
 
-        DWORD time_stamp = ::GetTickCount();
-        if (last_time_stamp) {
-            double  period;
-            _3d_sensor->get_Period(&period);
-            time_factor = (double)(time_stamp - last_time_stamp) / (/*1000.0 **/ period);
-            //std::cout << period << " " << time_factor << std::endl;
-        }
-        last_time_stamp = time_stamp;
+        _timer.stop();
+        _timer.start();
+
+        double time_factor = 1.0;
+        double  period; // in millisec
+        _3d_sensor->get_Period(&period);
+        time_factor = scm::time::to_milliseconds(_timer.get_time()) / (period * 1000.0);
+        //DWORD time_stamp = ::GetTickCount();
+        //if (last_time_stamp) {
+        //    double  period; // in millisec
+        //    _3d_sensor->get_Period(&period);
+        //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period);
+            std::cout << period << " " << time_factor << std::endl;
+        //}
+        //last_time_stamp = time_stamp;
 
 
         // translation
@@ -179,7 +193,7 @@ space_navigator_impl::update()
         rotation->get_Z(&rot_axis.z);
 
         rotation_angle *= time_factor;
-        rotate(_device->_rotation, (float)rotation_angle, math::vec3f(rot_axis));
+        rotate(_device->_rotation, static_cast<float>(math::rad2deg(rotation_angle)), (math::vec3f(rot_axis)));
     }
 
     rotation.Release();

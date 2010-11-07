@@ -26,7 +26,6 @@ public:
     const math::mat4f&  rotation() const;
     const math::mat4f&  translation() const;
 
-
 protected:
 
 private:

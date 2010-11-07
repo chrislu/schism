@@ -8,6 +8,8 @@
 #include <scm/core/time/accumulate_timer.h>
 #include <scm/core/time/high_res_timer.h>
 
+#include <scm/input/devices/devices_fwd.h>
+
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 
@@ -91,6 +93,8 @@ public:
     const viewport&                 main_viewport() const;
 
     void                            enable_main_manipulator(const bool f);
+    bool                            main_manipulator_enabled() const;
+
     math::vec2f                     norm_viewport_coords(const math::vec2i& pos) const;
 
     void                            clear_color() const;
@@ -175,6 +179,8 @@ protected:
     math::vec2f                     _trackball_start_pos;
     mouse_button                    _trackball_button;
     bool                            _trackball_enabled;
+
+    inp::space_navigator_ptr        _device_space_navigator;
 
     // callbacks
     update_func                     _update_func;

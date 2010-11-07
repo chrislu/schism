@@ -58,6 +58,7 @@ endif (WIN32)
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
+                                      ${SCM_ROOT_DIR}/scm_input/src
                                       ${SCM_BOOST_INC_DIR})
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
@@ -84,6 +85,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME}
     scm_core
     scm_gl_core
+    scm_input
 )
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
@@ -101,4 +103,5 @@ endif (UNIX)
 add_dependencies(${PROJECT_NAME}
     scm_core
     scm_gl_core
+    scm_input
 )

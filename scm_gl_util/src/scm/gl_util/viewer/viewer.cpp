@@ -12,6 +12,8 @@
 #include <scm/log.h>
 #include <scm/core/math.h>
 
+#include <scm/input/devices/space_navigator_device.h>
+
 #include <scm/gl_core/log.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/frame_buffer_objects.h>
@@ -137,6 +139,8 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
         _frame_counter_text.reset(new text(_device, counter_font, font_face::style_regular, "sick, sad world..."));
         _frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
         _frame_counter_text->text_kerning(true);
+
+        _device_space_navigator = make_shared<inp::space_navigator>();
     }
     catch (std::exception& e) {
         std::stringstream msg;
@@ -308,6 +312,16 @@ viewer::mouse_move_func(const mouse_func& f)
 void
 viewer::send_render_update()
 {
+    using namespace scm::math;
+
+    //_device_space_navigator->
+    _device_space_navigator->update();
+
+    mat4f view_matrix =   inverse(_device_space_navigator->translation())
+                        * inverse(_device_space_navigator->rotation())
+                        * _camera.view_matrix();
+    _camera.view_matrix(view_matrix);
+
     if (_update_func) {
         _update_func(device(), context());
     }
@@ -513,6 +527,12 @@ void
 viewer::enable_main_manipulator(const bool f)
 {
     _trackball_enabled = f;
+}
+
+bool
+viewer::main_manipulator_enabled() const
+{
+    return (_trackball_enabled);
 }
 
 bool
