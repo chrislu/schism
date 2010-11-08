@@ -34,7 +34,7 @@ trackball_manipulator::project_to_sphere(float x, float y) const
         return (math::sqrt(_radius * _radius - len_sqr));
     } else {
         // hyperbola z = r²/(2*d)
-        return ((_radius*_radius) / (2.0f * len));
+        return ((_radius * _radius) / (2.0f * len));
     }
 }
 
@@ -60,9 +60,14 @@ trackball_manipulator::rotation(float fx, float fy, float tx, float ty)
 
     mat4_type tmp(mat4_type::identity());
 
+    mat4_type tmp_dolly(mat4_type::identity());
+    mat4_type tmp_dolly_inv(mat4_type::identity());
+    translate(tmp_dolly, 0.f, 0.f, _dolly);
+    translate(tmp_dolly_inv, 0.f, 0.f, -_dolly);
+
     rotate(tmp, rad2deg(rot_angl), rot_axis);
 
-    _matrix = tmp * _matrix;
+    _matrix = tmp_dolly * tmp * tmp_dolly_inv * _matrix;
 }
 
 void
@@ -81,26 +86,50 @@ trackball_manipulator::translation(float x, float y)
               y * (near_dist + dolly_abs),
               0.f);
 
-    _matrix = tmp * _matrix;
+    mat4_type tmp_dolly(mat4_type::identity());
+    mat4_type tmp_dolly_inv(mat4_type::identity());
+    translate(tmp_dolly, 0.f, 0.f, _dolly);
+    translate(tmp_dolly_inv, 0.f, 0.f, -_dolly);
+
+    _matrix = tmp_dolly * tmp * tmp_dolly_inv * _matrix;
 }
 
 void
-trackball_manipulator::dolly(float y) {
+trackball_manipulator::dolly(float y)
+{
+    using namespace scm::math;
+
+    mat4_type tmp_dolly(mat4_type::identity());
+    mat4_type tmp_dolly_inv(mat4_type::identity());
+    translate(tmp_dolly, 0.f, 0.f, _dolly);
+    translate(tmp_dolly_inv, 0.f, 0.f, -_dolly);
+
     _dolly -= y;
+    mat4_type tmp(mat4_type::identity());
+    translate(tmp, 0.f, 0.f, _dolly);
+
+    _matrix = tmp * tmp_dolly_inv * _matrix;
 }
 
-const trackball_manipulator::mat4_type
+const trackball_manipulator::mat4_type&
 trackball_manipulator::transform_matrix() const
 {
     using namespace scm::math;
 
-    mat4_type tmp_ret(mat4_type::identity());
+    //mat4_type tmp_ret(mat4_type::identity());
 
-    translate(tmp_ret, 0.f, 0.f, _dolly);
+    //translate(tmp_ret, 0.f, 0.f, _dolly);
 
-    tmp_ret *= _matrix;
+    //tmp_ret *= _matrix;
 
-    return (tmp_ret);
+    //return (tmp_ret);
+    return (_matrix);
+}
+
+void
+trackball_manipulator::transform_matrix(const mat4_type& m)
+{
+    _matrix = m;
 }
 
 float

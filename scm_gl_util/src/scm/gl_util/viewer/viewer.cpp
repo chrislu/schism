@@ -1,6 +1,7 @@
 
 #include "viewer.h"
 
+#include <iostream>
 #include <cassert>
 #include <exception>
 #include <stdexcept>
@@ -314,13 +315,13 @@ viewer::send_render_update()
 {
     using namespace scm::math;
 
-    //_device_space_navigator->
-    _device_space_navigator->update();
+    //_device_space_navigator->update(); // update done via callback of the device
 
     mat4f view_matrix =   inverse(_device_space_navigator->translation())
                         * inverse(_device_space_navigator->rotation())
                         * _camera.view_matrix();
     _camera.view_matrix(view_matrix);
+    _trackball.transform_matrix(view_matrix);
 
     if (_update_func) {
         _update_func(device(), context());

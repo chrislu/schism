@@ -2,6 +2,7 @@
 #include "space_navigator_device.h"
 
 #include <iostream>
+#include <cassert>
 
 #include <scm/log.h>
 #include <scm/time.h>
@@ -138,8 +139,6 @@ space_navigator_impl::~space_navigator_impl()
 void
 space_navigator_impl::update()
 {
-    static DWORD last_time_stamp = 0;
-
     using namespace scm;
     using namespace scm::math;
 
@@ -153,11 +152,11 @@ space_navigator_impl::update()
     rotation->get_Angle(&rotation_angle);
     translation->get_Length(&translation_length);
 
-    _device->_rotation    = mat4f::identity();
-    _device->_translation = mat4f::identity();
+    _device->reset();
 
     if (   (rotation_angle     > 0.0)
-        || (translation_length > 0.0)) {
+        || (translation_length > 0.0))
+    {
 
         _timer.stop();
         _timer.start();
@@ -171,7 +170,7 @@ space_navigator_impl::update()
         //    double  period; // in millisec
         //    _3d_sensor->get_Period(&period);
         //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period);
-            std::cout << period << " " << time_factor << std::endl;
+            //std::cout << period << " " << time_factor << std::endl;
         //}
         //last_time_stamp = time_stamp;
 
@@ -191,6 +190,10 @@ space_navigator_impl::update()
         rotation->get_X(&rot_axis.x);
         rotation->get_Y(&rot_axis.y);
         rotation->get_Z(&rot_axis.z);
+
+        //std::cout << std::fixed << std::setprecision(3)
+        //          << scm::time::to_milliseconds(_timer.get_time()) << "\t"
+        //          << trans_vec << "\t" << rot_axis << "\t" << rotation_angle << std::endl;
 
         rotation_angle *= time_factor;
         rotate(_device->_rotation, static_cast<float>(math::rad2deg(rotation_angle)), (math::vec3f(rot_axis)));

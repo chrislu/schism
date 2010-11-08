@@ -33,7 +33,8 @@ public:
     void dolly(float y);
 
 
-    const mat4_type     transform_matrix() const;
+    const mat4_type&    transform_matrix() const;
+    void                transform_matrix(const mat4_type& m);
     float               dolly() const;
 
 private:
