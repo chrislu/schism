@@ -314,6 +314,11 @@ program::retrieve_uniform_information(render_device& ren_dev)
                                     temp_name.get());           // name
             actual_uniform_name.assign(temp_name.get());
 
+            // filter out uniform block elements
+            if (actual_uniform_name.find('.') != std::string::npos) {
+                continue;
+            }
+
             if (!boost::starts_with(actual_uniform_name, "gl_")) {
                 actual_uniform_location = glapi.glGetUniformLocation(_gl_program_obj, actual_uniform_name.c_str());
 
