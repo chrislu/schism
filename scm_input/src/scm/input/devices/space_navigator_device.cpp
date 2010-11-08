@@ -139,6 +139,8 @@ space_navigator_impl::~space_navigator_impl()
 void
 space_navigator_impl::update()
 {
+    static DWORD last_time_stamp = 0;
+
     using namespace scm;
     using namespace scm::math;
 
@@ -164,7 +166,12 @@ space_navigator_impl::update()
         double time_factor = 1.0;
         double  period; // in millisec
         _3d_sensor->get_Period(&period);
-        time_factor = scm::time::to_milliseconds(_timer.get_time()) / (period * 1000.0);
+        double frame_time = scm::time::to_milliseconds(_timer.get_time());
+        // detect interaction pauses
+        if (frame_time > 250.0) {
+            frame_time = period;
+        }
+        time_factor = frame_time / (period * 1000.0);
         //DWORD time_stamp = ::GetTickCount();
         //if (last_time_stamp) {
         //    double  period; // in millisec
@@ -172,6 +179,14 @@ space_navigator_impl::update()
         //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period);
             //std::cout << period << " " << time_factor << std::endl;
         //}
+
+        //DWORD time_stamp = ::GetTickCount(); 
+        //if (last_time_stamp) { 
+        //    double  period; 
+        //    _3d_sensor->get_Period(&period); 
+        //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period); 
+        //    //std::cout << period << " " << time_factor << std::endl; 
+        //} 
         //last_time_stamp = time_stamp;
 
 
