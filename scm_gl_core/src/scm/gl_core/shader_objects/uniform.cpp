@@ -71,7 +71,7 @@ SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2ui, scm::gl::TYPE_VEC2UI, uniform_ve
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3ui, scm::gl::TYPE_VEC3UI, uniform_vec3ui)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4ui, scm::gl::TYPE_VEC4UI, uniform_vec4ui)
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 SCM_UNIFORM_TYPE_INSTANTIATE(double,            scm::gl::TYPE_DOUBLE, uniform_1d)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec2d,  scm::gl::TYPE_VEC2D,  uniform_vec2d)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec3d,  scm::gl::TYPE_VEC3D,  uniform_vec3d)
@@ -79,7 +79,7 @@ SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::vec4d,  scm::gl::TYPE_VEC4D,  uniform_ve
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat2d,  scm::gl::TYPE_MAT2D,  uniform_mat2d)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat3d,  scm::gl::TYPE_MAT3D,  uniform_mat3d)
 SCM_UNIFORM_TYPE_INSTANTIATE(scm::math::mat4d,  scm::gl::TYPE_MAT4D,  uniform_mat4d)
-#endif // SCM_GL_CORE_OPENGL_40
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
 //} // namespace gl
 //} // namespace scm
@@ -197,7 +197,7 @@ uniform_mat4f::apply_value(const render_context& context, const program& p)
 }
 
 // double types ///////////////////////////////////////////////////////////////////////////////////
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 template<>
 void
 uniform_1d::apply_value(const render_context& context, const program& p)
@@ -261,8 +261,7 @@ uniform_mat4d::apply_value(const render_context& context, const program& p)
     gl_assert(glapi, leaving uniform_mat4d::apply_value());
 }
 
-
-#endif // SCM_GL_CORE_OPENGL_40
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
 // int types //////////////////////////////////////////////////////////////////////////////////////
 template<>

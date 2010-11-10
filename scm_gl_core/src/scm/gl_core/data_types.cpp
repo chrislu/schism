@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <boost/static_assert.hpp>
+
 namespace  {
 
 const char* type_strings[] = {
@@ -12,11 +14,11 @@ const char* type_strings[] = {
     "MAT2F", "MAT3F", "MAT4F",
     "MAT2X3F", "MAT2X4F", "MAT3X2F", "MAT3X4F", "MAT4X2F", "MAT4X3F",
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
     "DOUBLE", "VEC2D", "VEC3D", "VEC4D",
     "MAT2D", "MAT3D", "MAT4D",
     "MAT2X3D", "MAT2X4D", "MAT3X2D", "MAT3X4D", "MAT4X2D", "MAT4X3D",
-#endif
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
     "INT", "VEC2I", "VEC3I", "VEC4I",
 
@@ -38,6 +40,7 @@ namespace gl {
 const char*
 type_string(data_type d)
 {
+    BOOST_STATIC_ASSERT((sizeof(type_strings) / sizeof(const char*)) == TYPE_COUNT);
     assert(TYPE_UNKNOWN <= d && d < TYPE_COUNT);
     return (type_strings[d]);
 }

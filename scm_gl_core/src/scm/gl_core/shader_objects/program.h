@@ -102,7 +102,7 @@ public:
     uniform_vec3ui_ptr          uniform_vec3ui(const std::string& name) const;
     uniform_vec4ui_ptr          uniform_vec4ui(const std::string& name) const;
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
     uniform_1d_ptr              uniform_1d(const std::string& name) const;
     uniform_vec2d_ptr           uniform_vec2d(const std::string& name) const;
     uniform_vec3d_ptr           uniform_vec3d(const std::string& name) const;
@@ -110,7 +110,7 @@ public:
     uniform_mat2d_ptr           uniform_mat2d(const std::string& name) const;
     uniform_mat3d_ptr           uniform_mat3d(const std::string& name) const;
     uniform_mat4d_ptr           uniform_mat4d(const std::string& name) const;
-#endif // SCM_GL_CORE_OPENGL_40
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
     void                        uniform_buffer(const std::string& name, const unsigned binding);
     void                        uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine);

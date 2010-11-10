@@ -38,27 +38,29 @@ render_device::render_device()
         glerr() << log::fatal << s.str() << log::end;
         throw(std::runtime_error(s.str()));
     }
-#if SCM_GL_CORE_OPENGL_40
-    if (!(   _opengl3_api_core->version_supported(4, 0))) {
+    unsigned req_version_major = SCM_GL_CORE_BASE_OPENGL_VERSION / 100;
+    unsigned req_version_minor = (SCM_GL_CORE_BASE_OPENGL_VERSION - req_version_major * 100) / 10;
+
+    if (!(   _opengl3_api_core->version_supported(req_version_major, req_version_minor))) {
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core "
-          << "(at least OpenGL 4.0 requiered, encountered version "
+          << "(at least OpenGL "
+          << req_version_major << "." << req_version_minor
+          << " requiered, encountered version "
           << _opengl3_api_core->context_information()._version_major << "."
           << _opengl3_api_core->context_information()._version_minor << ").";
         glerr() << log::fatal << s.str() << log::end;
         throw(std::runtime_error(s.str()));
     }
-#else // SCM_GL_CORE_OPENGL_40
-    if (!(   _opengl3_api_core->version_supported(3, 3))) {
-        std::ostringstream s;
-        s << "render_device::render_device(): error initializing gl core "
-          << "(at least OpenGL 3.3 requiered, encountered version "
-          << _opengl3_api_core->context_information()._version_major << "."
-          << _opengl3_api_core->context_information()._version_minor << ").";
-        glerr() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
+    else {
+        glout() << log::info << "render_device::render_device(): "
+                << "scm_gl_core OpenGL "
+                << req_version_major << "." << req_version_minor
+                << " support enabled on "
+                << _opengl3_api_core->context_information()._version_major << "."
+                << _opengl3_api_core->context_information()._version_minor
+                << " context." << log::end;
     }
-#endif // SCM_GL_CORE_OPENGL_40
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!_opengl3_api_core->is_supported("GL_EXT_direct_state_access")) {
@@ -154,11 +156,12 @@ render_device::init_capabilities()
     assert(_capabilities._max_uniform_buffer_bindings > 0);
     assert(_capabilities._uniform_buffer_offset_alignment > 0);
 
-#if SCM_GL_CORE_OPENGL_41
-    glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
-#else // SCM_GL_CORE_OPENGL_41
-    _capabilities._max_viewports = 1;
-#endif // SCM_GL_CORE_OPENGL_41
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_410) {
+        glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
+    }
+    else {
+        _capabilities._max_viewports = 1;
+    }
 
     assert(_capabilities._max_viewports > 0);
 }

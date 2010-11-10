@@ -315,7 +315,7 @@ viewer::send_render_update()
 {
     using namespace scm::math;
 
-    //_device_space_navigator->update(); // update done via callback of the device
+    _device_space_navigator->update(); // update done directly (poll), callback of the device disabled!
 
     mat4f view_matrix =   inverse(_device_space_navigator->translation())
                         * inverse(_device_space_navigator->rotation())

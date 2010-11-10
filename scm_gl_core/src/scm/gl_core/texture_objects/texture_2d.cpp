@@ -177,7 +177,7 @@ texture_2d::image_data(const render_device&      in_device,
         }
         // multi sample texture
         else if (in_desc._samples > 1) {
-            if (in_desc._samples > in_device.capabilities()._max_samples) {
+            if (static_cast<int>(in_desc._samples) > in_device.capabilities()._max_samples) {
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
                 return (false);
             }
@@ -258,7 +258,7 @@ texture_2d::image_data(const render_device&      in_device,
             }
         }
         else if (in_desc._samples > 1) {
-            if (in_desc._samples > in_device.capabilities()._max_samples) {
+            if (static_cast<int>(in_desc._samples) > in_device.capabilities()._max_samples) {
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
                 return (false);
             }

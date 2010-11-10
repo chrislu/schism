@@ -1,6 +1,8 @@
 
 #include <cassert>
 
+#include <boost/static_assert.hpp>
+
 #include <scm/gl_core/config.h>
 
 namespace scm {
@@ -56,6 +58,8 @@ gl_usage_flags(const buffer_usage b)
         GL_DYNAMIC_COPY     // GPU rw, CPU
     };
 
+    BOOST_STATIC_ASSERT((sizeof(glbufu) / sizeof(int)) == USAGE_COUNT);
+
     assert((sizeof(glbufu) / sizeof(int)) == USAGE_COUNT);
     assert(USAGE_STATIC_DRAW <= b && b < USAGE_COUNT);
 
@@ -94,7 +98,44 @@ gl_primitive_types(const primitive_topology p)
         GL_TRIANGLE_STRIP,          // PRIMITIVE_TRIANGLE_STRIP,
         GL_TRIANGLES_ADJACENCY,     // PRIMITIVE_TRIANGLE_LIST_ADJACENCY,
         GL_TRIANGLE_STRIP_ADJACENCY // PRIMITIVE_TRIANGLE_STRIP_ADJACENCY
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+        ,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_1_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_2_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_3_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_4_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_5_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_6_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_7_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_8_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_9_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_10_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_11_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_12_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_13_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_14_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_15_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_16_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_17_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_18_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_19_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_20_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_21_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_22_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_23_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_24_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_25_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_26_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_27_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_28_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_29_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_30_CONTROL_POINTS,
+        GL_PATCHES,                 // PRIMITIVE_PATCH_LIST_31_CONTROL_POINTS,
+        GL_PATCHES                  // PRIMITIVE_PATCH_LIST_32_CONTROL_POINTS,
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400
     };
+
+    BOOST_STATIC_ASSERT((sizeof(types) / sizeof(unsigned)) == PRIMITIVE_TOPOLOGY_COUNT);
 
     assert((sizeof(types) / sizeof(unsigned)) == PRIMITIVE_TOPOLOGY_COUNT);
     assert(PRIMITIVE_POINT_LIST <= p && p < PRIMITIVE_TOPOLOGY_COUNT);
@@ -110,12 +151,14 @@ gl_shader_types(const shader_stage s)
         GL_VERTEX_SHADER,   // STAGE_VERTEX_SHADER      = 0x00,
         GL_GEOMETRY_SHADER, // STAGE_GEOMETRY_SHADER
         GL_FRAGMENT_SHADER  // STAGE_FRAGMENT_SHADER
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
         ,
         GL_TESS_EVALUATION_SHADER,  // STAGE_TESS_EVALUATION_SHADER,
         GL_TESS_CONTROL_SHADER      // STAGE_TESS_CONTROL_SHADER
-#endif
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
     };
+
+    BOOST_STATIC_ASSERT((sizeof(shader_types) / sizeof(int)) == SHADER_STAGE_COUNT);
 
     assert((sizeof(shader_types) / sizeof(int)) == SHADER_STAGE_COUNT);
     assert(STAGE_VERTEX_SHADER <= s && s < SHADER_STAGE_COUNT);
@@ -138,6 +181,8 @@ gl_compare_func(const compare_func c)
         GL_NOTEQUAL                 // COMPARISON_NOT_EQUAL
     };
 
+    BOOST_STATIC_ASSERT((sizeof(compare_funcs) / sizeof(unsigned)) == COMPARISON_FUNC_COUNT);
+
     assert((sizeof(compare_funcs) / sizeof(unsigned)) == COMPARISON_FUNC_COUNT);
     assert(COMPARISON_NEVER <= c && c < COMPARISON_FUNC_COUNT);
 
@@ -159,6 +204,8 @@ gl_stencil_op(const stencil_op s)
         GL_DECR_WRAP                // STENCIL_DECR_WRAP
     };
 
+    BOOST_STATIC_ASSERT((sizeof(stencil_ops) / sizeof(unsigned)) == STENCIL_OP_COUNT);
+
     assert((sizeof(stencil_ops) / sizeof(unsigned)) == STENCIL_OP_COUNT);
     assert(STENCIL_KEEP <= s && s < STENCIL_OP_COUNT);
 
@@ -174,6 +221,8 @@ gl_fill_mode(const fill_mode s)
         GL_LINE,    // FILL_WIREFRAME
         GL_POINT    // FILL_POINT
     };
+
+    BOOST_STATIC_ASSERT((sizeof(fill_modes) / sizeof(unsigned)) == FILL_MODE_COUNT);
 
     assert((sizeof(fill_modes) / sizeof(unsigned)) == FILL_MODE_COUNT);
     assert(FILL_SOLID <= s && s < FILL_MODE_COUNT);
@@ -191,6 +240,8 @@ gl_cull_mode(const cull_mode s)
         GL_BACK     // CULL_BACK
     };
 
+    BOOST_STATIC_ASSERT((sizeof(cull_modes) / sizeof(unsigned)) == CULL_MODE_COUNT);
+
     assert((sizeof(cull_modes) / sizeof(unsigned)) == CULL_MODE_COUNT);
     assert(CULL_NONE <= s && s < CULL_MODE_COUNT);
 
@@ -205,6 +256,8 @@ gl_polygon_orientation(const polygon_orientation s)
         GL_CW,      // ORIENT_CW = 0x00,
         GL_CCW      // ORIENT_CCW
     };
+
+    BOOST_STATIC_ASSERT((sizeof(polygon_orientations) / sizeof(unsigned)) == POLY_ORIENT_COUNT);
 
     assert((sizeof(polygon_orientations) / sizeof(unsigned)) == POLY_ORIENT_COUNT);
     assert(ORIENT_CW <= s && s < POLY_ORIENT_COUNT);
@@ -249,6 +302,8 @@ gl_blend_func(const blend_func s)
         GL_ONE_MINUS_SRC1_ALPHA         // FUNC_ONE_MINUS_SRC1_ALPHA
     };
 
+    BOOST_STATIC_ASSERT((sizeof(blend_funcs) / sizeof(unsigned)) == BLEND_FUNC_COUNT);
+
     assert((sizeof(blend_funcs) / sizeof(unsigned)) == BLEND_FUNC_COUNT);
     assert(FUNC_ZERO <= s && s < BLEND_FUNC_COUNT);
 
@@ -266,6 +321,8 @@ gl_blend_equation(const blend_equation s)
         GL_MIN,                         // EQ_MIN,
         GL_MAX                          // EQ_MAX
     };
+
+    BOOST_STATIC_ASSERT((sizeof(blend_equations) / sizeof(unsigned)) == BLEND_EQ_COUNT);
 
     assert((sizeof(blend_equations) / sizeof(unsigned)) == BLEND_EQ_COUNT);
     assert(EQ_FUNC_ADD <= s && s < BLEND_EQ_COUNT);
@@ -299,6 +356,8 @@ gl_texture_min_filter_mode(const texture_filter_mode s)
         GL_LINEAR_MIPMAP_LINEAR     // FILTER_ANISOTROPIC
     };
 
+    BOOST_STATIC_ASSERT((sizeof(texture_min_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
+
     assert((sizeof(texture_min_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
     assert(FILTER_MIN_MAG_NEAREST <= s && s < TEXTURE_FILTER_COUNT);
 
@@ -325,6 +384,8 @@ gl_texture_mag_filter_mode(const texture_filter_mode s)
         GL_LINEAR    // FILTER_ANISOTROPIC
     };
 
+    BOOST_STATIC_ASSERT((sizeof(texture_mag_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
+
     assert((sizeof(texture_mag_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
     assert(FILTER_MIN_MAG_NEAREST <= s && s < TEXTURE_FILTER_COUNT);
 
@@ -341,6 +402,8 @@ gl_wrap_mode(const texture_wrap_mode s)
         GL_MIRRORED_REPEAT  // WRAP_MIRRORED_REPEAT
     };
 
+    BOOST_STATIC_ASSERT((sizeof(wrap_modes) / sizeof(unsigned)) == WRAP_MODE_COUNT);
+
     assert((sizeof(wrap_modes) / sizeof(unsigned)) == WRAP_MODE_COUNT);
     assert(WRAP_CLAMP_TO_EDGE <= s && s < WRAP_MODE_COUNT);
 
@@ -356,6 +419,8 @@ gl_texture_compare_mode(const texture_compare_mode s)
         GL_COMPARE_REF_TO_TEXTURE   // TEXCOMPARE_COMPARE_REF_TO_TEXTURE
     };
 
+    BOOST_STATIC_ASSERT((sizeof(texture_compare_modes) / sizeof(unsigned)) == TEXCOMARE_COUNT);
+
     assert((sizeof(texture_compare_modes) / sizeof(unsigned)) == TEXCOMARE_COUNT);
     assert(TEXCOMPARE_NONE <= s && s < TEXCOMARE_COUNT);
 
@@ -370,6 +435,8 @@ gl_framebuffer_binding(const frame_buffer_binding s)
         GL_DRAW_FRAMEBUFFER,  // FRAMEBUFFER_DRAW = 0x00,
         GL_READ_FRAMEBUFFER   // FRAMEBUFFER_READ
     };
+
+    BOOST_STATIC_ASSERT((sizeof(framebuffer_bindings) / sizeof(unsigned)) == FRAMEBUFFER_BINDING_COUNT);
 
     assert((sizeof(framebuffer_bindings) / sizeof(unsigned)) == FRAMEBUFFER_BINDING_COUNT);
     assert(FRAMEBUFFER_DRAW <= s && s < FRAMEBUFFER_BINDING_COUNT);
@@ -392,6 +459,8 @@ gl_frame_buffer_target(const frame_buffer_target s)
         GL_RIGHT,                     // FRAMEBUFFER_RIGHT,
         GL_FRONT_AND_BACK             // FRAMEBUFFER_FRONT_AND_BACK,
     };
+
+    BOOST_STATIC_ASSERT((sizeof(framebuffer_targets) / sizeof(unsigned)) == FRAMEBUFFER_TARGET_COUNT);
 
     assert((sizeof(framebuffer_targets) / sizeof(unsigned)) == FRAMEBUFFER_TARGET_COUNT);
     assert(GL_FRONT_LEFT <= s && s < FRAMEBUFFER_TARGET_COUNT);

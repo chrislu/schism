@@ -71,10 +71,10 @@ shader_stage_string(shader_stage s)
     case STAGE_GEOMETRY_SHADER:        return ("geometry shader");break;
     case STAGE_FRAGMENT_SHADER:        return ("fragment shader");break;
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
     case STAGE_TESS_EVALUATION_SHADER: return ("tesselation evaluation shader");break;
     case STAGE_TESS_CONTROL_SHADER:    return ("tesselation control shader");break;
-#endif
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
     default: break;
     }

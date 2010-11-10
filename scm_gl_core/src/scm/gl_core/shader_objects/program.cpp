@@ -336,7 +336,7 @@ program::retrieve_uniform_information(render_device& ren_dev)
                         case GL_FLOAT_MAT2:             current_uniform.reset(new scm::gl::uniform_mat2f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_FLOAT_MAT3:             current_uniform.reset(new scm::gl::uniform_mat3f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_FLOAT_MAT4:             current_uniform.reset(new scm::gl::uniform_mat4f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
                         case GL_DOUBLE:                 current_uniform.reset(new scm::gl::uniform_1d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_VEC2:            current_uniform.reset(new scm::gl::uniform_vec2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_VEC3:            current_uniform.reset(new scm::gl::uniform_vec3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
@@ -344,7 +344,7 @@ program::retrieve_uniform_information(render_device& ren_dev)
                         case GL_DOUBLE_MAT2:            current_uniform.reset(new scm::gl::uniform_mat2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_MAT3:            current_uniform.reset(new scm::gl::uniform_mat3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_MAT4:            current_uniform.reset(new scm::gl::uniform_mat4d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
-#endif
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
                         case GL_INT:                    current_uniform.reset(new scm::gl::uniform_1i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_INT_VEC2:               current_uniform.reset(new scm::gl::uniform_vec2i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_INT_VEC3:               current_uniform.reset(new scm::gl::uniform_vec3i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
@@ -397,7 +397,7 @@ program::retrieve_uniform_information(render_device& ren_dev)
                                                                       actual_uniform_size);
         }
     }
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
     { // subroutines
         for (int stge = 0; stge < SHADER_STAGE_COUNT; ++stge) {
             { // subrountine uniforms
@@ -515,7 +515,7 @@ program::retrieve_uniform_information(render_device& ren_dev)
 #endif
         }
     }
-#endif
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
     gl_assert(glapi, leaving program::retrieve_uniform_information());
 }

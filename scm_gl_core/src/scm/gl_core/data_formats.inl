@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+#include <boost/static_assert.hpp>
+
 namespace scm {
 namespace gl {
 
@@ -101,6 +103,9 @@ int channel_count(data_format d)
         // depth stencil formats
         1, 1, 1, 1, 2, 2
     };
+
+    BOOST_STATIC_ASSERT((sizeof(channel_counts) / sizeof(int)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
     return (channel_counts[d]);
 }
@@ -134,6 +139,9 @@ int size_of_channel(data_format d)
         // depth stencil formats
         0, 0, 0, 0, 0, 0
     };
+
+    BOOST_STATIC_ASSERT((sizeof(channel_sizes) / sizeof(int)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d <= FORMAT_RGBA_32F);
     return (channel_sizes[d]);
 }
@@ -167,6 +175,9 @@ int size_of_format(data_format d)
         // depth stencil formats
         2, 3, 4, 4, 4, 8
     };
+
+    BOOST_STATIC_ASSERT((sizeof(format_sizes) / sizeof(int)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
     return (format_sizes[d]);
 }

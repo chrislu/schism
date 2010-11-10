@@ -259,8 +259,8 @@ space_navigator_impl::init_com()
             // Associate a configuration with this device
             //_3DxSimpleDevice->LoadPreferences(L"scm_input_sn");
 
-            hr = __hook(&_ISensorEvents::SensorInput, _3d_sensor, 
-                        &space_navigator_impl::on_sensor_input);
+            //hr = __hook(&_ISensorEvents::SensorInput, _3d_sensor, 
+            //            &space_navigator_impl::on_sensor_input);
 
             hr = __hook(&_IKeyboardEvents::KeyDown, _3d_keyboard, 
                         &space_navigator_impl::on_key_down);

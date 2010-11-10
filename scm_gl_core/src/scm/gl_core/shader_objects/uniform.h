@@ -103,7 +103,7 @@ SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2ui, TYPE_VEC2UI, uniform_vec2ui)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3ui, TYPE_VEC3UI, uniform_vec3ui)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4ui, TYPE_VEC4UI, uniform_vec4ui)
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 SCM_UNIFORM_TYPE_DECLARE(double,            TYPE_DOUBLE, uniform_1d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec2d,  TYPE_VEC2D,  uniform_vec2d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::vec3d,  TYPE_VEC3D,  uniform_vec3d)
@@ -111,7 +111,7 @@ SCM_UNIFORM_TYPE_DECLARE(scm::math::vec4d,  TYPE_VEC4D,  uniform_vec4d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat2d,  TYPE_MAT2D,  uniform_mat2d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat3d,  TYPE_MAT3D,  uniform_mat3d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
-#endif // SCM_GL_CORE_OPENGL_40
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
 // convenience
 typedef uniform_1i                                       uniform_sampler;

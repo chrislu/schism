@@ -234,14 +234,15 @@ blend_state::apply(const render_context& in_context, const math::vec4f& in_blend
         }
     }
     else {
-#ifndef SCM_GL_CORE_OPENGL_40
-        glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
-                                      util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
-        glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._dst_rgb_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._src_alpha_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._dst_alpha_func));
-#endif // SCM_GL_CORE_OPENGL_40
+        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+            glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
+                                          util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
+            glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._dst_rgb_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._src_alpha_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._dst_alpha_func));
+        }
+
         unsigned op_size = static_cast<unsigned>(_descriptor._blend_ops.size());
         unsigned ap_size = static_cast<unsigned>(in_applied_state._descriptor._blend_ops.size());
         unsigned max_size = math::max(op_size, ap_size);
@@ -282,14 +283,15 @@ blend_state::force_apply(const render_context& in_context, const math::vec4f& in
         force_apply(in_context, _descriptor._blend_ops[0]);
     }
     else {
-#ifndef SCM_GL_CORE_OPENGL_40
-        glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
-                                      util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
-        glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._dst_rgb_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._src_alpha_func),
-                                  util::gl_blend_func(_descriptor._blend_ops[0]._dst_alpha_func));
-#endif // SCM_GL_CORE_OPENGL_40
+        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+            glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
+                                          util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
+            glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._dst_rgb_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._src_alpha_func),
+                                      util::gl_blend_func(_descriptor._blend_ops[0]._dst_alpha_func));
+        }
+
         for (int i = 0; i < _descriptor._blend_ops.size(); ++i) {
             force_apply_i(in_context, i, _descriptor._blend_ops[i]);
         }
@@ -339,13 +341,12 @@ blend_state::force_apply_i(const render_context& in_context,
     glapi.glColorMaski(in_index, util::masked(in_blend_ops._write_mask, COLOR_RED),  util::masked(in_blend_ops._write_mask, COLOR_GREEN),
                                  util::masked(in_blend_ops._write_mask, COLOR_BLUE), util::masked(in_blend_ops._write_mask, COLOR_ALPHA));
 
-#if SCM_GL_CORE_OPENGL_40
-    assert(glapi.version_supported(4, 0));
-    glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
-                                             util::gl_blend_equation(in_blend_ops._alpha_equation));
-    glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),
-                                         util::gl_blend_func(in_blend_ops._src_alpha_func), util::gl_blend_func(in_blend_ops._dst_alpha_func));
-#endif // SCM_GL_CORE_OPENGL_40
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
+                                                 util::gl_blend_equation(in_blend_ops._alpha_equation));
+        glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),
+                                             util::gl_blend_func(in_blend_ops._src_alpha_func), util::gl_blend_func(in_blend_ops._dst_alpha_func));
+    }
 
     gl_assert(glapi, leaving blend_state::force_apply_i());
 }
@@ -397,13 +398,12 @@ blend_state::checked_apply_i(const render_context& in_context,
         glapi.glColorMaski(in_index, util::masked(in_blend_ops._write_mask, COLOR_RED),  util::masked(in_blend_ops._write_mask, COLOR_GREEN),
                                      util::masked(in_blend_ops._write_mask, COLOR_BLUE), util::masked(in_blend_ops._write_mask, COLOR_ALPHA));
     }
-#if SCM_GL_CORE_OPENGL_40
-    glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
-                                             util::gl_blend_equation(in_blend_ops._alpha_equation));
-    glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),
-                                         util::gl_blend_func(in_blend_ops._src_alpha_func), util::gl_blend_func(in_blend_ops._dst_alpha_func));
-#endif // SCM_GL_CORE_OPENGL_40
-
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
+                                                 util::gl_blend_equation(in_blend_ops._alpha_equation));
+        glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),
+                                             util::gl_blend_func(in_blend_ops._src_alpha_func), util::gl_blend_func(in_blend_ops._dst_alpha_func));
+    }
     gl_assert(glapi, leaving blend_state::checked_apply_i());
 }
 

@@ -112,7 +112,7 @@ program::uniform_vec4ui(const std::string& name) const {
     return (dynamic_pointer_cast<scm::gl::uniform_vec4ui>(uniform_raw(name)));
 }
 
-#if SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 inline uniform_1d_ptr
 program::uniform_1d(const std::string& name) const {
     return (dynamic_pointer_cast<scm::gl::uniform_1d>(uniform_raw(name)));
@@ -147,7 +147,7 @@ inline uniform_mat4d_ptr
 program::uniform_mat4d(const std::string& name) const {
     return (dynamic_pointer_cast<scm::gl::uniform_mat4d>(uniform_raw(name)));
 }
-#endif // SCM_GL_CORE_OPENGL_40
+#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
 namespace detail {
 
