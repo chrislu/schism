@@ -451,6 +451,8 @@ render_context::reset_vertex_input()
 void
 render_context::draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count)
 {
+    const opengl::gl3_core& glapi = opengl_api();
+
     if (   (0 > in_first_index)
         || (0 > in_count)) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
@@ -458,14 +460,25 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
         return;
     }
 
-    opengl_api().glDrawArrays(util::gl_primitive_types(in_topology), in_first_index, in_count);
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
+        if (0 != patch_control_points) {
+            glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
 
-    gl_assert(opengl_api(), leaving render_context::draw_arrays());
+            gl_assert(glapi, after glPatchParameteri);
+        }
+    }
+
+    glapi.glDrawArrays(util::gl_primitive_types(in_topology), in_first_index, in_count);
+
+    gl_assert(glapi, leaving render_context::draw_arrays());
 }
 
 void
 render_context::draw_elements(const int in_count, const int in_start_index, const int in_base_vertex)
 {
+    const opengl::gl3_core& glapi = opengl_api();
+
     if (!util::is_vaild_index_type(_applied_state._index_buffer_binding._index_data_type)) {
         state().set(object_state::OS_ERROR_INVALID_ENUM);
         return;
@@ -477,14 +490,23 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
         return;
     }
 
-    opengl_api().glDrawElementsBaseVertex(
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
+        if (0 != patch_control_points) {
+            glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
+
+            gl_assert(glapi, after glPatchParameteri);
+        }
+    }
+
+    glapi.glDrawElementsBaseVertex(
         util::gl_primitive_types(_applied_state._index_buffer_binding._primitive_topology),
         in_count,
         util::gl_base_type(_applied_state._index_buffer_binding._index_data_type),
         (char*)0 + _applied_state._index_buffer_binding._index_data_offset + size_of_type(_applied_state._index_buffer_binding._index_data_type) * in_start_index,
         in_base_vertex);
 
-    gl_assert(opengl_api(), leaving render_context::draw_elements());
+    gl_assert(glapi, leaving render_context::draw_elements());
 }
 
 void

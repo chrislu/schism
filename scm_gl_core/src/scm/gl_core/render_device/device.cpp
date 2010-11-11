@@ -41,7 +41,7 @@ render_device::render_device()
     unsigned req_version_major = SCM_GL_CORE_BASE_OPENGL_VERSION / 100;
     unsigned req_version_minor = (SCM_GL_CORE_BASE_OPENGL_VERSION - req_version_major * 100) / 10;
 
-    if (!(   _opengl3_api_core->version_supported(req_version_major, req_version_minor))) {
+    if (!_opengl3_api_core->version_supported(req_version_major, req_version_minor)) {
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core "
           << "(at least OpenGL "
@@ -75,7 +75,17 @@ render_device::render_device()
     init_capabilities();
 
     // setup main rendering context
-    _main_context.reset(new render_context(*this));
+    try {
+        _main_context.reset(new render_context(*this));
+    }
+    catch (const std::exception& e) {
+        std::ostringstream s;
+        s << "render_device::render_device(): error creating main_context (evoking error: "
+          << e.what()
+          << ").";
+        glerr() << log::fatal << s.str() << log::end;
+        throw(std::runtime_error(s.str()));
+    }
 }
 
 render_device::~render_device()
