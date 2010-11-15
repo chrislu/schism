@@ -8,12 +8,15 @@ namespace scm {
 namespace gl {
 
 class geometry;
+class geometry_highlight;
 class box_geometry;
 class quad_geometry;
 class wavefront_obj_geometry;
 
 typedef shared_ptr<geometry>                        geometry_ptr;
 typedef shared_ptr<const geometry>                  geometry_cptr;
+typedef shared_ptr<geometry_highlight>              geometry_highlight_ptr;
+typedef shared_ptr<const geometry_highlight>        geometry_highlight_cptr;
 typedef shared_ptr<box_geometry>                    box_geometry_ptr;
 typedef shared_ptr<const box_geometry>              box_geometry_cptr;
 typedef shared_ptr<quad_geometry>                   quad_geometry_ptr;
