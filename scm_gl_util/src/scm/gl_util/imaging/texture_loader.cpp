@@ -2,6 +2,7 @@
 #include "texture_loader.h"
 
 #include <vector>
+#include <memory.h>
 
 #include <FreeImagePlus.h>
 
@@ -53,6 +54,38 @@ void scale_colors(float r, float g, float b,
 }
 
 } // namespace
+
+texture_image_data::texture_image_data(const math::vec2ui&        img_size,
+                                       const data_format          img_format,
+                                       const shared_array<uint8>& img_data)
+  : _size(img_size)
+  , _format(img_format)
+  , _data(img_data)
+{
+}
+
+texture_image_data::~texture_image_data()
+{
+    _data.reset();
+}
+
+const math::vec2ui&
+texture_image_data::size() const
+{
+    return (_size);
+}
+
+const data_format
+texture_image_data::format() const
+{
+    return (_format);
+}
+
+const shared_array<uint8>&
+texture_image_data::data() const
+{
+    return (_data);
+}
 
 texture_2d_ptr
 texture_loader::load_texture_2d(render_device&       in_device,
@@ -145,24 +178,12 @@ texture_loader::load_texture_2d(render_device&       in_device,
             return (texture_2d_ptr());
         }
         if (0 != i && in_color_mips) {
-            if (i % 6 == 1) {
-                scale_colors(1, 0, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
-            else if (i % 6 == 2) {
-                scale_colors(0, 1, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
-            else if (i % 6 == 3) {
-                scale_colors(0, 0, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
-            else if (i % 6 == 4) {
-                scale_colors(1, 0, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
-            else if (i % 6 == 5) {
-                scale_colors(0, 1, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
-            else if (i % 6 == 0) {
-                scale_colors(1, 1, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
-            }
+            if      (i % 6 == 1) scale_colors(1, 0, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
+            else if (i % 6 == 2) scale_colors(0, 1, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
+            else if (i % 6 == 3) scale_colors(0, 0, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
+            else if (i % 6 == 4) scale_colors(1, 0, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
+            else if (i % 6 == 5) scale_colors(0, 1, 1, lev_size.x, lev_size.y, image_format, cur_data.get());
+            else if (i % 6 == 0) scale_colors(1, 1, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
         }
 
         image_mip_data.push_back(cur_data);
@@ -271,6 +292,62 @@ texture_loader::load_texture_image(const render_device_ptr& in_device,
     }
 
     return (true);
+}
+
+texture_image_data_ptr
+texture_loader::load_image_data(const std::string&  in_image_path)
+{
+    scm::scoped_ptr<fipImage>   in_image(new fipImage);
+
+    if (!in_image->load(in_image_path.c_str())) {
+        glerr() << log::error << "texture_loader::load_image_data(): "
+                << "unable to open file: " << in_image_path << log::end;
+        return (texture_image_data_ptr());
+    }
+
+    FREE_IMAGE_TYPE image_type = in_image->getImageType();
+    math::vec2ui    image_size(in_image->getWidth(), in_image->getHeight());
+    data_format     image_format = FORMAT_NULL;
+    
+    switch (image_type) {
+        case FIT_BITMAP: {
+            unsigned num_components = in_image->getBitsPerPixel() / 8;
+            switch (num_components) {
+                case 1: image_format = FORMAT_R_8; break;
+                case 2: image_format = FORMAT_RG_8; break;
+                case 3: image_format = FORMAT_BGR_8; FORMAT_RGB_8; break;
+                case 4: image_format = FORMAT_BGRA_8; FORMAT_RGBA_8; break;
+            }
+        } break;
+        case FIT_INT16:     image_format = FORMAT_R_16S; break;
+        case FIT_UINT16:    image_format = FORMAT_R_16; break;
+        case FIT_RGB16:     image_format = FORMAT_RGB_16; break;
+        case FIT_RGBA16:    image_format = FORMAT_RGBA_16; break;
+        case FIT_INT32:     break;
+        case FIT_UINT32:    break;
+        case FIT_FLOAT:     image_format = FORMAT_R_32F; break;
+        case FIT_RGBF:      image_format = FORMAT_RGB_32F; break;
+        case FIT_RGBAF:     image_format = FORMAT_RGBA_32F; break;
+    }
+
+    if (image_format == FORMAT_NULL) {
+        glerr() << log::error << "texture_loader::load_image_data(): "
+                << "unsupported color format: " << std::hex << in_image->getImageType() << log::end;
+        return (texture_image_data_ptr());
+    }
+
+    scm::size_t                 image_data_size = static_cast<size_t>(image_size.x) * image_size.y * size_of_format(image_format);
+    scm::shared_array<uint8>    image_data(new uint8[image_data_size]);
+
+    if (memcpy(image_data.get(), in_image->accessPixels(), image_data_size) != image_data.get()) {
+        glerr() << log::error << "texture_loader::load_image_data(): "
+                << "unable to copy image data." << log::end;
+        return (texture_image_data_ptr());
+    }
+
+    texture_image_data_ptr ret_data(new texture_image_data(image_size, image_format, image_data));
+    
+    return (ret_data);
 }
 
 } // namespace gl
