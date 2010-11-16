@@ -44,18 +44,20 @@ frame_buffer::attachment::operator!=(const attachment& rhs) const
 
 frame_buffer::frame_buffer(render_device& in_device)
   : render_device_child(in_device),
-    _gl_buffer_id(0),
     _drawable_region((std::numeric_limits<unsigned>::max)()),
     _current_gl_binding(0),
     _attachments_dirty(true)
 {
     const opengl::gl3_core& glapi = in_device.opengl3_api();
 
-    glapi.glGenFramebuffers(1, &_gl_buffer_id);
-    if (0 == _gl_buffer_id) {
+    glapi.glGenFramebuffers(1, &(context_bindable_object::_gl_object_id));
+    if (0 == object_id()) {
         state().set(object_state::OS_BAD);
     }
     else {
+        context_bindable_object::_gl_object_target  = GL_DRAW_FRAMEBUFFER;
+        context_bindable_object::_gl_object_binding = GL_DRAW_FRAMEBUFFER_BINDING;
+
         _selected_color_attachments.resize(in_device.capabilities()._max_frame_buffer_color_attachments);
         _current_color_attachments.resize(in_device.capabilities()._max_frame_buffer_color_attachments);
         _draw_buffers.resize(in_device.capabilities()._max_frame_buffer_color_attachments);
@@ -69,16 +71,10 @@ frame_buffer::~frame_buffer()
 {
     const opengl::gl3_core& glapi = parent_device().opengl3_api();
 
-    assert(0 != _gl_buffer_id);
-    glapi.glDeleteFramebuffers(1, &_gl_buffer_id);
+    assert(0 != object_id());
+    glapi.glDeleteFramebuffers(1, &(context_bindable_object::_gl_object_id));
     
     gl_assert(glapi, leaving frame_buffer::~frame_buffer());
-}
-
-unsigned
-frame_buffer::buffer_id() const
-{
-    return (_gl_buffer_id);
 }
 
 void
@@ -139,10 +135,10 @@ void
 frame_buffer::bind(const render_context& in_context, frame_buffer_binding in_binding) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-    assert(0 != buffer_id());
+    assert(0 != object_id());
 
     _current_gl_binding = util::gl_framebuffer_binding(in_binding);
-    glapi.glBindFramebuffer(_current_gl_binding, buffer_id());
+    glapi.glBindFramebuffer(_current_gl_binding, object_id());
 
     gl_assert(glapi, leaving frame_buffer::bind());
 }
@@ -151,7 +147,7 @@ void
 frame_buffer::unbind(const render_context& in_context) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-    assert(0 != buffer_id());
+    assert(0 != object_id());
     assert(0 != _current_gl_binding);
 
     if (0 != _current_gl_binding) {
@@ -169,12 +165,12 @@ frame_buffer::clear_color_buffer(const  render_context& in_context,
                                  const math::vec4f&     in_clear_color)
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-    assert(0 != buffer_id());
+    assert(0 != object_id());
     assert(in_buffer < _draw_buffers.size());
     
     {
-        util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
-        glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
 
         // apply attachments if they changed to get the correct attachment state for clearing
         apply_attachments(in_context);
@@ -191,11 +187,11 @@ frame_buffer::clear_color_buffers(const  render_context& in_context,
                                   const math::vec4f&     in_clear_color)
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-    assert(0 != buffer_id());
+    assert(0 != object_id());
     
     {
-        util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
-        glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
         // apply attachments if they changed to get the correct attachment state for clearing
         apply_attachments(in_context);
         assert(check_completeness(in_context));
@@ -216,11 +212,11 @@ frame_buffer::clear_depth_stencil_buffer(const  render_context& in_context,
                                          const int              in_clear_stencil)
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-    assert(0 != buffer_id());
+    assert(0 != object_id());
     
     {
-        util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
-        glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
 
         // apply attachments if they changed to get the correct attachment state for clearing
         apply_attachments(in_context);
@@ -242,18 +238,15 @@ frame_buffer::check_completeness(const render_context& in_context)
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
     unsigned status = 0;
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-    {
-        status = glapi.glCheckNamedFramebufferStatusEXT(buffer_id(), GL_DRAW_FRAMEBUFFER);
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        status = glapi.glCheckNamedFramebufferStatusEXT(object_id(), object_target());
     }
-#else
-    {
-        util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
-        glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
+    else {
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
 
-        status = glapi.glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+        status = glapi.glCheckFramebufferStatus(object_target());
     }
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         switch (status) {
@@ -299,9 +292,9 @@ frame_buffer::apply_attachments(const render_context& in_context)
 
     if (_attachments_dirty) {
 
-#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        util::framebuffer_binding_guard fbo_guard(glapi, GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING);
-        glapi.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer_id());
+#if !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
         bool attachments_changed = false;
@@ -328,11 +321,12 @@ frame_buffer::apply_attachments(const render_context& in_context)
             }
         }
         if (true /*attachments_changed*/) {
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            glapi.glFramebufferDrawBuffersEXT(buffer_id(), static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
-#else
-            glapi.glDrawBuffers(static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
-#endif
+            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                glapi.glFramebufferDrawBuffersEXT(object_id(), static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
+            }
+            else {
+                glapi.glDrawBuffers(static_cast<int>(_draw_buffers.size()), &(_draw_buffers.front()));
+            }
         }
         if (_selected_depth_stencil_attachment != _current_depth_stencil_attachment) {
 
@@ -377,49 +371,52 @@ frame_buffer::apply_attachment(const render_context& in_context, unsigned in_att
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
     if (GL_RENDERBUFFER == in_attachment._target->object_target()) {
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        glapi.glNamedFramebufferRenderbufferEXT(buffer_id(),
-                                                in_attach_point,
-                                                GL_RENDERBUFFER,
-                                                in_attachment._target->object_id());
-#else
-        glapi.glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-                                        in_attach_point,
-                                        GL_RENDERBUFFER,
-                                        in_attachment._target->object_id());
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+        if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+            glapi.glNamedFramebufferRenderbufferEXT(object_id(),
+                                                    in_attach_point,
+                                                    GL_RENDERBUFFER,
+                                                    in_attachment._target->object_id());
+        }
+        else {
+            glapi.glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
+                                            in_attach_point,
+                                            GL_RENDERBUFFER,
+                                            in_attachment._target->object_id());
+        }
         gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferRenderbuffer());
     }
     else {
         if (   (in_attachment._target->array_layers() > 1)
             && (in_attachment._layer >= 0)) {
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-                glapi.glNamedFramebufferTextureLayerEXT(buffer_id(),
+            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                glapi.glNamedFramebufferTextureLayerEXT(object_id(),
                                                         in_attach_point,
                                                         in_attachment._target->object_id(),
                                                         in_attachment._level,
                                                         in_attachment._layer);
-#else
-                glapi.glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER,
+            }
+            else {
+                glapi.glFramebufferTextureLayer(object_target(),
                                                 in_attach_point,
                                                 in_attachment._target->object_id(),
                                                 in_attachment._level,
                                                 in_attachment._layer);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            }
             gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTextureLayer());
         }
         else {
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            glapi.glNamedFramebufferTextureEXT(buffer_id(),
-                                                in_attach_point,
-                                                in_attachment._target->object_id(),
-                                                in_attachment._level);
-#else
-            glapi.glFramebufferTexture(GL_DRAW_FRAMEBUFFER,
-                                        in_attach_point,
-                                        in_attachment._target->object_id(),
-                                        in_attachment._level);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                glapi.glNamedFramebufferTextureEXT(object_id(),
+                                                    in_attach_point,
+                                                    in_attachment._target->object_id(),
+                                                    in_attachment._level);
+            }
+            else {
+                glapi.glFramebufferTexture(object_target(),
+                                            in_attach_point,
+                                            in_attachment._target->object_id(),
+                                            in_attachment._level);
+            }
             gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTexture());
         }
     }
@@ -429,11 +426,14 @@ void
 frame_buffer::clear_attachment(const render_context& in_context, unsigned in_attach_point)
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-    glapi.glNamedFramebufferRenderbufferEXT(buffer_id(), in_attach_point, GL_RENDERBUFFER, 0);
-#else
-    glapi.glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, in_attach_point, GL_RENDERBUFFER, 0);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glapi.glNamedFramebufferRenderbufferEXT(object_id(), in_attach_point, GL_RENDERBUFFER, 0);
+    }
+    else {
+        glapi.glFramebufferRenderbuffer(object_target(), in_attach_point, GL_RENDERBUFFER, 0);
+    }
+
     gl_assert(glapi, frame_buffer::clear_attachment() after glFramebufferRenderbuffer());
 }
 

@@ -637,11 +637,11 @@ render_context::reset_texture_units()
 }
 
 bool
-render_context::update_sub_texture(const texture_ptr&    in_texture,
-                                   const texture_region& in_region,
-                                   const unsigned        in_level,
-                                   const data_format     in_data_format,
-                                   const size_t          in_offset)
+render_context::update_sub_texture(const texture_image_ptr& in_texture,
+                                   const texture_region&    in_region,
+                                   const unsigned           in_level,
+                                   const data_format        in_data_format,
+                                   const size_t             in_offset)
 {
     assert(_unpack_buffer);
     if (!in_texture->image_sub_data(*this, in_region, in_level, in_data_format, BUFFER_OFFSET(in_offset))) {
@@ -655,11 +655,11 @@ render_context::update_sub_texture(const texture_ptr&    in_texture,
 }
 
 bool
-render_context::update_sub_texture(const texture_ptr&    in_texture,
-                                   const texture_region& in_region,
-                                   const unsigned        in_level,
-                                   const data_format     in_data_format,
-                                   const void*const      in_data)
+render_context::update_sub_texture(const texture_image_ptr& in_texture,
+                                   const texture_region&    in_region,
+                                   const unsigned           in_level,
+                                   const data_format        in_data_format,
+                                   const void*const         in_data)
 {
     assert(!_unpack_buffer);
     if (!in_texture->image_sub_data(*this, in_region, in_level, in_data_format, in_data)) {
@@ -997,7 +997,7 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 }
 
 void
-render_context::generate_mipmaps(const texture_ptr& in_texture) const
+render_context::generate_mipmaps(const texture_image_ptr& in_texture) const
 {
     const opengl::gl3_core& glapi = opengl_api();
 

@@ -21,17 +21,19 @@ vertex_array::vertex_array(      render_device&           ren_dev,
                            const std::vector<buffer_ptr>& in_attrib_buffers,
                            const program_ptr&             in_program)
   : render_device_child(ren_dev),
-    _gl_array_object(0),
     _vertex_format(in_vert_format)
 {
     const opengl::gl3_core& glapi = ren_dev.opengl3_api();
     util::gl_error          glerror(glapi);
 
-    glapi.glGenVertexArrays(1, &_gl_array_object);
-    if (0 == _gl_array_object) {
+    glapi.glGenVertexArrays(1, &(context_bindable_object::_gl_object_id));
+    if (0 == object_id()) {
         state().set(object_state::OS_BAD);
     }
     else {
+        context_bindable_object::_gl_object_target  = 0; // no explicit binding point
+        context_bindable_object::_gl_object_binding = GL_VERTEX_ARRAY_BINDING;
+
         build_buffer_slots(ren_dev, in_vert_format, in_attrib_buffers, in_program);
         initialize_array_object(ren_dev);
     }
@@ -42,8 +44,8 @@ vertex_array::~vertex_array()
 {
     const opengl::gl3_core& glapi = parent_device().opengl3_api();
 
-    assert(0 != _gl_array_object);
-    glapi.glDeleteVertexArrays(1, &_gl_array_object);
+    assert(0 != object_id());
+    glapi.glDeleteVertexArrays(1, &(context_bindable_object::_gl_object_id));
 
     gl_assert(glapi, leaving vertex_array::~vertex_array());
 }
@@ -51,12 +53,12 @@ vertex_array::~vertex_array()
 void
 vertex_array::bind(render_context& ren_ctx) const
 {
-    assert(_gl_array_object != 0);
+    assert(object_id() != 0);
     assert(state().ok());
 
     const opengl::gl3_core& glapi = ren_ctx.opengl_api();
 
-    glapi.glBindVertexArray(_gl_array_object);
+    glapi.glBindVertexArray(object_id());
 
     gl_assert(glapi, leaving vertex_array:bind());
 }
@@ -131,7 +133,7 @@ vertex_array::build_buffer_slots(const render_device&           in_ren_dev,
 bool
 vertex_array::initialize_array_object(const render_device& ren_dev)
 {
-    assert(_gl_array_object != 0);
+    assert(object_id() != 0);
 
     const opengl::gl3_core& glapi = ren_dev.opengl3_api();
     util::gl_error          glerror(glapi);
@@ -139,78 +141,80 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
     buffer_slot_map::const_iterator slot     = _buffer_slots.begin();
     buffer_slot_map::const_iterator slot_end = _buffer_slots.end();
 
-#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+#if !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
     util::vertex_array_binding_guard binding_guard(glapi);
-    glapi.glBindVertexArray(_gl_array_object);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+    glapi.glBindVertexArray(object_id());
+#endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
 
     for(; slot != slot_end; ++slot) {
         buffer_slot::slot_element_array::const_iterator elmt     = slot->second._elements.begin();
         buffer_slot::slot_element_array::const_iterator elmt_end = slot->second._elements.end();
         const buffer_ptr& buf = slot->second._buffer;
-#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        //util::buffer_binding_guard bguard(glapi, GL_ARRAY_BUFFER, GL_ARRAY_BUFFER_BINDING);
-        glapi.glBindBuffer(GL_ARRAY_BUFFER, buf->_gl_buffer_id);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+        if (!SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+            //util::buffer_binding_guard bguard(glapi, GL_ARRAY_BUFFER, GL_ARRAY_BUFFER_BINDING);
+            // TODO check an warn if buffer target not compatible with array buffer
+            glapi.glBindBuffer(GL_ARRAY_BUFFER, buf->object_id());
+        }
 
         for (; elmt != elmt_end; ++elmt) {
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-            glapi.glEnableVertexArrayAttribEXT(_gl_array_object, elmt->_attrib_location);
+            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                glapi.glEnableVertexArrayAttribEXT(object_id(), elmt->_attrib_location);
 
-            if (   is_integer_type(elmt->_type)
-                && elmt->_integer_handling == INT_PURE) {
-                glapi.glVertexArrayVertexAttribIOffsetEXT(_gl_array_object, buf->_gl_buffer_id,
-                                                          elmt->_attrib_location,
-                                                          components(elmt->_type),
-                                                          util::gl_base_type(elmt->_type),
-                                                          elmt->_stride,
-                                                          elmt->_offset);
+                if (   is_integer_type(elmt->_type)
+                    && elmt->_integer_handling == INT_PURE) {
+                    glapi.glVertexArrayVertexAttribIOffsetEXT(object_id(), buf->object_id(),
+                                                              elmt->_attrib_location,
+                                                              components(elmt->_type),
+                                                              util::gl_base_type(elmt->_type),
+                                                              elmt->_stride,
+                                                              elmt->_offset);
+                }
+                else {
+                    bool normalize = (is_integer_type(elmt->_type) && (elmt->_integer_handling == INT_FLOAT_NORMALIZE));
+                    glapi.glVertexArrayVertexAttribOffsetEXT(object_id(), buf->object_id(),
+                                                             elmt->_attrib_location,
+                                                             components(elmt->_type),
+                                                             util::gl_base_type(elmt->_type),
+                                                             normalize,
+                                                             elmt->_stride,
+                                                             elmt->_offset);
+                }
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return (false);
+                }
             }
-            else {
-                bool normalize = (is_integer_type(elmt->_type) && (elmt->_integer_handling == INT_FLOAT_NORMALIZE));
-                glapi.glVertexArrayVertexAttribOffsetEXT(_gl_array_object, buf->_gl_buffer_id,
-                                                         elmt->_attrib_location,
-                                                         components(elmt->_type),
-                                                         util::gl_base_type(elmt->_type),
-                                                         normalize,
-                                                         elmt->_stride,
-                                                         elmt->_offset);
-            }
-            if (glerror) {
-                state().set(glerror.to_object_state());
-                return (false);
-            }
-#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+            else { // SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
+                glapi.glEnableVertexAttribArray(elmt->_attrib_location);
 
-            glapi.glEnableVertexAttribArray(elmt->_attrib_location);
-
-            if (   is_integer_type(elmt->_type)
-                && elmt->_integer_handling == INT_PURE) {
-                    glapi.glVertexAttribIPointer(elmt->_attrib_location,
-                                                 components(elmt->_type),
-                                                 util::gl_base_type(elmt->_type),
-                                                 elmt->_stride,
-                                                 BUFFER_OFFSET(elmt->_offset));
+                if (   is_integer_type(elmt->_type)
+                    && elmt->_integer_handling == INT_PURE) {
+                        glapi.glVertexAttribIPointer(elmt->_attrib_location,
+                                                     components(elmt->_type),
+                                                     util::gl_base_type(elmt->_type),
+                                                     elmt->_stride,
+                                                     BUFFER_OFFSET(elmt->_offset));
+                }
+                else {
+                    bool normalize = (is_integer_type(elmt->_type) && (elmt->_integer_handling == INT_FLOAT_NORMALIZE));
+                    glapi.glVertexAttribPointer(elmt->_attrib_location,
+                                                components(elmt->_type),
+                                                util::gl_base_type(elmt->_type),
+                                                normalize,
+                                                elmt->_stride,
+                                                BUFFER_OFFSET(elmt->_offset));
+                }
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return (false);
+                }
             }
-            else {
-                bool normalize = (is_integer_type(elmt->_type) && (elmt->_integer_handling == INT_FLOAT_NORMALIZE));
-                glapi.glVertexAttribPointer(elmt->_attrib_location,
-                                            components(elmt->_type),
-                                            util::gl_base_type(elmt->_type),
-                                            normalize,
-                                            elmt->_stride,
-                                            BUFFER_OFFSET(elmt->_offset));
-            }
-            if (glerror) {
-                state().set(glerror.to_object_state());
-                return (false);
-            }
-
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
         }
-#ifndef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-        glapi.glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+        if (!SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+            glapi.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
     }
 
     gl_assert(glapi, leaving vertex_array::initialize_array_object());

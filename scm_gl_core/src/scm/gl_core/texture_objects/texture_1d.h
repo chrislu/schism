@@ -7,7 +7,7 @@
 #include <scm/core/math.h>
 
 #include <scm/gl_core/data_formats.h>
-#include <scm/gl_core/texture_objects/texture.h>
+#include <scm/gl_core/texture_objects/texture_image.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -31,7 +31,7 @@ struct __scm_export(gl_core) texture_1d_desc
     unsigned        _array_layers;
 }; // struct texture_1d_desc
 
-class __scm_export(gl_core) texture_1d : public texture
+class __scm_export(gl_core) texture_1d : public texture_image
 {
 public:
     virtual ~texture_1d();

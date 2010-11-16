@@ -23,17 +23,18 @@ buffer::buffer(render_device& ren_dev,
                const void*              initial_data)
   : render_device_resource(ren_dev),
     _descriptor(),
-    _gl_buffer_id(0),
     _mapped_interval_offset(0),
     _mapped_interval_length(0)
 {
     const opengl::gl3_core& glapi = ren_dev.opengl3_api();
 
-    glapi.glGenBuffers(1, &_gl_buffer_id);
-    if (0 == _gl_buffer_id) {
+    glapi.glGenBuffers(1, &(context_bindable_object::_gl_object_id));
+    if (0 == object_id()) {
         state().set(object_state::OS_BAD);
     }
     else {
+        context_bindable_object::_gl_object_target  = util::gl_buffer_targets(buffer_desc._bindings);
+        context_bindable_object::_gl_object_binding = util::gl_buffer_bindings(buffer_desc._bindings);
         buffer_data(ren_dev, buffer_desc, initial_data);
     }
     gl_assert(glapi, leaving buffer::buffer());
@@ -43,8 +44,8 @@ buffer::~buffer()
 {
     const opengl::gl3_core& glapi = parent_device().opengl3_api();
 
-    assert(0 != _gl_buffer_id);
-    glapi.glDeleteBuffers(1, &_gl_buffer_id);
+    assert(0 != object_id());
+    glapi.glDeleteBuffers(1, &(context_bindable_object::_gl_object_id));
     
     gl_assert(glapi, leaving buffer::~buffer());
 }
@@ -56,10 +57,10 @@ buffer::bind(render_context& ren_ctx, buffer_binding target) const
 
     gl_assert(glapi, entering buffer::bind());
 
-    assert(_gl_buffer_id != 0);
+    assert(object_id() != 0);
     assert(state().ok());
 
-    glapi.glBindBuffer(util::gl_buffer_targets(target), _gl_buffer_id);
+    glapi.glBindBuffer(util::gl_buffer_targets(target), object_id());
 
     gl_assert(glapi, leaving buffer::bind());
 }
@@ -87,7 +88,7 @@ buffer::bind_range(render_context&   in_context,
 
     gl_assert(glapi, entering buffer::bind_range());
 
-    assert(_gl_buffer_id != 0);
+    assert(object_id() != 0);
     assert(state().ok());
 
     if (   (0 > in_offset)
@@ -98,12 +99,12 @@ buffer::bind_range(render_context&   in_context,
 
     if (0 < in_size) {
         glapi.glBindBufferRange(util::gl_buffer_targets(in_target), 
-                                in_index, _gl_buffer_id,
+                                in_index, object_id(),
                                 in_offset, in_size);
     }
     else {
         glapi.glBindBufferBase(util::gl_buffer_targets(in_target), 
-                               in_index, _gl_buffer_id);
+                               in_index, object_id());
     }
 
     gl_assert(glapi, leaving buffer::bind_range());
@@ -143,7 +144,7 @@ buffer::map_range(const render_context& in_context,
 
     gl_assert(glapi, entering buffer::map_range());
 
-    assert(_gl_buffer_id != 0);
+    assert(object_id() != 0);
     assert(state().ok());
 
     void*       return_value = 0;
@@ -164,21 +165,15 @@ buffer::map_range(const render_context& in_context,
         return (0);
     }
 
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        return_value = glapi.glMapNamedBufferRangeEXT(object_id(), in_offset, in_size, access_flags);
+    }
+    else {
+        util::buffer_binding_guard save_guard(glapi, object_target(), object_binding());
 
-    return_value = glapi.glMapNamedBufferRangeEXT(_gl_buffer_id, in_offset, in_size, access_flags);
-
-#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-
-    unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
-    unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
-
-    util::buffer_binding_guard save_guard(glapi, gl_buffer_target, gl_buffer_binding);
-
-    glapi.glBindBuffer(gl_buffer_target, _gl_buffer_id);
-    return_value = glapi.glMapBufferRange(gl_buffer_target, in_offset, in_size, access_flags);
-
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+        glapi.glBindBuffer(object_target(), object_id());
+        return_value = glapi.glMapBufferRange(object_target(), in_offset, in_size, access_flags);
+    }
 
     if (0 != return_value) {
         _mapped_interval_offset = in_offset;
@@ -197,7 +192,7 @@ buffer::unmap(const render_context& in_context)
 
     gl_assert(glapi, entering buffer::unmap());
 
-    assert(_gl_buffer_id != 0);
+    assert(object_id() != 0);
     assert(state().ok());
 
     if (   0 == _mapped_interval_offset
@@ -207,21 +202,16 @@ buffer::unmap(const render_context& in_context)
     }
 
     bool return_value = true;
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
-    return_value = (GL_TRUE == glapi.glUnmapNamedBufferEXT(_gl_buffer_id));
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        return_value = (GL_TRUE == glapi.glUnmapNamedBufferEXT(object_id()));
+    }
+    else {
+        util::buffer_binding_guard save_guard(glapi, object_target(), object_binding());
 
-#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-
-    unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
-    unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
-
-    util::buffer_binding_guard save_guard(glapi, gl_buffer_target, gl_buffer_binding);
-
-    glapi.glBindBuffer(gl_buffer_target, _gl_buffer_id);
-    return_value = (GL_TRUE == glapi.glUnmapBuffer(gl_buffer_target));
-        
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+        glapi.glBindBuffer(object_target(), object_id());
+        return_value = (GL_TRUE == glapi.glUnmapBuffer(object_target()));
+    }
 
     _mapped_interval_offset = 0;
     _mapped_interval_length = 0;
@@ -242,32 +232,26 @@ buffer::buffer_data(      render_device&     ren_dev,
 
     util::gl_error          glerror(glcore);
 
-    if (0 == _gl_buffer_id) {
+    if (0 == object_id()) {
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
         return (false);
     }
 
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glNamedBufferDataEXT(object_id(),
+                                    buffer_desc._size,
+                                    initial_data,
+                                    util::gl_usage_flags(buffer_desc._usage));
+    }
+    else {
+        util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
 
-    glcore.glNamedBufferDataEXT(_gl_buffer_id,
-                                buffer_desc._size,
-                                initial_data,
-                                util::gl_usage_flags(buffer_desc._usage));
-
-#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-
-    unsigned gl_buffer_target  = util::gl_buffer_targets(buffer_desc._bindings);
-    unsigned gl_buffer_binding = util::gl_buffer_bindings(buffer_desc._bindings);
-
-    util::buffer_binding_guard save_guard(glcore, gl_buffer_target, gl_buffer_binding);
-
-    glcore.glBindBuffer(gl_buffer_target, _gl_buffer_id);
-    glcore.glBufferData(gl_buffer_target,
-                        buffer_desc._size,
-                        initial_data,
-                        util::gl_usage_flags(buffer_desc._usage));
-
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+        glcore.glBindBuffer(object_target(), object_id());
+        glcore.glBufferData(object_target(),
+                            buffer_desc._size,
+                            initial_data,
+                            util::gl_usage_flags(buffer_desc._usage));
+    }
 
     if (glerror) {
         _descriptor = descriptor_type();
@@ -292,7 +276,7 @@ buffer::buffer_sub_data(render_device&  ren_dev,
 
     util::gl_error          glerror(glcore);
 
-    if (0 == _gl_buffer_id) {
+    if (0 == object_id()) {
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
         return (false);
     }
@@ -313,21 +297,15 @@ buffer::buffer_sub_data(render_device&  ren_dev,
         return (false);
     }
 
-#ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glNamedBufferSubDataEXT(object_id(), offset, size, data);
+    }
+    else {
+        util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
 
-    glcore.glNamedBufferSubDataEXT(_gl_buffer_id, offset, size, data);
-
-#else // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-
-    unsigned gl_buffer_target  = util::gl_buffer_targets(_descriptor._bindings);
-    unsigned gl_buffer_binding = util::gl_buffer_bindings(_descriptor._bindings);
-
-    util::buffer_binding_guard save_guard(glcore, gl_buffer_target, gl_buffer_binding);
-
-    glcore.glBindBuffer(gl_buffer_target, _gl_buffer_id);
-    glcore.glBufferSubData(gl_buffer_target, offset, size, data);
-
-#endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+        glcore.glBindBuffer(object_target(), object_id());
+        glcore.glBufferSubData(object_target(), offset, size, data);
+    }
 
     gl_assert(glcore, leaving buffer::buffer_sub_data());
 

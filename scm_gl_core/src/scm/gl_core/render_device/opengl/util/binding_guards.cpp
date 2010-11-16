@@ -6,6 +6,8 @@
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
+#include <scm/gl_core/config.h>
+
 namespace scm {
 namespace gl {
 
@@ -43,7 +45,12 @@ program_binding_guard::program_binding_guard(const opengl::gl3_core& in_glapi)
 {
     gl_assert(_gl_api, entering program_binding_guard::program_binding_guard());
 
-    _gl_api.glGetIntegerv(GL_CURRENT_PROGRAM, &_active_program);
+    //if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_410) {
+    //    _gl_api.glGetIntegerv(GL_ACTIVE_PROGRAM, &_active_program);
+    //}
+    //else {
+        _gl_api.glGetIntegerv(GL_CURRENT_PROGRAM, &_active_program);
+    //}
 
     gl_assert(_gl_api, leaving program_binding_guard::program_binding_guard());
 }

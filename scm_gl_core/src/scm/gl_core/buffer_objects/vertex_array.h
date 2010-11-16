@@ -9,6 +9,7 @@
 
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
+#include <scm/gl_core/render_device/context_bindable_object.h>
 #include <scm/gl_core/render_device/device_child.h>
 
 #include <scm/core/platform/platform.h>
@@ -17,7 +18,7 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_core) vertex_array : public render_device_child
+class __scm_export(gl_core) vertex_array : public context_bindable_object, public render_device_child
 {
 protected:
     struct buffer_slot_element : public vertex_format::element {
@@ -54,7 +55,6 @@ protected:
     bool                initialize_array_object(const render_device& ren_dev);
 
 protected:
-    unsigned            _gl_array_object;
     vertex_format       _vertex_format;
     buffer_slot_map     _buffer_slots;
 

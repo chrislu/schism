@@ -168,16 +168,16 @@ public:
 
     void                        reset_texture_units();
 
-    bool                        update_sub_texture(const texture_ptr&    in_texture,
-                                                   const texture_region& in_region,
-                                                   const unsigned        in_level,
-                                                   const data_format     in_data_format,
-                                                   const size_t          in_offset);
-    bool                        update_sub_texture(const texture_ptr&    in_texture,
-                                                   const texture_region& in_region,
-                                                   const unsigned        in_level,
-                                                   const data_format     in_data_format,
-                                                   const void*const      in_data);
+    bool                        update_sub_texture(const texture_image_ptr& in_texture,
+                                                   const texture_region&    in_region,
+                                                   const unsigned           in_level,
+                                                   const data_format        in_data_format,
+                                                   const size_t             in_offset);
+    bool                        update_sub_texture(const texture_image_ptr& in_texture,
+                                                   const texture_region&    in_region,
+                                                   const unsigned           in_level,
+                                                   const data_format        in_data_format,
+                                                   const void*const         in_data);
 
 protected:
     void                        apply_texture_units();
@@ -210,7 +210,7 @@ public:
 
     void                        resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buffer,
                                                             const frame_buffer_ptr& in_draw_buffer) const;
-    void                        generate_mipmaps(const texture_ptr& in_texture) const;
+    void                        generate_mipmaps(const texture_image_ptr& in_texture) const;
 
 protected:
     void                        apply_frame_buffer();

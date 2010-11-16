@@ -9,6 +9,7 @@
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/frame_buffer_objects/frame_buffer_objects_fwd.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
+#include <scm/gl_core/render_device/context_bindable_object.h>
 #include <scm/gl_core/render_device/device_child.h>
 
 #include <scm/core/platform/platform.h>
@@ -17,7 +18,7 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_core) frame_buffer : public render_device_child
+class __scm_export(gl_core) frame_buffer : public context_bindable_object, public render_device_child
 {
 protected:
     struct attachment {
@@ -47,8 +48,6 @@ public:
 protected:
     frame_buffer(render_device& in_device);
 
-    unsigned                        buffer_id() const;
-
     void                            bind(const render_context& in_context, frame_buffer_binding in_binding = FRAMEBUFFER_DRAW) const;
     void                            unbind(const render_context& in_context) const;
 
@@ -68,8 +67,6 @@ protected:
     void                            clear_attachment(const render_context& in_context, unsigned in_attach_point);
 
 protected:
-    unsigned                        _gl_buffer_id;
-
     attachment_array                _selected_color_attachments;
     attachment                      _selected_depth_stencil_attachment;
 

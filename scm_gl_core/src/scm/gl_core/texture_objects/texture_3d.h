@@ -7,7 +7,7 @@
 #include <scm/core/math.h>
 
 #include <scm/gl_core/data_formats.h>
-#include <scm/gl_core/texture_objects/texture.h>
+#include <scm/gl_core/texture_objects/texture_image.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -29,7 +29,7 @@ struct __scm_export(gl_core) texture_3d_desc
     unsigned        _mip_levels;
 }; // struct texture_3d_desc
 
-class __scm_export(gl_core) texture_3d : public texture
+class __scm_export(gl_core) texture_3d : public texture_image
 {
 public:
     virtual ~texture_3d();
@@ -50,9 +50,6 @@ protected:
                const texture_3d_desc&    in_desc,
                const data_format         in_initial_data_format,
                const std::vector<void*>& in_initial_mip_level_data);
-
-    void                    bind(const render_context& in_context, int in_unit) const;
-    void                    unbind(const render_context& in_context) const;
 
     bool                    image_data(const render_device&      in_device,
                                        const texture_3d_desc&    in_desc,

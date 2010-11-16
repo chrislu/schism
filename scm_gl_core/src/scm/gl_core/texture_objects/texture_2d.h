@@ -8,7 +8,7 @@
 
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/data_types.h>
-#include <scm/gl_core/texture_objects/texture.h>
+#include <scm/gl_core/texture_objects/texture_image.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -35,7 +35,7 @@ struct __scm_export(gl_core) texture_2d_desc
     unsigned        _flags; // auto generate mipmaps
 }; // struct texture_2d_desc
 
-class __scm_export(gl_core) texture_2d : public texture
+class __scm_export(gl_core) texture_2d : public texture_image
 {
 public:
     virtual ~texture_2d();

@@ -5,8 +5,8 @@
 #include <scm/core/math.h>
 
 #include <scm/gl_core/data_formats.h>
+#include <scm/gl_core/frame_buffer_objects/frame_buffer_objects_fwd.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
-#include <scm/gl_core/render_device/device_resource.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -14,7 +14,7 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_core) render_target : public render_device_resource
+class __scm_export(gl_core) render_target
 {
 public:
     virtual ~render_target();
@@ -26,21 +26,17 @@ public:
     virtual unsigned        samples() const = 0;
 
 protected:
-    render_target(render_device& in_device);
+    render_target();
 
-    unsigned                object_id() const;
-    unsigned                object_target() const;
-
-protected:
-    unsigned                _gl_object_id;
-    unsigned                _gl_object_target;
+    virtual unsigned        object_id() const = 0;
+    virtual unsigned        object_target() const = 0;
 
 private:
 
     friend class render_device;
     friend class render_context;
     friend class frame_buffer;
-}; // class frame_buffer
+}; // class render_target
 
 } // namespace gl
 } // namespace scm

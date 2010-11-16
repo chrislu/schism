@@ -7,6 +7,7 @@
 
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/gl_core_fwd.h>
+#include <scm/gl_core/render_device/context_bindable_object.h>
 #include <scm/gl_core/render_device/device_resource.h>
 
 #include <scm/core/platform/platform.h>
@@ -18,7 +19,7 @@ namespace gl {
 class render_device;
 class render_context;
 
-class __scm_export(gl_core) buffer : public render_device_resource
+class __scm_export(gl_core) buffer : public context_bindable_object, public render_device_resource
 {
 public:
     struct descriptor_type {
@@ -72,7 +73,6 @@ protected:
 
 protected:
     descriptor_type             _descriptor;
-    unsigned                    _gl_buffer_id;
 
     scm::size_t                 _mapped_interval_offset;
     scm::size_t                 _mapped_interval_length;

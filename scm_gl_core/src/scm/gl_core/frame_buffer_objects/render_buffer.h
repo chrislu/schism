@@ -7,6 +7,7 @@
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/frame_buffer_objects/render_target.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
+#include <scm/gl_core/render_device/context_bindable_object.h>
 #include <scm/gl_core/render_device/device_resource.h>
 
 #include <scm/core/platform/platform.h>
@@ -29,7 +30,9 @@ struct __scm_export(gl_core) render_buffer_desc
     unsigned        _samples;
 }; // struct render_buffer_desc
 
-class __scm_export(gl_core) render_buffer : public render_target
+class __scm_export(gl_core) render_buffer : public context_bindable_object,
+                                            public render_target,
+                                            public render_device_resource
 {
 public:
     virtual ~render_buffer();
@@ -46,6 +49,9 @@ public:
 protected:
     render_buffer(render_device&            in_device,
                   const render_buffer_desc& in_desc);
+
+    unsigned                  object_id() const;
+    unsigned                  object_target() const;
 
 protected:
     render_buffer_desc      _descriptor;
