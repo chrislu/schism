@@ -18,9 +18,9 @@ namespace gl {
 render_buffer_desc::render_buffer_desc(const math::vec2ui& in_size,
                                        const data_format   in_format,
                                        const unsigned      in_samples)
-  : _size(in_size),
-    _format(in_format),
-    _samples(in_samples)
+  : _size(in_size)
+  , _format(in_format)
+  , _samples(in_samples)
 {
 }
 
@@ -51,7 +51,7 @@ render_buffer::render_buffer(render_device&            in_device,
     util::gl_error          glerror(glapi);
 
     glapi.glGenRenderbuffers(1, &(context_bindable_object::_gl_object_id));
-    if (0 == _gl_object_id) {
+    if (0 == object_id()) {
         state().set(object_state::OS_BAD);
     }
     else {
@@ -109,7 +109,7 @@ render_buffer::~render_buffer()
 {
     const opengl::gl3_core& glapi = parent_device().opengl3_api();
 
-    assert(0 != _gl_object_id);
+    assert(0 != object_id());
     glapi.glDeleteRenderbuffers(1, &(context_bindable_object::_gl_object_id));
     
     gl_assert(glapi, leaving render_buffer::~render_buffer());

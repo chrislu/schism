@@ -18,9 +18,9 @@ namespace gl {
 namespace {
 } // namespace 
 
-buffer::buffer(render_device& ren_dev,
-               const descriptor_type&   buffer_desc,
-               const void*              initial_data)
+buffer::buffer(render_device&     ren_dev,
+               const buffer_desc& in_desc,
+               const void*        initial_data)
   : render_device_resource(ren_dev),
     _descriptor(),
     _mapped_interval_offset(0),
@@ -33,9 +33,9 @@ buffer::buffer(render_device& ren_dev,
         state().set(object_state::OS_BAD);
     }
     else {
-        context_bindable_object::_gl_object_target  = util::gl_buffer_targets(buffer_desc._bindings);
-        context_bindable_object::_gl_object_binding = util::gl_buffer_bindings(buffer_desc._bindings);
-        buffer_data(ren_dev, buffer_desc, initial_data);
+        context_bindable_object::_gl_object_target  = util::gl_buffer_targets(in_desc._bindings);
+        context_bindable_object::_gl_object_binding = util::gl_buffer_bindings(in_desc._bindings);
+        buffer_data(ren_dev, in_desc, initial_data);
     }
     gl_assert(glapi, leaving buffer::buffer());
 }
@@ -222,9 +222,9 @@ buffer::unmap(const render_context& in_context)
 }
 
 bool
-buffer::buffer_data(      render_device&     ren_dev,
-                    const descriptor_type&   buffer_desc,
-                    const void*              initial_data)
+buffer::buffer_data(      render_device& ren_dev,
+                    const buffer_desc&   in_desc,
+                    const void*          initial_data)
 {
     const opengl::gl3_core& glcore = ren_dev.opengl3_api();
 
@@ -239,27 +239,27 @@ buffer::buffer_data(      render_device&     ren_dev,
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
         glcore.glNamedBufferDataEXT(object_id(),
-                                    buffer_desc._size,
+                                    in_desc._size,
                                     initial_data,
-                                    util::gl_usage_flags(buffer_desc._usage));
+                                    util::gl_usage_flags(in_desc._usage));
     }
     else {
         util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
 
         glcore.glBindBuffer(object_target(), object_id());
         glcore.glBufferData(object_target(),
-                            buffer_desc._size,
+                            in_desc._size,
                             initial_data,
-                            util::gl_usage_flags(buffer_desc._usage));
+                            util::gl_usage_flags(in_desc._usage));
     }
 
     if (glerror) {
-        _descriptor = descriptor_type();
+        _descriptor = buffer_desc();
         state().set(glerror.to_object_state());
         return (false);
     }
     else {
-        _descriptor = buffer_desc;
+        _descriptor = in_desc;
         return (true);
     }
 }
@@ -312,7 +312,7 @@ buffer::buffer_sub_data(render_device&  ren_dev,
     return (true);
 }
 
-const buffer::descriptor_type&
+const buffer_desc&
 buffer::descriptor() const
 {
     return (_descriptor);

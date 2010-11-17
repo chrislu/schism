@@ -140,6 +140,7 @@ render_device::init_capabilities()
     glcore.glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES,    &_capabilities._max_color_texture_samples);
     glcore.glGetIntegerv(GL_MAX_INTEGER_SAMPLES,          &_capabilities._max_integer_samples);
     glcore.glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS,      &_capabilities._max_texture_image_units);
+    glcore.glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,      &_capabilities._max_texture_buffer_size);
     glcore.glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS,        &_capabilities._max_frame_buffer_color_attachments);
 
     assert(_capabilities._max_texture_size > 0);
@@ -150,6 +151,7 @@ render_device::init_capabilities()
     assert(_capabilities._max_color_texture_samples > 0);
     assert(_capabilities._max_integer_samples > 0);
     assert(_capabilities._max_texture_image_units > 0);
+    assert(_capabilities._max_texture_buffer_size > 0);
     assert(_capabilities._max_frame_buffer_color_attachments > 0);
 
     glcore.glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS,        &_capabilities._max_vertex_uniform_blocks);
@@ -177,8 +179,8 @@ render_device::init_capabilities()
 }
 
 buffer_ptr
-render_device::create_buffer(const buffer::descriptor_type&  in_buffer_desc,
-                             const void*                     in_initial_data)
+render_device::create_buffer(const buffer_desc& in_buffer_desc,
+                             const void*        in_initial_data)
 {
     buffer_ptr new_buffer(new buffer(*this, in_buffer_desc, in_initial_data),
                           boost::bind(&render_device::release_resource, this, _1));
@@ -205,13 +207,13 @@ render_device::create_buffer(buffer_binding in_binding,
                              scm::size_t    in_size,
                              const void*    in_initial_data)
 {
-    return (create_buffer(buffer::descriptor_type(in_binding, in_usage, in_size), in_initial_data));
+    return (create_buffer(buffer_desc(in_binding, in_usage, in_size), in_initial_data));
 }
 
 bool
 render_device::resize_buffer(const buffer_ptr& in_buffer, scm::size_t in_size)
 {
-    buffer::descriptor_type desc = in_buffer->descriptor();
+    buffer_desc desc = in_buffer->descriptor();
     desc._size = in_size;
     if (!in_buffer->buffer_data(*this, desc, 0)) {
         glerr() << log::error << "render_device::resize_buffer(): unable to reallocate buffer ("
@@ -525,6 +527,47 @@ render_device::create_texture_3d(const math::vec3ui&       in_size,
     return (create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels),
                               in_initial_data_format,
                               in_initial_mip_level_data));
+}
+
+texture_buffer_ptr
+render_device::create_texture_buffer(const texture_buffer_desc& in_desc)
+{
+    texture_buffer_ptr  new_tex(new texture_buffer(*this, in_desc));
+    if (new_tex->fail()) {
+        if (new_tex->bad()) {
+            glerr() << log::error << "render_device::create_texture_buffer(): unable to create texture buffer object ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        else {
+            glerr() << log::error << "render_device::create_texture_buffer(): unable to allocate or attach texture buffer data ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        return texture_buffer_ptr();
+    }
+    else {
+        return new_tex;
+    }
+}
+
+texture_buffer_ptr
+render_device::create_texture_buffer(const data_format   in_format,
+                                     const buffer_ptr&   in_buffer)
+{
+    return create_texture_buffer(texture_buffer_desc(in_format, in_buffer));
+}
+
+texture_buffer_ptr
+render_device::create_texture_buffer(const data_format   in_format,
+                                     buffer_usage        in_buffer_usage,
+                                     scm::size_t         in_buffer_size,
+                                     const void*         in_buffer_initial_data)
+{
+    buffer_ptr  tex_buffer = create_buffer(BIND_TEXTURE_BUFFER, in_buffer_usage, in_buffer_size, in_buffer_initial_data);
+    if (!tex_buffer) {
+        glerr() << log::error << "render_device::create_texture_buffer(): unable to create texture buffer data buffer." << log::end;
+        return texture_buffer_ptr();
+    }
+    return create_texture_buffer(in_format, tex_buffer);
 }
 
 sampler_state_ptr

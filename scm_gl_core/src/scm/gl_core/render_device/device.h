@@ -47,6 +47,7 @@ public:
         int             _max_color_texture_samples;
         int             _max_integer_samples;
         int             _max_texture_image_units;
+        int             _max_texture_buffer_size;
         int             _max_frame_buffer_color_attachments;
         int             _max_vertex_uniform_blocks;
         int             _max_geometry_uniform_blocks;
@@ -92,8 +93,8 @@ protected:
 
     // buffer api /////////////////////////////////////////////////////////////////////////////////
 public:
-    buffer_ptr                      create_buffer(const buffer::descriptor_type& in_buffer_desc,
-                                                  const void*                    in_initial_data = 0);
+    buffer_ptr                      create_buffer(const buffer_desc& in_buffer_desc,
+                                                  const void*        in_initial_data = 0);
     buffer_ptr                      create_buffer(buffer_binding in_binding,
                                                   buffer_usage   in_usage,
                                                   scm::size_t    in_size,
@@ -172,6 +173,14 @@ public:
                                                       const unsigned            in_mip_levels,
                                                       const data_format         in_initial_data_format,
                                                       const std::vector<void*>& in_initial_mip_level_data);
+
+    texture_buffer_ptr              create_texture_buffer(const texture_buffer_desc& in_desc);
+    texture_buffer_ptr              create_texture_buffer(const data_format   in_format,
+                                                          const buffer_ptr&   in_buffer);
+    texture_buffer_ptr              create_texture_buffer(const data_format   in_format,
+                                                          buffer_usage        in_buffer_usage,
+                                                          scm::size_t         in_buffer_size,
+                                                          const void*         in_buffer_initial_data = 0);
 
     sampler_state_ptr               create_sampler_state(const sampler_state_desc& in_desc);
     sampler_state_ptr               create_sampler_state(texture_filter_mode  in_filter1,

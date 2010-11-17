@@ -6,9 +6,9 @@
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
+#include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
-#include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 
 namespace scm {
 namespace gl {

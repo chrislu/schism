@@ -19,28 +19,27 @@ namespace gl {
 class render_device;
 class render_context;
 
+struct __scm_export(gl_core) buffer_desc {
+    buffer_desc() : _bindings(BIND_UNKNOWN), _usage(USAGE_STATIC_DRAW), _size(0) {}
+    buffer_desc(buffer_binding b, buffer_usage u, scm::size_t s) : _bindings(b), _usage(u), _size(s) {}
+
+    buffer_binding  _bindings;
+    buffer_usage    _usage;
+    scm::size_t     _size;
+}; // struct buffer_desc
+
 class __scm_export(gl_core) buffer : public context_bindable_object, public render_device_resource
 {
 public:
-    struct descriptor_type {
-        descriptor_type() : _bindings(BIND_UNKNOWN), _usage(USAGE_STATIC_DRAW), _size(0) {}
-        descriptor_type(buffer_binding b, buffer_usage u, scm::size_t s) : _bindings(b), _usage(u), _size(s) {}
-
-        buffer_binding  _bindings;
-        buffer_usage    _usage;
-        scm::size_t     _size;
-    }; // struct descriptor
-
-public:
     virtual ~buffer();
 
-    const descriptor_type&      descriptor() const;
+    const buffer_desc&          descriptor() const;
     void                        print(std::ostream& os) const;
 
 protected:
-    buffer(render_device&           ren_dev,
-           const descriptor_type&   buffer_desc,
-           const void*              initial_data);
+    buffer(render_device&       ren_dev,
+           const buffer_desc&   in_desc,
+           const void*          initial_data);
 
     void                        bind(render_context& ren_ctx, buffer_binding target) const;
     void                        unbind(render_context& ren_ctx, buffer_binding target) const;
@@ -63,16 +62,16 @@ protected:
     bool                        unmap(const render_context& in_context);
 
 
-    bool                        buffer_data(      render_device&     ren_dev,
-                                            const descriptor_type&   buffer_desc,
-                                            const void*              initial_data);
+    bool                        buffer_data(      render_device& ren_dev,
+                                            const buffer_desc&   in_desc,
+                                            const void*          initial_data);
     bool                        buffer_sub_data(render_device&  ren_dev,
                                                 scm::size_t     offset,
                                                 scm::size_t     size,
                                                 const void*     data);
 
 protected:
-    descriptor_type             _descriptor;
+    buffer_desc                 _descriptor;
 
     scm::size_t                 _mapped_interval_offset;
     scm::size_t                 _mapped_interval_length;
@@ -80,6 +79,7 @@ protected:
     friend class render_device;
     friend class render_context;
     friend class vertex_array;
+    friend class texture_buffer;
 };
 
 } // namespace gl
