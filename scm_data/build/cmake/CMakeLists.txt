@@ -74,14 +74,14 @@ target_link_libraries(${PROJECT_NAME}
 )
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
-        optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}   debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_system-${SCHISM_BOOST_LIB_POSTFIX_REL}       debug libboost_system-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_filesystem-${SCM_BOOST_MT_REL}   debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+        optimized libboost_system-${SCM_BOOST_MT_REL}       debug libboost_system-${SCM_BOOST_MT_DBG}
     )
 endif (WIN32)
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
-        boost_filesystem${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_system${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_filesystem${SCM_BOOST_MT_REL}
+        boost_system${SCM_BOOST_MT_REL}
     )
 endif (UNIX)
 

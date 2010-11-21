@@ -127,8 +127,6 @@ target_link_libraries(${PROJECT_NAME}
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
         opengl32
-        optimized libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_REL}        debug libboost_regex-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_REL}         debug libboost_wave-${SCHISM_BOOST_LIB_POSTFIX_DBG}
     )
     if (OPT_BUILD_deprecated_classic_scm_gl)
         target_link_libraries(${PROJECT_NAME}

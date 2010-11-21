@@ -84,21 +84,19 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 # link libraries
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
-        optimized libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_REL}  debug libboost_program_options-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_thread-${SCHISM_BOOST_LIB_POSTFIX_REL}           debug libboost_thread-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_REL}        debug libboost_date_time-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_REL}       debug libboost_filesystem-${SCHISM_BOOST_LIB_POSTFIX_DBG}
-        optimized libboost_system-${SCHISM_BOOST_LIB_POSTFIX_REL}           debug libboost_system-${SCHISM_BOOST_LIB_POSTFIX_DBG}
+        optimized libboost_date_time-${SCM_BOOST_MT_REL}        debug libboost_date_time-${SCM_BOOST_MT_DBG}
+        optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+        optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
+        optimized libboost_system-${SCM_BOOST_MT_REL}           debug libboost_system-${SCM_BOOST_MT_DBG}
     )
 endif (WIN32)
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
         rt
-        boost_date_time${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_filesystem${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_program_options${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_signals${SCHISM_BOOST_LIB_POSTFIX_REL}
-        boost_system${SCHISM_BOOST_LIB_POSTFIX_REL}
+        boost_date_time${SCM_BOOST_MT_REL}
+        boost_filesystem${SCM_BOOST_MT_REL}
+        boost_program_options${SCM_BOOST_MT_REL}
+        boost_system${SCM_BOOST_MT_REL}
     )
 endif (UNIX)
