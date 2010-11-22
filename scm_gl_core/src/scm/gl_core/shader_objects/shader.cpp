@@ -73,8 +73,11 @@ shader::compile_source_string(      render_device&  ren_dev,
     util::gl_error          glerror(glapi);
 
     const char* source_string = in_src.c_str();
+    gl_assert(glapi, shader::compile_source_string() before glShaderSource);
     glapi.glShaderSource(_gl_shader_obj, 1, reinterpret_cast<const GLchar**>(boost::addressof(source_string)), NULL);
+    gl_assert(glapi, shader::compile_source_string() before glCompileShader);
     glapi.glCompileShader(_gl_shader_obj);
+    gl_assert(glapi, shader::compile_source_string() fater glCompileShader);
 
     int compile_state = 0;
     glapi.glGetShaderiv(_gl_shader_obj, GL_COMPILE_STATUS, &compile_state);

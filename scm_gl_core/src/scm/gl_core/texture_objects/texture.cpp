@@ -56,11 +56,17 @@ texture::bind(const render_context& in_context, int in_unit) const
         glapi.glActiveTexture(GL_TEXTURE0 + in_unit);
         glapi.glBindTexture(object_target(), object_id());
 
-        //glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        //glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // AMD bug!!! overwritten by sampler object anyway
+        glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_R, GL_RED);
+        //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+        //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+        //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
         //glapi.glEnable(object_target());
         glapi.glActiveTexture(GL_TEXTURE0);

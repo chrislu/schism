@@ -972,7 +972,7 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 
     glapi.glBlitFramebuffer(0, 0, min_drawable_region.x, min_drawable_region.y,
                             0, 0, min_drawable_region.x, min_drawable_region.y,
-                            GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
+                            GL_COLOR_BUFFER_BIT,// | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
                             GL_NEAREST);
 
     gl_assert(glapi, render_context::resolve_multi_sample_buffer() after glBlitFramebuffer);
