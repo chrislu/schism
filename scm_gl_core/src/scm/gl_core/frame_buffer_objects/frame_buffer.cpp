@@ -222,11 +222,19 @@ frame_buffer::clear_depth_stencil_buffer(const  render_context& in_context,
         apply_attachments(in_context);
         assert(check_completeness(in_context));
 
-        glapi.glClearDepth(in_clear_depth);
-        glapi.glClearStencil(in_clear_stencil);
-        glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        //glapi.glClearBufferfv(GL_DEPTH, 0, &in_clear_depth);
-        //glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            glapi.glClearDepth(in_clear_depth);
+            glapi.glClearStencil(in_clear_stencil);
+            glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
+        else {
+            //if (is_stencil_format(_current_depth_stencil_attachment._target->format())) {
+                glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+            //}
+            //else {
+            //    glapi.glClearBufferfv(GL_DEPTH, 0, &in_clear_depth);
+            //}
+        }
     }
 
     gl_assert(glapi, leaving frame_buffer::clear_color_buffer());

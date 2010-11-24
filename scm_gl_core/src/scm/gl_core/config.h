@@ -18,6 +18,9 @@
 #define SCM_GL_CORE_USE_DIRECT_STATE_ACCESS 1
 #undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
+#define SCM_GL_CORE_WORKAROUND_AMD 1
+#undef SCM_GL_CORE_WORKAROUND_AMD
+
 #define SCM_GL_CORE_OPENGL_40 1
 #undef SCM_GL_CORE_OPENGL_40
 
@@ -47,5 +50,13 @@
 #else
 #   define SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS 0
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+
+#if SCM_GL_CORE_WORKAROUND_AMD
+#   define SCM_GL_CORE_USE_WORKAROUND_AMD 1
+#else
+#   define SCM_GL_CORE_USE_WORKAROUND_AMD 0
+#endif // SCM_GL_CORE_WORKAROUND_AMD
+
+// end scm_gl_core internal ///////////////////////////////////////////////////////////////////////
 
 #endif // SCM_GL_CORE_OPENGL_CONFIG_H_INCLUDED

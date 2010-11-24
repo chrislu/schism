@@ -879,9 +879,13 @@ render_context::clear_default_color_buffer(const frame_buffer_target in_target,
             glapi.glColorMask(true, true, true, true);
         }
         
-        glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
-        glapi.glClear(GL_COLOR_BUFFER_BIT);
-        //glapi.glClearBufferfv(GL_COLOR, 0, in_clear_color.data_array);
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
+            glapi.glClear(GL_COLOR_BUFFER_BIT);
+        }
+        else {
+            glapi.glClearBufferfv(GL_COLOR, 0, in_clear_color.data_array);
+        }
 
         if (abops[0]._write_mask != COLOR_ALL) {
             glapi.glColorMask(util::masked(abops[0]._write_mask, COLOR_RED),  util::masked(abops[0]._write_mask, COLOR_GREEN),
@@ -892,10 +896,14 @@ render_context::clear_default_color_buffer(const frame_buffer_target in_target,
         if (abops[0]._write_mask != COLOR_ALL) {
             glapi.glColorMaski(0, true, true, true, true);
         }
-        
-        glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
-        glapi.glClear(GL_COLOR_BUFFER_BIT);
-        //glapi.glClearBufferfv(GL_COLOR, 0, in_clear_color.data_array);
+
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
+            glapi.glClear(GL_COLOR_BUFFER_BIT);
+        }
+        else {
+            glapi.glClearBufferfv(GL_COLOR, 0, in_clear_color.data_array);
+        }
 
         if (abops[0]._write_mask != COLOR_ALL) {
             glapi.glColorMaski(0, util::masked(abops[0]._write_mask, COLOR_RED),  util::masked(abops[0]._write_mask, COLOR_GREEN),
@@ -928,19 +936,37 @@ render_context::clear_default_depth_stencil_buffer(const float in_clear_depth,
         glapi.glDepthMask(true);
         glapi.glStencilMask(true);
 
-        glapi.glClearDepth(in_clear_depth);
-        glapi.glClearStencil(in_clear_stencil);
-        glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        //glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            glapi.glClearDepth(in_clear_depth);
+            glapi.glClearStencil(in_clear_stencil);
+            glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
+        else {
+            //if (is_stencil_format(_current_depth_stencil_attachment._target->format())) {
+                glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+            //}
+            //else {
+            //    glapi.glClearBufferfv(GL_DEPTH, 0, &in_clear_depth);
+            //}
+        }
         
         glapi.glDepthMask(_applied_state._depth_stencil_state->_descriptor._depth_mask);
         glapi.glStencilMask(_applied_state._depth_stencil_state->_descriptor._stencil_wmask);
     }
     else {
-        glapi.glClearDepth(in_clear_depth);
-        glapi.glClearStencil(in_clear_stencil);
-        glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        //glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            glapi.glClearDepth(in_clear_depth);
+            glapi.glClearStencil(in_clear_stencil);
+            glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
+        else {
+            //if (is_stencil_format(_current_depth_stencil_attachment._target->format())) {
+                glapi.glClearBufferfi(GL_DEPTH_STENCIL, 0, in_clear_depth, in_clear_stencil);
+            //}
+            //else {
+            //    glapi.glClearBufferfv(GL_DEPTH, 0, &in_clear_depth);
+            //}
+        }
     }
 
     if (_applied_state._draw_framebuffer) {
