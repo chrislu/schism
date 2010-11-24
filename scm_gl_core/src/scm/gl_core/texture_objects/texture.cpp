@@ -56,9 +56,11 @@ texture::bind(const render_context& in_context, int in_unit) const
         glapi.glActiveTexture(GL_TEXTURE0 + in_unit);
         glapi.glBindTexture(object_target(), object_id());
 
-        // AMD bug!!! overwritten by sampler object anyway
-        glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+            // AMD bug!!! overwritten by sampler object anyway
+            glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
