@@ -17,6 +17,8 @@
 #include <scm/core/math/mat3.h>
 #include <scm/core/math/mat4.h>
 
+#include <scm/core/math/quat.h>
+
 #include <scm/core/math/vec_stream_io.h>
 #include <scm/core/math/mat_stream_io.h>
 
@@ -46,6 +48,9 @@ typedef mat<float, 4, 4>    mat4f;
 typedef mat<double, 2, 2>   mat2d;
 typedef mat<double, 3, 3>   mat3d;
 typedef mat<double, 4, 4>   mat4d;
+
+typedef quat<float>         quatf;
+typedef quat<double>        quatd;
 
 // some constants
 const float                 pi_f = 3.14159265358979323846264338327950288f;
