@@ -37,7 +37,7 @@
 namespace {
 
 std::string color_present_vsrc = "\
-    #version 330\n\
+    #version 330 core\n\
     \
     uniform mat4 mvp;\
     out vec2 tex_coord;\
@@ -52,7 +52,7 @@ std::string color_present_vsrc = "\
     ";
 
 std::string color_present_fsrc = "\
-    #version 330\n\
+    #version 330 core\n\
     \
     in vec2 tex_coord;\
     uniform sampler2D in_texture;\

@@ -7,6 +7,11 @@
 namespace scm {
 namespace gl {
 
+class coordinate_cross;
+
+typedef shared_ptr<coordinate_cross>                coordinate_cross_ptr;
+typedef shared_ptr<const coordinate_cross>          coordinate_cross_cptr;
+
 class geometry;
 class geometry_highlight;
 class box_geometry;
