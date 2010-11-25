@@ -125,7 +125,7 @@ camera::view_projection_matrix_inverse() const
 const math::vec4f
 camera::position() const
 {
-    return (_view_matrix_inverse.column(3));
+    return (_view_matrix_inverse.column(3) / _view_matrix_inverse.column(3).w);
 }
 
 const frustumf&
