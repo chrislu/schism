@@ -87,7 +87,7 @@ inline T lerp(const T min,
               const T max,
               const scal_type a)
 {
-    return (T(a * max + (scal_type(1) - a) * min));
+    return max * a + min * (scal_type(1) - a);
 }
 
 template<typename scal_type>

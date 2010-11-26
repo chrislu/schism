@@ -2,6 +2,7 @@
 #ifndef SCM_CORE_MATH_QUAT_H_INCLUDED
 #define SCM_CORE_MATH_QUAT_H_INCLUDED
 
+#include <scm/core/math/common.h>
 #include <scm/core/math/vec3.h>
 #include <scm/core/math/mat3.h>
 #include <scm/core/math/mat4.h>
@@ -63,6 +64,15 @@ template<typename scal_type> const quat<scal_type>      slerp(const quat<scal_ty
 
 } // namespace math
 } // namespace scm
+
+namespace std {
+
+template<typename scal_type>
+void swap(scm::math::quat<scal_type>& lhs,
+          scm::math::quat<scal_type>& rhs);
+
+} // namespace std
+
 
 #include "quat.inl"
 

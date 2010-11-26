@@ -316,6 +316,15 @@ operator/(const vec<scal_type, dim>& lhs,
 
 template<typename scal_type,
          const unsigned dim>
+inline vec<scal_type, dim> lerp(const vec<scal_type, dim>& min,
+                                const vec<scal_type, dim>& max,
+                                const scal_type            a)
+{
+    return max * a + min * (scal_type(1) - a);
+}
+
+template<typename scal_type,
+         const unsigned dim>
 inline scal_type length_sqr(const vec<scal_type, dim>& lhs)
 {
     return (dot(lhs, lhs));

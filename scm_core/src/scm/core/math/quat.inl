@@ -3,6 +3,17 @@
 
 #include <scm/core/math/common.h>
 
+namespace std {
+
+template<typename scal_type>
+inline void swap(scm::math::quat<scal_type>& lhs,
+                 scm::math::quat<scal_type>& rhs)
+{
+    lhs.swap(rhs);
+}
+
+} // namespace std
+
 namespace scm {
 namespace math {
 

@@ -23,7 +23,8 @@ namespace math {
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline mat<scal_type, row_dim, col_dim>& 
+inline
+mat<scal_type, row_dim, col_dim>& 
 operator+=(      mat<scal_type, row_dim, col_dim>& lhs,
            const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -36,7 +37,8 @@ operator+=(      mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline mat<scal_type, row_dim, col_dim>&
+inline
+mat<scal_type, row_dim, col_dim>&
 operator-=(      mat<scal_type, row_dim, col_dim>& lhs,
            const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -48,7 +50,8 @@ operator-=(      mat<scal_type, row_dim, col_dim>& lhs,
 
 template<typename scal_type,
          const unsigned order>
-inline mat<scal_type, order, order>&
+inline
+mat<scal_type, order, order>&
 operator*=(      mat<scal_type, order, order>& lhs,
            const mat<scal_type, order, order>& rhs)
 {
@@ -83,7 +86,8 @@ operator*=(      mat<scal_type, order, order>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline mat<scal_type, row_dim, col_dim>&
+inline
+mat<scal_type, row_dim, col_dim>&
 operator*=(mat<scal_type, row_dim, col_dim>&   lhs,
            const scal_type                     rhs)
 {
@@ -96,7 +100,8 @@ operator*=(mat<scal_type, row_dim, col_dim>&   lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline mat<scal_type, row_dim, col_dim>&
+inline
+mat<scal_type, row_dim, col_dim>&
 operator/=(mat<scal_type, row_dim, col_dim>& lhs,
            const scal_type rhs)
 {
@@ -109,7 +114,8 @@ operator/=(mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline bool
+inline
+bool
 operator==(const mat<scal_type, row_dim, col_dim>& lhs,
            const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -125,7 +131,8 @@ operator==(const mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline bool
+inline
+bool
 operator!=(const mat<scal_type, row_dim, col_dim>& lhs,
            const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -141,7 +148,8 @@ operator!=(const mat<scal_type, row_dim, col_dim>& lhs,
 // binary operators
 template<typename scal_type,
          const unsigned order>
-inline const mat<scal_type, order, order>
+inline
+const mat<scal_type, order, order>
 operator*(const mat<scal_type, order, order>& lhs,
           const mat<scal_type, order, order>& rhs)
 {
@@ -155,7 +163,8 @@ operator*(const mat<scal_type, order, order>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline const mat<scal_type, row_dim, col_dim>
+inline
+const mat<scal_type, row_dim, col_dim>
 operator*(const mat<scal_type, row_dim, col_dim>& lhs,
           const scal_type                         rhs)
 {
@@ -169,7 +178,8 @@ operator*(const mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline const mat<scal_type, row_dim, col_dim>
+inline
+const mat<scal_type, row_dim, col_dim>
 operator/(const mat<scal_type, row_dim, col_dim>& lhs,
           const scal_type                         rhs)
 {
@@ -183,7 +193,8 @@ operator/(const mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline const mat<scal_type, row_dim, col_dim>
+inline
+const mat<scal_type, row_dim, col_dim>
 operator+(const mat<scal_type, row_dim, col_dim>& lhs,
           const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -197,7 +208,8 @@ operator+(const mat<scal_type, row_dim, col_dim>& lhs,
 template<typename scal_type,
          const unsigned row_dim,
          const unsigned col_dim>
-inline const mat<scal_type, row_dim, col_dim>
+inline
+const mat<scal_type, row_dim, col_dim>
 operator-(const mat<scal_type, row_dim, col_dim>& lhs,
           const mat<scal_type, row_dim, col_dim>& rhs)
 {
@@ -210,7 +222,8 @@ operator-(const mat<scal_type, row_dim, col_dim>& lhs,
 
 template<typename scal_type,
          const unsigned order>
-inline const vec<scal_type, order>
+inline
+const vec<scal_type, order>
 operator*(const mat<scal_type, order, order>& lhs,
           const vec<scal_type, order>&        rhs)
 {
@@ -236,7 +249,8 @@ operator*(const mat<scal_type, order, order>& lhs,
 
 template<typename scal_type,
          const unsigned order>
-inline const vec<scal_type, order>
+inline
+const vec<scal_type, order>
 operator*(const mat<scal_type, order, order>& lhs,
           const vec<scal_type, order - 1>&    rhs)
 {
@@ -263,7 +277,8 @@ operator*(const mat<scal_type, order, order>& lhs,
 
 template<typename scal_type,
          const unsigned order>
-inline const vec<scal_type, order>
+inline
+const vec<scal_type, order>
 operator*(const vec<scal_type, order>&        lhs,
           const mat<scal_type, order, order>& rhs)
 {
@@ -290,7 +305,9 @@ operator*(const vec<scal_type, order>&        lhs,
 // common functions
 template<typename scal_type,
          const unsigned order>
-inline void set_identity(mat<scal_type, order, order>& m)
+inline
+void
+set_identity(mat<scal_type, order, order>& m)
 {
     for (unsigned i = 0; i < (order * order); ++i) {
         m.data_array[i] = (i % (order + 1)) == 0 ? scal_type(1) : scal_type(0);
@@ -300,7 +317,9 @@ inline void set_identity(mat<scal_type, order, order>& m)
 template<typename scal_type, 
          const unsigned row_dim,
          const unsigned col_dim>
-inline const mat<scal_type, row_dim, col_dim> transpose(const mat<scal_type, row_dim, col_dim>& lhs)
+inline
+const mat<scal_type, row_dim, col_dim>
+transpose(const mat<scal_type, row_dim, col_dim>& lhs)
 {
     mat<scal_type, col_dim, row_dim> tmp_ret;
 
@@ -321,9 +340,11 @@ inline const mat<scal_type, row_dim, col_dim> transpose(const mat<scal_type, row
 
 template<typename scal_type,
          const unsigned order>
-inline const mat<scal_type, order - 1, order - 1> minor_mat(const mat<scal_type, order, order>& lhs,
-                                                            const unsigned row,
-                                                            const unsigned col)
+inline
+const mat<scal_type, order - 1, order - 1>
+minor_mat(const mat<scal_type, order, order>& lhs,
+          const unsigned row,
+          const unsigned col)
 {
     mat<scal_type, order - 1, order - 1>   tmp_minor;
 
@@ -353,19 +374,25 @@ inline const mat<scal_type, order - 1, order - 1> minor_mat(const mat<scal_type,
 }
 
 template<typename scal_type>
-inline scal_type determinant(const mat<scal_type, 1, 1>& lhs)
+inline
+scal_type
+determinant(const mat<scal_type, 1, 1>& lhs)
 {
     return (lhs.data_array[0]);
 }
 
 template<typename scal_type>
-inline scal_type determinant(const mat<scal_type, 2, 2>& lhs)
+inline
+scal_type
+determinant(const mat<scal_type, 2, 2>& lhs)
 {
     return (lhs.data_array[0] * lhs.data_array[3] - lhs.data_array[1] * lhs.data_array[2]);
 }
 
 template<typename scal_type, const unsigned order>
-inline scal_type determinant(const mat<scal_type, order, order>& lhs)
+inline
+scal_type
+determinant(const mat<scal_type, order, order>& lhs)
 {
     scal_type tmp_ret = scal_type(0);
 
@@ -378,7 +405,9 @@ inline scal_type determinant(const mat<scal_type, order, order>& lhs)
 }
 
 template<typename scal_type, const unsigned order>
-inline const mat<scal_type, order, order> inverse(const mat<scal_type, order, order>& lhs)
+inline
+const mat<scal_type, order, order>
+inverse(const mat<scal_type, order, order>& lhs)
 {
     mat<scal_type, order, order> tmp_ret(mat<scal_type, order, order>::zero());
     scal_type                    tmp_det = determinant(lhs);
@@ -397,7 +426,6 @@ inline const mat<scal_type, order, order> inverse(const mat<scal_type, order, or
 
     return (tmp_ret);
 }
-
 
 } // namespace math
 } // namespace scm

@@ -91,6 +91,17 @@ public:
 
 }; // class vec<scal_type, 2>
 
+// common functions
+template<typename scal_type> scal_type                      dot(const vec<scal_type, 2>& lhs, const vec<scal_type, 2>& rhs);
+template<typename scal_type> const vec<scal_type, 2>        cross(const vec<scal_type, 2>& lhs, const vec<scal_type, 2>& rhs);
+template<typename scal_type> const vec<scal_type, 2>        clamp(const vec<scal_type, 2>& val, const vec<scal_type, 2>& min, const vec<scal_type, 2>& max);
+template<typename scal_type> const vec<scal_type, 2>        pow(const vec<scal_type, 2>& val, const scal_type exp);
+template<typename scal_type> const vec<scal_type, 2>        min(const vec<scal_type, 2>& a, const vec<scal_type, 2>& b);
+template<typename scal_type> const vec<scal_type, 2>        max(const vec<scal_type, 2>& a, const vec<scal_type, 2>& b);
+template<typename scal_type> const vec<scal_type, 2>        floor(const vec<scal_type, 2>& rhs);
+template<typename scal_type> const vec<scal_type, 2>        ceil(const vec<scal_type, 2>& rhs);
+template<typename scal_type> const vec<scal_type, 2>        fract(const vec<scal_type, 2>& rhs);
+
 } // namespace math
 } // namespace scm
 

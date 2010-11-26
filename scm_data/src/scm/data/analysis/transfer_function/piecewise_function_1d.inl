@@ -109,7 +109,7 @@ piecewise_function_1d<val_type, res_type>::operator[](float point) const
         }
         else {
             float     a = float(point - lequal->first) / float(gequal->first - lequal->first);
-            result      = scm::math::lerp<res_type>(lequal->second, gequal->second, a);
+            result      = scm::math::lerp(lequal->second, gequal->second, a);
         }
     }
 
