@@ -150,6 +150,27 @@ quat<scal_type>::to_matrix() const
 
 template<typename scal_type>
 inline
+void
+quat<scal_type>::retrieve_axis_angle(value_type& angle, vec<value_type, 3>& axis) const
+{
+    const value_type n = sqrt(i * i + j * j + k * k);
+
+    if (n > value_type(0)) {
+        axis.x = i / n;
+        axis.y = j / n;
+        axis.z = k / n;
+        angle  = rad2deg(value_type(2.0) * acos(w));
+    }
+    else {
+        axis.x = value_type(1.0);
+        axis.y = value_type(0.0);
+        axis.z = value_type(0.0);
+        angle  = value_type(0.0);
+    }
+}
+
+template<typename scal_type>
+inline
 quat<scal_type>
 quat<scal_type>::identity()
 {

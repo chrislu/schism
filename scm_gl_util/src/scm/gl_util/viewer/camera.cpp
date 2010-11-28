@@ -31,7 +31,7 @@ camera::projection_perspective(float fovy, float aspect, float near_z, float far
     _near_plane    = near_z;
     _far_plane     = far_z;
     _type          = camera::perspective;
-    math::perspective_matrix(_projection_matrix, fovy, aspect, near_z, far_z);
+    _projection_matrix = math::make_perspective_matrix(fovy, aspect, near_z, far_z);
     update();
 }
 
@@ -43,7 +43,7 @@ camera::projection_ortho(float left, float right, float bottom, float top, float
     _near_plane    = near_z;
     _far_plane     = far_z;
     _type          = camera::ortho;
-    math::ortho_matrix(_projection_matrix, left, right, bottom, top, near_z, far_z);
+    _projection_matrix = math::make_ortho_matrix(left, right, bottom, top, near_z, far_z);
     update();
 }
 
@@ -55,7 +55,7 @@ camera::projection_ortho_2d(float left, float right, float bottom, float top)
     _near_plane    = -1.0f;
     _far_plane     = 1.0f;
     _type          = camera::ortho;
-    math::ortho_matrix(_projection_matrix, left, right, bottom, top, _near_plane, _far_plane);
+    _projection_matrix = math::make_ortho_matrix(left, right, bottom, top, _near_plane, _far_plane);
     update();
 }
 
@@ -69,7 +69,7 @@ camera::projection_frustum(float left, float right, float bottom, float top, flo
     _near_plane    = near_z;
     _far_plane     = far_z;
     _type          = camera::perspective;
-    math::frustum_matrix(_projection_matrix, left, right, bottom, top, _near_plane, _far_plane);
+    _projection_matrix = math::make_frustum_matrix(left, right, bottom, top, _near_plane, _far_plane);
     update();
 }
 

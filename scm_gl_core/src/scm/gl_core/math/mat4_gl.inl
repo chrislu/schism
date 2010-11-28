@@ -245,6 +245,137 @@ look_at_matrix_inv(mat<scal_type, 4, 4>& m,
     m.data_array[15] = scal_type(1.0);
 }
 
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_translation(const vec<scal_type, 3>& t)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    translate(ret, t);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_translation(const scal_type x, const scal_type y, const scal_type z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    translate(ret, x, y, z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_rotation(const scal_type angl, const vec<scal_type, 3>& axis)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    rotate(ret, angl, axis);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_rotation(const scal_type angl, const scal_type axis_x, const scal_type axis_y, const scal_type axis_z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    rotate(ret, angl, axis_x, axis_y, axis_z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_scale(const vec<scal_type, 3>& s)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    scale(ret, s);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_scale(const scal_type x, const scal_type y, const scal_type z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    scale(ret, x, y, z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_ortho_matrix(scal_type left, scal_type right, scal_type bottom, scal_type top, scal_type near_z, scal_type far_z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    ortho_matrix(ret, left, right, bottom, top, near_z, far_z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_frustum_matrix(scal_type left, scal_type right, scal_type bottom, scal_type top, scal_type near_z, scal_type far_z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    frustum_matrix(ret, left, right, bottom, top, near_z, far_z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_perspective_matrix(scal_type fovy, scal_type aspect, scal_type near_z, scal_type far_z)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    perspective_matrix(ret, fovy, aspect, near_z, far_z);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_look_at_matrix(const vec<scal_type, 3>& eye, const vec<scal_type, 3>& center, const vec<scal_type, 3>& up)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    look_at_matrix(ret, eye, center, up);
+
+    return ret;
+}
+
+template<typename scal_type>
+inline
+const mat<scal_type, 4, 4>
+make_look_at_matrix_inv(const vec<scal_type, 3>& eye, const vec<scal_type, 3>& center, const vec<scal_type, 3>& up)
+{
+    mat<scal_type, 4, 4> ret = mat4f::identity();
+
+    look_at_matrix_inv(ret, eye, center, up);
+
+    return ret;
+}
 
 } // namespace math
 } // namespace scm

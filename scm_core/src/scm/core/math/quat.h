@@ -35,6 +35,7 @@ public:
     quat<value_type>&               operator*=(const quat<rhs_t>& a);
 
     const mat<value_type, 4, 4>     to_matrix() const;
+    void                            retrieve_axis_angle(value_type& angle, vec<value_type, 3>& axis) const;
 
     static quat<value_type>         identity();
     static quat<value_type>         from_arc(const vec<value_type, 3>& a, const vec<value_type, 3>& b);
