@@ -84,6 +84,10 @@ public:
     const device_capabilities&      capabilities() const;
 
     virtual void                    print_device_informations(std::ostream& os) const;
+    const std::string               device_vendor() const;
+    const std::string               device_renderer() const;
+    const std::string               device_shader_compiler() const;
+    const std::string               device_context_version() const;
 
 protected:
     void                            init_capabilities();

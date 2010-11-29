@@ -749,6 +749,38 @@ render_device::print_device_informations(std::ostream& os) const
     os << "OpenGL render device" << std::endl;
     os << *_opengl3_api_core;
 }
+const std::string
+render_device::device_vendor() const
+{
+    return _opengl3_api_core->context_information()._vendor;
+}
+
+const std::string
+render_device::device_renderer() const
+{
+    return _opengl3_api_core->context_information()._renderer;
+}
+
+const std::string
+render_device::device_shader_compiler() const
+{
+    return _opengl3_api_core->context_information()._glsl_version_info;
+}
+
+const std::string
+render_device::device_context_version() const
+{
+    std::stringstream s;
+    s << _opengl3_api_core->context_information()._version_major << "." 
+      << _opengl3_api_core->context_information()._version_minor << "." 
+      << _opengl3_api_core->context_information()._version_release;
+    if (!_opengl3_api_core->context_information()._version_info.empty())
+         s << " " << _opengl3_api_core->context_information()._version_info;
+    if (!_opengl3_api_core->context_information()._profile_string.empty())
+         s << " " << _opengl3_api_core->context_information()._profile_string;
+
+    return s.str();
+}
 
 void
 render_device::register_resource(render_device_resource* res_ptr)
