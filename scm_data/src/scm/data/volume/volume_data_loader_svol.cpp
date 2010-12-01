@@ -48,7 +48,7 @@ bool volume_data_loader_svol::open_file(const std::string& filename)
     using namespace boost::filesystem;
 
     path                file_path(filename);
-    std::string         sraw_path = (file_path.branch_path() / _vol_desc._sraw_file).file_string();
+    std::string         sraw_path = (file_path.parent_path() / _vol_desc._sraw_file).string();
 
     return (volume_data_loader_raw::open_file(sraw_path,
                                               _vol_desc._data_dimensions,

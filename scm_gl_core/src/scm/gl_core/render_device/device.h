@@ -110,12 +110,10 @@ public:
                                                         const program_ptr&   in_program = program_ptr());
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:
-    void                            add_include_path(const std::string& in_path,
-                                                     const std::string& in_file_extensions     = std::string(".glsl .glslh"),
-                                                     bool               in_scan_subdirectories = true);
-    void                            add_include_paths(const std::vector<std::string>& in_paths,
-                                                      const std::string&              in_file_extensions     = std::string(".glsl .glslh"),
-                                                      bool                            in_scan_subdirectories = true);
+    void                            add_include_files(const std::string& in_path,
+                                                      const std::string& in_glsl_root_path      = std::string("/"),
+                                                      const std::string& in_file_extensions     = std::string(".glsl .glslh"),
+                                                      bool               in_scan_subdirectories = true);
     bool                            add_include_string(const std::string& in_path,
                                                        const std::string& in_source_string);
 

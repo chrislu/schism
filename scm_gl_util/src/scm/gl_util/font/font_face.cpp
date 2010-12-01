@@ -50,9 +50,9 @@ find_font_style_files(const std::string&         in_regular_font_file,
     out_font_style_files[font_face::style_regular] = in_regular_font_file;
 
     path            font_file_path = path(in_regular_font_file);
-    std::string     font_file_ext  = extension(font_file_path);
-    std::string     font_file_base = basename(font_file_path);
-    path            font_file_dir  = font_file_path.branch_path();
+    std::string     font_file_ext  = font_file_path.extension().string();
+    std::string     font_file_base = font_file_path.stem().string();
+    path            font_file_dir  = font_file_path.parent_path();
 
     // search for italic style
     path    font_file_italic = font_file_dir
@@ -103,7 +103,7 @@ available_72dpi_size(const std::string& file_name,
     unsigned    display_res = disp_res;
 
     detail::ft_library  ft_lib;
-    detail::ft_face     ft_font(ft_lib, font_file.file_string());
+    detail::ft_face     ft_font(ft_lib, font_file.string());
 
     if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
 
@@ -399,7 +399,7 @@ font_face::font_face(const render_device_ptr& device,
         using namespace boost::filesystem;
 
         path            font_file_path = path(font_file);
-        std::string     font_file_base = basename(font_file_path);
+        std::string     font_file_base = font_file_path.stem().string();
         _name = font_file_base;
     }
     catch(...) {

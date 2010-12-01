@@ -142,8 +142,8 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
     std::ifstream   obj_file;
 
     path                    file_path(filename, native);
-    std::string             file_name       = file_path.leaf();
-    std::string             file_extension  = extension(file_path);
+    std::string             file_name       = file_path.filename().string();
+    std::string             file_extension  = file_path.extension().string();
 
     obj_file.open(filename.c_str(), std::ios_base::in);
 
@@ -231,13 +231,13 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
                         std::string matlib_file;
                         line >> matlib_file;
 
-                        path matlib_file_name = file_path.branch_path() / matlib_file;
+                        path matlib_file_name = file_path.parent_path() / matlib_file;
 
-                        if (!load_material_lib(matlib_file_name.file_string(), out_obj)) {
+                        if (!load_material_lib(matlib_file_name.string(), out_obj)) {
                             //out_obj._objects.clear();
 
                             std::cout << "open_obj_file(): warning: loading materal lib ('"
-                                      << matlib_file_name.file_string() << "')"
+                                      << matlib_file_name << "')"
                                       << std::endl;
                         }
                     }

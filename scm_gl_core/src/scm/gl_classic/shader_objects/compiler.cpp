@@ -201,7 +201,7 @@ shader_compiler::compile(const shader_type           t,
     using namespace boost::filesystem;
 
     path            file_path(shader_file, native);
-    std::string     file_name(file_path.filename());
+    std::string     file_name = file_path.filename().string();
 
     if (!exists(file_path) || is_directory(file_path)) {
         log_stream << "shader_compiler::compile() <error>: "

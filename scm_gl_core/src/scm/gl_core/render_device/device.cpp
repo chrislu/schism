@@ -7,6 +7,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <scm/core/io/tools.h>
 #include <scm/core/utilities/foreach.h>
@@ -251,17 +252,16 @@ render_device::create_vertex_array(const vertex_format& in_vert_fmt,
 
 // shader api /////////////////////////////////////////////////////////////////////////////////////
 void
-render_device::add_include_path(const std::string& in_path,
-                                const std::string& in_file_extensions,
-                                bool               in_scan_subdirectories)
+render_device::add_include_files(const std::string& in_path,
+                                 const std::string& in_glsl_root_path,
+                                 const std::string& in_file_extensions,
+                                 bool               in_scan_subdirectories)
 {
-}
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+    boost::char_separator<char> space_separator(" ");
+    tokenizer                   file_extensions(in_file_extensions, space_separator);
 
-void
-render_device::add_include_paths(const std::vector<std::string>& in_paths,
-                                 const std::string&              in_file_extensions,
-                                 bool                            in_scan_subdirectories)
-{
+
 }
 
 bool
@@ -459,7 +459,7 @@ render_device::create_shader_from_file(shader_stage                    in_stage,
         return (shader_ptr());
     }
 
-    return create_shader(in_stage, source_string, in_macros, in_inc_paths, file_path.filename());
+    return create_shader(in_stage, source_string, in_macros, in_inc_paths, file_path.filename().string());
 }
 
 program_ptr

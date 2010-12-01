@@ -84,8 +84,8 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
 
     using namespace boost::filesystem;
     path                file_path(filename, native);
-    std::string         file_name       = file_path.leaf();
-    std::string         file_extension  = extension(file_path);
+    std::string         file_name       = file_path.filename().string();
+    std::string         file_extension  = file_path.extension().string();
 
     if (!parse_raw_file_name(file_name,
                              file_offset,
