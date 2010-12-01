@@ -1,6 +1,7 @@
 
 #include "device.h"
 
+#include <algorithm>
 #include <exception>
 #include <stdexcept>
 #include <sstream>
@@ -8,6 +9,7 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <scm/core/io/tools.h>
 #include <scm/core/utilities/foreach.h>
@@ -251,7 +253,7 @@ render_device::create_vertex_array(const vertex_format& in_vert_fmt,
 }
 
 // shader api /////////////////////////////////////////////////////////////////////////////////////
-void
+bool
 render_device::add_include_files(const std::string& in_path,
                                  const std::string& in_glsl_root_path,
                                  const std::string& in_file_extensions,
@@ -261,7 +263,107 @@ render_device::add_include_files(const std::string& in_path,
     boost::char_separator<char> space_separator(" ");
     tokenizer                   file_extensions(in_file_extensions, space_separator);
 
+    namespace bfs = boost::filesystem;
+    
 
+    std::string         output_root_path
+        = boost::trim_left_copy_if(
+              boost::trim_right_copy_if(
+                in_glsl_root_path,
+                boost::is_any_of("/")),
+              boost::is_any_of("/"));
+
+    if (!output_root_path.empty()) {
+        output_root_path = std::string("/") + output_root_path + std::string("/");
+    }
+    else {
+        output_root_path = std::string("/");
+    }
+
+    bfs::path           input_path = bfs::path(in_path, bfs::native);
+    bfs::path           input_root;
+
+    //if (input_path.is_relative()) {
+    //    input_path = bfs::absolute(input_path);
+    //}
+
+    if (!bfs::exists(input_path)) {
+        glerr() << log::error << "render_device::add_include_files(): "
+                << "<error> input path does not exist (" << input_path << ")." << log::end;
+        return false;
+    }
+
+    if (bfs::is_directory(input_path)) {
+        input_root = input_path;
+    }
+    else {
+        glerr() << log::error << "render_device::add_include_files(): "
+                << "<error> input path is a file (" << input_path << ")." << log::end;
+        return false;
+    }
+
+    if (in_scan_subdirectories) {
+        bfs::recursive_directory_iterator  file_iter(input_path);
+        bfs::recursive_directory_iterator  e = bfs::recursive_directory_iterator();
+        for (; file_iter != e; ++file_iter) {
+            bfs::path current_file = file_iter->path();
+            if (!bfs::is_directory(current_file)) {
+                if (    std::find(file_extensions.begin(),
+                                  file_extensions.end(),
+                                  current_file.extension().string())
+                    != file_extensions.end())
+                {
+                    std::string     source_string;
+                    if (io::read_text_file(current_file.string(), source_string)) {
+                        // me not likey... but does the trick in a portable manner
+                        bfs::path::const_iterator first_mis
+                            = std::mismatch(input_root.begin(), input_root.end(),
+                                            current_file.begin()).second;
+                        bfs::path input_rel_path;
+                        for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
+
+                        assert(input_path / input_rel_path == current_file);
+                        add_include_string(output_root_path + input_rel_path.string(), source_string);
+                    }
+                    else {
+                        glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+                    }
+                }
+            }
+        }
+    }
+    else {
+        bfs::directory_iterator  file_iter(input_path);
+        bfs::directory_iterator  e = bfs::directory_iterator();
+        for (; file_iter != e; ++file_iter) {
+            bfs::path current_file = file_iter->path();
+            if (!bfs::is_directory(current_file)) {
+                if (    std::find(file_extensions.begin(),
+                                  file_extensions.end(),
+                                  current_file.extension().string())
+                    != file_extensions.end())
+                {
+                    std::string     source_string;
+                    if (io::read_text_file(current_file.string(), source_string)) {
+                        // me not likey... but does the trick in a portable manner
+                        bfs::path::const_iterator first_mis
+                            = std::mismatch(input_root.begin(), input_root.end(),
+                                            current_file.begin()).second;
+                        bfs::path input_rel_path;
+                        for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
+
+                        assert(input_path / input_rel_path == current_file);
+                        add_include_string(output_root_path + input_rel_path.string(), source_string);
+                    }
+                    else {
+                        glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 bool
@@ -304,9 +406,9 @@ render_device::add_include_string(const std::string& in_path,
     size_t      parent_path_end = in_path.find_last_of('/');
     std::string parent_path     = in_path.substr(0, parent_path_end);
 
-    if (!parent_path.empty()) {
-        _default_include_paths.insert(parent_path);
-    }
+    //if (!parent_path.empty()) {
+    //    _default_include_paths.insert(parent_path);
+    //}
 
     gl_assert(glcore, leaving render_device::add_include_string());
 

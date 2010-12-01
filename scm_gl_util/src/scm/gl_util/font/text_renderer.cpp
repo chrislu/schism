@@ -21,56 +21,56 @@
 
 namespace {
 std::string v_source = "\
-    #version 330\n\
-    \
-    out vec3 tex_coord;\
-    \
-    uniform mat4  in_mvp;\
-    \
-    layout(location = 0) in vec3 in_position;\
-    layout(location = 2) in vec3 in_texcoord;\
-    \
-    void main()\
-    {\
-        tex_coord    = in_texcoord.xyz;\
-        gl_Position  = in_mvp * vec4(in_position, 1.0);\
-    }\
+    #version 330 core\n\
+    \n\
+    out vec3 tex_coord;\n\
+    \n\
+    uniform mat4  in_mvp;\n\
+    \n\
+    layout(location = 0) in vec3 in_position;\n\
+    layout(location = 2) in vec3 in_texcoord;\n\
+    \n\
+    void main()\n\
+    {\n\
+        tex_coord    = in_texcoord.xyz;\n\
+        gl_Position  = in_mvp * vec4(in_position, 1.0);\n\
+    }\n\
     ";
 
 std::string f_source_gray = "\
-    #version 330\n\
-    \
-    in vec3 tex_coord;\
-    \
-    uniform vec4            in_color;\
-    uniform sampler2DArray  in_font_array;\
-    \
-    layout(location = 0) out vec4 out_color;\
-    \
-    void main()\
-    {\
-        float core = texture(in_font_array, tex_coord).r;\
-        out_color.rgb = in_color.rgb;\
-        out_color.a   = core * in_color.a;\
-    }\
+    #version 330 core\n\
+    \n\
+    in vec3 tex_coord;\n\
+    \n\
+    uniform vec4            in_color;\n\
+    uniform sampler2DArray  in_font_array;\n\
+    \n\
+    layout(location = 0) out vec4 out_color;\n\
+    \n\
+    void main()\n\
+    {\n\
+        float core = texture(in_font_array, tex_coord).r;\n\
+        out_color.rgb = in_color.rgb;\n\
+        out_color.a   = core * in_color.a;\n\
+    }\n\
     ";
 
 std::string f_source_lcd = "\
-    #version 330\n\
-    \
-    in vec3 tex_coord;\
-    \
-    uniform vec4            in_color;\
-    uniform sampler2DArray  in_font_array;\
-    \
-    layout(location = 0) out vec4 out_color;\
-    \
-    void main()\
-    {\
-        vec3 core = texture(in_font_array, tex_coord).rgb;\
-        out_color.rgb = core.rgb * in_color.a;\
-        out_color.a   = 1.0;\
-    }\
+    #version 330 core\n\
+    \n\
+    in vec3 tex_coord;\n\
+    \n\
+    uniform vec4            in_color;\n\
+    uniform sampler2DArray  in_font_array;\n\
+    \n\
+    layout(location = 0) out vec4 out_color;\n\
+    \n\
+    void main()\n\
+    {\n\
+        vec3 core = texture(in_font_array, tex_coord).rgb;\n\
+        out_color.rgb = core.rgb * in_color.a;\n\
+        out_color.a   = 1.0;\n\
+    }\n\
     ";
 
 } // namespace
@@ -86,10 +86,10 @@ text_renderer::text_renderer(const render_device_ptr& device)
     using namespace scm::math;
     using boost::assign::list_of;
 
-    _font_program_gray = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source))
-                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_gray)));
-    _font_program_lcd  = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source))
-                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_lcd)));
+    _font_program_gray = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source,        "text_renderer::v_source"))
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_gray, "text_renderer::f_source_gray")));
+    _font_program_lcd  = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source,        "text_renderer::v_source"))
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_lcd,  "text_renderer::f_source_lcd")));
 
     if (   !_font_program_gray
         || !_font_program_lcd) {
