@@ -5,11 +5,13 @@
 #include <iosfwd>
 #include <limits>
 #include <list>
+#include <set>
 #include <utility>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <scm/core/math.h>
 #include <scm/core/pointer_types.h>
@@ -17,6 +19,8 @@
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
+#include <scm/gl_core/shader_objects/shader_objects_fwd.h>
+#include <scm/gl_core/shader_objects/shader_macro.h>
 #include <scm/gl_core/state_objects/blend_state.h>
 #include <scm/gl_core/state_objects/depth_stencil_state.h>
 #include <scm/gl_core/state_objects/rasterizer_state.h>
@@ -58,17 +62,13 @@ public:
         int             _max_viewports;
     }; // struct device_capabilities
 
-private:
+protected:
     typedef boost::unordered_set<render_device_resource*>   resource_ptr_set;
+    //typedef std::map<std::string, shader_macro>             shader_macro_map;
+    typedef boost::unordered_map<std::string, shader_macro> shader_macro_map;
+    typedef std::set<std::string>                           shader_include_path_set;
 
-    struct shader_macro {
-        shader_macro(const std::string& n, const std::string& v) : _name(n), _value(v) {};
-        std::string     _name;
-        std::string     _value;
-    };
-    typedef std::list<shader_macro>             shader_macro_list;
-    typedef std::list<std::string>              shader_include_list;
-    typedef std::list<shader_ptr>               shader_list;
+    typedef std::list<shader_ptr>                           shader_list;
 
     typedef std::vector<buffer_ptr>             buffer_array;
 
@@ -110,24 +110,50 @@ public:
                                                         const program_ptr&   in_program = program_ptr());
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:
-    void                            add_include_path(const std::string& p);
-    void                            add_macro_define(const shader_macro& d);
-    shader_ptr                      create_shader(shader_stage t, const std::string& s);
-    shader_ptr                      create_shader_from_file(shader_stage t, const std::string& f);
-    program_ptr                     create_program(const shader_list& in_shaders);
-    //shader_ptr                      create_shader(shader::stage_type t, const std::string& s, const shader_macro_list& m, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader(shader::stage_type t, const std::string& s, const shader_include_list& i, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader(shader::stage_type t, const std::string& s, const shader_macro_list& m, const shader_include_list& i, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader_from_file(shader::stage_type t, const std::string& s, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader_from_file(shader::stage_type t, const std::string& s, const shader_macro_list& m, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader_from_file(shader::stage_type t, const std::string& s, const shader_include_list& i, std::ostream& err_os = std::cerr);
-    //shader_ptr                      create_shader_from_file(shader::stage_type t, const std::string& s, const shader_macro_list& m, const shader_include_list& i, std::ostream& err_os = std::cerr);
+    void                            add_include_path(const std::string& in_path,
+                                                     const std::string& in_file_extensions     = std::string(".glsl .glslh"),
+                                                     bool               in_scan_subdirectories = true);
+    void                            add_include_paths(const std::vector<std::string>& in_paths,
+                                                      const std::string&              in_file_extensions     = std::string(".glsl .glslh"),
+                                                      bool                            in_scan_subdirectories = true);
+    bool                            add_include_string(const std::string& in_path,
+                                                       const std::string& in_source_string);
 
-    //virtual program_ptr                 create_program();
-    //shader(shader_type t, const std::string& s, std::ostream& err_os = std::cerr);
-    //shader(shader_type t, const std::string& s, const macro_definition_list& m, std::ostream& err_os = std::cerr);
-    //shader(shader_type t, const std::string& s, const include_path_list& i, std::ostream& err_os = std::cerr);
-    //shader(shader_type t, const std::string& s, const macro_definition_list& m, const include_path_list& i, std::ostream& err_os = std::cerr);
+    void                            add_macro_define(const std::string& in_name, const std::string& in_value);
+    void                            add_macro_define(const shader_macro& in_macro);
+    void                            add_macro_defines(const shader_macro_array& in_macros);
+
+    shader_ptr                      create_shader(shader_stage       in_stage,
+                                                  const std::string& in_source,
+                                                  const std::string& in_source_name = "");
+    shader_ptr                      create_shader(shader_stage              in_stage,
+                                                  const std::string&        in_source,
+                                                  const shader_macro_array& in_macros,
+                                                  const std::string&        in_source_name = "");
+    shader_ptr                      create_shader(shader_stage                    in_stage,
+                                                  const std::string&              in_source,
+                                                  const shader_include_path_list& in_inc_paths,
+                                                  const std::string&              in_source_name = "");
+    shader_ptr                      create_shader(shader_stage                    in_stage,
+                                                  const std::string&              in_source,
+                                                  const shader_macro_array&       in_macros,
+                                                  const shader_include_path_list& in_inc_paths,
+                                                  const std::string&              in_source_name = "");
+
+    shader_ptr                      create_shader_from_file(shader_stage       in_stage,
+                                                            const std::string& in_file_name);
+    shader_ptr                      create_shader_from_file(shader_stage              in_stage,
+                                                            const std::string&        in_source,
+                                                            const shader_macro_array& in_macros);
+    shader_ptr                      create_shader_from_file(shader_stage                    in_stage,
+                                                            const std::string&              in_source,
+                                                            const shader_include_path_list& in_inc_paths);
+    shader_ptr                      create_shader_from_file(shader_stage                    in_stage,
+                                                            const std::string&              in_source,
+                                                            const shader_macro_array&       in_macros,
+                                                            const shader_include_path_list& in_inc_paths);
+
+    program_ptr                     create_program(const shader_list& in_shaders);
 
 protected:
 
@@ -248,8 +274,8 @@ protected:
     render_context_ptr              _main_context;
 
     // shader api /////////////////////////////////////////////////////////////////////////////////
-    shader_macro_list               _default_macro_defines;
-    shader_include_list             _default_include_paths;
+    shader_macro_map                _default_macro_defines;
+    shader_include_path_set         _default_include_paths;
 
     device_capabilities             _capabilities;
     resource_ptr_set                _registered_resources;

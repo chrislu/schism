@@ -152,7 +152,8 @@ render_context::register_debug_callback(const debug_output_ptr& f)
 {
     const opengl::gl3_core& glapi = opengl_api();
 
-    if (!glapi.is_supported("GL_ARB_debug_output")) {
+    //if (!glapi.is_supported("GL_ARB_debug_output")) {
+    if (!glapi.extension_ARB_debug_output) {
         glout() << log::warning << "render_context::register_debug_callback(): "
                 << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
         return;
@@ -188,7 +189,8 @@ render_context::unregister_debug_callback(const debug_output_ptr& f)
 {
     const opengl::gl3_core& glapi = opengl_api();
 
-    if (!glapi.is_supported("GL_ARB_debug_output")) {
+    //if (!glapi.is_supported("GL_ARB_debug_output")) {
+    if (!glapi.extension_ARB_debug_output) {
         glout() << log::warning << "render_context::unregister_debug_callback(): "
                 << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
         return;
@@ -215,7 +217,8 @@ render_context::retrieve_debug_log() const
 {
     const opengl::gl3_core& glapi = opengl_api();
 
-    if (!glapi.is_supported("GL_ARB_debug_output")) {
+    // if (!glapi.is_supported("GL_ARB_debug_output")) {
+    if (!glapi.extension_ARB_debug_output) {
         glout() << log::warning << "render_context::retrieve_debug_log(): "
                 << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
         return (std::string(""));
@@ -261,11 +264,13 @@ render_context::synchronous_reporting(bool e)
         _debug_synchronous_reporting = e;
 
         const opengl::gl3_core& glapi = opengl_api();
-        if (_debug_synchronous_reporting) {
-            glapi.glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        }
-        else {
-            glapi.glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        if (glapi.extension_ARB_debug_output) {
+            if (_debug_synchronous_reporting) {
+                glapi.glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+            }
+            else {
+                glapi.glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 
 #include <scm/core/io/tools.h>
+#include <scm/core/utilities/foreach.h>
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/log.h>
@@ -16,6 +17,8 @@
 #include <scm/gl_core/query_objects.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/util/assert.h>
+#include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/shader_objects/program.h>
 #include <scm/gl_core/shader_objects/shader.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
@@ -178,6 +181,7 @@ render_device::init_capabilities()
     assert(_capabilities._max_viewports > 0);
 }
 
+// buffer api /////////////////////////////////////////////////////////////////////////////////////
 buffer_ptr
 render_device::create_buffer(const buffer_desc& in_buffer_desc,
                              const void*        in_initial_data)
@@ -245,20 +249,161 @@ render_device::create_vertex_array(const vertex_format& in_vert_fmt,
     return (new_array);
 }
 
-shader_ptr
-render_device::create_shader(shader_stage       t,
-                             const std::string& s)
+// shader api /////////////////////////////////////////////////////////////////////////////////////
+void
+render_device::add_include_path(const std::string& in_path,
+                                const std::string& in_file_extensions,
+                                bool               in_scan_subdirectories)
 {
-    shader_ptr new_shader(new shader(*this, t, s));
+}
+
+void
+render_device::add_include_paths(const std::vector<std::string>& in_paths,
+                                 const std::string&              in_file_extensions,
+                                 bool                            in_scan_subdirectories)
+{
+}
+
+bool
+render_device::add_include_string(const std::string& in_path,
+                                  const std::string& in_source_string)
+{
+    const opengl::gl3_core& glcore = opengl3_api();
+    util::gl_error          glerror(glcore);
+
+    if (!glcore.extension_ARB_shading_language_include) {
+        glout() << log::warning << "render_device::add_include_string(): "
+                << "shader includes not supported (GL_ARB_shading_language_include unsupported), ignoring include string." << log::end;
+        return false;
+    }
+
+    if (in_path[0] != '/') {
+        glerr() << log::error << "render_device::add_include_string(): "
+                << "<error> path not starting with '/'." << log::end;
+        return false;
+    }
+
+    glcore.glNamedStringARB(GL_SHADER_INCLUDE_ARB,
+                            static_cast<int>(in_path.length()),          in_path.c_str(),
+                            static_cast<int>(in_source_string.length()), in_source_string.c_str());
+
+    if (glerror) {
+        switch (glerror.to_object_state()) {
+        case object_state::OS_ERROR_INVALID_VALUE:
+            glerr() << log::error << "render_device::add_include_string(): "
+                    << "error creating named include string (path or source string empty or path not starting with '/'." << log::end;
+            return false;
+            break;
+        default:
+            glerr() << log::error << "render_device::add_include_string(): "
+                    << "error creating named include string (an unknown error occured)" << log::end;
+            return false;
+        }
+    }
+
+    size_t      parent_path_end = in_path.find_last_of('/');
+    std::string parent_path     = in_path.substr(0, parent_path_end);
+
+    if (!parent_path.empty()) {
+        _default_include_paths.insert(parent_path);
+    }
+
+    gl_assert(glcore, leaving render_device::add_include_string());
+
+    return true;
+}
+
+void
+render_device::add_macro_define(const std::string& in_name,
+                                const std::string& in_value)
+{
+    _default_macro_defines[in_name] = shader_macro(in_name, in_value);
+}
+
+void
+render_device::add_macro_define(const shader_macro& in_macro)
+{
+    _default_macro_defines[in_macro._name] = in_macro;
+}
+
+void
+render_device::add_macro_defines(const shader_macro_array& in_macros)
+{
+    foreach(const shader_macro& m, in_macros.macros()) {
+        add_macro_define(m);
+    }
+}
+
+shader_ptr
+render_device::create_shader(shader_stage       in_stage,
+                             const std::string& in_source,
+                             const std::string& in_source_name)
+{
+    return create_shader(in_stage, in_source, shader_macro_array(), shader_include_path_list(), in_source_name);
+}
+
+shader_ptr
+render_device::create_shader(shader_stage              in_stage,
+                             const std::string&        in_source,
+                             const shader_macro_array& in_macros,
+                             const std::string&        in_source_name)
+{
+    return create_shader(in_stage, in_source, in_macros, shader_include_path_list(), in_source_name);
+}
+
+shader_ptr
+render_device::create_shader(shader_stage                    in_stage,
+                             const std::string&              in_source,
+                             const shader_include_path_list& in_inc_paths,
+                             const std::string&              in_source_name)
+{
+    return create_shader(in_stage, in_source, shader_macro_array(), in_inc_paths, in_source_name);
+}
+
+shader_ptr
+render_device::create_shader(shader_stage                    in_stage,
+                             const std::string&              in_source,
+                             const shader_macro_array&       in_macros,
+                             const shader_include_path_list& in_inc_paths,
+                             const std::string&              in_source_name)
+{
+    // combine macro definitions
+    shader_macro_array  macro_array(in_macros);
+
+    shader_macro_map::const_iterator mb = _default_macro_defines.begin();
+    shader_macro_map::const_iterator me = _default_macro_defines.end();
+
+    for(; mb != me; ++mb) {
+        macro_array(mb->second._name, mb->second._value);
+    }
+
+    // combine shader include paths
+    shader_include_path_list   include_paths(in_inc_paths);
+
+    shader_include_path_set::const_iterator ipb = _default_include_paths.begin();
+    shader_include_path_set::const_iterator ipe = _default_include_paths.end();
+
+    for(; ipb != ipe; ++ipb) {
+        include_paths.push_back(*ipb);
+    }
+
+    shader_ptr new_shader(new shader(*this,
+                                     in_stage,
+                                     in_source,
+                                     in_source_name,
+                                     macro_array,
+                                     include_paths));
     if (new_shader->fail()) {
         if (new_shader->bad()) {
             glerr() << "render_device::create_shader(): unable to create shader object ("
-                    << "stage: " << shader_stage_string(t) << ", "
+                    << "name: " << in_source_name << ", "
+                    << "stage: " << shader_stage_string(in_stage) << ", "
                     << new_shader->state().state_string() << ")." << log::end;
         }
         else {
             glerr() << "render_device::create_shader(): unable to compile shader ("
-                    << "stage: " << shader_stage_string(t) << ", "
+                    << "name: " << in_source_name << ", "
+                    << "stage: " << shader_stage_string(in_stage) << ", "
                     << new_shader->state().state_string() << "):" << log::nline
                     << new_shader->info_log() << log::end;
         }
@@ -266,8 +411,10 @@ render_device::create_shader(shader_stage       t,
     }
     else {
         if (!new_shader->info_log().empty()) {
-            glout() << log::info << "render_device::create_shader(): compiler info"
-                    << "(stage: " << shader_stage_string(t) << ")" << log::nline
+            glout() << log::info << "render_device::create_shader(): compiler info ("
+                    << "name: " << in_source_name << ", "
+                    << "stage: " << shader_stage_string(in_stage)
+                    << ")" << log::nline
                     << new_shader->info_log() << log::end;
         }
         return (new_shader);
@@ -275,41 +422,44 @@ render_device::create_shader(shader_stage       t,
 }
 
 shader_ptr
-render_device::create_shader_from_file(shader_stage       t,
-                                       const std::string& f)
+render_device::create_shader_from_file(shader_stage       in_stage,
+                                       const std::string& in_file_name)
+{
+    return create_shader_from_file(in_stage, in_file_name, shader_macro_array(), shader_include_path_list());
+}
+
+shader_ptr
+render_device::create_shader_from_file(shader_stage              in_stage,
+                                       const std::string&        in_file_name,
+                                       const shader_macro_array& in_macros)
+{
+    return create_shader_from_file(in_stage, in_file_name, in_macros, shader_include_path_list());
+}
+
+shader_ptr
+render_device::create_shader_from_file(shader_stage                    in_stage,
+                                       const std::string&              in_file_name,
+                                       const shader_include_path_list& in_inc_paths)
+{
+    return create_shader_from_file(in_stage, in_file_name, shader_macro_array(), in_inc_paths);
+}
+
+shader_ptr
+render_device::create_shader_from_file(shader_stage                    in_stage,
+                                       const std::string&              in_file_name,
+                                       const shader_macro_array&       in_macros,
+                                       const shader_include_path_list& in_inc_paths)
 {
     namespace bfs = boost::filesystem;
-    bfs::path       file_path(f, bfs::native);
+    bfs::path       file_path(in_file_name, bfs::native);
     std::string     source_string;
 
-    if (   !io::read_text_file(f, source_string)) {
-        glerr() << "render_device::create_shader_from_file(): error reading shader file " << f << log::end;
+    if (   !io::read_text_file(in_file_name, source_string)) {
+        glerr() << "render_device::create_shader_from_file(): error reading shader file " << in_file_name << log::end;
         return (shader_ptr());
     }
 
-    shader_ptr new_shader(new shader(*this, t, source_string));
-    if (new_shader->fail()) {
-        if (new_shader->bad()) {
-            glerr() << "render_device::create_shader_from_file(): unable to create shader object" << log::nline
-                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ", "
-                    << new_shader->state().state_string() << ")" << log::end;
-        }
-        else {
-            glerr() << "render_device::create_shader_from_file(): unable to compile shader" << log::nline
-                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ", "
-                    << new_shader->state().state_string() << "):" << log::nline
-                    << new_shader->info_log() << log::end;
-        }
-        return (shader_ptr());
-    }
-    else {
-        if (!new_shader->info_log().empty()) {
-            glout() << log::info << "render_device::create_shader_from_file(): compiler info" << log::nline
-                    << "(" << file_path.filename() << ", " << shader_stage_string(t) << ")" << log::nline
-                    << new_shader->info_log() << log::end;
-        }
-        return (new_shader);
-    }
+    return create_shader(in_stage, source_string, in_macros, in_inc_paths, file_path.filename());
 }
 
 program_ptr
@@ -337,6 +487,7 @@ render_device::create_program(const shader_list& in_shaders)
     }
 }
 
+// texture api ////////////////////////////////////////////////////////////////////////////////////
 texture_1d_ptr
 render_device::create_texture_1d(const texture_1d_desc&   in_desc)
 {
@@ -616,7 +767,7 @@ render_device::create_sampler_state(texture_filter_mode  in_filter,
         in_max_anisotropy, in_min_lod, in_max_lod, in_lod_bias, in_compare_func, in_compare_mode)));
 }
 
-// frame buffer api ///////////////////////////////////////////////////////////////////////////
+// frame buffer api ///////////////////////////////////////////////////////////////////////////////
 render_buffer_ptr
 render_device::create_render_buffer(const render_buffer_desc& in_desc)
 {
@@ -726,7 +877,7 @@ render_device::create_blend_state(const blend_ops_array& in_blend_ops, bool in_a
     return (create_blend_state(blend_state_desc(in_blend_ops, in_alpha_to_coverage)));
 }
 
-// query api //////////////////////////////////////////////////////////////////////////////////
+// query api //////////////////////////////////////////////////////////////////////////////////////
 timer_query_ptr
 render_device::create_timer_query()
 {

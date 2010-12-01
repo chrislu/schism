@@ -10,6 +10,8 @@
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/render_device/device_child.h>
+#include <scm/gl_core/shader_objects/shader_objects_fwd.h>
+#include <scm/gl_core/shader_objects/shader_macro.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -26,12 +28,22 @@ public:
     const std::string&  info_log() const;
 
 protected:
-    shader(render_device&       ren_dev,
-           shader_stage         in_type,
-           const std::string&   in_src);
+    shader(render_device&                  ren_dev,
+           shader_stage                    in_type,
+           const std::string&              in_src,
+           const std::string&              in_src_name,
+           const shader_macro_array&       in_macros,
+           const shader_include_path_list& in_inc_paths);
 
-    bool   compile_source_string(      render_device&  ren_dev,
-                                 const std::string&    in_src);
+    bool   preprocess_source_string(      render_device&      ren_dev,
+                                    const std::string&        in_src,
+                                    const std::string&        in_src_name,
+                                    const shader_macro_array& in_macros,
+                                          std::string&        out_string);
+    bool   compile_source_string(      render_device&            ren_dev,
+                                 const std::string&              in_src,
+                                 const shader_include_path_list& in_inc_paths);
+
 
 protected:
     shader_stage    _type;

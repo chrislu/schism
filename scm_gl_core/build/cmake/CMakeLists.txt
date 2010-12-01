@@ -127,6 +127,7 @@ target_link_libraries(${PROJECT_NAME}
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
         opengl32
+        optimized libboost_regex-${SCM_BOOST_MT_REL}           debug libboost_regex-${SCM_BOOST_MT_DBG}
     )
     if (OPT_BUILD_deprecated_classic_scm_gl)
         target_link_libraries(${PROJECT_NAME}
@@ -138,6 +139,7 @@ endif (WIN32)
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
         GL
+        boost_regex${SCM_BOOST_MT_REL}
     )
     if (OPT_BUILD_deprecated_classic_scm_gl)
         target_link_libraries(${PROJECT_NAME}

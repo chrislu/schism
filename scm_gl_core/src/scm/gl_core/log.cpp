@@ -16,6 +16,7 @@ namespace gl {
 log::out_stream
 glout()
 {
+    gl_core_log.log_level(log::ll_output);
     return (gl_core_log.output());
 }
 
@@ -23,8 +24,10 @@ log::out_stream
 glerr()
 {
 #if SCM_GL_DEBUG
+    gl_core_log.log_level(log::ll_debug);
     return (gl_core_log.debug());
 #else
+    gl_core_log.log_level(log::ll_error);
     return (gl_core_log.error());
 #endif
 }

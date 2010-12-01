@@ -644,6 +644,15 @@ public:
     PFNGLGETFLOATI_VPROC                            glGetFloati_v;
     PFNGLGETDOUBLEI_VPROC                           glGetDoublei_v;
 
+    // GL_ARB_shading_language_include
+    bool extension_ARB_shading_language_include;
+    PFNGLNAMEDSTRINGARBPROC                         glNamedStringARB;
+    PFNGLDELETENAMEDSTRINGARBPROC                   glDeleteNamedStringARB;
+    PFNGLCOMPILESHADERINCLUDEARBPROC                glCompileShaderIncludeARB;
+    PFNGLISNAMEDSTRINGARBPROC                       glIsNamedStringARB;
+    PFNGLGETNAMEDSTRINGARBPROC                      glGetNamedStringARB;
+    PFNGLGETNAMEDSTRINGIVARBPROC                    glGetNamedStringivARB;
+
     // ARB_cl_event
     bool extension_ARB_cl_event;
     PFNGLCREATESYNCFROMCLEVENTARBPROC               glCreateSyncFromCLeventARB;

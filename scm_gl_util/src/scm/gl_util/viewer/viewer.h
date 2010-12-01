@@ -126,6 +126,7 @@ public:
 
 protected:
     bool                            initialize_render_target();
+    bool                            initialize_shader_includes();
 
 protected:
     // framestamp

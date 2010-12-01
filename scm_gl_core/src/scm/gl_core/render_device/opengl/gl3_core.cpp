@@ -111,6 +111,7 @@ gl3_core::gl3_core()
     version_4_1_available   = false;
 
     extension_EXT_direct_state_access_available = false;
+    extension_ARB_shading_language_include      = false;
     extension_ARB_cl_event                      = false;
     extension_ARB_debug_output                  = false;
     extension_ARB_robustness                    = false;
@@ -883,6 +884,16 @@ gl3_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLGETFLOATI_VPROC, glGetFloati_v, "OpenGL Core 4.1", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETDOUBLEI_VPROC, glGetDoublei_v, "OpenGL Core 4.1", init_success);
     version_4_1_available = version_4_0_available && init_success;
+
+    // GL_ARB_shading_language_include
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLNAMEDSTRINGARBPROC, glNamedStringARB, "GL_ARB_shading_language_include", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDELETENAMEDSTRINGARBPROC, glDeleteNamedStringARB, "GL_ARB_shading_language_include", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCOMPILESHADERINCLUDEARBPROC, glCompileShaderIncludeARB, "GL_ARB_shading_language_include", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISNAMEDSTRINGARBPROC, glIsNamedStringARB, "GL_ARB_shading_language_include", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETNAMEDSTRINGARBPROC, glGetNamedStringARB, "GL_ARB_shading_language_include", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETNAMEDSTRINGIVARBPROC, glGetNamedStringivARB, "GL_ARB_shading_language_include", init_success);
+    extension_ARB_shading_language_include = init_success;
 
     // ARB_cl_event ///////////////////////////////////////////////////////////////////////////////
     init_success = true;

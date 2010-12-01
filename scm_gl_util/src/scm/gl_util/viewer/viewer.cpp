@@ -36,33 +36,60 @@
 
 namespace {
 
-std::string color_present_vsrc = "\
+const std::string color_present_vsrc = "\
     #version 330 core\n\
-    \
-    uniform mat4 mvp;\
-    out vec2 tex_coord;\
-    layout(location = 0) in vec3 in_position;\
-    layout(location = 2) in vec2 in_texture_coord;\
-    \
-    void main()\
-    {\
-        gl_Position = mvp * vec4(in_position, 1.0);\
-        tex_coord = in_texture_coord;\
-    }\
+    \n\
+    uniform mat4 mvp;\n\
+    out vec2 tex_coord;\n\
+    layout(location = 0) in vec3 in_position;\n\
+    layout(location = 2) in vec2 in_texture_coord;\n\
+    \n\
+    void main()\n\
+    {\n\
+        gl_Position = mvp * vec4(in_position, 1.0);\n\
+        tex_coord = in_texture_coord;\n\
+    }\n\
     ";
 
-std::string color_present_fsrc = "\
+const std::string color_present_fsrc = "\
     #version 330 core\n\
-    \
-    in vec2 tex_coord;\
-    uniform sampler2D in_texture;\
-    uniform int       in_level;\
-    \
-    layout(location = 0) out vec4 out_color;\
-    void main()\
-    {\
-        out_color = texelFetch(in_texture, ivec2(gl_FragCoord.xy), in_level).rgba;\
-    }\
+    \n\
+    in vec2 tex_coord;\n\
+    uniform sampler2D in_texture;\n\
+    uniform int       in_level;\n\
+    \n\
+    layout(location = 0) out vec4 out_color;\n\
+    void main()\n\
+    {\n\
+        out_color = texelFetch(in_texture, ivec2(gl_FragCoord.xy), in_level).rgba;\n\
+    }\n\
+    ";
+
+const std::string camera_block_include_path = "/scm/gl_util/camera_block.glsl";
+const std::string camera_block_include_src  = "\
+    \n\
+    #ifndef SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
+    #define SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
+    \n\
+    layout(std140, column_major) uniform;\n\
+    \n\
+    uniform camera_matrices\n\
+    {\n\
+        vec4 ws_position;\n\
+        \n\
+        mat4 v_matrix;\n\
+        mat4 v_matrix_inverse;\n\
+        mat4 v_matrix_inverse_transpose;\n\
+        \n\
+        mat4 p_matrix;\n\
+        mat4 p_matrix_inverse;\n\
+        \n\
+        mat4 vp_matrix;\n\
+        mat4 vp_matrix_inverse;\n\
+    } camera_transform;\n\
+    \n\
+    #endif // SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
+    \n\
     ";
 
 } // namespace 
@@ -133,6 +160,7 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
         _device.reset(new render_device());
         _context = _device->main_context();
 
+        initialize_shader_includes();
         initialize_render_target();
 
         font_face_ptr counter_font(new font_face(_device, "../../../res/fonts/Consola.ttf", 12, 0, font_face::smooth_lcd));
@@ -588,16 +616,32 @@ viewer::initialize_render_target()
     }
 
     // shader programs
-    _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc))
-                                                                             (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc)));
+    _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
+                                                                             (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")));
     if (   !_render_target->_color_present_program) {
-        scm::err() << "viewer::initialize_render_target()): error creating pass through shader program" << log::end;
+        scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
         return (false);
     }
 
     _render_target->_quad_geom = make_shared<gl::quad_geometry>(device(), vec2f(0.0f, 0.0f), vec2f(1.0f, 1.0f));
 
     return (true);
+}
+
+bool
+viewer::initialize_shader_includes()
+{
+    if (!device()->add_include_string(camera_block_include_path, camera_block_include_src)) {
+        scm::err() << "viewer::initialize_shader_included(): error adding camera block include string." << log::end;
+        return false;
+    }
+    // just a test
+    //if (!device()->add_include_string("/scm/gl_util/viewer/camera_block.glsl", camera_block_include_src)) {
+    //    scm::err() << "viewer::initialize_shader_included(): error adding camera block include string." << log::end;
+    //    return false;
+    //}
+
+    return true;
 }
 
 } // namespace gl

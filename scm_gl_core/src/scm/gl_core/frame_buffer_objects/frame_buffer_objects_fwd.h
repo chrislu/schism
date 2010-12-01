@@ -15,6 +15,7 @@ class  render_buffer;
 class frame_buffer;
 
 class viewport;
+class viewport_array;
 
 typedef shared_ptr<render_target>       render_target_ptr;
 typedef shared_ptr<const render_target> render_target_cptr;

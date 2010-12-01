@@ -2,6 +2,9 @@
 #ifndef SCM_GL_CORE_SHADER_OBJECTS_FWD_H_INCLUDED
 #define SCM_GL_CORE_SHADER_OBJECTS_FWD_H_INCLUDED
 
+#include <list>
+#include <string>
+
 #include <scm/core/pointer_types.h>
 
 namespace scm {
@@ -10,6 +13,11 @@ namespace gl {
 class shader;
 class program;
 class uniform_base;
+
+class shader_macro;
+class shader_macro_array;
+
+typedef std::list<std::string>          shader_include_path_list;
 
 typedef shared_ptr<shader>              shader_ptr;
 typedef shared_ptr<const shader>        shader_cptr;
