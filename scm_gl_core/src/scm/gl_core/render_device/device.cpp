@@ -376,7 +376,7 @@ render_device::add_include_string(const std::string& in_path,
     if (!glcore.extension_ARB_shading_language_include) {
         glout() << log::warning << "render_device::add_include_string(): "
                 << "shader includes not supported (GL_ARB_shading_language_include unsupported), ignoring include string." << log::end;
-        return false;
+        return true;
     }
 
     if (in_path[0] != '/') {
