@@ -280,7 +280,7 @@ render_device::add_include_files(const std::string& in_path,
         output_root_path = std::string("/");
     }
 
-    bfs::path           input_path = bfs::path(in_path, bfs::native);
+    bfs::path           input_path = bfs::path(in_path);
     bfs::path           input_root;
 
     //if (input_path.is_relative()) {
@@ -553,7 +553,7 @@ render_device::create_shader_from_file(shader_stage                    in_stage,
                                        const shader_include_path_list& in_inc_paths)
 {
     namespace bfs = boost::filesystem;
-    bfs::path       file_path(in_file_name, bfs::native);
+    bfs::path       file_path(in_file_name);
     std::string     source_string;
 
     if (   !io::read_text_file(in_file_name, source_string)) {

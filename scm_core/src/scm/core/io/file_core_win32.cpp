@@ -137,7 +137,7 @@ file_core_win32::open(const std::string&       file_path,
 {
     using namespace boost::filesystem;
 
-    path            input_file_path(file_path, native);
+    path            input_file_path(file_path);
     path            complete_input_file_path(system_complete(input_file_path));
 
     bool            input_file_exists = exists(complete_input_file_path);

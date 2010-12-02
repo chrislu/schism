@@ -83,7 +83,7 @@ bool volume_data_loader_raw::open_file(const std::string& filename)
     unsigned            file_offset;
 
     using namespace boost::filesystem;
-    path                file_path(filename, native);
+    path                file_path(filename);
     std::string         file_name       = file_path.filename().string();
     std::string         file_extension  = file_path.extension().string();
 

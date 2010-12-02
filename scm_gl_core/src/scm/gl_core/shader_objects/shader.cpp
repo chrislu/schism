@@ -1,10 +1,12 @@
 
 #include "shader.h"
 
+#include <iostream>
 #include <cassert>
 #include <string>
 #include <sstream>
 
+#include <boost/xpressive/xpressive_static.hpp>
 #include <boost/regex.hpp>
 #include <boost/utility.hpp>
 
@@ -110,11 +112,23 @@ shader::preprocess_source_string(      render_device&      ren_dev,
     using boost::regex_match;
     using boost::smatch;
 
-    // comment line (//|/*...*/)          1
-    regex    comment_line_open_regex("\\s*(//|/\\*.*)?");
+
+    // comment line (//|/*...*/)          1           2
+    regex    comment_line_open_regex("\\s*(//|/\\*)?(.*)(\\*/)?");
     regex    comment_line_close_regex(".*\\*/\\s*");
     // #version xxx xxxxxxx(//|/*...)                1       2    3                4
     regex    version_line_regex("\\s*#\\s*version\\s+(\\d{3})(\\s+([a-zA-Z]*))?\\s*(//|/\\*.*)?");
+
+    using namespace boost::xpressive;
+
+    mark_tag    comment_open_single_tag(1);
+    mark_tag    comment_open_multi_begin_tag(2);
+    mark_tag    comment_open_multi_end_tag(3);
+    sregex      comment_line =    *_s
+                               >> !(  (comment_open_single_tag = "//")
+                                   >> (comment_open_multi_begin_tag = "/*"))
+                               >> *_
+                               >> !(comment_open_multi_begin_tag = "*/");
 
     std::string         src_name = (    in_src_name.empty()
                                     || !ren_dev.opengl3_api().extension_ARB_shading_language_include
@@ -132,14 +146,9 @@ shader::preprocess_source_string(      render_device&      ren_dev,
 
     while (std::getline(in_stream, in_line)) {
 
-        if (multi_line_comment) {
-            if (regex_match(in_line, comment_line_close_regex)) {
-                multi_line_comment = false;
-            }
-        }
-
         if (!version_line_found && !multi_line_comment) {
             smatch m;
+            cmatch what;
             if (regex_match(in_line, m, version_line_regex)) {
                 version_line_found = true;
                 if (m[4] == "/*") {
@@ -147,14 +156,29 @@ shader::preprocess_source_string(      render_device&      ren_dev,
                 }
             }
             else if (regex_match(in_line, m, comment_line_open_regex)) {
-                if (m[1] == "/*") {
+                if (   m[1] == "/*"
+                    && !m[2].matched) {
+                        std::cout << m[2] << std::endl;
                     multi_line_comment = true;
                 }
             }
+            //else if (regex_search(in_line.c_str(), what, comment_line)) {
+            //    if (   what[comment_open_multi_begin_tag].
+            //        && !m[2].matched) {
+            //            std::cout << m[2] << std::endl;
+            //        multi_line_comment = true;
+            //    }
+            //}
             else {
                 _info_log.clear();
                 _info_log = src_name + std::string("(0) : error no #version statement found at beginning of source string.");
                 return false;
+            }
+        }
+
+        if (multi_line_comment) {
+            if (regex_match(in_line, comment_line_close_regex)) {
+                multi_line_comment = false;
             }
         }
 

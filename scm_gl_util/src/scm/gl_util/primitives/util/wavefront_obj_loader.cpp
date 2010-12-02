@@ -155,7 +155,7 @@ bool open_obj_file(const std::string& filename, wavefront_model& out_obj)
 
     std::ifstream   obj_file;
 
-    path                    file_path(filename, native);
+    path                    file_path(filename);
     std::string             file_name       = file_path.filename().string();
     std::string             file_extension  = file_path.extension().string();
 

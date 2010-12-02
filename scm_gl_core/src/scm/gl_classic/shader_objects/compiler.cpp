@@ -175,7 +175,7 @@ shader_compiler::add_include_path(const std::string& p)
 {
     using namespace boost::filesystem;
 
-    path    new_path(p, native);
+    path    new_path(p);
 
     if (exists(new_path)) {
         if (!is_directory(new_path)) {
@@ -200,7 +200,7 @@ shader_compiler::compile(const shader_type           t,
 {
     using namespace boost::filesystem;
 
-    path            file_path(shader_file, native);
+    path            file_path(shader_file);
     std::string     file_name = file_path.filename().string();
 
     if (!exists(file_path) || is_directory(file_path)) {
