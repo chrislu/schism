@@ -1,14 +1,12 @@
 
 #include "shader.h"
 
-#include <iostream>
 #include <cassert>
 #include <string>
 #include <sstream>
 
-#include <boost/xpressive/xpressive_static.hpp>
-#include <boost/regex.hpp>
 #include <boost/utility.hpp>
+#include <boost/xpressive/xpressive_static.hpp>
 
 #include <scm/core/pointer_types.h>
 #include <scm/core/utilities/foreach.h>
@@ -108,27 +106,24 @@ shader::preprocess_source_string(      render_device&      ren_dev,
                                  const shader_macro_array& in_macros,
                                        std::string&        out_string)
 {
-    using boost::regex;
-    using boost::regex_match;
-    using boost::smatch;
-
-
-    // comment line (//|/*...*/)          1           2
-    regex    comment_line_open_regex("\\s*(//|/\\*)?(.*)(\\*/)?");
-    regex    comment_line_close_regex(".*\\*/\\s*");
-    // #version xxx xxxxxxx(//|/*...)                1       2    3                4
-    regex    version_line_regex("\\s*#\\s*version\\s+(\\d{3})(\\s+([a-zA-Z]*))?\\s*(//|/\\*.*)?");
-
     using namespace boost::xpressive;
 
-    mark_tag    comment_open_single_tag(1);
-    mark_tag    comment_open_multi_begin_tag(2);
-    mark_tag    comment_open_multi_end_tag(3);
-    sregex      comment_line =    *_s
-                               >> !(  (comment_open_single_tag = "//")
-                                   >> (comment_open_multi_begin_tag = "/*"))
-                               >> *_
-                               >> !(comment_open_multi_begin_tag = "*/");
+    mark_tag    comment_line_open_sl(1);
+    mark_tag    comment_line_open_mlo(2);
+    mark_tag    comment_line_open_mlc(3);
+    cregex      comment_line_open =    *_s >> !( ((comment_line_open_sl = "//")  >>  *_ )
+                                               | ((comment_line_open_mlo = "/*") >> -*_ >> !(comment_line_open_mlc = "*/") >> *_s) );
+
+    mark_tag    comment_line_close_mlc(1);
+    cregex      comment_line_close =   -*_ >> (comment_line_close_mlc = "*/") >> *_s;
+
+    mark_tag    version_line_version(1);
+    mark_tag    version_line_profile(2);
+    mark_tag    version_line_open_mlo(3);
+    cregex      version_line =     *_s >> "#version"
+                              >>   +_s >> (version_line_version   = repeat<1, 3>(_d))
+                              >> !(+_s >> (version_line_profile   = +_w))
+                              >>   *_s >> !(version_line_open_mlo = "/*") >> *_;
 
     std::string         src_name = (    in_src_name.empty()
                                     || !ren_dev.opengl3_api().extension_ARB_shading_language_include
@@ -147,42 +142,39 @@ shader::preprocess_source_string(      render_device&      ren_dev,
     while (std::getline(in_stream, in_line)) {
 
         if (!version_line_found && !multi_line_comment) {
-            smatch m;
             cmatch what;
-            if (regex_match(in_line, m, version_line_regex)) {
+            if (regex_match(in_line.c_str(), what, version_line)) {
+                //std::cout << what[version_line_version] << std::endl;
+                //std::cout << what[version_line_profile] << std::endl;
+                //std::cout << what[version_line_open_mlo] << std::endl;
                 version_line_found = true;
-                if (m[4] == "/*") {
+                if (what[version_line_open_mlo].matched) {
                     multi_line_comment = true;
                 }
             }
-            else if (regex_match(in_line, m, comment_line_open_regex)) {
-                if (   m[1] == "/*"
-                    && !m[2].matched) {
-                        std::cout << m[2] << std::endl;
+            else if (regex_match(in_line.c_str(), what, comment_line_open)) {
+                //std::cout << what[comment_line_open_sl] << std::endl;
+                //std::cout << what[comment_line_open_mlo] << std::endl;
+                //std::cout << what[comment_line_open_mlc] << std::endl;
+                if (    what[comment_line_open_mlo].matched
+                    && !what[comment_line_open_mlc].matched) {
                     multi_line_comment = true;
                 }
             }
-            //else if (regex_search(in_line.c_str(), what, comment_line)) {
-            //    if (   what[comment_open_multi_begin_tag].
-            //        && !m[2].matched) {
-            //            std::cout << m[2] << std::endl;
-            //        multi_line_comment = true;
-            //    }
-            //}
             else {
                 _info_log.clear();
                 _info_log = src_name + std::string("(0) : error no #version statement found at beginning of source string.");
                 return false;
             }
         }
-
-        if (multi_line_comment) {
-            if (regex_match(in_line, comment_line_close_regex)) {
+        else if (multi_line_comment) {
+            if (regex_match(in_line.c_str(), comment_line_close)) {
                 multi_line_comment = false;
             }
         }
 
         out_stream << in_line << std::endl;
+        ++line_number;
 
         if (   !macro_lines_inserted
             &&  version_line_found
@@ -193,12 +185,10 @@ shader::preprocess_source_string(      render_device&      ren_dev,
                 out_stream << "#define " << m._name << " " << m._value << std::endl;
             }
 
-            out_stream << line_string(line_number + 1, src_name) << std::endl;
+            out_stream << line_string(line_number, src_name) << std::endl;
 
             macro_lines_inserted = true;
         }
-        
-        ++line_number;
     }
 
     out_string = out_stream.str();
