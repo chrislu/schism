@@ -120,10 +120,11 @@ shader::preprocess_source_string(      render_device&      ren_dev,
     mark_tag    version_line_version(1);
     mark_tag    version_line_profile(2);
     mark_tag    version_line_open_mlo(3);
+    mark_tag    version_line_open_mlc(4);
     cregex      version_line =     *_s >> "#version"
-                              >>   +_s >> (version_line_version   = repeat<1, 3>(_d))
-                              >> !(+_s >> (version_line_profile   = +_w))
-                              >>   *_s >> !(version_line_open_mlo = "/*") >> *_;
+                              >>   +_s >>  (version_line_version   = repeat<1, 3>(_d))
+                              >> !(+_s >>  (version_line_profile   = +_w))
+                              >>   *_s >> !((version_line_open_mlo = "/*") >> -*_ >> !(version_line_open_mlc = "*/") >> *_s);
 
     std::string         src_name = (    in_src_name.empty()
                                     || !ren_dev.opengl3_api().extension_ARB_shading_language_include
@@ -148,7 +149,8 @@ shader::preprocess_source_string(      render_device&      ren_dev,
                 //std::cout << what[version_line_profile] << std::endl;
                 //std::cout << what[version_line_open_mlo] << std::endl;
                 version_line_found = true;
-                if (what[version_line_open_mlo].matched) {
+                if (    what[version_line_open_mlo].matched
+                    && !what[version_line_open_mlc].matched) {
                     multi_line_comment = true;
                 }
             }
