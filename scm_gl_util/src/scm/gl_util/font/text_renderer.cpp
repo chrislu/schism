@@ -87,9 +87,11 @@ text_renderer::text_renderer(const render_device_ptr& device)
     using boost::assign::list_of;
 
     _font_program_gray = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source,        "text_renderer::v_source"))
-                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_gray, "text_renderer::f_source_gray")));
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_gray, "text_renderer::f_source_gray")),
+                                                "text_renderer::font_program_gray");
     _font_program_lcd  = device->create_program(list_of(device->create_shader(STAGE_VERTEX_SHADER, v_source,        "text_renderer::v_source"))
-                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_lcd,  "text_renderer::f_source_lcd")));
+                                                       (device->create_shader(STAGE_FRAGMENT_SHADER, f_source_lcd,  "text_renderer::f_source_lcd")),
+                                                "text_renderer::font_program_lcd");
 
     if (   !_font_program_gray
         || !_font_program_lcd) {

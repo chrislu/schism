@@ -151,7 +151,8 @@ public:
                                                             const shader_macro_array&       in_macros,
                                                             const shader_include_path_list& in_inc_paths);
 
-    program_ptr                     create_program(const shader_list& in_shaders);
+    program_ptr                     create_program(const shader_list& in_shaders,
+                                                   const std::string& in_program_name = "");
 
 protected:
 

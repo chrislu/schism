@@ -565,16 +565,19 @@ render_device::create_shader_from_file(shader_stage                    in_stage,
 }
 
 program_ptr
-render_device::create_program(const shader_list& in_shaders)
+render_device::create_program(const shader_list& in_shaders,
+                              const std::string& in_program_name)
 {
     program_ptr new_program(new program(*this, in_shaders));
     if (new_program->fail()) {
         if (new_program->bad()) {
             glerr() << "render_device::create_program(): unable to create shader object ("
+                    << "name: " << in_program_name << ", "
                     << new_program->state().state_string() << ")." << log::end;
         }
         else {
             glerr() << "render_device::create_program(): error during link operation ("
+                    << "name: " << in_program_name << ", "
                     << new_program->state().state_string() << "):" << log::nline
                     << new_program->info_log() << log::end;
         }
@@ -582,7 +585,8 @@ render_device::create_program(const shader_list& in_shaders)
     }
     else {
         if (!new_program->info_log().empty()) {
-            glout() << log::info << "render_device::create_program(): linker info" << log::nline
+            glout() << log::info << "render_device::create_program(): linker info ("
+                    << "name: " << in_program_name << ")" << log::nline
                     << new_program->info_log() << log::end;
         }
         return (new_program);

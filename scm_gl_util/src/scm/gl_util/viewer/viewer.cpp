@@ -617,7 +617,8 @@ viewer::initialize_render_target()
 
     // shader programs
     _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
-                                                                             (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")));
+                                                                             (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
+                                                                      "viewer::_color_present_program");
     if (   !_render_target->_color_present_program) {
         scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
         return (false);
