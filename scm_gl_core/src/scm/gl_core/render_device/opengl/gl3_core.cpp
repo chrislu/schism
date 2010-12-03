@@ -240,6 +240,11 @@ gl3_core::initialize()
         glout() << log::warning << "gl3_core::initialize(): ARB_robustness reported but missing entry points detected" << log::end;
     }
 
+    extension_ARB_shading_language_include = extension_ARB_shading_language_include && is_supported("GL_ARB_shading_language_include");
+    extension_ARB_cl_event                 = extension_ARB_cl_event                 && is_supported("GL_ARB_cl_event");
+    extension_ARB_debug_output             = extension_ARB_debug_output             && is_supported("GL_ARB_debug_output");
+    extension_ARB_robustness               = extension_ARB_robustness               && is_supported("GL_ARB_robustness");
+
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
         glout() << log::warning
@@ -247,6 +252,8 @@ gl3_core::initialize()
                 << "GL_EXT_direct_state_access not supported but enabled for scm_gl_core use "
                 << "(undefine SCM_GL_CORE_USE_DIRECT_STATE_ACCESS!)" << log::end;
     }
+    extension_EXT_direct_state_access_available = extension_EXT_direct_state_access_available && is_supported("GL_EXT_direct_state_access");
+
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
     glout() << log::outdent;
