@@ -535,7 +535,7 @@ file_core_win32::set_end_of_file()
                 return (-1);
             }
         }
-		else {
+        else {
             set_file_pointer(_position);
             if (SetEndOfFile(_file_handle.get()) == 0) {
                 scm::err() << log::error
@@ -547,7 +547,7 @@ file_core_win32::set_end_of_file()
                 close();
                 return (-1);
             }
-		}
+        }
 
         return (_position);
     }

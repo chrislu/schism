@@ -24,17 +24,19 @@ read_text_file(const std::string& in_file_path, std::string& out_file_string)
         return (false);
     }
 
-    // reserve at least file_size characters in string
-    out_file_string.resize(f->size());
+    if (0 < f->size()) {
+        // reserve at least file_size characters in string
+        out_file_string.resize(f->size());
 
-    assert(out_file_string.capacity() >= f->size());
+        assert(out_file_string.capacity() >= f->size());
 
-    if (f->read(&out_file_string[0], f->size()) != f->size()) {
-        scm::out() << log::error
-                   << "read_text_file(): error reading from file "
-                   << in_file_path 
-                   << " (number of bytes attempted to read: " << f->size() << ")" << log::end;
-        return (false);
+        if (f->read(&out_file_string[0], f->size()) != f->size()) {
+            scm::out() << log::error
+                       << "read_text_file(): error reading from file "
+                       << in_file_path 
+                       << " (number of bytes attempted to read: " << f->size() << ")" << log::end;
+            return (false);
+        }
     }
 
     f->close();

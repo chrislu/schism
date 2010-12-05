@@ -323,7 +323,7 @@ render_device::add_include_files(const std::string& in_path,
                         for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
 
                         assert(input_path / input_rel_path == current_file);
-                        add_include_string(output_root_path + input_rel_path.string(), source_string);
+                        add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
                     }
                     else {
                         glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
@@ -353,7 +353,7 @@ render_device::add_include_files(const std::string& in_path,
                         for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
 
                         assert(input_path / input_rel_path == current_file);
-                        add_include_string(output_root_path + input_rel_path.string(), source_string);
+                        add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
                     }
                     else {
                         glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
@@ -376,7 +376,7 @@ render_device::add_include_string(const std::string& in_path,
     if (!glcore.extension_ARB_shading_language_include) {
         glout() << log::warning << "render_device::add_include_string(): "
                 << "shader includes not supported (GL_ARB_shading_language_include unsupported), ignoring include string." << log::end;
-        return true;
+        return false;
     }
 
     if (in_path[0] != '/') {

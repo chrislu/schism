@@ -633,7 +633,7 @@ bool
 viewer::initialize_shader_includes()
 {
     if (!device()->add_include_string(camera_block_include_path, camera_block_include_src)) {
-        scm::err() << "viewer::initialize_shader_included(): error adding camera block include string." << log::end;
+        scm::err() << "viewer::initialize_shader_includes(): error adding camera block include string." << log::end;
         return false;
     }
     // just a test
