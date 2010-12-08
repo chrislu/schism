@@ -46,6 +46,8 @@ public:
     size_type                   write(const void*   input_buffer,
                                       size_type     num_bytes_to_write);
 
+    bool                        flush_buffers() const;
+
 	offset_type                 set_end_of_file();
     // end file_core interface
 

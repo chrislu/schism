@@ -81,6 +81,13 @@ file::write(const void* input_buffer,
     return (_file_core->write(input_buffer, num_bytes_to_write));
 }
 
+bool
+file::flush_buffers() const
+{
+    assert(_file_core);
+    return (_file_core->flush_buffers());
+}
+
 file::offset_type
 file::set_end_of_file()
 {

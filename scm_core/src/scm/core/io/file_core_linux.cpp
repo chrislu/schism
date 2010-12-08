@@ -333,6 +333,14 @@ file_core_linux::write(const void* input_buffer,
     return (bytes_written);
 }
 
+bool
+file_core_linux::flush_buffers() const
+{
+    assert(is_open());
+
+    return (true);//FlushFileBuffers(_file_handle.get()) == TRUE ? true : false);
+}
+
 file_core_linux::offset_type
 file_core_linux::set_end_of_file()
 {

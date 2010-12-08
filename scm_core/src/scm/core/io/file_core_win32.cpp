@@ -476,6 +476,15 @@ file_core_win32::write(const void* input_buffer,
     return (bytes_written);
 }
 
+bool
+file_core_win32::flush_buffers() const
+{
+    assert(_file_handle);
+    assert(_file_handle.get() != INVALID_HANDLE_VALUE);
+
+    return (FlushFileBuffers(_file_handle.get()) == TRUE ? true : false);
+}
+
 file_core_win32::offset_type
 file_core_win32::set_end_of_file()
 {

@@ -33,6 +33,8 @@ public:
     virtual size_type           write(const void*    input_buffer,
                                       size_type      num_bytes_to_write) = 0;
 
+    virtual bool                flush_buffers() const = 0;
+
 	virtual offset_type         set_end_of_file() = 0;
 
     // fixed functionality

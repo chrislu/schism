@@ -49,6 +49,7 @@ public:
                                      size_type       num_bytes_to_read);
     size_type                   write(const void*    input_buffer,
                                       size_type      num_bytes_to_write);
+    bool                        flush_buffers() const;
     offset_type                 seek(offset_type                off,
                                      std::ios_base::seek_dir    way);
 	offset_type                 set_end_of_file();
