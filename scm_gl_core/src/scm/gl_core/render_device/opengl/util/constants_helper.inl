@@ -14,14 +14,14 @@ unsigned
 gl_buffer_targets(const buffer_binding b)
 {
     switch (b) {
-        case BIND_VERTEX_BUFFER:                return (GL_ARRAY_BUFFER);
-        case BIND_INDEX_BUFFER:                 return (GL_ELEMENT_ARRAY_BUFFER);
-        case BIND_PIXEL_BUFFER:                 return (GL_PIXEL_PACK_BUFFER);
-        case BIND_PIXEL_UNPACK_BUFFER:          return (GL_PIXEL_UNPACK_BUFFER);
-        case BIND_UNIFORM_BUFFER:               return (GL_UNIFORM_BUFFER);
-        case BIND_TEXTURE_BUFFER:               return (GL_TEXTURE_BUFFER);
-        case BIND_TRANSFORM_FEEDBACK_BUFFER:    return (GL_TRANSFORM_FEEDBACK_BUFFER);
-        default:                                return (0);                       
+        case BIND_VERTEX_BUFFER:                return GL_ARRAY_BUFFER;
+        case BIND_INDEX_BUFFER:                 return GL_ELEMENT_ARRAY_BUFFER;
+        case BIND_PIXEL_BUFFER:                 return GL_PIXEL_PACK_BUFFER;
+        case BIND_PIXEL_UNPACK_BUFFER:          return GL_PIXEL_UNPACK_BUFFER;
+        case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER;
+        case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BUFFER;
+        case BIND_TRANSFORM_FEEDBACK_BUFFER:    return GL_TRANSFORM_FEEDBACK_BUFFER;
+        default:                                return 0;
     }
 }
 
@@ -30,14 +30,14 @@ unsigned
 gl_buffer_bindings(const buffer_binding b)
 {
     switch (b) {
-        case BIND_VERTEX_BUFFER:                return (GL_ARRAY_BUFFER_BINDING);
-        case BIND_INDEX_BUFFER:                 return (GL_ELEMENT_ARRAY_BUFFER_BINDING);
-        case BIND_PIXEL_BUFFER:                 return (GL_PIXEL_PACK_BUFFER_BINDING);
-        case BIND_PIXEL_UNPACK_BUFFER:          return (GL_PIXEL_UNPACK_BUFFER_BINDING);
-        case BIND_UNIFORM_BUFFER:               return (GL_UNIFORM_BUFFER_BINDING);
-        case BIND_TEXTURE_BUFFER:               return (GL_TEXTURE_BINDING_BUFFER);
-        case BIND_TRANSFORM_FEEDBACK_BUFFER:    return (GL_TRANSFORM_FEEDBACK_BUFFER_BINDING);
-        default:                                return (0);                       
+        case BIND_VERTEX_BUFFER:                return GL_ARRAY_BUFFER_BINDING;
+        case BIND_INDEX_BUFFER:                 return GL_ELEMENT_ARRAY_BUFFER_BINDING;
+        case BIND_PIXEL_BUFFER:                 return GL_PIXEL_PACK_BUFFER_BINDING;
+        case BIND_PIXEL_UNPACK_BUFFER:          return GL_PIXEL_UNPACK_BUFFER_BINDING;
+        case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER_BINDING;
+        case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BINDING_BUFFER;
+        case BIND_TRANSFORM_FEEDBACK_BUFFER:    return GL_TRANSFORM_FEEDBACK_BUFFER_BINDING;
+        default:                                return 0;
     }
 }
 
@@ -65,7 +65,7 @@ gl_usage_flags(const buffer_usage b)
     assert((sizeof(glbufu) / sizeof(int)) == USAGE_COUNT);
     assert(USAGE_STATIC_DRAW <= b && b < USAGE_COUNT);
 
-    return (glbufu[b]);
+    return glbufu[b];
 }
 
 inline
@@ -75,13 +75,13 @@ gl_buffer_access(const buffer_access a)
     assert(ACCESS_READ_ONLY <= a && a < ACCESS_COUNT);
 
     switch (a) {
-        case ACCESS_READ_ONLY:                  return (GL_MAP_READ_BIT);
-        case ACCESS_WRITE_ONLY:                 return (GL_MAP_WRITE_BIT);
-        case ACCESS_READ_WRITE:                 return (GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        case ACCESS_WRITE_INVALIDATE_RANGE:     return (GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
-        case ACCESS_WRITE_INVALIDATE_BUFFER:    return (GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        case ACCESS_WRITE_UNSYNCHRONIZED:       return (GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-        default:                                return (0);                       
+        case ACCESS_READ_ONLY:                  return GL_MAP_READ_BIT;
+        case ACCESS_WRITE_ONLY:                 return GL_MAP_WRITE_BIT;
+        case ACCESS_READ_WRITE:                 return GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+        case ACCESS_WRITE_INVALIDATE_RANGE:     return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
+        case ACCESS_WRITE_INVALIDATE_BUFFER:    return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
+        case ACCESS_WRITE_UNSYNCHRONIZED:       return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+        default:                                return 0;                       
     }
 }
 
@@ -142,7 +142,7 @@ gl_primitive_types(const primitive_topology p)
     assert((sizeof(types) / sizeof(unsigned)) == PRIMITIVE_TOPOLOGY_COUNT);
     assert(PRIMITIVE_POINT_LIST <= p && p < PRIMITIVE_TOPOLOGY_COUNT);
 
-    return (types[p]);
+    return types[p];
 }
 
 inline
@@ -165,7 +165,7 @@ gl_shader_types(const shader_stage s)
     assert((sizeof(shader_types) / sizeof(int)) == SHADER_STAGE_COUNT);
     assert(STAGE_VERTEX_SHADER <= s && s < SHADER_STAGE_COUNT);
 
-    return (shader_types[s]);
+    return shader_types[s];
 }
 
 inline
@@ -188,7 +188,7 @@ gl_compare_func(const compare_func c)
     assert((sizeof(compare_funcs) / sizeof(unsigned)) == COMPARISON_FUNC_COUNT);
     assert(COMPARISON_NEVER <= c && c < COMPARISON_FUNC_COUNT);
 
-    return (compare_funcs[c]);
+    return compare_funcs[c];
 }
 
 inline
@@ -211,7 +211,7 @@ gl_stencil_op(const stencil_op s)
     assert((sizeof(stencil_ops) / sizeof(unsigned)) == STENCIL_OP_COUNT);
     assert(STENCIL_KEEP <= s && s < STENCIL_OP_COUNT);
 
-    return (stencil_ops[s]);
+    return stencil_ops[s];
 }
 
 inline
@@ -229,7 +229,7 @@ gl_fill_mode(const fill_mode s)
     assert((sizeof(fill_modes) / sizeof(unsigned)) == FILL_MODE_COUNT);
     assert(FILL_SOLID <= s && s < FILL_MODE_COUNT);
 
-    return (fill_modes[s]);
+    return fill_modes[s];
 }
 
 inline
@@ -247,7 +247,7 @@ gl_cull_mode(const cull_mode s)
     assert((sizeof(cull_modes) / sizeof(unsigned)) == CULL_MODE_COUNT);
     assert(CULL_NONE <= s && s < CULL_MODE_COUNT);
 
-    return (cull_modes[s]);
+    return cull_modes[s];
 }
 
 inline
@@ -264,7 +264,7 @@ gl_polygon_orientation(const polygon_orientation s)
     assert((sizeof(polygon_orientations) / sizeof(unsigned)) == POLY_ORIENT_COUNT);
     assert(ORIENT_CW <= s && s < POLY_ORIENT_COUNT);
 
-    return (polygon_orientations[s]);
+    return polygon_orientations[s];
 }
 
 inline
@@ -272,9 +272,9 @@ unsigned
 gl_origin_mode(const enum origin_mode o)
 {
     switch (o) {
-    case ORIGIN_UPPER_LEFT: return (GL_UPPER_LEFT); break;
-    case ORIGIN_LOWER_LEFT: return (GL_LOWER_LEFT); break;
-    default:                assert(0 && (o < ORIGIN_MODE_COUNT));return (0);
+    case ORIGIN_UPPER_LEFT: return GL_UPPER_LEFT; break;
+    case ORIGIN_LOWER_LEFT: return GL_LOWER_LEFT; break;
+    default:                assert(0 && (o < ORIGIN_MODE_COUNT));return 0;
     }
 }
 
@@ -309,7 +309,7 @@ gl_blend_func(const blend_func s)
     assert((sizeof(blend_funcs) / sizeof(unsigned)) == BLEND_FUNC_COUNT);
     assert(FUNC_ZERO <= s && s < BLEND_FUNC_COUNT);
 
-    return (blend_funcs[s]);
+    return blend_funcs[s];
 }
 
 inline
@@ -329,7 +329,7 @@ gl_blend_equation(const blend_equation s)
     assert((sizeof(blend_equations) / sizeof(unsigned)) == BLEND_EQ_COUNT);
     assert(EQ_FUNC_ADD <= s && s < BLEND_EQ_COUNT);
 
-    return (blend_equations[s]);
+    return blend_equations[s];
 }
 
 inline
@@ -363,7 +363,7 @@ gl_texture_min_filter_mode(const texture_filter_mode s)
     assert((sizeof(texture_min_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
     assert(FILTER_MIN_MAG_NEAREST <= s && s < TEXTURE_FILTER_COUNT);
 
-    return (texture_min_filter_modes[s]);
+    return texture_min_filter_modes[s];
 }
 
 inline
@@ -391,7 +391,7 @@ gl_texture_mag_filter_mode(const texture_filter_mode s)
     assert((sizeof(texture_mag_filter_modes) / sizeof(unsigned)) == TEXTURE_FILTER_COUNT);
     assert(FILTER_MIN_MAG_NEAREST <= s && s < TEXTURE_FILTER_COUNT);
 
-    return (texture_mag_filter_modes[s]);
+    return texture_mag_filter_modes[s];
 }
 
 inline
@@ -409,7 +409,7 @@ gl_wrap_mode(const texture_wrap_mode s)
     assert((sizeof(wrap_modes) / sizeof(unsigned)) == WRAP_MODE_COUNT);
     assert(WRAP_CLAMP_TO_EDGE <= s && s < WRAP_MODE_COUNT);
 
-    return (wrap_modes[s]);
+    return wrap_modes[s];
 }
 
 inline
@@ -426,7 +426,7 @@ gl_texture_compare_mode(const texture_compare_mode s)
     assert((sizeof(texture_compare_modes) / sizeof(unsigned)) == TEXCOMARE_COUNT);
     assert(TEXCOMPARE_NONE <= s && s < TEXCOMARE_COUNT);
 
-    return (texture_compare_modes[s]);
+    return texture_compare_modes[s];
 }
 
 inline
@@ -443,7 +443,7 @@ gl_framebuffer_binding(const frame_buffer_binding s)
     assert((sizeof(framebuffer_bindings) / sizeof(unsigned)) == FRAMEBUFFER_BINDING_COUNT);
     assert(FRAMEBUFFER_DRAW <= s && s < FRAMEBUFFER_BINDING_COUNT);
 
-    return (framebuffer_bindings[s]);
+    return framebuffer_bindings[s];
 }
 
 inline
@@ -467,7 +467,7 @@ gl_frame_buffer_target(const frame_buffer_target s)
     assert((sizeof(framebuffer_targets) / sizeof(unsigned)) == FRAMEBUFFER_TARGET_COUNT);
     assert(GL_FRONT_LEFT <= s && s < FRAMEBUFFER_TARGET_COUNT);
 
-    return (framebuffer_targets[s]);
+    return framebuffer_targets[s];
 }
 
 inline
