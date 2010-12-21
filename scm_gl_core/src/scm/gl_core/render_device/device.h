@@ -60,6 +60,8 @@ public:
         int             _max_uniform_buffer_bindings;
         int             _uniform_buffer_offset_alignment;
         int             _max_viewports;
+        int             _max_transform_feedback_separate_attribs;
+        int             _max_transform_feedback_buffers;
     }; // struct device_capabilities
 
 protected:

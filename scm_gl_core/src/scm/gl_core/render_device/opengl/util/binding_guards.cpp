@@ -134,6 +134,30 @@ framebuffer_binding_guard::~framebuffer_binding_guard()
 
 }
 
+transform_feedback_binding_guard::transform_feedback_binding_guard(const opengl::gl3_core& in_glapi,
+                                                                   unsigned                in_target,
+                                                                   unsigned                in_binding)
+  : _gl_api(in_glapi)
+  , _target(in_target)
+  , _binding(in_binding)
+  , _save(0)
+{
+    gl_assert(_gl_api, entering transform_feedback_binding_guard::transform_feedback_binding_guard());
+
+    _gl_api.glGetIntegerv(_binding, &_save);
+    
+    gl_assert(_gl_api, leaving transform_feedback_binding_guard::transform_feedback_binding_guard());
+}
+
+transform_feedback_binding_guard::~transform_feedback_binding_guard()
+{
+    gl_assert(_gl_api, entering transform_feedback_binding_guard::~transform_feedback_binding_guard());
+
+    _gl_api.glBindTransformFeedback(_target, _save);
+    
+    gl_assert(_gl_api, leaving transform_feedback_binding_guard::~transform_feedback_binding_guard());
+}
+
 } // namespace util
 } // namespace gl
 } // namespace scm

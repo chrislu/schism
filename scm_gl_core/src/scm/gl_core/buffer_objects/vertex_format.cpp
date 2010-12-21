@@ -11,12 +11,12 @@ vertex_format::element::element(int                 stream,
                                 data_type           type,
                                 int                 stride,
                                 interger_handling   int_handling)
-  : _buffer_stream(stream),
-    _attrib_name(name),
-    _attrib_location(-1),
-    _type(type),
-    _stride(stride),
-    _integer_handling(int_handling)
+  : _buffer_stream(stream)
+  , _attrib_name(name)
+  , _attrib_location(-1)
+  , _type(type)
+  , _stride(stride)
+  , _integer_handling(int_handling)
 {
 }
 
@@ -25,38 +25,39 @@ vertex_format::element::element(int               stream,
                                 data_type         type,
                                 int               stride,
                                 interger_handling int_handling)
-  : _buffer_stream(stream),
-    _attrib_location(location),
-    _type(type),
-    _stride(stride),
-    _integer_handling(int_handling)
+  : _buffer_stream(stream)
+  , _attrib_location(location)
+  , _type(type)
+  , _stride(stride)
+  , _integer_handling(int_handling)
 {
 }
 
 bool
 vertex_format::element::operator==(const element& e) const
 {
-    return (   (_buffer_stream == e._buffer_stream)
-            && (_type == e._type)
-            && (_stride == e._stride)
-            && (_integer_handling == e._integer_handling)
-            && (_attrib_location == e._attrib_location)
-            && (_attrib_name == e._attrib_name));
+    return    (_buffer_stream == e._buffer_stream)
+           && (_type == e._type)
+           && (_stride == e._stride)
+           && (_integer_handling == e._integer_handling)
+           && (_attrib_location == e._attrib_location)
+           && (_attrib_name == e._attrib_name);
 }
 
 bool
 vertex_format::element::operator!=(const element& e) const
 {
-    return (   (_buffer_stream != e._buffer_stream)
-            || (_type != e._type)
-            || (_stride != e._stride)
-            || (_integer_handling != e._integer_handling)
-            || (_attrib_location != e._attrib_location)
-            || (_attrib_name != e._attrib_name));
+    return    (_buffer_stream != e._buffer_stream)
+           || (_type != e._type)
+           || (_stride != e._stride)
+           || (_integer_handling != e._integer_handling)
+           || (_attrib_location != e._attrib_location)
+           || (_attrib_name != e._attrib_name);
 }
 
 vertex_format::vertex_format(const element_array& in_elements)
-  : _elements(in_elements), _generic(true)
+  : _elements(in_elements)
+  , _generic(true)
 {
     for (element_array::const_iterator i = in_elements.begin();
          (i != in_elements.end()) && _generic;
@@ -68,7 +69,8 @@ vertex_format::vertex_format(const element_array& in_elements)
 }
 
 vertex_format::vertex_format(const element& in_element)
-  : _elements(1, in_element), _generic(true)
+  : _elements(1, in_element)
+  , _generic(true)
 {
     if (!in_element._attrib_name.empty()) {
         _generic = false;
@@ -80,7 +82,8 @@ vertex_format::vertex_format(int                stream,
                              data_type          type,
                              int                stride,
                              interger_handling  int_handling)
-  : _elements(1, element(stream, name, type, stride, int_handling)), _generic(false)
+  : _elements(1, element(stream, name, type, stride, int_handling))
+  , _generic(false)
 {
 }
 
@@ -89,7 +92,8 @@ vertex_format::vertex_format(int                stream,
                              data_type          type,
                              int                stride,
                              interger_handling  int_handling)
-  : _elements(1, element(stream, location, type, stride, int_handling)), _generic(true)
+  : _elements(1, element(stream, location, type, stride, int_handling))
+  , _generic(true)
 {
 }
 
@@ -114,7 +118,7 @@ vertex_format::operator()(int                stream,
     _elements.push_back(element(stream, name, type, stride, int_handling));
     _generic = false;
 
-    return (*this);
+    return *this;
 }
 
 vertex_format&
@@ -127,7 +131,7 @@ vertex_format::operator()(int               stream,
     _elements.push_back(element(stream, location, type, stride, int_handling));
     _generic = true;
 
-    return (*this);
+    return *this;
 }
 
 const vertex_format::element_array&

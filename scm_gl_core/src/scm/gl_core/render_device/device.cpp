@@ -180,8 +180,17 @@ render_device::init_capabilities()
     else {
         _capabilities._max_viewports = 1;
     }
-
     assert(_capabilities._max_viewports > 0);
+
+    glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS, &_capabilities._max_transform_feedback_separate_attribs);
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &_capabilities._max_transform_feedback_buffers);
+    }
+    else {
+        _capabilities._max_transform_feedback_buffers = _capabilities._max_transform_feedback_separate_attribs;
+    }
+    assert(_capabilities._max_transform_feedback_separate_attribs > 0);
+    assert(_capabilities._max_transform_feedback_buffers > 0);
 }
 
 // buffer api /////////////////////////////////////////////////////////////////////////////////////

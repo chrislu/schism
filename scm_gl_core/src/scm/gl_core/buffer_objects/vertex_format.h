@@ -43,7 +43,7 @@ public:
     vertex_format(int stream, const std::string& name, data_type type, int stride = 0, interger_handling int_handling = INT_PURE);
     vertex_format(int stream, int location,            data_type type, int stride = 0, interger_handling int_handling = INT_PURE);
 
-    virtual ~vertex_format();
+    /*virtual*/ ~vertex_format();
 
     vertex_format&  operator()(const element& in_element);
     vertex_format&  operator()(int stream, const std::string& name, data_type type, int stride = 0, interger_handling int_handling = INT_PURE);

@@ -80,6 +80,7 @@ protected:
     friend class render_context;
     friend class vertex_array;
     friend class texture_buffer;
+    friend class transform_feedback;
 };
 
 } // namespace gl

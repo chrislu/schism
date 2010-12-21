@@ -76,6 +76,20 @@ private:
     const opengl::gl3_core& _gl_api;
 };
 
+class transform_feedback_binding_guard
+{
+public:
+    explicit transform_feedback_binding_guard(const opengl::gl3_core& in_glapi,
+                                              unsigned                in_target,
+                                              unsigned                in_binding);
+    virtual ~transform_feedback_binding_guard();
+private:
+    int             _save;
+    unsigned        _target;
+    unsigned        _binding;
+    const opengl::gl3_core& _gl_api;
+};
+
 } // namespace util
 } // namespace gl
 } // namespace scm
