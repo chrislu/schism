@@ -16,19 +16,20 @@
 namespace scm {
 namespace gl {
 
-stream_output_setup::stream_output_setup(const element_array& in_elements)
-  : _elements(in_elements)
+stream_output_setup::stream_output_setup(const output_stream stream, const element& in_element)
+  : _elements(static_cast<size_t>(OUTPUT_STREAM_COUNT))
+  , _max_used_stream(0)
 {
+    assert(_elements.size() == OUTPUT_STREAM_COUNT);
+    insert(stream, in_element);
 }
 
-stream_output_setup::stream_output_setup(const element& in_element)
-  : _elements(1, in_element)
+stream_output_setup::stream_output_setup(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset)
+  : _elements(static_cast<size_t>(OUTPUT_STREAM_COUNT))
+  , _max_used_stream(0)
 {
-}
-
-stream_output_setup::stream_output_setup(const buffer_ptr& out_buffer, const size_t out_buffer_offset)
-  : _elements(1, element(out_buffer, out_buffer_offset))
-{
+    assert(_elements.size() == OUTPUT_STREAM_COUNT);
+    insert(stream, out_buffer, out_buffer_offset);
 }
 
 stream_output_setup::~stream_output_setup()
@@ -36,32 +37,52 @@ stream_output_setup::~stream_output_setup()
 }
 
 stream_output_setup&
-stream_output_setup::operator()(const element& in_element)
+stream_output_setup::operator()(const output_stream stream, const element& in_element)
 {
-    _elements.push_back(in_element);
-
+    insert(stream, in_element);
     return *this;
 }
 
 stream_output_setup&
-stream_output_setup::operator()(const buffer_ptr& out_buffer, const size_t out_buffer_offset)
+stream_output_setup::operator()(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset)
 {
-    _elements.push_back(element(out_buffer, out_buffer_offset));
-
+    insert(stream, out_buffer, out_buffer_offset);
     return *this;
 }
 
-const stream_output_setup::element&
-stream_output_setup::operator[](const size_t i) const
+void
+stream_output_setup::insert(const output_stream stream, const element& in_element)
 {
-    assert(0 <= i && i < _elements.size());
-    return _elements[i];
+    assert(0 <= stream && stream < _elements.size());
+    _elements[stream] = in_element;
+    _max_used_stream  = math::max<unsigned>(_max_used_stream, stream);
 }
 
-const stream_output_setup::element_array&
-stream_output_setup::elements() const
+void
+stream_output_setup::insert(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset)
 {
-    return _elements;
+    assert(0 <= stream && stream < _elements.size());
+    _elements[stream] = element(out_buffer, out_buffer_offset);
+    _max_used_stream  = math::max<unsigned>(_max_used_stream, stream);
+}
+
+unsigned
+stream_output_setup::max_used_stream() const
+{
+    return _max_used_stream;
+}
+
+bool
+stream_output_setup::empty() const
+{
+    return _elements.empty();
+}
+
+const stream_output_setup::element&
+stream_output_setup::operator[](const output_stream stream) const
+{
+    assert(0 <= stream && stream < _elements.size());
+    return _elements[stream];
 }
 
 bool
@@ -114,16 +135,15 @@ transform_feedback::~transform_feedback()
 }
 
 const buffer_ptr&
-transform_feedback::stream_out_buffer(const size_t i) const
+transform_feedback::stream_out_buffer(const output_stream stream) const
 {
-    assert(0 <= i && i < _stream_out_setup.elements().size());
-    return _stream_out_setup.elements()[i].first;
+    return _stream_out_setup[stream].first;
 }
 
 const buffer_ptr&
-transform_feedback::operator[](const size_t i) const
+transform_feedback::operator[](const output_stream stream) const
 {
-    return stream_out_buffer(i);
+    return stream_out_buffer(stream);
 }
 
 const stream_output_setup&
@@ -172,27 +192,26 @@ transform_feedback::unbind(render_context& in_context) const
     }
 
     gl_assert(in_context.opengl_api(), leaving transform_feedback:unbind());
-
 }
 
 bool
 transform_feedback::initialize_transform_feedback_object(const render_device& in_device)
 {
-    if (_stream_out_setup.elements().empty()) {
+    if (_stream_out_setup.empty()) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
         return false;
     }
 
     if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
         // GL4.x MAX_TRANSFORM_FEEDBACK_BUFFERS
-        if (_stream_out_setup.elements().size() > in_device.capabilities()._max_transform_feedback_buffers) {
+        if (_stream_out_setup.max_used_stream() >= static_cast<unsigned>(in_device.capabilities()._max_transform_feedback_buffers)) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
             return false;
         }
     }
     else {
         // GL3.x MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS
-        if (_stream_out_setup.elements().size() > in_device.capabilities()._max_transform_feedback_separate_attribs) {
+        if (_stream_out_setup.max_used_stream() >= static_cast<unsigned>(in_device.capabilities()._max_transform_feedback_separate_attribs)) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
             return false;
         }
@@ -224,13 +243,13 @@ transform_feedback::bind_stream_out_buffers(render_context& in_context) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
-    stream_output_setup::element_array::const_iterator  b = _stream_out_setup.elements().begin();
-    stream_output_setup::element_array::const_iterator  e = _stream_out_setup.elements().end();
+    for (unsigned bind_index = 0; bind_index <= _stream_out_setup.max_used_stream(); ++bind_index) {
+        const buffer_ptr& cur_buffer = _stream_out_setup[static_cast<output_stream>(bind_index)].first;
+        const size_t      cur_offset = _stream_out_setup[static_cast<output_stream>(bind_index)].second;
 
-    for (unsigned bind_index = 0; b != e; ++b, ++bind_index) {
-        const buffer_ptr& cur_buffer = b->first;
-
-        cur_buffer->bind_range(in_context, BIND_TRANSFORM_FEEDBACK_BUFFER, bind_index, b->second, 0);
+        if (cur_buffer) {
+            cur_buffer->bind_range(in_context, BIND_TRANSFORM_FEEDBACK_BUFFER, bind_index, cur_offset, 0);
+        }
         assert(cur_buffer->ok());
     }
 }
@@ -240,12 +259,13 @@ transform_feedback::unbind_stream_out_buffers(render_context& in_context) const
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
-    stream_output_setup::element_array::const_iterator  b = _stream_out_setup.elements().begin();
-    stream_output_setup::element_array::const_iterator  e = _stream_out_setup.elements().end();
+    for (unsigned bind_index = 0; bind_index <= _stream_out_setup.max_used_stream(); ++bind_index) {
+        const buffer_ptr& cur_buffer = _stream_out_setup[static_cast<output_stream>(bind_index)].first;
 
-    for (unsigned bind_index = 0; b != e; ++b, ++bind_index) {
-        const buffer_ptr& cur_buffer = b->first;
-        cur_buffer->unbind_range(in_context, BIND_TRANSFORM_FEEDBACK_BUFFER, bind_index);
+        if (cur_buffer) {
+            cur_buffer->unbind_range(in_context, BIND_TRANSFORM_FEEDBACK_BUFFER, bind_index);
+        }
+        assert(cur_buffer->ok());
     }
 }
 

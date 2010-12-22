@@ -17,6 +17,8 @@ class uniform_base;
 class shader_macro;
 class shader_macro_array;
 
+class stream_capture;
+
 typedef std::list<std::string>          shader_include_path_list;
 
 typedef shared_ptr<shader>              shader_ptr;

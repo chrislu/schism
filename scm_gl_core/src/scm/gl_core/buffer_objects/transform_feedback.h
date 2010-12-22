@@ -26,23 +26,28 @@ public:
     typedef std::vector<element>            element_array;
 
 public:
-    stream_output_setup(const element_array& in_elements);
-    stream_output_setup(const element& in_element);
-    stream_output_setup(const buffer_ptr& out_buffer, const size_t out_buffer_offset = 0);
+    stream_output_setup(const output_stream stream, const element& in_element);
+    stream_output_setup(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset = 0);
 
     /*virtual*/ ~stream_output_setup();
 
-    stream_output_setup&    operator()(const element& in_element);
-    stream_output_setup&    operator()(const buffer_ptr& out_buffer, const size_t out_buffer_offset = 0);
+    stream_output_setup&    operator()(const output_stream stream, const element& in_element);
+    stream_output_setup&    operator()(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset = 0);
 
-    const element&          operator[](const size_t i) const;
-    const element_array&    elements() const;
+    void                    insert(const output_stream stream, const element& in_element);
+    void                    insert(const output_stream stream, const buffer_ptr& out_buffer, const size_t out_buffer_offset = 0);
+
+    bool                    empty() const;
+    unsigned                max_used_stream() const;
+
+    const element&          operator[](const output_stream stream) const;
 
     bool                    operator==(const stream_output_setup& rhs) const;
     bool                    operator!=(const stream_output_setup& rhs) const;
 
 protected:
     element_array           _elements;
+    unsigned                _max_used_stream;
 
 }; // class stream_output_setup
 
@@ -51,8 +56,8 @@ class __scm_export(gl_core) transform_feedback : public context_bindable_object,
 public:
     virtual ~transform_feedback();
 
-    const buffer_ptr&           stream_out_buffer(const size_t i) const;
-    const buffer_ptr&           operator[](const size_t i) const;
+    const buffer_ptr&           stream_out_buffer(const output_stream stream) const;
+    const buffer_ptr&           operator[](const output_stream stream) const;
     const stream_output_setup&  stream_out_setup() const;
 
 protected:

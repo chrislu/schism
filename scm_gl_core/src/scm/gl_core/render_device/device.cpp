@@ -24,6 +24,7 @@
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/shader_objects/program.h>
 #include <scm/gl_core/shader_objects/shader.h>
+#include <scm/gl_core/shader_objects/stream_capture.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
 #include <scm/gl_core/state_objects/depth_stencil_state.h>
@@ -577,7 +578,7 @@ program_ptr
 render_device::create_program(const shader_list& in_shaders,
                               const std::string& in_program_name)
 {
-    program_ptr new_program(new program(*this, in_shaders));
+    program_ptr new_program(new program(*this, in_shaders, stream_capture()));
     if (new_program->fail()) {
         if (new_program->bad()) {
             glerr() << "render_device::create_program(): unable to create shader object ("
