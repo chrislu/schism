@@ -19,6 +19,36 @@
 namespace scm {
 namespace gl {
 
+#if 0
+class __scm_export(gl_core) stream_capture
+{
+    typedef boost::variant<std::string, skip_components_type>   capture_element;
+    typedef std::list<capture_element>                          capture_varyings_list;
+
+}; // class stream_capture
+
+class __scm_export(gl_core) separate_stream_capture : public stream_capture
+{
+    interleaved_stream_capture(const std::string& varying_name);
+}; // class separate_stream_capture
+
+class __scm_export(gl_core) interleaved_stream_capture : public stream_capture
+{
+    interleaved_stream_capture(const std::string& varying_name);
+    interleaved_stream_capture(const skip_components_type& skip_components);
+
+    interleaved_stream_capture&                 operator()(const std::string& varying_name);
+    interleaved_stream_capture&                 operator()(const skip_components_type& skip_components);
+
+
+}; // class interleaved_stream_capture
+
+class __scm_export(gl_core) stream_capture_array
+{
+}; // class stream_capture_array
+
+#endif
+
 class __scm_export(gl_core) stream_capture
 {
 public:
