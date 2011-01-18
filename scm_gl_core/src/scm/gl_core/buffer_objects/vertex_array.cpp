@@ -34,8 +34,9 @@ vertex_array::vertex_array(      render_device&           ren_dev,
         context_bindable_object::_gl_object_target  = 0; // no explicit binding point
         context_bindable_object::_gl_object_binding = GL_VERTEX_ARRAY_BINDING;
 
-        build_buffer_slots(ren_dev, in_vert_format, in_attrib_buffers, in_program);
-        initialize_array_object(ren_dev);
+        if (build_buffer_slots(ren_dev, in_vert_format, in_attrib_buffers, in_program)) {
+            initialize_array_object(ren_dev);
+        }
     }
     gl_assert(glapi, leaving vertex_array::vertex_array());
 }
@@ -115,7 +116,8 @@ vertex_array::build_buffer_slots(const render_device&           in_ren_dev,
             state().set(object_state::OS_ERROR_INVALID_VALUE);
             return (false);
         }
-        if (0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_VERTEX_BUFFER)) {
+        if (   0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_VERTEX_BUFFER)
+            && 0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_TRANSFORM_FEEDBACK_BUFFER)) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
             return (false);
         }
