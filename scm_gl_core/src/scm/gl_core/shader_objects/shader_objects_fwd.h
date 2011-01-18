@@ -18,6 +18,9 @@ class shader_macro;
 class shader_macro_array;
 
 class stream_capture;
+class stream_capture_array;
+class separate_stream_capture;
+class interleaved_capture;
 
 typedef std::list<std::string>          shader_include_path_list;
 

@@ -38,6 +38,10 @@ public:
     void                draw_raw(const render_context_ptr& in_context,
                                  const draw_mode           in_draw_mode = MODE_SOLID) const;
 
+    const buffer_ptr&       vertex_buffer() const;
+    const buffer_ptr&       index_buffer() const;
+    const vertex_array_ptr& vertex_array() const;
+
 protected:
     buffer_ptr              _vertex_buffer;
     buffer_ptr              _index_buffer;

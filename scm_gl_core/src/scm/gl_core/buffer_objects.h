@@ -4,6 +4,7 @@
 
 #include <scm/gl_core/buffer_objects/buffer_objects_fwd.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
+#include <scm/gl_core/buffer_objects/transform_feedback.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
 

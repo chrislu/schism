@@ -110,6 +110,9 @@ public:
     vertex_array_ptr                create_vertex_array(const vertex_format& in_vert_fmt,
                                                         const buffer_array&  in_attrib_buffers,
                                                         const program_ptr&   in_program = program_ptr());
+
+    transform_feedback_ptr          create_transform_feedback(const stream_output_setup& in_setup);
+
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:
     bool                            add_include_files(const std::string& in_path,
@@ -155,6 +158,9 @@ public:
 
     program_ptr                     create_program(const shader_list& in_shaders,
                                                    const std::string& in_program_name = "");
+    program_ptr                     create_program(const shader_list&          in_shaders,
+                                                   const stream_capture_array& in_capture,
+                                                   const std::string&          in_program_name = "");
 
 protected:
 

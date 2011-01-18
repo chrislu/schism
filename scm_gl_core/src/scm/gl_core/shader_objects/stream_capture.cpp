@@ -2,6 +2,7 @@
 #include "stream_capture.h"
 
 #include <cassert>
+#include <limits>
 
 #include <scm/core/math.h>
 
@@ -11,114 +12,219 @@ namespace {
 namespace scm {
 namespace gl {
 
+// stream_capture /////////////////////////////////////////////////////////////////////////////////
 stream_capture::stream_capture()
-  : _stream_captures(static_cast<size_t>(OUTPUT_STREAM_COUNT))
-  , _max_used_stream(0)
-  , _captures_count(0)
 {
-    assert(_stream_captures.size() == OUTPUT_STREAM_COUNT);
-}
-
-stream_capture::stream_capture(const output_stream stream, const std::string& varying_name)
-  : _stream_captures(static_cast<size_t>(OUTPUT_STREAM_COUNT))
-  , _max_used_stream(0)
-  , _captures_count(0)
-{
-    assert(_stream_captures.size() == OUTPUT_STREAM_COUNT);
-
-    append_capture(stream, varying_name);
-}
-
-stream_capture::stream_capture(const output_stream stream, const skip_components_type skip_components)
-  : _stream_captures(static_cast<size_t>(OUTPUT_STREAM_COUNT))
-  , _max_used_stream(0)
-  , _captures_count(0)
-{
-    assert(_stream_captures.size() == OUTPUT_STREAM_COUNT);
-
-    append_capture(stream, skip_components);
 }
 
 stream_capture::~stream_capture()
 {
 }
 
-stream_capture&
-stream_capture::operator()(const output_stream stream, const std::string& varying_name)
+bool
+stream_capture::empty() const
 {
-    append_capture(stream, varying_name);
-    return *this;
+    return _elements.empty();
 }
 
-stream_capture&
-stream_capture::operator()(const output_stream stream, const skip_components_type skip_components)
+int
+stream_capture::size() const
 {
-    append_capture(stream, skip_components);
-    return *this;
+    assert(_elements.size() < (std::numeric_limits<int>::max)());
+    return static_cast<int>(_elements.size());
 }
 
-void
-stream_capture::append_capture(const output_stream stream, const std::string& varying_name)
+const stream_capture::captures_list&
+stream_capture::captures() const
 {
-    assert(static_cast<int>(stream) < _stream_captures.size());
-
-    _stream_captures[stream].push_back(varying_name);
-    _max_used_stream  = math::max<unsigned>(_max_used_stream, stream);
-    _captures_count  += 1;
+    return _elements;
 }
 
-void
-stream_capture::append_capture(const output_stream stream, const skip_components_type skip_components)
+// separate_stream_capture ////////////////////////////////////////////////////////////////////////
+separate_stream_capture::separate_stream_capture(const std::string& varying_name)
 {
-    assert(static_cast<int>(stream) < _stream_captures.size());
+    _elements.push_back(varying_name);
+}
 
-    _stream_captures[stream].push_back(skip_components);
-    _max_used_stream = math::max<unsigned>(_max_used_stream, stream);
-    _captures_count  += 1;
+separate_stream_capture::~separate_stream_capture()
+{
 }
 
 bool
-stream_capture::empty() const
+separate_stream_capture::is_interleaved() const
+{
+    return false;
+}
+
+// interleaved_stream_capture /////////////////////////////////////////////////////////////////////
+interleaved_stream_capture::interleaved_stream_capture(const std::string& varying_name)
+  : _has_skipped_components(false)
+{
+    _elements.push_back(varying_name);
+}
+
+interleaved_stream_capture::interleaved_stream_capture(const skip_components_type& skip_components)
+  : _has_skipped_components(true)
+{
+    _elements.push_back(skip_components);
+}
+
+interleaved_stream_capture::~interleaved_stream_capture()
+{
+}
+
+bool
+interleaved_stream_capture::is_interleaved() const
+{
+    return true;
+}
+
+bool
+interleaved_stream_capture::has_skipped_components() const
+{
+    return _has_skipped_components;
+}
+
+interleaved_stream_capture&
+interleaved_stream_capture::operator()(const std::string& varying_name)
+{
+    _elements.push_back(varying_name);
+    return *this;
+}
+
+interleaved_stream_capture&
+interleaved_stream_capture::operator()(const skip_components_type& skip_components)
+{
+    _elements.push_back(skip_components);
+    _has_skipped_components = true;
+    return *this;
+}
+
+// stream_capture_array ///////////////////////////////////////////////////////////////////////////
+stream_capture_array::stream_capture_array()
+  : _captures_count(0)
+  , _interleaved_streams(false)
+  , _interleaved_skipped_components(false)
+{
+}
+
+stream_capture_array::stream_capture_array(const std::string& varying_name)
+  : _captures_count(0)
+  , _interleaved_streams(false)
+  , _interleaved_skipped_components(false)
+{
+    append_capture(varying_name);
+}
+
+stream_capture_array::stream_capture_array(const separate_stream_capture& capture)
+  : _captures_count(0)
+  , _interleaved_streams(false)
+  , _interleaved_skipped_components(false)
+{
+    append_capture(capture);
+}
+
+stream_capture_array::stream_capture_array(const interleaved_stream_capture& capture)
+  : _captures_count(0)
+  , _interleaved_streams(true)
+  , _interleaved_skipped_components(capture.has_skipped_components())
+{
+    append_capture(capture);
+}
+
+stream_capture_array::~stream_capture_array()
+{
+}
+
+stream_capture_array&
+stream_capture_array::operator()(const std::string& varying_name)
+{
+    append_capture(varying_name);
+    return *this;
+}
+
+stream_capture_array&
+stream_capture_array::operator()(const separate_stream_capture& capture)
+{
+    append_capture(capture);
+    return *this;
+}
+
+stream_capture_array&
+stream_capture_array::operator()(const interleaved_stream_capture& capture)
+{
+    append_capture(capture);
+    return *this;
+}
+
+void
+stream_capture_array::append_capture(const std::string& varying_name) // appends a separate capture object
+{
+    _stream_captures.push_back(make_shared<separate_stream_capture>(varying_name));
+    _captures_count += 1;
+}
+
+void
+stream_capture_array::append_capture(const separate_stream_capture& capture)
+{
+    _stream_captures.push_back(make_shared<separate_stream_capture>(capture));
+    assert(capture.size() == 1);
+    _captures_count += capture.size();
+}
+
+void
+stream_capture_array::append_capture(const interleaved_stream_capture& capture)
+{
+    _stream_captures.push_back(make_shared<interleaved_stream_capture>(capture));
+
+    _interleaved_streams            = true;
+    _interleaved_skipped_components = capture.has_skipped_components();
+    _captures_count                += capture.size();
+}
+
+bool
+stream_capture_array::empty() const
 {
     bool captures_empty = true;
 
     for (int i = 0; i < _stream_captures.size(); ++i) {
-        captures_empty = captures_empty && _stream_captures[i].empty();
+        captures_empty = captures_empty && _stream_captures[i]->empty();
     }
 
     return captures_empty;
 }
 
-unsigned
-stream_capture::max_used_stream() const
+int
+stream_capture_array::used_streams() const
 {
-    return _max_used_stream;
+    assert(_stream_captures.size() < (std::numeric_limits<int>::max)());
+    return static_cast<int>(_stream_captures.size());
 }
 
 bool
-stream_capture::interleaved_streams() const
+stream_capture_array::interleaved_streams() const
 {
-    bool captures_interleaved = false;
+    return _interleaved_streams;
+}
 
-    for (int i = 0; i < _stream_captures.size(); ++i) {
-        captures_interleaved = captures_interleaved || (_stream_captures[i].size() > 1);
-    }
-
-    return captures_interleaved;
+bool
+stream_capture_array::interleaved_skipped_components() const
+{
+    return _interleaved_skipped_components;
 }
 
 int
-stream_capture::captures_count() const
+stream_capture_array::captures_count() const
 {
     return _captures_count;
 }
 
-const stream_capture::capture_varyings_list&
-stream_capture::captures(const output_stream stream) const
+const stream_capture&
+stream_capture_array::stream_captures(const int stream) const
 {
-    assert(static_cast<int>(stream) < _stream_captures.size());
-
-    return _stream_captures[stream];
+    assert(0 <= stream && stream < _stream_captures.size());
+    assert(_stream_captures[stream]);
+    return *_stream_captures[stream];
 }
 
 } // namespace gl

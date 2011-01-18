@@ -31,11 +31,11 @@ namespace gl {
 namespace detail {
 } // namespace detail
 
-program::program(render_device&             in_device,
-                 const shader_list&         in_shaders,
-                 const stream_capture&      in_capture,
-                 const named_location_list& in_attibute_locations,
-                 const named_location_list& in_fragment_locations)
+program::program(render_device&              in_device,
+                 const shader_list&          in_shaders,
+                 const stream_capture_array& in_capture,
+                 const named_location_list&  in_attribute_locations,
+                 const named_location_list&  in_fragment_locations)
   : render_device_child(in_device)
 {
     const opengl::gl3_core& glapi = in_device.opengl3_api();
@@ -70,7 +70,7 @@ program::program(render_device&             in_device,
             }
         }
         // set default attribute locations
-        foreach(const named_location& l, in_attibute_locations) {
+        foreach(const named_location& l, in_attribute_locations) {
             glapi.glBindAttribLocation(_gl_program_obj, l.second, l.first.c_str());
             gl_assert(glapi, program::program() binding attribute location);
         }
@@ -229,44 +229,60 @@ program::bind_uniforms(render_context& ren_ctx) const
 }
 
 bool
-program::apply_transform_feedback_varyings(render_device& in_device, const stream_capture& in_capture)
+program::apply_transform_feedback_varyings(render_device& in_device, const stream_capture_array& in_capture)
 {
     assert(_gl_program_obj != 0);
 
     const opengl::gl3_core& glapi = in_device.opengl3_api();
     util::gl_error          glerror(glapi);
 
+    int  max_stream_count    = 0;
+
     // error handling
     if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
         // GL 4.0+
-        if (in_capture.max_used_stream() >= static_cast<unsigned>(in_device.capabilities()._max_transform_feedback_buffers)) {
+        max_stream_count = in_device.capabilities()._max_transform_feedback_buffers;
+        if (in_capture.used_streams() > max_stream_count) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
-            _info_log =   std::string("program::apply_transform_feedback_varyings(): OpenGL 3.0+ only allows for ")
-                        + boost::lexical_cast<std::string>(in_device.capabilities()._max_transform_feedback_buffers)
-                        + std::string(" transform feedback streams.");
+            _info_log =   std::string("program::apply_transform_feedback_varyings(): unsupported amount of feedback buffer encountered ")
+                        + std::string("(feedback buffers: ")
+                        + boost::lexical_cast<std::string>(in_capture.used_streams())
+                        + std::string(", max supported: ")
+                        + boost::lexical_cast<std::string>(max_stream_count)
+                        + std::string(").");
             return false;
         }
     }
     else {
         // GL 3.3+
+        max_stream_count = in_device.capabilities()._max_transform_feedback_separate_attribs;
         if (in_capture.interleaved_streams()) {
-            if (in_capture.max_used_stream() > 0) {
+            if (in_capture.used_streams() > 1) {
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
                 _info_log = "program::apply_transform_feedback_varyings(): OpenGL 3.3+ only allows for a single interleaved transform feedback stream.";
                 return false;
             }
+            if (in_capture.interleaved_skipped_components()) {
+                state().set(object_state::OS_ERROR_INVALID_VALUE);
+                _info_log = "program::apply_transform_feedback_varyings(): OpenGL 3.3+ does not allow for skipped interleaved components.";
+                return false;
+            }
         }
         else {
-            if (in_capture.max_used_stream() >= static_cast<unsigned>(in_device.capabilities()._max_transform_feedback_separate_attribs)) {
+            if (in_capture.used_streams() > max_stream_count) {
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
                 _info_log =   std::string("program::apply_transform_feedback_varyings(): OpenGL 3.3+ only allows for ")
-                            + boost::lexical_cast<std::string>(in_device.capabilities()._max_transform_feedback_separate_attribs)
+                            + boost::lexical_cast<std::string>(max_stream_count)
                             + std::string(" separate transform feedback streams.");
                 return false;
             }
         }
     }
 
+    assert(max_stream_count > 0);
+
+    static const char* next_buffer_string =
+        "gl_NextBuffer";
     static const char* skip_strings[] = {
         "gl_SkipComponents1",
         "gl_SkipComponents2",
@@ -275,23 +291,26 @@ program::apply_transform_feedback_varyings(render_device& in_device, const strea
     };
     BOOST_STATIC_ASSERT((sizeof(skip_strings) / sizeof(const char*)) == (stream_capture::skip_4_float + 1));
 
-
-    std::vector<std::string>    varying_names(static_cast<size_t>(in_capture.captures_count() + OUTPUT_STREAM_COUNT));
-    for (unsigned stream = 0; stream <= in_capture.max_used_stream(); ++stream) {
-        if (stream > 0 && in_capture.interleaved_streams()) {
-            varying_names.push_back("gl_NextBuffer");
+    std::vector<std::string>    varying_names;
+    varying_names.reserve(in_capture.captures_count() + max_stream_count);
+    for (int stream = 0; stream < in_capture.used_streams(); ++stream) {
+        if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+            if (stream > 0 && in_capture.interleaved_streams()) {
+                varying_names.push_back(next_buffer_string);
+            }
         }
 
-        const stream_capture::capture_varyings_list& stream_capture = in_capture.captures(static_cast<output_stream>(stream));
-        if (!stream_capture.empty()) {
-            stream_capture::capture_varyings_list::const_iterator b = stream_capture.begin();
-            stream_capture::capture_varyings_list::const_iterator e = stream_capture.end();
+        const stream_capture::captures_list& captures = in_capture.stream_captures(stream).captures();
+        if (!captures.empty()) {
+            stream_capture::captures_list::const_iterator b = captures.begin();
+            stream_capture::captures_list::const_iterator e = captures.end();
             for (; b != e; ++b) {
-                if (boost::get<std::string>(&(*b))) {
-                    varying_names.push_back(boost::get<std::string>(*b));
+                stream_capture::capture_element cap = *b;
+                if (boost::get<std::string>(&cap)) {
+                    varying_names.push_back(boost::get<std::string>(cap));
                 }
-                else if (boost::get<stream_capture::skip_components_type>(&(*b))) {
-                    std::string skip_string = skip_strings[boost::get<stream_capture::skip_components_type>(*b)];
+                else if (boost::get<stream_capture::skip_components_type>(&cap)) {
+                    std::string skip_string = skip_strings[boost::get<stream_capture::skip_components_type>(cap)];
                     varying_names.push_back(skip_string);
                 }
             }
@@ -303,6 +322,18 @@ program::apply_transform_feedback_varyings(render_device& in_device, const strea
         const char* name_string = varying_names[i].c_str();
         varying_name_ptrs[i] = name_string;
     }
+
+    glapi.glTransformFeedbackVaryings(_gl_program_obj,
+                                      static_cast<int>(varying_names.size()),
+                                      varying_name_ptrs.get(),
+                                      in_capture.interleaved_streams() ? GL_INTERLEAVED_ATTRIBS : GL_SEPARATE_ATTRIBS);
+
+    if (glerror) {
+        state().set(glerror.to_object_state());
+        return false;
+    }
+
+    gl_assert(glapi, leaving program::apply_transform_feedback_varyings());
 
     return true;
 }

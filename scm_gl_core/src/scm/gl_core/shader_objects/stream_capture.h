@@ -8,6 +8,8 @@
 
 #include <boost/variant.hpp>
 
+#include <scm/core/pointer_types.h>
+
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_types.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
@@ -18,36 +20,6 @@
 
 namespace scm {
 namespace gl {
-
-#if 0
-class __scm_export(gl_core) stream_capture
-{
-    typedef boost::variant<std::string, skip_components_type>   capture_element;
-    typedef std::list<capture_element>                          capture_varyings_list;
-
-}; // class stream_capture
-
-class __scm_export(gl_core) separate_stream_capture : public stream_capture
-{
-    interleaved_stream_capture(const std::string& varying_name);
-}; // class separate_stream_capture
-
-class __scm_export(gl_core) interleaved_stream_capture : public stream_capture
-{
-    interleaved_stream_capture(const std::string& varying_name);
-    interleaved_stream_capture(const skip_components_type& skip_components);
-
-    interleaved_stream_capture&                 operator()(const std::string& varying_name);
-    interleaved_stream_capture&                 operator()(const skip_components_type& skip_components);
-
-
-}; // class interleaved_stream_capture
-
-class __scm_export(gl_core) stream_capture_array
-{
-}; // class stream_capture_array
-
-#endif
 
 class __scm_export(gl_core) stream_capture
 {
@@ -60,34 +32,88 @@ public:
     } skip_components_type;
 
     typedef boost::variant<std::string, skip_components_type>   capture_element;
-    typedef std::list<capture_element>                          capture_varyings_list;
-    typedef std::vector<capture_varyings_list>                  stream_captures_array;
+    typedef std::list<capture_element>                          captures_list;
 
 public:
     stream_capture();
-    stream_capture(const output_stream stream, const std::string& varying_name);
-    stream_capture(const output_stream stream, const skip_components_type skip_components);
-    /*virtual*/ ~stream_capture();
+    virtual ~stream_capture();
 
-    stream_capture&                 operator()(const output_stream stream, const std::string& varying_name);
-    stream_capture&                 operator()(const output_stream stream, const skip_components_type skip_components);
+    virtual bool                is_interleaved() const = 0;
 
-    void                            append_capture(const output_stream stream, const std::string& varying_name);
-    void                            append_capture(const output_stream stream, const skip_components_type skip_components);
+    bool                        empty() const;
+    int                         size() const;
 
-    bool                            empty() const;
-    unsigned                        max_used_stream() const;
-    bool                            interleaved_streams() const;
-    int                             captures_count() const;
-
-    const capture_varyings_list&    captures(const output_stream stream) const;
+    const captures_list&        captures() const;
 
 protected:
-    stream_captures_array           _stream_captures;
-    unsigned                        _max_used_stream;
-    int                             _captures_count;
+    captures_list               _elements;
 
 }; // class stream_capture
+
+class __scm_export(gl_core) separate_stream_capture : public stream_capture
+{
+public:
+    separate_stream_capture(const std::string& varying_name);
+    virtual ~separate_stream_capture();
+
+    bool                        is_interleaved() const;
+
+}; // class separate_stream_capture
+
+class __scm_export(gl_core) interleaved_stream_capture : public stream_capture
+{
+public:
+    interleaved_stream_capture(const std::string& varying_name);
+    interleaved_stream_capture(const skip_components_type& skip_components);
+    virtual ~interleaved_stream_capture();
+
+    interleaved_stream_capture& operator()(const std::string& varying_name);
+    interleaved_stream_capture& operator()(const skip_components_type& skip_components);
+
+    bool                        is_interleaved() const;
+    bool                        has_skipped_components() const;
+
+private:
+    bool                        _has_skipped_components;
+
+}; // class interleaved_stream_capture
+
+class __scm_export(gl_core) stream_capture_array
+{
+protected:
+    typedef shared_ptr<stream_capture>  capture_ptr;
+    typedef std::vector<capture_ptr>    stream_capture_vector;
+
+public:
+    stream_capture_array();
+    stream_capture_array(const std::string&                varying_name);
+    stream_capture_array(const separate_stream_capture&    capture);
+    stream_capture_array(const interleaved_stream_capture& capture);
+    /*virtual*/ ~stream_capture_array();
+
+    stream_capture_array&       operator()(const std::string&                varying_name);
+    stream_capture_array&       operator()(const separate_stream_capture&    capture);
+    stream_capture_array&       operator()(const interleaved_stream_capture& capture);
+
+    void                        append_capture(const std::string&                varying_name); // appends a separate capture object
+    void                        append_capture(const separate_stream_capture&    capture);
+    void                        append_capture(const interleaved_stream_capture& capture);
+
+    bool                        empty() const;
+    int                         used_streams() const;
+    bool                        interleaved_streams() const;
+    bool                        interleaved_skipped_components() const;
+    int                         captures_count() const;
+
+    const stream_capture&       stream_captures(const int stream) const;
+
+protected:
+    stream_capture_vector       _stream_captures;
+    int                         _captures_count;
+    bool                        _interleaved_streams;
+    bool                        _interleaved_skipped_components;
+
+}; // class stream_capture_array
 
 } // namespace gl
 } // namespace scm

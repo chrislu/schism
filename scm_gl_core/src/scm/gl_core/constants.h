@@ -53,16 +53,6 @@ enum buffer_access
     ACCESS_COUNT
 }; // enum buffer_access
 
-enum output_stream
-{
-    OUTPUT_STREAM_0        = 0x00,
-    OUTPUT_STREAM_1,
-    OUTPUT_STREAM_2,
-    OUTPUT_STREAM_3,
-
-    OUTPUT_STREAM_COUNT
-}; // output_stream
-
 enum primitive_topology {
     PRIMITIVE_POINT_LIST = 0x00,
     PRIMITIVE_LINE_LIST,

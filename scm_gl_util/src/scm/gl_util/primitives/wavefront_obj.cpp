@@ -215,5 +215,23 @@ wavefront_obj_geometry::draw_raw(const render_context_ptr& in_context,
     }
 }
 
+const buffer_ptr&
+wavefront_obj_geometry::vertex_buffer() const
+{
+    return _vertex_buffer;
+}
+
+const buffer_ptr&
+wavefront_obj_geometry::index_buffer() const
+{
+    return _index_buffer;
+}
+
+const vertex_array_ptr&
+wavefront_obj_geometry::vertex_array() const
+{
+    return _vertex_array;
+}
+
 } // namespace gl
 } // namespace scm

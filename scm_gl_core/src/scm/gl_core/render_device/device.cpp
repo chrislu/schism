@@ -16,6 +16,7 @@
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/log.h>
+#include <scm/gl_core/buffer_objects.h>
 #include <scm/gl_core/frame_buffer_objects.h>
 #include <scm/gl_core/query_objects.h>
 #include <scm/gl_core/render_device/context.h>
@@ -25,8 +26,6 @@
 #include <scm/gl_core/shader_objects/program.h>
 #include <scm/gl_core/shader_objects/shader.h>
 #include <scm/gl_core/shader_objects/stream_capture.h>
-#include <scm/gl_core/buffer_objects/vertex_array.h>
-#include <scm/gl_core/buffer_objects/vertex_format.h>
 #include <scm/gl_core/state_objects/depth_stencil_state.h>
 #include <scm/gl_core/state_objects/rasterizer_state.h>
 #include <scm/gl_core/state_objects/sampler_state.h>
@@ -260,6 +259,24 @@ render_device::create_vertex_array(const vertex_format& in_vert_fmt,
         return (vertex_array_ptr());
     }
     return (new_array);
+}
+
+transform_feedback_ptr
+render_device::create_transform_feedback(const stream_output_setup& in_setup)
+{
+    transform_feedback_ptr new_feedback(new transform_feedback(*this, in_setup));
+    if (new_feedback->fail()) {
+        if (new_feedback->bad()) {
+            glerr() << log::error << "render_device::create_transform_feedback(): unable to create transform feedback object ("
+                    << new_feedback->state().state_string() << ")." << log::end;
+        }
+        else {
+            glerr() << log::error << "render_device::create_transform_feedback(): unable to initialize transform feedback object ("
+                    << new_feedback->state().state_string() << ")." << log::end;
+        }
+        return (transform_feedback_ptr());
+    }
+    return (new_feedback);
 }
 
 // shader api /////////////////////////////////////////////////////////////////////////////////////
@@ -578,7 +595,15 @@ program_ptr
 render_device::create_program(const shader_list& in_shaders,
                               const std::string& in_program_name)
 {
-    program_ptr new_program(new program(*this, in_shaders, stream_capture()));
+    return create_program(in_shaders, stream_capture_array(), in_program_name);
+}
+
+program_ptr
+render_device::create_program(const shader_list&          in_shaders,
+                              const stream_capture_array& in_capture,
+                              const std::string&          in_program_name)
+{
+    program_ptr new_program(new program(*this, in_shaders, in_capture));
     if (new_program->fail()) {
         if (new_program->bad()) {
             glerr() << "render_device::create_program(): unable to create shader object ("

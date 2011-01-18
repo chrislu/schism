@@ -8,6 +8,7 @@ namespace scm {
 namespace gl {
 
 class buffer;
+class stream_output_setup;
 class transform_feedback;
 class vertex_format;
 class vertex_array;

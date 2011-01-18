@@ -120,9 +120,9 @@ public:
 protected:
     program(render_device&              in_device,
             const shader_list&          in_shaders,
-            const stream_capture&       in_capture,
-            const named_location_list&  in_attibute_locations = named_location_list(),
-            const named_location_list&  in_fragment_locations = named_location_list());
+            const stream_capture_array& in_capture,
+            const named_location_list&  in_attribute_locations = named_location_list(),
+            const named_location_list&  in_fragment_locations  = named_location_list());
 
     bool                        link(render_device& ren_dev);
     bool                        validate(render_context& ren_ctx);
@@ -130,7 +130,7 @@ protected:
     void                        bind(render_context& ren_ctx) const;
     void                        bind_uniforms(render_context& ren_ctx) const;
 
-    bool                        apply_transform_feedback_varyings(render_device& in_device, const stream_capture& in_capture); 
+    bool                        apply_transform_feedback_varyings(render_device& in_device, const stream_capture_array& in_capture); 
 
     void                        retrieve_attribute_information(render_device& in_device);
     void                        retrieve_fragdata_information(render_device& in_device);
