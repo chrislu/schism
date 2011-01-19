@@ -3,6 +3,7 @@
 #define SCM_GL_CORE_CONTEXT_H_INCLUDED
 
 #include <vector>
+#include <utility>
 
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
@@ -139,10 +140,21 @@ public:
 
     void                        reset_vertex_input();
 
+    void                        begin_transform_feedback(const transform_feedback_ptr& in_transform_feedback, primitive_type in_topology_mode);
+    void                        end_transform_feedback();
+    const transform_feedback_ptr& active_transform_feedback() const;
+
+    void                        draw_transform_feedback(const primitive_topology in_topology, const transform_feedback_ptr& in_transform_feedback, int stream = -1);
+
     void                        draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count);
     void                        draw_elements(const int in_count, const int in_start_index = 0, const int in_base_vertex = 0);
 
 protected:
+    void                        pre_draw_setup();
+    void                        post_draw_setup();
+
+    void                        start_transform_feedback();
+
     void                        apply_vertex_input();
     void                        apply_uniform_buffer_bindings();
 
@@ -258,8 +270,12 @@ private:
 
     boost::unordered_set<debug_output_ptr>      _debug_outputs;
     bool                                        _debug_synchronous_reporting;
-    
-    boost::unordered_map<unsigned, query_ptr>   _active_queries;
+
+    typedef std::pair<unsigned, int>                    indexed_query_id;
+    boost::unordered_map<indexed_query_id, query_ptr>   _active_queries;
+
+    transform_feedback_ptr                      _active_transform_feedback;
+    primitive_type                              _active_transform_feedback_topology_mode;
 
     // defaults
     // TODO

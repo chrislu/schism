@@ -12,9 +12,10 @@ namespace scm {
 namespace gl {
 
 query::query(render_device& in_device)
-  : render_device_child(in_device),
-    _gl_query_id(0),
-    _gl_query_type(0)
+  : render_device_child(in_device)
+  , _index(0)
+  , _gl_query_id(0)
+  , _gl_query_type(0)
 {
     const opengl::gl3_core& glapi = in_device.opengl3_api();
 
@@ -60,16 +61,22 @@ query::end(const render_context& in_context) const
     gl_assert(glapi, leaving query::end());
 }
 
+int
+query::index() const
+{
+    return _index;
+}
+
 unsigned
 query::query_id() const
 {
-    return (_gl_query_id);
+    return _gl_query_id;
 }
 
 unsigned
 query::query_type() const
 {
-    return (_gl_query_type);
+    return _gl_query_type;
 }
 
 } // namespace gl

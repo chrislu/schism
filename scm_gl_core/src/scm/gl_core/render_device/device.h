@@ -62,6 +62,7 @@ public:
         int             _max_viewports;
         int             _max_transform_feedback_separate_attribs;
         int             _max_transform_feedback_buffers;
+        int             _max_vertex_streams;
     }; // struct device_capabilities
 
 protected:
@@ -160,6 +161,7 @@ public:
                                                    const std::string& in_program_name = "");
     program_ptr                     create_program(const shader_list&          in_shaders,
                                                    const stream_capture_array& in_capture,
+                                                   bool                        in_rasterization_discard = false,
                                                    const std::string&          in_program_name = "");
 
 protected:
@@ -273,6 +275,7 @@ public:
     // query api //////////////////////////////////////////////////////////////////////////////////
 public:
     timer_query_ptr                 create_timer_query();
+    transform_feedback_statistics_query_ptr create_transform_feedback_statistics_query(int stream = 0);
 
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:

@@ -53,8 +53,17 @@ enum buffer_access
     ACCESS_COUNT
 }; // enum buffer_access
 
+enum primitive_type
+{
+    PRIMITIVE_POINTS                    = 0x00,
+    PRIMITIVE_LINES,
+    PRIMITIVE_TRIANGLES,
+
+    PRIMITIVE_TYPE_COUNT
+}; // enum primitive_type
+
 enum primitive_topology {
-    PRIMITIVE_POINT_LIST = 0x00,
+    PRIMITIVE_POINT_LIST                = 0x00,
     PRIMITIVE_LINE_LIST,
     PRIMITIVE_LINE_STRIP,
     PRIMITIVE_LINE_LOOP,

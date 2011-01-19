@@ -204,12 +204,12 @@ wavefront_obj_geometry::draw_raw(const render_context_ptr& in_context,
         in_context->bind_index_buffer(_index_buffer, PRIMITIVE_TRIANGLE_LIST, _index_type);
 
         in_context->set_blend_state(_no_blend_state);
+        
+        in_context->apply();
         for (scm::size_t i = 0; i < _opaque_object_start_indices.size(); ++i) {
-            in_context->apply();
             in_context->draw_elements(_opaque_object_indices_count[i], _opaque_object_start_indices[i]);
         }
         for (scm::size_t i = 0; i < _transparent_object_start_indices.size(); ++i) {
-            in_context->apply();
             in_context->draw_elements(_transparent_object_indices_count[i], _transparent_object_start_indices[i]);
         }
     }

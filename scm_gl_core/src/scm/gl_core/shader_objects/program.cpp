@@ -34,9 +34,11 @@ namespace detail {
 program::program(render_device&              in_device,
                  const shader_list&          in_shaders,
                  const stream_capture_array& in_capture,
+                 bool                        in_rasterization_discard,
                  const named_location_list&  in_attribute_locations,
                  const named_location_list&  in_fragment_locations)
   : render_device_child(in_device)
+  , _rasterization_discard(in_rasterization_discard)
 {
     const opengl::gl3_core& glapi = in_device.opengl3_api();
     util::gl_error          glerror(glapi);
@@ -390,6 +392,12 @@ program::attribute_location(const std::string& name) const
         return (a->second._location);
     }
     return (-1);
+}
+
+bool
+program::rasterization_discard() const
+{
+    return _rasterization_discard;
 }
 
 void

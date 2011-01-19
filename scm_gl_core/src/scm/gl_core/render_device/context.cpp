@@ -104,6 +104,8 @@ render_context::render_context(render_device& in_device)
 
     _debug_synchronous_reporting = true;
 
+    _active_transform_feedback_topology_mode = PRIMITIVE_POINTS;
+
     gl_assert(glapi, leaving render_context::render_context());
 }
 
@@ -454,6 +456,96 @@ render_context::reset_vertex_input()
 }
 
 void
+render_context::start_transform_feedback()
+{
+    if (_active_transform_feedback) {
+        if (!_active_transform_feedback->active()) {
+            _active_transform_feedback->begin(*this, _active_transform_feedback_topology_mode);
+        }
+    }
+}
+
+void
+render_context::begin_transform_feedback(const transform_feedback_ptr& in_transform_feedback, primitive_type in_topology_mode)
+{
+    if (_active_transform_feedback) {
+        glerr() << log::warning
+                << "render_context::begin_transform_feedback(): active transform feedback object present, "
+                << "overriding active transform feedback." << log::end;
+        assert(_active_transform_feedback->active());
+        _active_transform_feedback->end(*this); // unbind implicit
+    }
+    //in_transform_feedback->begin(*this, in_topology_mode); // bind implicit
+    _active_transform_feedback               = in_transform_feedback;
+    _active_transform_feedback_topology_mode = in_topology_mode;
+
+    gl_assert(opengl_api(), leaving render_context::begin_transform_feedback());
+}
+
+void
+render_context::end_transform_feedback()
+{
+    if (!_active_transform_feedback) {
+        glerr() << log::warning
+                << "render_context::end_transform_feedback(): no transform feedback currently active." << log::end;
+    }
+    else {
+        if (_active_transform_feedback->active()) {
+            _active_transform_feedback->end(*this);
+        }
+        _active_transform_feedback = transform_feedback_ptr();
+    }
+
+    gl_assert(opengl_api(), leaving render_context::end_transform_feedback());
+}
+
+const transform_feedback_ptr&
+render_context::active_transform_feedback() const
+{
+    return _active_transform_feedback;
+}
+
+void
+render_context::draw_transform_feedback(const primitive_topology in_topology, const transform_feedback_ptr& in_transform_feedback, int stream)
+{
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        const opengl::gl3_core& glapi = opengl_api();
+
+        // check if feedback object is currently active and give warning
+        if (active_transform_feedback() == in_transform_feedback) {
+            SCM_GL_DGB(   "render_context::draw_transform_feedback(): "
+                       << "transform feedback object is currently active, results from previous operation used.");
+        }
+
+        pre_draw_setup();
+
+        if (stream < 0) {
+            glapi.glDrawTransformFeedback(util::gl_primitive_topology(in_topology), in_transform_feedback->object_id());
+        }
+        else {
+            if (stream > parent_device().capabilities()._max_vertex_streams) {
+                state().set(object_state::OS_ERROR_INVALID_VALUE);
+                SCM_GL_DGB(    "render_context::draw_transform_feedback(): error invalid vertex stream (>"
+                           <<  parent_device().capabilities()._max_vertex_streams
+                           << ") passed"
+                           << "('" << state().state_string() << "')");
+                return;
+            }
+            glapi.glDrawTransformFeedbackStream(util::gl_primitive_topology(in_topology), in_transform_feedback->object_id(), stream);
+        }
+
+        post_draw_setup();
+
+    }
+    else {
+        glerr() << log::error
+                << "render_context::draw_transform_feedback(): "
+                << "the draw_transform_feedback functionality is only available using scm_gl_core with OpenGL4.x capabilities enabled on a OpenGL4.x context."
+                << log::end;
+    }
+}
+
+void
 render_context::draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count)
 {
     const opengl::gl3_core& glapi = opengl_api();
@@ -465,16 +557,9 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
         return;
     }
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
-        if (0 != patch_control_points) {
-            glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
+    pre_draw_setup();
 
-            gl_assert(glapi, after glPatchParameteri);
-        }
-    }
-
-    glapi.glDrawArrays(util::gl_primitive_types(in_topology), in_first_index, in_count);
+    glapi.glDrawArrays(util::gl_primitive_topology(in_topology), in_first_index, in_count);
 
     gl_assert(glapi, leaving render_context::draw_arrays());
 }
@@ -495,23 +580,58 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
         return;
     }
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
-        if (0 != patch_control_points) {
-            glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
-
-            gl_assert(glapi, after glPatchParameteri);
-        }
-    }
+    pre_draw_setup();
 
     glapi.glDrawElementsBaseVertex(
-        util::gl_primitive_types(_applied_state._index_buffer_binding._primitive_topology),
+        util::gl_primitive_topology(_applied_state._index_buffer_binding._primitive_topology),
         in_count,
         util::gl_base_type(_applied_state._index_buffer_binding._index_data_type),
         (char*)0 + _applied_state._index_buffer_binding._index_data_offset + size_of_type(_applied_state._index_buffer_binding._index_data_type) * in_start_index,
         in_base_vertex);
 
+    post_draw_setup();
+
     gl_assert(glapi, leaving render_context::draw_elements());
+}
+
+void
+render_context::pre_draw_setup()
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    gl_assert(glapi, entering render_context::pre_draw());
+    assert(state().ok());
+
+    start_transform_feedback();
+
+    if (_applied_state._program->rasterization_discard()) {
+        glapi.glEnable(GL_RASTERIZER_DISCARD);
+    }
+
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
+        if (0 != patch_control_points) {
+            glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
+
+            gl_assert(glapi, render_context::pre_draw_setup() after glPatchParameteri);
+        }
+    }
+
+    gl_assert(glapi, leaving render_context::pre_draw());
+}
+
+void
+render_context::post_draw_setup()
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    gl_assert(glapi, entering render_context::post_draw());
+    
+    if (_applied_state._program->rasterization_discard()) {
+        glapi.glDisable(GL_RASTERIZER_DISCARD);
+    }
+
+    gl_assert(glapi, leaving render_context::post_draw());
 }
 
 void
@@ -1230,13 +1350,16 @@ render_context::apply_state_objects()
 void
 render_context::begin_query(const query_ptr& in_query)
 {
-    if (_active_queries[in_query->query_type()]) {
+    indexed_query_id cur_query = std::make_pair(in_query->query_type(), in_query->index());
+
+    if (_active_queries[cur_query]) {
         glerr() << log::warning
-                << "render_context::begin_query(): query of type (" << std::hex << in_query->query_type() << ") "
+                << "render_context::begin_query(): query of type and index ("
+                << std::hex << in_query->query_type() << ", " << std::dec << in_query->index() << ") "
                 << "allready active, overriding query." << log::end;
     }
     in_query->begin(*this);
-    _active_queries[in_query->query_type()] = in_query;
+    _active_queries[cur_query] = in_query;
 
     gl_assert(opengl_api(), leaving render_context::begin_query());
 }
@@ -1244,13 +1367,16 @@ render_context::begin_query(const query_ptr& in_query)
 void
 render_context::end_query(const query_ptr& in_query)
 {
-    if (_active_queries[in_query->query_type()] != in_query) {
+    indexed_query_id cur_query = std::make_pair(in_query->query_type(), in_query->index());
+
+    if (_active_queries[cur_query] != in_query) {
         glerr() << log::warning
-                << "render_context::end_query(): this query of type (" << std::hex << in_query->query_type() << ") "
+                << "render_context::end_query(): this query of type and index ("
+                << std::hex << in_query->query_type() << ", " << std::dec << in_query->index() << ") "
                 << "not currently active active, result may be undefined." << log::end;
     }
     in_query->end(*this);
-    _active_queries[in_query->query_type()] = query_ptr();
+    _active_queries[cur_query] = query_ptr();
 
     gl_assert(opengl_api(), leaving render_context::end_query());
 }
@@ -1258,9 +1384,12 @@ render_context::end_query(const query_ptr& in_query)
 void
 render_context::collect_query_results(const query_ptr& in_query)
 {
-    if (_active_queries[in_query->query_type()] == in_query) {
+    indexed_query_id cur_query = std::make_pair(in_query->query_type(), in_query->index());
+
+    if (_active_queries[cur_query] == in_query) {
         glerr() << log::warning
-                << "render_context::collect_query_results(): this query of type (" << std::hex << in_query->query_type() << ") "
+                << "render_context::collect_query_results(): this query of type and index ("
+                << std::hex << in_query->query_type() << ", " << std::dec << in_query->index() << ") "
                 << "is currently active, the collected results may be undefined." << log::end;
     }
     in_query->collect(*this);

@@ -9,11 +9,14 @@ namespace gl {
 
 class query;
 class timer_query;
+class transform_feedback_statistics_query;
 
-typedef shared_ptr<query>               query_ptr;
-typedef shared_ptr<const query>         query_cptr;
-typedef shared_ptr<timer_query>         timer_query_ptr;
-typedef shared_ptr<const timer_query>   timer_query_cptr;
+typedef shared_ptr<query>                                       query_ptr;
+typedef shared_ptr<query const>                                 query_cptr;
+typedef shared_ptr<timer_query>                                 timer_query_ptr;
+typedef shared_ptr<timer_query const>                           timer_query_cptr;
+typedef shared_ptr<transform_feedback_statistics_query>         transform_feedback_statistics_query_ptr;
+typedef shared_ptr<transform_feedback_statistics_query const>   transform_feedback_statistics_query_cptr;
 
 } // namespace gl
 } // namespace scm

@@ -117,10 +117,13 @@ public:
 
     int                         attribute_location(const std::string& name) const;
 
+    bool                        rasterization_discard() const;
+
 protected:
     program(render_device&              in_device,
             const shader_list&          in_shaders,
             const stream_capture_array& in_capture,
+            bool                        in_rasterization_discard = false,
             const named_location_list&  in_attribute_locations = named_location_list(),
             const named_location_list&  in_fragment_locations  = named_location_list());
 
@@ -138,6 +141,8 @@ protected:
 
 protected:
     shader_list                 _shaders;
+
+    bool                        _rasterization_discard;
 
     name_uniform_map            _uniforms;
     name_uniform_block_map      _uniform_blocks;

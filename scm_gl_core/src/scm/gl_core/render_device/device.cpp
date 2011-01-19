@@ -185,12 +185,15 @@ render_device::init_capabilities()
     glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS, &_capabilities._max_transform_feedback_separate_attribs);
     if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
         glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &_capabilities._max_transform_feedback_buffers);
+        glcore.glGetIntegerv(GL_MAX_VERTEX_STREAMS, &_capabilities._max_vertex_streams);
     }
     else {
         _capabilities._max_transform_feedback_buffers = _capabilities._max_transform_feedback_separate_attribs;
+        _capabilities._max_vertex_streams             = 1;
     }
     assert(_capabilities._max_transform_feedback_separate_attribs > 0);
     assert(_capabilities._max_transform_feedback_buffers > 0);
+    assert(_capabilities._max_vertex_streams > 0);
 }
 
 // buffer api /////////////////////////////////////////////////////////////////////////////////////
@@ -595,15 +598,16 @@ program_ptr
 render_device::create_program(const shader_list& in_shaders,
                               const std::string& in_program_name)
 {
-    return create_program(in_shaders, stream_capture_array(), in_program_name);
+    return create_program(in_shaders, stream_capture_array(), false, in_program_name);
 }
 
 program_ptr
 render_device::create_program(const shader_list&          in_shaders,
                               const stream_capture_array& in_capture,
+                              bool                        in_rasterization_discard,
                               const std::string&          in_program_name)
 {
-    program_ptr new_program(new program(*this, in_shaders, in_capture));
+    program_ptr new_program(new program(*this, in_shaders, in_capture, in_rasterization_discard));
     if (new_program->fail()) {
         if (new_program->bad()) {
             glerr() << "render_device::create_program(): unable to create shader object ("
@@ -1028,10 +1032,26 @@ render_device::create_timer_query()
             glerr() << log::error << "render_device::create_timer_query(): unable to create timer query object ("
                     << new_tq->state().state_string() << ")." << log::end;
         }
-        return (timer_query_ptr());
+        return timer_query_ptr();
     }
     else {
-        return (new_tq);
+        return new_tq;
+    }
+}
+
+transform_feedback_statistics_query_ptr
+render_device::create_transform_feedback_statistics_query(int stream)
+{
+    transform_feedback_statistics_query_ptr  new_xfbq(new transform_feedback_statistics_query(*this, stream));
+    if (new_xfbq->fail()) {
+        if (new_xfbq->bad()) {
+            glerr() << log::error << "render_device::create_transform_feedback_statistics_query(): unable to create transform feedback statistics query object ("
+                    << new_xfbq->state().state_string() << ")." << log::end;
+        }
+        return transform_feedback_statistics_query_ptr();
+    }
+    else {
+        return new_xfbq;
     }
 }
 

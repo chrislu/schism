@@ -19,15 +19,17 @@ public:
 protected:
     query(render_device& in_device);
 
-    void            begin(const render_context& in_context) const;
-    void            end(const render_context& in_context) const;
+    virtual void    begin(const render_context& in_context) const;
+    virtual void    end(const render_context& in_context) const;
 
     virtual void    collect(const render_context& in_context) = 0;
 
+    int             index() const;
     unsigned        query_id() const;
     unsigned        query_type() const;
     
 protected:
+    int             _index;
     unsigned        _gl_query_id;
     unsigned        _gl_query_type;
 

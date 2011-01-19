@@ -11,6 +11,7 @@
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
+#include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 
@@ -95,8 +96,10 @@ stream_output_setup::operator!=(const stream_output_setup& rhs) const
 
 transform_feedback::transform_feedback(      render_device&         in_device,
                                        const stream_output_setup&   in_setup)
-  : render_device_child(in_device),
-    _stream_out_setup(in_setup)
+  : render_device_child(in_device)
+  , _stream_out_setup(in_setup)
+  , _active(false)
+  , _captured_topology(PRIMITIVE_POINTS)
 {
     if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
         const opengl::gl3_core& glapi = in_device.opengl3_api();
@@ -149,6 +152,18 @@ transform_feedback::stream_out_setup() const
     return _stream_out_setup;
 }
 
+bool
+transform_feedback::active() const
+{
+    return _active;
+}
+
+primitive_type
+transform_feedback::captured_topology() const
+{
+    return _captured_topology;
+}
+
 void
 transform_feedback::bind(render_context& in_context) const
 {
@@ -179,7 +194,7 @@ transform_feedback::unbind(render_context& in_context) const
         assert(object_id() != 0);
 
         const opengl::gl3_core& glapi = in_context.opengl_api();
-        
+
         glapi.glBindTransformFeedback(object_target(), 0);
 
         gl_assert(glapi, transform_feedback::unbind() after glBindTransformFeedback());
@@ -189,6 +204,44 @@ transform_feedback::unbind(render_context& in_context) const
     }
 
     gl_assert(in_context.opengl_api(), leaving transform_feedback:unbind());
+}
+
+void
+transform_feedback::begin(render_context& in_context, primitive_type in_topology_mode) 
+{
+    assert(state().ok());
+    gl_assert(in_context.opengl_api(), entering transform_feedback:begin());
+
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+
+    bind(in_context);
+    if (!active()) {
+        glapi.glBeginTransformFeedback(util::gl_primitive_type(in_topology_mode));
+    }
+    gl_assert(in_context.opengl_api(), leaving transform_feedback:begin());
+
+    _active            = true;
+    _captured_topology = in_topology_mode;
+
+    gl_assert(in_context.opengl_api(), leaving transform_feedback:begin());
+}
+
+void
+transform_feedback::end(render_context& in_context)
+{
+    assert(state().ok());
+    gl_assert(in_context.opengl_api(), entering transform_feedback:end());
+
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+
+    if (active()) {
+        glapi.glEndTransformFeedback();
+    }
+    unbind(in_context);
+
+    _active            = false;
+
+    gl_assert(in_context.opengl_api(), leaving transform_feedback:end());
 }
 
 bool

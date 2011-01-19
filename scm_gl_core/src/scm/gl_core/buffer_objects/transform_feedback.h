@@ -60,6 +60,9 @@ public:
     const buffer_ptr&           operator[](const int stream) const;
     const stream_output_setup&  stream_out_setup() const;
 
+    bool                        active() const;
+    primitive_type              captured_topology() const;
+
 protected:
     transform_feedback(      render_device&         in_device,
                        const stream_output_setup&   in_setup);
@@ -67,12 +70,17 @@ protected:
     void                        bind(render_context& in_context) const;
     void                        unbind(render_context& in_context) const;
 
+    void                        begin(render_context& in_context, primitive_type in_topology_mode);
+    void                        end(render_context& in_context);
+
     bool                        initialize_transform_feedback_object(const render_device& in_device);
     void                        bind_stream_out_buffers(render_context& in_context) const;
     void                        unbind_stream_out_buffers(render_context& in_context) const;
 
 protected:
     stream_output_setup         _stream_out_setup;
+    bool                        _active;
+    primitive_type              _captured_topology;
 
     friend class scm::gl::render_device;
     friend class scm::gl::render_context;

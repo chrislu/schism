@@ -87,7 +87,25 @@ gl_buffer_access(const buffer_access a)
 
 inline
 unsigned
-gl_primitive_types(const primitive_topology p)
+gl_primitive_type(const primitive_type p)
+{
+    static unsigned types[] = {
+        GL_POINTS,                  // PRIMITIVE_POINTS                = 0x00,
+        GL_LINES,                   // PRIMITIVE_LINES,
+        GL_TRIANGLES                // PRIMITIVE_TRIANGLES
+    };
+
+    BOOST_STATIC_ASSERT((sizeof(types) / sizeof(unsigned)) == PRIMITIVE_TYPE_COUNT);
+
+    assert((sizeof(types) / sizeof(unsigned)) == PRIMITIVE_TYPE_COUNT);
+    assert(PRIMITIVE_POINTS <= p && p < PRIMITIVE_TYPE_COUNT);
+
+    return types[p];
+}
+
+inline
+unsigned
+gl_primitive_topology(const primitive_topology p)
 {
     static unsigned types[] = {
         GL_POINTS,                  // PRIMITIVE_POINT_LIST                = 0x00,
