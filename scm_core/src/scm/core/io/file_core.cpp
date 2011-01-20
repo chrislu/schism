@@ -71,12 +71,14 @@ file_core::volume_sector_size() const
 file_core::offset_type
 file_core::vss_align_floor(const offset_type in_val) const
 {
+    assert(_volume_sector_size > 0);
     return((in_val / _volume_sector_size) * _volume_sector_size);
 }
 
 file_core::offset_type
 file_core::vss_align_ceil(const offset_type in_val) const
 {
+    assert(_volume_sector_size > 0);
     return ( ((in_val / _volume_sector_size)
             + (in_val % _volume_sector_size > 0 ? 1 : 0)) * _volume_sector_size);
 }

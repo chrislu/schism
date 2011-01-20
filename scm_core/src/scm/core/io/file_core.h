@@ -35,7 +35,7 @@ public:
 
     virtual bool                flush_buffers() const = 0;
 
-	virtual offset_type         set_end_of_file() = 0;
+    virtual offset_type         set_end_of_file() = 0;
 
     // fixed functionality
     offset_type                 seek(offset_type                off,

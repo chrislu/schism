@@ -44,18 +44,18 @@ file::open(const std::string&       file_path,
            scm::uint32              async_io_requests)
 {
     assert(_file_core);
-    return (_file_core->open(file_path,
-                             open_mode,
-                             disable_system_cache,
-                             io_block_size,
-                             async_io_requests));
+    return _file_core->open(file_path,
+                            open_mode,
+                            disable_system_cache,
+                            io_block_size,
+                            async_io_requests);
 }
 
 bool
 file::is_open() const
 {
     assert(_file_core);
-    return (_file_core->is_open());
+    return _file_core->is_open();
 }
 
 void
@@ -70,7 +70,7 @@ file::read(void*     output_buffer,
            size_type num_bytes_to_read)
 {
     assert(_file_core);
-    return (_file_core->read(output_buffer, num_bytes_to_read));
+    return _file_core->read(output_buffer, num_bytes_to_read);
 }
 
 file::size_type
@@ -78,51 +78,72 @@ file::write(const void* input_buffer,
             size_type   num_bytes_to_write)
 {
     assert(_file_core);
-    return (_file_core->write(input_buffer, num_bytes_to_write));
+    return _file_core->write(input_buffer, num_bytes_to_write);
 }
 
 bool
 file::flush_buffers() const
 {
     assert(_file_core);
-    return (_file_core->flush_buffers());
+    return _file_core->flush_buffers();
 }
 
 file::offset_type
 file::set_end_of_file()
 {
     assert(_file_core);
-    return (_file_core->set_end_of_file());
+    return _file_core->set_end_of_file();
 }
 
 // fixed functionality
+scm::int32
+file::volume_sector_size() const
+{
+    assert(_file_core);
+    return _file_core->volume_sector_size();
+}
+
+file::offset_type
+file::vss_align_floor(const offset_type in_val) const
+{
+    assert(_file_core);
+    return _file_core->vss_align_floor(in_val);
+}
+
+file::offset_type
+file::vss_align_ceil(const offset_type in_val) const
+{
+    assert(_file_core);
+    return _file_core->vss_align_ceil(in_val);
+}
+
 file::offset_type
 file::seek(offset_type                off,
            std::ios_base::seek_dir    way)
 {
     assert(_file_core);
-    return (_file_core->seek(off, way));
+    return _file_core->seek(off, way);
 }
 
 file::size_type
 file::optimal_buffer_size() const
 {
     assert(_file_core);
-    return (_file_core->optimal_buffer_size());
+    return _file_core->optimal_buffer_size();
 }
 
 file::size_type
 file::size() const
 {
     assert(_file_core);
-    return (_file_core->size());
+    return _file_core->size();
 }
 
 const std::string&
 file::file_path() const
 {
     assert(_file_core);
-    return (_file_core->file_path());
+    return _file_core->file_path();
 }
 
 } // namespace io

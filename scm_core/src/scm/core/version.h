@@ -11,11 +11,11 @@ namespace scm {
 static const std::string    SCHISM_NAME         = std::string("schism");
 
 static const unsigned       VERSION_MAJOR       = 0;
-static const unsigned       VERSION_MINOR       = 0;
-static const unsigned       VERSION_REVISION    = 2;
+static const unsigned       VERSION_MINOR       = 1;
+static const unsigned       VERSION_REVISION    = 0;
 
 static const std::string    VERSION_TAG         = std::string("devel");
-static const std::string    VERSION_NAME        = std::string("on the side of the demons");
+static const std::string    VERSION_NAME        = std::string("to live is to die");
 
 #if SCM_DEBUG
 static const std::string    VERSION_BUILD_TAG   = std::string("debug");
@@ -31,6 +31,7 @@ static const std::string    VERSION_ARCH_TAG   = std::string("x64");
 
 // gone names
 //   - friend of the night
+//   - on the side of the demons
 
 // new name candidates:
 //   - lux aeterna

@@ -52,7 +52,11 @@ public:
     bool                        flush_buffers() const;
     offset_type                 seek(offset_type                off,
                                      std::ios_base::seek_dir    way);
-	offset_type                 set_end_of_file();
+    offset_type                 set_end_of_file();
+
+    scm::int32                  volume_sector_size() const;
+    offset_type                 vss_align_floor(const offset_type in_val) const;
+    offset_type                 vss_align_ceil(const offset_type in_val) const;
 
     size_type                   optimal_buffer_size() const;
 

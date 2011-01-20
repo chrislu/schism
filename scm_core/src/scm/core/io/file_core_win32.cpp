@@ -243,30 +243,30 @@ file_core_win32::open(const std::string&       file_path,
         return (false);
     }
 
+    // retrieve the sector size information
+    DWORD   sectors_per_cluster;
+    DWORD   bytes_per_sector;
+    DWORD   free_clusters;
+    DWORD   total_clusters;
+    if (GetDiskFreeSpace(input_root_path.c_str(),
+                         &sectors_per_cluster,
+                         &bytes_per_sector,
+                         &free_clusters,
+                         &total_clusters) == FALSE) {
+
+        scm::err() << log::error
+                    << "file_win::open(): "
+                    << "error retrieving sector size information "
+                    << "on device of file '" << complete_input_file_path.string() << "'" << log::end;
+
+        return (false);
+    }
+
+    _volume_sector_size = bytes_per_sector;
+
+    assert(_volume_sector_size != 0);
+
     if (disable_system_cache) {
-        // retrieve the sector size information
-        DWORD   sectors_per_cluster;
-        DWORD   bytes_per_sector;
-        DWORD   free_clusters;
-        DWORD   total_clusters;
-
-        if (GetDiskFreeSpace(input_root_path.c_str(),
-                             &sectors_per_cluster,
-                             &bytes_per_sector,
-                             &free_clusters,
-                             &total_clusters) == FALSE) {
-
-            scm::err() << log::error
-                       << "file_win::open(): "
-                       << "error retrieving sector size information "
-                       << "on device of file '" << complete_input_file_path.string() << "'" << log::end;
-
-            return (false);
-        }
-
-        _volume_sector_size = bytes_per_sector;
-
-        assert(_volume_sector_size != 0);
 
         // create completion io port for asynchronous read/write operations
         _completion_port.reset(CreateIoCompletionPort(_file_handle.get(), NULL, 0 /*generate key*/, 0),
