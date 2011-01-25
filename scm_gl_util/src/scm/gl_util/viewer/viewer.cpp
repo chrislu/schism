@@ -65,33 +65,6 @@ const std::string color_present_fsrc = "\
     }\n\
     ";
 
-const std::string camera_block_include_path = "/scm/gl_util/camera_block.glsl";
-const std::string camera_block_include_src  = "\
-    \n\
-    #ifndef SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    #define SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    \n\
-    layout(std140, column_major) uniform;\n\
-    \n\
-    uniform camera_matrices\n\
-    {\n\
-        vec4 ws_position;\n\
-        \n\
-        mat4 v_matrix;\n\
-        mat4 v_matrix_inverse;\n\
-        mat4 v_matrix_inverse_transpose;\n\
-        \n\
-        mat4 p_matrix;\n\
-        mat4 p_matrix_inverse;\n\
-        \n\
-        mat4 vp_matrix;\n\
-        mat4 vp_matrix_inverse;\n\
-    } camera_transform;\n\
-    \n\
-    #endif // SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    \n\
-    ";
-
 } // namespace 
 
 namespace scm {
@@ -632,10 +605,10 @@ viewer::initialize_render_target()
 bool
 viewer::initialize_shader_includes()
 {
-    if (!device()->add_include_string(camera_block_include_path, camera_block_include_src)) {
-        scm::err() << "viewer::initialize_shader_includes(): error adding camera block include string." << log::end;
-        return false;
-    }
+    //if (!device()->add_include_string(camera_block_include_path, camera_block_include_src)) {
+    //    scm::err() << "viewer::initialize_shader_includes(): error adding camera block include string." << log::end;
+    //    return false;
+    //}
     // just a test
     //if (!device()->add_include_string("/scm/gl_util/viewer/camera_block.glsl", camera_block_include_src)) {
     //    scm::err() << "viewer::initialize_shader_included(): error adding camera block include string." << log::end;
