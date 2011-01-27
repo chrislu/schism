@@ -60,6 +60,7 @@ camera_uniform_block::update(const render_context_ptr& context,
                              const camera&             cam)
 {
     _uniform_block.begin_manipulation(context); {
+        _uniform_block->_ws_position                 = cam.position();
         _uniform_block->_p_matrix                    = cam.projection_matrix();
         _uniform_block->_p_matrix_inverse            = cam.projection_matrix_inverse();
         _uniform_block->_v_matrix                    = cam.view_matrix();
@@ -70,14 +71,8 @@ camera_uniform_block::update(const render_context_ptr& context,
     } _uniform_block.end_manipulation();
 }
 
-const camera_uniform_block::camera_block&
-camera_uniform_block::block() const
-{
-    return *_uniform_block;
-}
-
 const camera_uniform_block::block_type&
-camera_uniform_block::uniform_block() const
+camera_uniform_block::block() const
 {
     return _uniform_block;
 }

@@ -40,8 +40,7 @@ public:
     void                update(const render_context_ptr& context,
                                const camera&             cam);
 
-    const camera_block& block() const;
-    const block_type&   uniform_block() const;
+    const block_type&   block() const;
 
 public:
     static void         add_block_include_string(const render_device_ptr& device);

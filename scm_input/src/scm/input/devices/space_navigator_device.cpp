@@ -149,73 +149,74 @@ space_navigator_impl::update()
     double              rotation_angle;
     double              translation_length;
 
-    _3d_sensor->get_Rotation(&rotation);
-    _3d_sensor->get_Translation(&translation);
-    rotation->get_Angle(&rotation_angle);
-    translation->get_Length(&translation_length);
+    if (_3d_sensor) {
+        _3d_sensor->get_Rotation(&rotation);
+        _3d_sensor->get_Translation(&translation);
+        rotation->get_Angle(&rotation_angle);
+        translation->get_Length(&translation_length);
 
-    _device->reset();
+        _device->reset();
 
-    if (   (rotation_angle     > 0.0)
-        || (translation_length > 0.0))
-    {
+        if (   (rotation_angle     > 0.0)
+            || (translation_length > 0.0))
+        {
 
-        _timer.stop();
-        _timer.start();
+            _timer.stop();
+            _timer.start();
 
-        double time_factor = 1.0;
-        double  period; // in millisec
-        _3d_sensor->get_Period(&period);
-        double frame_time = scm::time::to_milliseconds(_timer.get_time());
-        // detect interaction pauses
-        if (frame_time > 250.0) {
-            frame_time = period;
+            double time_factor = 1.0;
+            double  period; // in millisec
+            _3d_sensor->get_Period(&period);
+            double frame_time = scm::time::to_milliseconds(_timer.get_time());
+            // detect interaction pauses
+            if (frame_time > 250.0) {
+                frame_time = period;
+            }
+            time_factor = frame_time / (period * 1000.0);
+            //DWORD time_stamp = ::GetTickCount();
+            //if (last_time_stamp) {
+            //    double  period; // in millisec
+            //    _3d_sensor->get_Period(&period);
+            //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period);
+                //std::cout << period << " " << time_factor << std::endl;
+            //}
+
+            //DWORD time_stamp = ::GetTickCount(); 
+            //if (last_time_stamp) { 
+            //    double  period; 
+            //    _3d_sensor->get_Period(&period); 
+            //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period); 
+            //    //std::cout << period << " " << time_factor << std::endl; 
+            //} 
+            //last_time_stamp = time_stamp;
+
+
+            // translation
+            vec3d  trans_vec;
+            translation->get_X(&trans_vec.x);
+            translation->get_Y(&trans_vec.y);
+            translation->get_Z(&trans_vec.z);
+
+            trans_vec *= vec3d(_device->_translation_sensitivity) * time_factor;
+            translate(_device->_translation, math::vec3f(trans_vec));
+
+
+            // rotation
+            vec3d  rot_axis;
+            rotation->get_X(&rot_axis.x);
+            rotation->get_Y(&rot_axis.y);
+            rotation->get_Z(&rot_axis.z);
+
+            //std::cout << std::fixed << std::setprecision(3)
+            //          << scm::time::to_milliseconds(_timer.get_time()) << "\t"
+            //          << trans_vec << "\t" << rot_axis << "\t" << rotation_angle << std::endl;
+
+            rotation_angle *= time_factor;
+            rotate(_device->_rotation, static_cast<float>(math::rad2deg(rotation_angle)), (math::vec3f(rot_axis)));
         }
-        time_factor = frame_time / (period * 1000.0);
-        //DWORD time_stamp = ::GetTickCount();
-        //if (last_time_stamp) {
-        //    double  period; // in millisec
-        //    _3d_sensor->get_Period(&period);
-        //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period);
-            //std::cout << period << " " << time_factor << std::endl;
-        //}
-
-        //DWORD time_stamp = ::GetTickCount(); 
-        //if (last_time_stamp) { 
-        //    double  period; 
-        //    _3d_sensor->get_Period(&period); 
-        //    time_factor = (double)(time_stamp - last_time_stamp) / (1000.0 * period); 
-        //    //std::cout << period << " " << time_factor << std::endl; 
-        //} 
-        //last_time_stamp = time_stamp;
-
-
-        // translation
-        vec3d  trans_vec;
-        translation->get_X(&trans_vec.x);
-        translation->get_Y(&trans_vec.y);
-        translation->get_Z(&trans_vec.z);
-
-        trans_vec *= vec3d(_device->_translation_sensitivity) * time_factor;
-        translate(_device->_translation, math::vec3f(trans_vec));
-
-
-        // rotation
-        vec3d  rot_axis;
-        rotation->get_X(&rot_axis.x);
-        rotation->get_Y(&rot_axis.y);
-        rotation->get_Z(&rot_axis.z);
-
-        //std::cout << std::fixed << std::setprecision(3)
-        //          << scm::time::to_milliseconds(_timer.get_time()) << "\t"
-        //          << trans_vec << "\t" << rot_axis << "\t" << rotation_angle << std::endl;
-
-        rotation_angle *= time_factor;
-        rotate(_device->_rotation, static_cast<float>(math::rad2deg(rotation_angle)), (math::vec3f(rot_axis)));
+        rotation.Release();
+        translation.Release();
     }
-
-    rotation.Release();
-    translation.Release();
 }
 
 void
