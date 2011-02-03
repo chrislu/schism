@@ -49,7 +49,7 @@ std::string f_source_gray = "\
     \n\
     void main()\n\
     {\n\
-        float core = texture(in_font_array, tex_coord).r;\n\
+        float core    = texture(in_font_array, tex_coord).r;\n\
         out_color.rgb = in_color.rgb;\n\
         out_color.a   = core * in_color.a;\n\
     }\n\
@@ -63,13 +63,14 @@ std::string f_source_lcd = "\
     uniform vec4            in_color;\n\
     uniform sampler2DArray  in_font_array;\n\
     \n\
-    layout(location = 0) out vec4 out_color;\n\
+    layout(location = 0, index = 0) out vec4 out_color;\n\
+    layout(location = 0, index = 1) out vec4 out_sup_pixel_blend;\n\
     \n\
     void main()\n\
     {\n\
-        vec3 core = texture(in_font_array, tex_coord).rgb;\n\
-        out_color.rgb = core.rgb * in_color.a;\n\
-        out_color.a   = 1.0;\n\
+        vec3 core           = texture(in_font_array, tex_coord).rgb;\n\
+        out_color           = in_color;\n\
+        out_sup_pixel_blend = vec4(core.rgb * in_color.a, 1.0);\n\
     }\n\
     ";
 
@@ -100,8 +101,8 @@ text_renderer::text_renderer(const render_device_ptr& device)
     }
 
     _font_sampler_state = device->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
-    _font_blend_gray    = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
-    _font_blend_lcd     = device->create_blend_state(true, FUNC_CONSTANT_COLOR, FUNC_ONE_MINUS_SRC_COLOR, FUNC_ONE, FUNC_ZERO);
+    _font_blend_gray    = device->create_blend_state(true, FUNC_SRC_ALPHA,  FUNC_ONE_MINUS_SRC_ALPHA,  FUNC_ONE, FUNC_ZERO);
+    _font_blend_lcd     = device->create_blend_state(true, FUNC_SRC1_COLOR, FUNC_ONE_MINUS_SRC1_COLOR, FUNC_ONE, FUNC_ZERO);
     //_font_blend_lcd     = device->create_blend_state(true, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
     _font_dstate        = device->create_depth_stencil_state(false, false, COMPARISON_LESS);
     _font_raster_state  = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true);
@@ -145,8 +146,7 @@ text_renderer::draw(const render_context_ptr& context,
     context_texture_units_guard tug(context);
     context_program_guard       cpg(context);
     
-    mat4f v = mat4f::identity();
-    translate(v, vec3f(vec2f(pos), 0.0f));
+    mat4f v = make_translation(vec3f(vec2f(pos), 0.0f));
     //scale(v, static_cast<float>(txt->font()->styles_texture_array()->dimensions().x),
     //         static_cast<float>(txt->font()->styles_texture_array()->dimensions().y), 1.0f);
     mat4f mvp = _projection_matrix * v;
@@ -169,7 +169,7 @@ text_renderer::draw(const render_context_ptr& context,
             _font_program_lcd->uniform("in_font_array", 0);
             _font_program_lcd->uniform("in_color", txt->text_color());
 
-            context->set_blend_state(_font_blend_lcd, txt->text_color());
+            context->set_blend_state(_font_blend_lcd/*, txt->text_color()*/);
             context->bind_program(_font_program_lcd);
             break;
         default:
@@ -212,8 +212,7 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
             context->set_blend_state(_font_blend_gray);
             context->bind_program(_font_program_gray);
             { // shadow
-                mat4f v = mat4f::identity();
-                translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
+                mat4f v   = make_translation(vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
                 mat4f mvp = _projection_matrix * v;
 
                 _font_program_gray->uniform("in_mvp", mvp);
@@ -242,13 +241,12 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
             _font_program_lcd->uniform("in_font_array", 0);
             context->bind_program(_font_program_lcd);
             { // shadow
-                mat4f v = mat4f::identity();
-                translate(v, vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
+                mat4f v   = make_translation(vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));
                 mat4f mvp = _projection_matrix * v;
 
                 _font_program_lcd->uniform("in_mvp", mvp);
                 _font_program_lcd->uniform("in_color", txt->text_shadow_color());
-                context->set_blend_state(_font_blend_lcd, txt->text_shadow_color());
+                context->set_blend_state(_font_blend_lcd/*, txt->text_shadow_color()*/);
 
                 if (txt->_indices_count > 0) {
                     context->apply();
@@ -262,7 +260,7 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
 
                 _font_program_lcd->uniform("in_mvp", mvp);
                 _font_program_lcd->uniform("in_color", txt->text_color());
-                context->set_blend_state(_font_blend_lcd, txt->text_color());
+                context->set_blend_state(_font_blend_lcd/*, txt->text_color()*/);
 
                 if (txt->_indices_count > 0) {
                     context->apply();
