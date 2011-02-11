@@ -16,6 +16,9 @@ timer_query::timer_query(render_device& in_device)
     _result(0)
 {
     _gl_query_type = GL_TIME_ELAPSED;
+    // start and stop the query to actually generate the query object
+    begin(*in_device.main_context());
+    end(*in_device.main_context());
 }
 
 timer_query::~timer_query()

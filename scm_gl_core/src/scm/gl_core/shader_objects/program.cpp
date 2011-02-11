@@ -178,6 +178,7 @@ program::bind_uniforms(render_context& ren_ctx) const
         name_uniform_map::const_iterator u = _uniforms.begin();
         name_uniform_map::const_iterator e = _uniforms.end();
         for (; u != e; ++u) {
+            //std::cout << u->first << std::endl;
             if (u->second->update_required()) {
                 u->second->apply_value(ren_ctx, *this);
                 u->second->_update_required = false;
@@ -421,6 +422,32 @@ program::retrieve_uniform_information(render_device& in_device)
     const opengl::gl3_core& glapi = in_device.opengl3_api();
     util::gl_error          glerror(glapi);
 
+    { // uniform blocks
+        int act_uniforms = 0;
+        int act_uniform_max_len = 0;
+        scoped_array<char>  temp_name;
+        glapi.glGetProgramiv(_gl_program_obj, GL_ACTIVE_UNIFORM_BLOCKS, &act_uniforms);
+        glapi.glGetProgramiv(_gl_program_obj, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &act_uniform_max_len);
+        if (act_uniform_max_len > 0) {
+            temp_name.reset(new char[act_uniform_max_len + 1]); // reserve for null termination
+        }
+        for (int i = 0; i < act_uniforms; ++i) {
+            int             actual_uniform_size = 0;
+            int             actual_uniform_location = -1;
+            std::string     actual_uniform_name;
+
+            glapi.glGetActiveUniformBlockiv(_gl_program_obj, i, GL_UNIFORM_BLOCK_DATA_SIZE, &actual_uniform_size);
+            glapi.glGetActiveUniformBlockName(_gl_program_obj, i, act_uniform_max_len, 0, temp_name.get());
+            actual_uniform_name.assign(temp_name.get());
+            actual_uniform_location = glapi.glGetUniformBlockIndex(_gl_program_obj, actual_uniform_name.c_str());
+            
+            //std::cout << "uniform block: " << actual_uniform_name << " size: " << actual_uniform_size << std::endl;
+
+            _uniform_blocks[actual_uniform_name] = uniform_block_type(actual_uniform_name,
+                                                                      actual_uniform_location,
+                                                                      actual_uniform_size);
+        }
+    }
     { // uniforms
         int act_uniforms = 0;
         int act_uniform_max_len = 0;
@@ -446,8 +473,14 @@ program::retrieve_uniform_information(render_device& in_device)
             actual_uniform_name.assign(temp_name.get());
 
             // filter out uniform block elements
-            if (actual_uniform_name.find('.') != std::string::npos) {
-                continue;
+            size_t  dot_delim_pos = actual_uniform_name.find('.');
+            if (dot_delim_pos != std::string::npos) {
+                std::string parent_name = actual_uniform_name.substr(0, dot_delim_pos);
+                if (_uniform_blocks.count(parent_name) > 0) {
+                    continue;
+                }
+                //std::cout << actual_uniform_name << std::endl;
+                //continue;
             }
 
             if (!boost::starts_with(actual_uniform_name, "gl_")) {
@@ -500,32 +533,6 @@ program::retrieve_uniform_information(render_device& in_device)
                     _uniforms[actual_uniform_name] = current_uniform;
                 }
             }
-        }
-    }
-    { // uniform blocks
-        int act_uniforms = 0;
-        int act_uniform_max_len = 0;
-        scoped_array<char>  temp_name;
-        glapi.glGetProgramiv(_gl_program_obj, GL_ACTIVE_UNIFORM_BLOCKS, &act_uniforms);
-        glapi.glGetProgramiv(_gl_program_obj, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &act_uniform_max_len);
-        if (act_uniform_max_len > 0) {
-            temp_name.reset(new char[act_uniform_max_len + 1]); // reserve for null termination
-        }
-        for (int i = 0; i < act_uniforms; ++i) {
-            int             actual_uniform_size = 0;
-            int             actual_uniform_location = -1;
-            std::string     actual_uniform_name;
-
-            glapi.glGetActiveUniformBlockiv(_gl_program_obj, i, GL_UNIFORM_BLOCK_DATA_SIZE, &actual_uniform_size);
-            glapi.glGetActiveUniformBlockName(_gl_program_obj, i, act_uniform_max_len, 0, temp_name.get());
-            actual_uniform_name.assign(temp_name.get());
-            actual_uniform_location = glapi.glGetUniformBlockIndex(_gl_program_obj, actual_uniform_name.c_str());
-            
-            //std::cout << "uniform block: " << actual_uniform_name << " size: " << actual_uniform_size << std::endl;
-
-            _uniform_blocks[actual_uniform_name] = uniform_block_type(actual_uniform_name,
-                                                                      actual_uniform_location,
-                                                                      actual_uniform_size);
         }
     }
 #if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
