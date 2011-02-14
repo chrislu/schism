@@ -231,7 +231,7 @@ gl_base_type(const data_format d)
 
         // swizzled integer formats
         GL_UNSIGNED_BYTE,        // FORMAT_BGR_8,
-        GL_UNSIGNED_BYTE,       // FORMAT_BGRA_8,
+        GL_UNSIGNED_INT_8_8_8_8_REV,       // FORMAT_BGRA_8,
 
         // srgb integer formats
         GL_UNSIGNED_BYTE,       // FORMAT_SRGB_8,

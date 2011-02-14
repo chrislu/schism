@@ -16,7 +16,8 @@ gl_buffer_targets(const buffer_binding b)
     switch (b) {
         case BIND_VERTEX_BUFFER:                return GL_ARRAY_BUFFER;
         case BIND_INDEX_BUFFER:                 return GL_ELEMENT_ARRAY_BUFFER;
-        case BIND_PIXEL_BUFFER:                 return GL_PIXEL_PACK_BUFFER;
+        //case BIND_PIXEL_BUFFER:
+        case BIND_PIXEL_PACK_BUFFER:            return GL_PIXEL_PACK_BUFFER;
         case BIND_PIXEL_UNPACK_BUFFER:          return GL_PIXEL_UNPACK_BUFFER;
         case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER;
         case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BUFFER;
@@ -32,7 +33,8 @@ gl_buffer_bindings(const buffer_binding b)
     switch (b) {
         case BIND_VERTEX_BUFFER:                return GL_ARRAY_BUFFER_BINDING;
         case BIND_INDEX_BUFFER:                 return GL_ELEMENT_ARRAY_BUFFER_BINDING;
-        case BIND_PIXEL_BUFFER:                 return GL_PIXEL_PACK_BUFFER_BINDING;
+        //case BIND_PIXEL_BUFFER:
+        case BIND_PIXEL_PACK_BUFFER:            return GL_PIXEL_PACK_BUFFER_BINDING;
         case BIND_PIXEL_UNPACK_BUFFER:          return GL_PIXEL_UNPACK_BUFFER_BINDING;
         case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER_BINDING;
         case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BINDING_BUFFER;
@@ -462,6 +464,23 @@ gl_framebuffer_binding(const frame_buffer_binding s)
     assert(FRAMEBUFFER_DRAW <= s && s < FRAMEBUFFER_BINDING_COUNT);
 
     return framebuffer_bindings[s];
+}
+
+inline
+unsigned
+gl_framebuffer_binding_point(const frame_buffer_binding s)
+{
+    static unsigned framebuffer_binding_points[] = {
+        GL_DRAW_FRAMEBUFFER_BINDING,  // FRAMEBUFFER_DRAW = 0x00,
+        GL_READ_FRAMEBUFFER_BINDING   // FRAMEBUFFER_READ
+    };
+
+    BOOST_STATIC_ASSERT((sizeof(framebuffer_binding_points) / sizeof(unsigned)) == FRAMEBUFFER_BINDING_COUNT);
+
+    assert((sizeof(framebuffer_binding_points) / sizeof(unsigned)) == FRAMEBUFFER_BINDING_COUNT);
+    assert(FRAMEBUFFER_DRAW <= s && s < FRAMEBUFFER_BINDING_COUNT);
+
+    return framebuffer_binding_points[s];
 }
 
 inline

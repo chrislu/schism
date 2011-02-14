@@ -29,6 +29,7 @@ unsigned gl_texture_mag_filter_mode(const texture_filter_mode s);
 unsigned gl_wrap_mode(const texture_wrap_mode s);
 unsigned gl_texture_compare_mode(const texture_compare_mode s);
 unsigned gl_framebuffer_binding(const frame_buffer_binding s);
+unsigned gl_framebuffer_binding_point(const frame_buffer_binding s);
 unsigned gl_frame_buffer_target(const frame_buffer_target s);
 
 debug_source    gl_to_debug_source(unsigned s);

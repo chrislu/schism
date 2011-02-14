@@ -1004,7 +1004,7 @@ render_context::clear_default_color_buffer(const frame_buffer_target in_target,
             glapi.glColorMask(true, true, true, true);
         }
         
-        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+        if (true/*SCM_GL_CORE_USE_WORKAROUND_AMD*/) {
             glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
             glapi.glClear(GL_COLOR_BUFFER_BIT);
         }
@@ -1022,7 +1022,7 @@ render_context::clear_default_color_buffer(const frame_buffer_target in_target,
             glapi.glColorMaski(0, true, true, true, true);
         }
 
-        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+        if (true/*SCM_GL_CORE_USE_WORKAROUND_AMD*/) {
             glapi.glClearColor(in_clear_color.r, in_clear_color.g, in_clear_color.b, in_clear_color.a);
             glapi.glClear(GL_COLOR_BUFFER_BIT);
         }
@@ -1061,7 +1061,7 @@ render_context::clear_default_depth_stencil_buffer(const float in_clear_depth,
         glapi.glDepthMask(true);
         glapi.glStencilMask(true);
 
-        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+        if (true/*SCM_GL_CORE_USE_WORKAROUND_AMD*/) {
             glapi.glClearDepth(in_clear_depth);
             glapi.glClearStencil(in_clear_stencil);
             glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -1079,7 +1079,7 @@ render_context::clear_default_depth_stencil_buffer(const float in_clear_depth,
         glapi.glStencilMask(_applied_state._depth_stencil_state->_descriptor._stencil_wmask);
     }
     else {
-        if (SCM_GL_CORE_USE_WORKAROUND_AMD) {
+        if (true/*SCM_GL_CORE_USE_WORKAROUND_AMD*/) {
             glapi.glClearDepth(in_clear_depth);
             glapi.glClearStencil(in_clear_stencil);
             glapi.glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -1155,6 +1155,21 @@ render_context::generate_mipmaps(const texture_image_ptr& in_texture) const
     in_texture->generate_mipmaps(*this);
 
     gl_assert(glapi, leaving render_context::generate_mipmaps());
+}
+
+void
+render_context::capture_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                     const unsigned          in_buffer,
+                                     const texture_region&   in_region,
+                                     const data_format       in_data_format,
+                                     const buffer_ptr&       in_target_buffer,
+                                     const size_t            in_offset)
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    in_frame_buffer->capture_color_buffer(*this, in_buffer, in_region, in_data_format, in_target_buffer, in_offset);
+
+    gl_assert(glapi, leaving render_context::capture_color_buffer());
 }
 
 void

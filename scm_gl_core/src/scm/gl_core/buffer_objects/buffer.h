@@ -78,6 +78,7 @@ protected:
 
     friend class render_device;
     friend class render_context;
+    friend class frame_buffer;
     friend class vertex_array;
     friend class texture_buffer;
     friend class transform_feedback;

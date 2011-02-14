@@ -16,8 +16,9 @@ enum buffer_binding
     BIND_UNKNOWN                     = 0x00,
     BIND_VERTEX_BUFFER               = 0x01,
     BIND_INDEX_BUFFER                = 0x02,
-    BIND_PIXEL_BUFFER                = 0x04,
+    BIND_PIXEL_PACK_BUFFER           = 0x04,
     BIND_PIXEL_UNPACK_BUFFER         = 0x08,
+    BIND_PIXEL_BUFFER                = BIND_PIXEL_PACK_BUFFER,
     BIND_UNIFORM_BUFFER              = 0x10,
     BIND_TEXTURE_BUFFER              = 0x20,
     BIND_TRANSFORM_FEEDBACK_BUFFER   = 0x40

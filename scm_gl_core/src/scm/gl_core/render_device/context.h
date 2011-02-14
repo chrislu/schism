@@ -224,6 +224,13 @@ public:
                                                             const frame_buffer_ptr& in_draw_buffer) const;
     void                        generate_mipmaps(const texture_image_ptr& in_texture) const;
 
+    void                        capture_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                                     const unsigned          in_buffer,
+                                                     const texture_region&   in_region,
+                                                     const data_format       in_data_format,
+                                                     const buffer_ptr&       in_target_buffer,
+                                                     const size_t            in_offset = 0);
+
 protected:
     void                        apply_frame_buffer();
 

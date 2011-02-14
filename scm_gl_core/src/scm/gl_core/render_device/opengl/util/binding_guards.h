@@ -66,8 +66,8 @@ class framebuffer_binding_guard
 {
 public:
     explicit framebuffer_binding_guard(const opengl::gl3_core& in_glapi,
-                              unsigned                in_target,
-                              unsigned                in_binding);
+                                       unsigned                in_target,
+                                       unsigned                in_binding);
     virtual ~framebuffer_binding_guard();
 private:
     int             _save;

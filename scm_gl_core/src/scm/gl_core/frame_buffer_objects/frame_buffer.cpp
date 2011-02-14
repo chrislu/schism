@@ -14,6 +14,7 @@
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
+#include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
 namespace scm {
@@ -238,6 +239,52 @@ frame_buffer::clear_depth_stencil_buffer(const  render_context& in_context,
     }
 
     gl_assert(glapi, leaving frame_buffer::clear_color_buffer());
+}
+
+void
+frame_buffer::capture_color_buffer(      render_context& in_context,
+                                   const unsigned        in_buffer,
+                                   const texture_region& in_region,
+                                   const data_format     in_data_format,
+                                   const buffer_ptr&     in_target_buffer,
+                                   const size_t          in_offset)
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    assert(0 != object_id());
+    
+    {
+        assert(check_completeness(in_context));
+
+        util::framebuffer_binding_guard fbo_guard(glapi, util::gl_framebuffer_binding(FRAMEBUFFER_READ),
+                                                         util::gl_framebuffer_binding_point(FRAMEBUFFER_READ));
+        this->bind(in_context, FRAMEBUFFER_READ);
+
+        util::buffer_binding_guard save_guard(glapi, util::gl_buffer_targets(BIND_PIXEL_PACK_BUFFER),
+                                                     util::gl_buffer_bindings(BIND_PIXEL_PACK_BUFFER));
+        in_target_buffer->bind(in_context, BIND_PIXEL_PACK_BUFFER);
+
+        // TODO have the read buffer be part of the framebuffer state
+        glapi.glReadBuffer(GL_COLOR_ATTACHMENT0 + in_buffer);
+        gl_assert(glapi, frame_buffer::capture_color_buffer() after glReadBuffer to target attachment);
+
+        glapi.glReadPixels(in_region._origin.x, in_region._origin.y,
+                           in_region._dimensions.x, in_region._dimensions.y,
+                           util::gl_base_format(in_data_format),
+                           util::gl_base_type(in_data_format),
+                           BUFFER_OFFSET(in_offset));
+
+        gl_assert(glapi, frame_buffer::capture_color_buffer() after glReadPixels);
+
+        glapi.glReadBuffer(GL_COLOR_ATTACHMENT0);
+        gl_assert(glapi, frame_buffer::capture_color_buffer() after glReadBuffer to default attachment);
+    }
+
+    gl_assert(glapi, leaving frame_buffer::capture_color_buffer());
+
+    // bind fbo (GUARDED)
+    // bind PBO (GUARDED)
+    // glReadBuffer(GL_COLOR_ATTACHMENT0 + in_buffer);
+    // glReadPixels
 }
 
 bool

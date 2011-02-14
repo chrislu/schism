@@ -7,6 +7,9 @@
 #include <scm/core/math.h>
 
 #include <scm/gl_core/constants.h>
+#include <scm/gl_core/data_formats.h>
+#include <scm/gl_core/data_types.h>
+#include <scm/gl_core/buffer_objects/buffer_objects_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/frame_buffer_objects_fwd.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_core/render_device/context_bindable_object.h>
@@ -60,6 +63,13 @@ protected:
                                                                const float            in_clear_depth = 1.0f,
                                                                const int              in_clear_stencil = 0);
     
+    void                            capture_color_buffer(      render_context& in_context,
+                                                         const unsigned        in_buffer,
+                                                         const texture_region& in_region,
+                                                         const data_format     in_data_format,
+                                                         const buffer_ptr&     in_target_buffer,
+                                                         const size_t          in_offset = 0);
+
     void                            apply_attachments(const render_context& in_context);
     bool                            check_completeness(const render_context& in_context);
 
