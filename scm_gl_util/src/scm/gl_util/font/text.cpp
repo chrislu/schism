@@ -206,6 +206,7 @@ text::update()
             char  cur_char = _text_string[i];
 
             if (cur_char == '\n') {
+                current_pos.x         = 0;
                 current_pos.y        -= _font->line_advance(_text_style);
                 prev_char             = 0;
                 _text_bounding_box.y += _font->line_advance(_text_style);
