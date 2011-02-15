@@ -545,60 +545,61 @@ viewer::initialize_render_target()
     using namespace scm::math;
     using boost::assign::list_of;
 
-    _render_target->_viewport_scale           = static_cast<int>(floor(sqrt(static_cast<double>(_attributes._super_samples))));
-    _render_target->_viewport_color_mip_level = floor_log2(static_cast<uint32>(_render_target->_viewport_scale));
+    if (   (_attributes._multi_samples > 1) || (_attributes._super_samples > 1)) {
+        _render_target->_viewport_scale           = static_cast<int>(floor(sqrt(static_cast<double>(_attributes._super_samples))));
+        _render_target->_viewport_color_mip_level = floor_log2(static_cast<uint32>(_render_target->_viewport_scale));
 
-     // textures
-    _render_target->_color_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, 1, 1, _attributes._multi_samples);
-    _render_target->_depth_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8, 1, 1, _attributes._multi_samples);
-    _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
+         // textures
+        _render_target->_color_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, 1, 1, _attributes._multi_samples);
+        _render_target->_depth_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8, 1, 1, _attributes._multi_samples);
+        _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
 
-    if (   !_render_target->_color_buffer
-        || !_render_target->_color_buffer_resolved
-        || !_render_target->_depth_buffer) {
-        err() << "viewer::initialize_render_target(): error creating textures" << log::end;
-        return (false);
+        if (   !_render_target->_color_buffer
+            || !_render_target->_color_buffer_resolved
+            || !_render_target->_depth_buffer) {
+            err() << "viewer::initialize_render_target(): error creating textures" << log::end;
+            return (false);
+        }
+
+        // framebuffers
+        _render_target->_framebuffer           = device()->create_frame_buffer();
+        _render_target->_framebuffer_resolved  = device()->create_frame_buffer();
+
+        if (   !_render_target->_framebuffer
+            || !_render_target->_framebuffer_resolved) {
+            err() << "viewer::initialize_render_target(): error creating framebuffers" << log::end;
+            return (false);
+        }
+
+        _render_target->_framebuffer->attach_color_buffer(0, _render_target->_color_buffer);
+        _render_target->_framebuffer->attach_depth_stencil_buffer(_render_target->_depth_buffer);
+        _render_target->_framebuffer_resolved->attach_color_buffer(0, _render_target->_color_buffer_resolved);
+
+        // state objects
+        _render_target->_filter_nearest   = device()->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
+        _render_target->_no_blend         = device()->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
+        _render_target->_dstate_no_zwrite = device()->create_depth_stencil_state(false, false);
+        _render_target->_cull_back        = device()->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW);
+
+        if (   !_render_target->_filter_nearest
+            || !_render_target->_no_blend
+            || !_render_target->_dstate_no_zwrite
+            || !_render_target->_cull_back) {
+            err() << "viewer::initialize_render_target(): error creating state objects" << log::end;
+            return (false);
+        }
+
+        // shader programs
+        _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
+                                                                                 (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
+                                                                          "viewer::_color_present_program");
+        if (   !_render_target->_color_present_program) {
+            scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
+            return (false);
+        }
+
+        _render_target->_quad_geom = make_shared<gl::quad_geometry>(device(), vec2f(0.0f, 0.0f), vec2f(1.0f, 1.0f));
     }
-
-    // framebuffers
-    _render_target->_framebuffer           = device()->create_frame_buffer();
-    _render_target->_framebuffer_resolved  = device()->create_frame_buffer();
-
-    if (   !_render_target->_framebuffer
-        || !_render_target->_framebuffer_resolved) {
-        err() << "viewer::initialize_render_target(): error creating framebuffers" << log::end;
-        return (false);
-    }
-
-    _render_target->_framebuffer->attach_color_buffer(0, _render_target->_color_buffer);
-    _render_target->_framebuffer->attach_depth_stencil_buffer(_render_target->_depth_buffer);
-    _render_target->_framebuffer_resolved->attach_color_buffer(0, _render_target->_color_buffer_resolved);
-
-    // state objects
-    _render_target->_filter_nearest   = device()->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
-    _render_target->_no_blend         = device()->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
-    _render_target->_dstate_no_zwrite = device()->create_depth_stencil_state(false, false);
-    _render_target->_cull_back        = device()->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW);
-
-    if (   !_render_target->_filter_nearest
-        || !_render_target->_no_blend
-        || !_render_target->_dstate_no_zwrite
-        || !_render_target->_cull_back) {
-        err() << "viewer::initialize_render_target(): error creating state objects" << log::end;
-        return (false);
-    }
-
-    // shader programs
-    _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
-                                                                             (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
-                                                                      "viewer::_color_present_program");
-    if (   !_render_target->_color_present_program) {
-        scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
-        return (false);
-    }
-
-    _render_target->_quad_geom = make_shared<gl::quad_geometry>(device(), vec2f(0.0f, 0.0f), vec2f(1.0f, 1.0f));
-
     return (true);
 }
 

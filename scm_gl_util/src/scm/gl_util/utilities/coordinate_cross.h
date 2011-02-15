@@ -12,7 +12,7 @@
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
-#include <scm/gl_util/primitives/primitives_fwd.h>
+#include <scm/gl_util/utilities/utilities_fwd.h>
 
 namespace scm {
 namespace gl {
