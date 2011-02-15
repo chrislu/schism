@@ -93,6 +93,9 @@ public:
 
     void                        reset();
 
+    void                        flush();
+    void                        sync();
+
     // debug api //////////////////////////////////////////////////////////////////////////////////
 public:
     struct debug_output {

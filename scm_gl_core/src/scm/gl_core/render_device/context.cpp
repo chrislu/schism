@@ -148,6 +148,20 @@ render_context::reset()
     reset_program();
 }
 
+void
+render_context::flush()
+{
+    apply();
+    opengl_api().glFlush();
+}
+
+void
+render_context::sync()
+{
+    flush();
+    opengl_api().glFinish();
+}
+
 // debug api //////////////////////////////////////////////////////////////////////////////////
 void
 render_context::register_debug_callback(const debug_output_ptr& f)
