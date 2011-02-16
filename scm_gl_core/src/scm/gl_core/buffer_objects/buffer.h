@@ -62,13 +62,13 @@ protected:
     bool                        unmap(const render_context& in_context);
 
 
-    bool                        buffer_data(      render_device& ren_dev,
+    bool                        buffer_data(const render_device& ren_dev,
                                             const buffer_desc&   in_desc,
                                             const void*          initial_data);
-    bool                        buffer_sub_data(render_device&  ren_dev,
-                                                scm::size_t     offset,
-                                                scm::size_t     size,
-                                                const void*     data);
+    bool                        buffer_sub_data(const render_device& ren_dev,
+                                                scm::size_t          offset,
+                                                scm::size_t          size,
+                                                const void*          data);
 
 protected:
     buffer_desc                 _descriptor;

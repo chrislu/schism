@@ -368,6 +368,19 @@ render_context::unmap_buffer(const buffer_ptr& in_buffer) const
     return (return_value);
 }
 
+bool
+render_context::orphane_buffer(const buffer_ptr& in_buffer) const
+{
+    bool return_value = in_buffer->buffer_data(parent_device(), in_buffer->descriptor(), 0);
+
+    if (   (false == return_value)
+        || (!in_buffer->ok())) {
+        SCM_GL_DGB("render_context::orphane_buffer(): error orphaning buffer ('" << in_buffer->state().state_string() << "')");
+    }
+
+    return return_value;
+}
+
 void
 render_context::bind_uniform_buffer(const buffer_ptr& in_buffer,
                                     const unsigned    in_bind_point,
