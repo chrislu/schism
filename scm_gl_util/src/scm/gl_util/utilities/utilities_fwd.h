@@ -7,10 +7,13 @@
 namespace scm {
 namespace gl {
 
+class accumulate_timer_query;
 class coordinate_cross;
 class geometry_highlight;
 class texture_output;
 
+typedef shared_ptr<accumulate_timer_query>          accumulate_timer_query_ptr;
+typedef shared_ptr<accumulate_timer_query const>    accumulate_timer_query_cptr;
 typedef shared_ptr<coordinate_cross>                coordinate_cross_ptr;
 typedef shared_ptr<coordinate_cross const>          coordinate_cross_cptr;
 typedef shared_ptr<geometry_highlight>              geometry_highlight_ptr;

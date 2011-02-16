@@ -724,7 +724,8 @@ void
 render_context::apply_program()
 {
     if (!_current_state._program) {
-        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        // TODO some kind of read state validation before draw, the can be a state with no program bound
+        //state().set(object_state::OS_ERROR_INVALID_VALUE);
         return;
     }
     if (!_current_state._program->ok()) {

@@ -265,6 +265,9 @@ frame_buffer::capture_color_buffer(      render_context& in_context,
 
         glapi.glBindBuffer(GL_PIXEL_PACK_BUFFER, in_target_buffer->object_id());
         //in_target_buffer->bind(in_context, BIND_PIXEL_PACK_BUFFER);
+    
+        //glapi.glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+        //glapi.glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
         // TODO have the read buffer be part of the framebuffer state
         glapi.glReadBuffer(GL_COLOR_ATTACHMENT0 + in_buffer);
