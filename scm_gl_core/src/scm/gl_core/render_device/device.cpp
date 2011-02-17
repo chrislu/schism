@@ -194,6 +194,15 @@ render_device::init_capabilities()
     assert(_capabilities._max_transform_feedback_separate_attribs > 0);
     assert(_capabilities._max_transform_feedback_buffers > 0);
     assert(_capabilities._max_vertex_streams > 0);
+
+    if (glcore.extension_EXT_shader_image_load_store) {
+        glcore.glGetIntegerv(GL_MAX_IMAGE_UNITS_EXT, &_capabilities._max_image_units);
+    }
+    else {
+        _capabilities._max_image_units = 0;
+    }
+
+    //std::cout << "GL_MAX_IMAGE_UNITS_EXT " << _capabilities._max_image_units << std::endl;
 }
 
 // buffer api /////////////////////////////////////////////////////////////////////////////////////

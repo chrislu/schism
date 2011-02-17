@@ -42,7 +42,7 @@ enum buffer_usage
     USAGE_COUNT
 }; // enum buffer_usage
 
-enum buffer_access
+enum access_mode
 {
     ACCESS_READ_ONLY = 0x00,
     ACCESS_WRITE_ONLY,
@@ -52,7 +52,7 @@ enum buffer_access
     ACCESS_WRITE_UNSYNCHRONIZED,
 
     ACCESS_COUNT
-}; // enum buffer_access
+}; // enum access_mode
 
 enum primitive_type
 {

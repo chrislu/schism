@@ -11,7 +11,8 @@ namespace util {
 unsigned gl_buffer_targets(const buffer_binding b);
 unsigned gl_buffer_bindings(const buffer_binding b);
 int      gl_usage_flags(const buffer_usage b);
-unsigned gl_buffer_access(const buffer_access a);
+unsigned gl_buffer_access_mode(const access_mode a);
+unsigned gl_image_access_mode(const access_mode a);
 unsigned gl_primitive_type(const primitive_type p);
 unsigned gl_primitive_topology(const primitive_topology p);
 int      gl_shader_types(const shader_stage s);

@@ -110,11 +110,12 @@ gl3_core::gl3_core()
     version_4_0_available   = false;
     version_4_1_available   = false;
 
-    extension_EXT_direct_state_access_available = false;
     extension_ARB_shading_language_include      = false;
     extension_ARB_cl_event                      = false;
     extension_ARB_debug_output                  = false;
     extension_ARB_robustness                    = false;
+    extension_EXT_shader_image_load_store       = false;
+    extension_EXT_direct_state_access_available = false;
 }
 
 bool
@@ -244,6 +245,7 @@ gl3_core::initialize()
     extension_ARB_cl_event                 = extension_ARB_cl_event                 && is_supported("GL_ARB_cl_event");
     extension_ARB_debug_output             = extension_ARB_debug_output             && is_supported("GL_ARB_debug_output");
     extension_ARB_robustness               = extension_ARB_robustness               && is_supported("GL_ARB_robustness");
+    extension_EXT_shader_image_load_store  = extension_EXT_shader_image_load_store  && is_supported("GL_EXT_shader_image_load_store");
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
@@ -938,6 +940,12 @@ gl3_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLGETNUNIFORMUIVARBPROC, glGetnUniformuivARB, "ARB_robustness", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETNUNIFORMDVARBPROC, glGetnUniformdvARB, "ARB_robustness", init_success);
     extension_ARB_robustness = init_success;
+
+    // EXT_shader_image_load_store ////////////////////////////////////////////////////////////////
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLBINDIMAGETEXTUREEXTPROC, glBindImageTextureEXT, "EXT_shader_image_load_store", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMEMORYBARRIEREXTPROC, glMemoryBarrierEXT, "EXT_shader_image_load_store", init_success);
+    extension_EXT_shader_image_load_store = init_success;
 
     // EXT_direct_state_access ////////////////////////////////////////////////////////////////////
     init_success = true;

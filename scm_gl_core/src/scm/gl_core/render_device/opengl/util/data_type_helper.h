@@ -10,6 +10,7 @@ namespace util {
 
 data_type   from_gl_data_type(unsigned gl_type);
 bool        is_sampler_type(unsigned gl_type);
+bool        is_image_type(unsigned gl_type);
 bool        is_vaild_index_type(const data_type d);
 
 unsigned    gl_base_type(const data_type d);

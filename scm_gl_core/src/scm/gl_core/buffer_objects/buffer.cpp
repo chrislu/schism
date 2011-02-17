@@ -129,7 +129,7 @@ buffer::unbind_range(render_context&   in_context,
 
 void*
 buffer::map(const render_context& in_context,
-            const buffer_access   in_access)
+            const access_mode   in_access)
 {
     return (map_range(in_context, 0, _descriptor._size, in_access));
 }
@@ -138,7 +138,7 @@ void*
 buffer::map_range(const render_context& in_context,
                   scm::size_t           in_offset,
                   scm::size_t           in_size,
-                  const buffer_access   in_access)
+                  const access_mode   in_access)
 {
     const opengl::gl3_core& glapi = in_context.opengl_api();
 
@@ -148,7 +148,7 @@ buffer::map_range(const render_context& in_context,
     assert(state().ok());
 
     void*       return_value = 0;
-    unsigned    access_flags = util::gl_buffer_access(in_access);
+    unsigned    access_flags = util::gl_buffer_access_mode(in_access);
 
     if (   (0 > in_offset)
         || (0 > in_size)

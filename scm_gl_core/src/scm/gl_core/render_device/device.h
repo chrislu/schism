@@ -63,6 +63,7 @@ public:
         int             _max_transform_feedback_separate_attribs;
         int             _max_transform_feedback_buffers;
         int             _max_vertex_streams;
+        int             _max_image_units;
     }; // struct device_capabilities
 
 protected:

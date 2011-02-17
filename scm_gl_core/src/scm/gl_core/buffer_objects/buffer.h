@@ -54,11 +54,11 @@ protected:
                                              const unsigned    in_index);
 
     void*                       map(const render_context& in_context,
-                                    const buffer_access   in_access);
+                                    const access_mode   in_access);
     void*                       map_range(const render_context& in_context,
                                           scm::size_t           in_offset,
                                           scm::size_t           in_size,
-                                          const buffer_access   in_access);
+                                          const access_mode   in_access);
     bool                        unmap(const render_context& in_context);
 
 

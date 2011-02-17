@@ -37,6 +37,11 @@ program::uniform_sampler(const std::string& name) const {
     return (dynamic_pointer_cast<scm::gl::uniform_sampler>(uniform_raw(name)));
 }
 
+inline uniform_image_ptr
+program::uniform_image(const std::string& name) const {
+    return (dynamic_pointer_cast<scm::gl::uniform_image>(uniform_raw(name)));
+}
+
 inline uniform_1f_ptr
 program::uniform_1f(const std::string& name) const {
     return (dynamic_pointer_cast<scm::gl::uniform_1f>(uniform_raw(name)));

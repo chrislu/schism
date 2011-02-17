@@ -491,6 +491,9 @@ program::retrieve_uniform_information(render_device& in_device)
                 if (util::is_sampler_type(actual_uniform_type)) { // samplers as integer uniforms
                     current_uniform.reset(new scm::gl::uniform_sampler(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_INT));
                 }
+                else if (util::is_image_type(actual_uniform_type)) { // images as integer uniforms
+                    current_uniform.reset(new scm::gl::uniform_image(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_INT));
+                }
                 else {
                     switch (actual_uniform_type) {
                         case GL_FLOAT:                  current_uniform.reset(new scm::gl::uniform_1f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;

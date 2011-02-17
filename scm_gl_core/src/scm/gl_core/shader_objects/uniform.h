@@ -81,7 +81,7 @@ struct uniform_data_type {
 #define SCM_UNIFORM_TYPE_DECLARE(type_raw, type_id, uniform_type_name)                                  \
     typedef scm::gl::uniform<type_raw, type_id>          uniform_type_name;                             \
     typedef shared_ptr<scm::gl::uniform_type_name>       uniform_type_name##_ptr;                       \
-    typedef shared_ptr<const scm::gl::uniform_type_name> uniform_type_name##_cptr;                      \
+    typedef shared_ptr<scm::gl::uniform_type_name const> uniform_type_name##_cptr;                      \
     template<> struct uniform_type<type_raw>      { typedef uniform_type_name  type; };                 \
     template<> struct uniform_data_type<type_raw> { static const data_type  type = type_id; };
 
@@ -114,9 +114,13 @@ SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
 #endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
 
 // convenience
-typedef uniform_1i                                       uniform_sampler;
-typedef shared_ptr<scm::gl::uniform_sampler>             uniform_sampler_ptr;
-typedef shared_ptr<const scm::gl::uniform_sampler>       uniform_sampler_cptr;
+typedef uniform_1i                                      uniform_sampler;
+typedef shared_ptr<scm::gl::uniform_sampler>            uniform_sampler_ptr;
+typedef shared_ptr<scm::gl::uniform_sampler const>      uniform_sampler_cptr;
+
+typedef uniform_1i                                      uniform_image;
+typedef shared_ptr<scm::gl::uniform_image>              uniform_image_ptr;
+typedef shared_ptr<scm::gl::uniform_image const>        uniform_image_cptr;
 
 template<> struct uniform_type<bool>      { typedef uniform_1i  type; };
 template<> struct uniform_data_type<bool> { static const data_type  type = TYPE_INT; };

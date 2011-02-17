@@ -156,6 +156,27 @@ private:
     const render_context::texture_unit_array  _save_texture_units;
 }; // class context_texture_units_guard
 
+class context_image_units_guard : boost::noncopyable
+{
+public:
+    context_image_units_guard(const render_context_ptr& in_context)
+      : _guarded_context(in_context)
+      , _save_image_units(in_context->current_image_unit_state())
+    {
+    }
+    ~context_image_units_guard()
+    {
+        restore();
+    }
+    void restore()
+    {
+        _guarded_context->set_image_unit_state(_save_image_units);
+    }
+private:
+    const render_context_ptr&               _guarded_context;
+    const render_context::image_unit_array  _save_image_units;
+}; // class context_image_units_guard
+
 
 class context_framebuffer_guard : boost::noncopyable
 {
@@ -199,6 +220,7 @@ public:
       , _up_guard(in_context)
       , _s_guard(in_context)
       , _t_guard(in_context)
+      , _i_guard(in_context)
       , _f_guard(in_context)
     {
     }
@@ -212,6 +234,7 @@ private:
     context_unpack_buffer_guard     _up_guard;
     context_state_objects_guard     _s_guard;
     context_texture_units_guard     _t_guard;
+    context_image_units_guard       _i_guard;
     context_framebuffer_guard       _f_guard;
 }; // class context_all_guard
 

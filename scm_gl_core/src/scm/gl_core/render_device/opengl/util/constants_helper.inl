@@ -72,7 +72,7 @@ gl_usage_flags(const buffer_usage b)
 
 inline
 unsigned
-gl_buffer_access(const buffer_access a)
+gl_buffer_access_mode(const access_mode a)
 {
     assert(ACCESS_READ_ONLY <= a && a < ACCESS_COUNT);
 
@@ -83,6 +83,20 @@ gl_buffer_access(const buffer_access a)
         case ACCESS_WRITE_INVALIDATE_RANGE:     return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
         case ACCESS_WRITE_INVALIDATE_BUFFER:    return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
         case ACCESS_WRITE_UNSYNCHRONIZED:       return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+        default:                                return 0;                       
+    }
+}
+
+inline
+unsigned
+gl_image_access_mode(const access_mode a)
+{
+    assert(ACCESS_READ_ONLY <= a && a < ACCESS_COUNT);
+
+    switch (a) {
+        case ACCESS_READ_ONLY:                  return GL_READ_ONLY;
+        case ACCESS_WRITE_ONLY:                 return GL_WRITE_ONLY;
+        case ACCESS_READ_WRITE:                 return GL_READ_WRITE;
         default:                                return 0;                       
     }
 }

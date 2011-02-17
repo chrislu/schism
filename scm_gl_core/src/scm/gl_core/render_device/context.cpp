@@ -31,35 +31,64 @@ render_context::index_buffer_binding::index_buffer_binding()
 bool
 render_context::index_buffer_binding::operator==(const index_buffer_binding& rhs) const
 {
-    return (   (_index_buffer       == rhs._index_buffer)
-            && (_primitive_topology == rhs._primitive_topology)
-            && (_index_data_type    == rhs._index_data_type)
-            && (_index_data_offset  == rhs._index_data_offset));
+    return    (_index_buffer       == rhs._index_buffer)
+           && (_primitive_topology == rhs._primitive_topology)
+           && (_index_data_type    == rhs._index_data_type)
+           && (_index_data_offset  == rhs._index_data_offset);
 }
 
 bool
 render_context::index_buffer_binding::operator!=(const index_buffer_binding& rhs) const
 {
-    return (   (_index_buffer       != rhs._index_buffer)
-            || (_primitive_topology != rhs._primitive_topology)
-            || (_index_data_type    != rhs._index_data_type)
-            || (_index_data_offset  != rhs._index_data_offset));
+    return    (_index_buffer       != rhs._index_buffer)
+           || (_primitive_topology != rhs._primitive_topology)
+           || (_index_data_type    != rhs._index_data_type)
+           || (_index_data_offset  != rhs._index_data_offset);
 }
 
 bool
 render_context::buffer_binding::operator==(const buffer_binding& rhs) const
 {
-    return (   (_buffer == rhs._buffer)
-            && (_offset == rhs._offset)
-            && (_size   == rhs._size));
+    return    (_buffer == rhs._buffer)
+           && (_offset == rhs._offset)
+           && (_size   == rhs._size);
 }
 
 bool
 render_context::buffer_binding::operator!=(const buffer_binding& rhs) const
 {
-    return (   (_buffer != rhs._buffer)
-            || (_offset != rhs._offset)
-            || (_size   != rhs._size));
+    return    (_buffer != rhs._buffer)
+           || (_offset != rhs._offset)
+           || (_size   != rhs._size);
+}
+
+render_context::image_unit_binding::image_unit_binding()
+  : _texture_image()
+  , _format(FORMAT_NULL)
+  , _access(ACCESS_READ_WRITE)
+  , _level(0)
+  , _layer(0)
+{
+}
+
+bool
+render_context::image_unit_binding::operator==(const image_unit_binding& rhs) const
+{
+    return    (_texture_image == rhs._texture_image)
+           && (_format        == rhs._format)
+           && (_access        == rhs._access)
+           && (_level         == rhs._level)
+           && (_layer         == rhs._layer);
+}
+
+bool
+render_context::image_unit_binding::operator!=(const image_unit_binding& rhs) const
+{
+    return    (_texture_image != rhs._texture_image)
+           || (_format        != rhs._format)
+           || (_access        != rhs._access)
+           || (_level         != rhs._level)
+           || (_layer         != rhs._layer);
 }
 
 render_context::binding_state_type::binding_state_type()
@@ -95,6 +124,11 @@ render_context::render_context(render_device& in_device)
 
     _current_state._texture_units.resize(in_device.capabilities()._max_texture_image_units);
     _applied_state._texture_units.resize(in_device.capabilities()._max_texture_image_units);
+    if (   glapi.extension_EXT_shader_image_load_store
+        && in_device.capabilities()._max_image_units > 0) {
+        _current_state._image_units.resize(in_device.capabilities()._max_image_units);
+        _applied_state._image_units.resize(in_device.capabilities()._max_image_units);
+    }
 
     _current_state._active_uniform_buffers.resize(in_device.capabilities()._max_uniform_buffer_bindings);
     _applied_state._active_uniform_buffers.resize(in_device.capabilities()._max_uniform_buffer_bindings);
@@ -128,6 +162,7 @@ render_context::apply()
     assert(state().ok());
 
     apply_texture_units();
+    apply_image_units();
     apply_frame_buffer();
     apply_vertex_input();
     apply_state_objects();
@@ -140,6 +175,7 @@ render_context::apply()
 void
 render_context::reset()
 {
+    reset_image_units();
     reset_texture_units();
     reset_framebuffer();
     reset_vertex_input();
@@ -160,6 +196,7 @@ render_context::sync()
 {
     flush();
     opengl_api().glFinish();
+    //opengl_api().glMemoryBarrierEXT(GL_ALL_BARRIER_BITS_EXT);
 }
 
 // debug api //////////////////////////////////////////////////////////////////////////////////
@@ -327,7 +364,7 @@ render_context::gl_debug_dispatch(unsigned src, unsigned type, unsigned severity
 // buffer api /////////////////////////////////////////////////////////////////////////////////
 void*
 render_context::map_buffer(const buffer_ptr&  in_buffer,
-                           const buffer_access in_access) const
+                           const access_mode in_access) const
 {
     void* return_value = in_buffer->map(*this, in_access);
 
@@ -343,7 +380,7 @@ void*
 render_context::map_buffer_range(const buffer_ptr&   in_buffer,
                                  scm::size_t         in_offset,
                                  scm::size_t         in_size,
-                                 const buffer_access in_access) const
+                                 const access_mode in_access) const
 {
     void* return_value = in_buffer->map_range(*this, in_offset, in_size, in_access);
 
@@ -765,6 +802,11 @@ render_context::bind_texture(const texture_ptr&       in_texture_image,
                              const unsigned           in_unit)
 {
     assert(in_unit < _current_state._texture_units.size());
+
+    if (in_unit >= _current_state._texture_units.size()) {
+        return;
+    }
+
     _current_state._texture_units[in_unit]._texture_image = in_texture_image;
     _current_state._texture_units[in_unit]._sampler_state = in_sampler_state;
 }
@@ -787,6 +829,55 @@ render_context::reset_texture_units()
     std::fill(_current_state._texture_units.begin(),
               _current_state._texture_units.end(),
               texture_unit_binding());
+}
+
+void
+render_context::bind_image(const texture_ptr&       in_texture_image,
+                                 data_format        in_format,
+                                 access_mode        in_access,
+                                 unsigned           in_unit,
+                                 int                in_level,
+                                 int                in_layer)
+{
+    assert(in_unit < _current_state._image_units.size());
+
+    if (in_unit < _current_state._image_units.size()) {
+        image_unit_binding& cur_binding = _current_state._image_units[in_unit];
+
+        cur_binding._texture_image = in_texture_image;
+        cur_binding._format        = in_format;
+        cur_binding._access        = in_access;
+        cur_binding._level         = in_level;
+        cur_binding._layer         = in_layer;
+    }
+    else {
+        if (SCM_GL_DEBUG) {
+            glerr() << log::error
+                    << "render_context::bind_image(): "
+                    << "error, no image units available (EXT_shader_image_load_store unavailable)."
+                    << log::end;
+        }
+    }
+}
+
+void
+render_context::set_image_unit_state(const image_unit_array& in_imageunits)
+{
+    _current_state._image_units = in_imageunits;
+}
+
+const render_context::image_unit_array&
+render_context::current_image_unit_state() const
+{
+    return _current_state._image_units;
+}
+
+void
+render_context::reset_image_units()
+{
+    std::fill(_current_state._image_units.begin(),
+              _current_state._image_units.end(),
+              image_unit_binding());
 }
 
 bool
@@ -855,6 +946,27 @@ render_context::apply_texture_units()
         }
     }
     gl_assert(opengl_api(), leaving render_context::apply_texture_units());
+}
+
+void
+render_context::apply_image_units()
+{
+    for (int u = 0; u < _current_state._image_units.size(); ++u) {
+        const image_unit_binding& cub = _current_state._image_units[u];
+        image_unit_binding&       aub = _applied_state._image_units[u];
+
+        if (cub != aub) {
+            if (cub._texture_image) {
+                cub._texture_image->bind_image(*this, u, cub._format, cub._access, cub._level, cub._layer);
+            }
+            else {
+                aub._texture_image->unbind_image(*this, u);
+            }
+        }
+        aub = cub;
+    }
+
+    gl_assert(opengl_api(), leaving render_context::apply_image_units());
 }
 
 // frame buffer api ///////////////////////////////////////////////////////////////////////////

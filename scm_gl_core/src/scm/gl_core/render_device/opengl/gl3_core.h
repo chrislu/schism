@@ -75,8 +75,30 @@ private:
     friend std::ostream& operator<<(std::ostream& out_stream, const gl3_core& c);
 
 public:
+    bool version_1_0_available;
+    bool version_1_1_available;
+    bool version_1_2_available;
+    bool version_1_3_available;
+    bool version_1_4_available;
+    bool version_1_5_available;
+    bool version_2_0_available;
+    bool version_2_1_available;
+    bool version_3_0_available;
+    bool version_3_1_available;
+    bool version_3_2_available;
+    bool version_3_3_available;
+    bool version_4_0_available;
+    bool version_4_1_available;
+
+
+    bool extension_ARB_shading_language_include;
+    bool extension_ARB_cl_event;
+    bool extension_ARB_debug_output;
+    bool extension_ARB_robustness;
+    bool extension_EXT_shader_image_load_store;
+    bool extension_EXT_direct_state_access_available;
+
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_0_available;
     PFNGLCULLFACEPROC                               glCullFace;
     PFNGLFRONTFACEPROC                              glFrontFace;
     PFNGLHINTPROC                                   glHint;
@@ -127,7 +149,6 @@ public:
     PFNGLVIEWPORTPROC                               glViewport;
                                             
     // version 1.1 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_1_available;
     PFNGLDRAWARRAYSPROC                             glDrawArrays;
     PFNGLDRAWELEMENTSPROC                           glDrawElements;
     PFNGLGETPOINTERVPROC                            glGetPointerv;
@@ -144,7 +165,6 @@ public:
     PFNGLISTEXTUREPROC                              glIsTexture;
                                             
     // version 1.2 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_2_available;
     PFNGLBLENDCOLORPROC                             glBlendColor;
     PFNGLBLENDEQUATIONPROC                          glBlendEquation;
     PFNGLDRAWRANGEELEMENTSPROC                      glDrawRangeElements;
@@ -153,7 +173,6 @@ public:
     PFNGLCOPYTEXSUBIMAGE3DPROC                      glCopyTexSubImage3D;
                                             
     // version 1.3 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_3_available;
     PFNGLACTIVETEXTUREPROC                          glActiveTexture;
     PFNGLSAMPLECOVERAGEPROC                         glSampleCoverage;
     PFNGLCOMPRESSEDTEXIMAGE3DPROC                   glCompressedTexImage3D;
@@ -165,7 +184,6 @@ public:
     PFNGLGETCOMPRESSEDTEXIMAGEPROC                  glGetCompressedTexImage;
                                             
     // version 1.4 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_4_available;
     PFNGLBLENDFUNCSEPARATEPROC                      glBlendFuncSeparate;
     PFNGLMULTIDRAWARRAYSPROC                        glMultiDrawArrays;
     PFNGLMULTIDRAWELEMENTSPROC                      glMultiDrawElements;
@@ -175,7 +193,6 @@ public:
     PFNGLPOINTPARAMETERIVPROC                       glPointParameteriv;
                                             
     // version 1.5 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_1_5_available;
     PFNGLGENQUERIESPROC                             glGenQueries;
     PFNGLDELETEQUERIESPROC                          glDeleteQueries;
     PFNGLISQUERYPROC                                glIsQuery;
@@ -197,7 +214,6 @@ public:
     PFNGLGETBUFFERPOINTERVPROC                      glGetBufferPointerv;
 
     // version 2.0 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_2_0_available;
     PFNGLBLENDEQUATIONSEPARATEPROC                  glBlendEquationSeparate;
     PFNGLDRAWBUFFERSPROC                            glDrawBuffers;
     PFNGLSTENCILOPSEPARATEPROC                      glStencilOpSeparate;
@@ -293,7 +309,6 @@ public:
     PFNGLVERTEXATTRIBPOINTERPROC                    glVertexAttribPointer;
                                             
     // version 2.1 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_2_1_available;
     PFNGLUNIFORMMATRIX2X3FVPROC                     glUniformMatrix2x3fv;
     PFNGLUNIFORMMATRIX3X2FVPROC                     glUniformMatrix3x2fv;
     PFNGLUNIFORMMATRIX2X4FVPROC                     glUniformMatrix2x4fv;
@@ -302,7 +317,6 @@ public:
     PFNGLUNIFORMMATRIX4X3FVPROC                     glUniformMatrix4x3fv;
 
     // version 3.0 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_3_0_available;
     PFNGLCOLORMASKIPROC                             glColorMaski;
     PFNGLGETBOOLEANI_VPROC                          glGetBooleani_v;
     PFNGLGETINTEGERI_VPROC                          glGetIntegeri_v;
@@ -392,7 +406,6 @@ public:
     PFNGLISVERTEXARRAYPROC                          glIsVertexArray;
                                             
     // version 3.1 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_3_1_available;
     PFNGLDRAWARRAYSINSTANCEDPROC                    glDrawArraysInstanced;
     PFNGLDRAWELEMENTSINSTANCEDPROC                  glDrawElementsInstanced;
     PFNGLTEXBUFFERPROC                              glTexBuffer;
@@ -409,7 +422,6 @@ public:
     PFNGLUNIFORMBLOCKBINDINGPROC                    glUniformBlockBinding;
                                             
     // version 3.2 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_3_2_available;
     PFNGLGETINTEGER64I_VPROC                        glGetInteger64i_v;
     PFNGLGETBUFFERPARAMETERI64VPROC                 glGetBufferParameteri64v;
     //PFNGLPROGRAMPARAMETERIPROC                      glProgramParameteri;
@@ -437,7 +449,6 @@ public:
     PFNGLSAMPLEMASKIPROC                            glSampleMaski;
 
     // version 3.3 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_3_3_available;
     // use GL_ARB_shader_bit_encoding
     // use ARB_blend_func_extended
     PFNGLBINDFRAGDATALOCATIONINDEXEDPROC            glBindFragDataLocationIndexed;
@@ -471,7 +482,6 @@ public:
     // non which concern core profile
 
     // version 4.0 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_4_0_available;
     // use ARB_draw_buffers_blend
     PFNGLBLENDEQUATIONIPROC                         glBlendEquationi;
     PFNGLBLENDEQUATIONSEPARATEIPROC                 glBlendEquationSeparatei;
@@ -548,7 +558,6 @@ public:
     PFNGLGETQUERYINDEXEDIVPROC                      glGetQueryIndexediv;
 
     // version 4.1 ////////////////////////////////////////////////////////////////////////////////
-    bool    version_4_1_available;
     // use  ARB_ES2_compatibility
     PFNGLRELEASESHADERCOMPILERPROC                  glReleaseShaderCompiler;
     PFNGLSHADERBINARYPROC                           glShaderBinary;
@@ -645,7 +654,6 @@ public:
     PFNGLGETDOUBLEI_VPROC                           glGetDoublei_v;
 
     // GL_ARB_shading_language_include
-    bool extension_ARB_shading_language_include;
     PFNGLNAMEDSTRINGARBPROC                         glNamedStringARB;
     PFNGLDELETENAMEDSTRINGARBPROC                   glDeleteNamedStringARB;
     PFNGLCOMPILESHADERINCLUDEARBPROC                glCompileShaderIncludeARB;
@@ -654,18 +662,15 @@ public:
     PFNGLGETNAMEDSTRINGIVARBPROC                    glGetNamedStringivARB;
 
     // ARB_cl_event
-    bool extension_ARB_cl_event;
     PFNGLCREATESYNCFROMCLEVENTARBPROC               glCreateSyncFromCLeventARB;
 
     // ARB_debug_output
-    bool extension_ARB_debug_output;
     PFNGLDEBUGMESSAGECONTROLARBPROC                 glDebugMessageControlARB;
     PFNGLDEBUGMESSAGEINSERTARBPROC                  glDebugMessageInsertARB;
     PFNGLDEBUGMESSAGECALLBACKARBPROC                glDebugMessageCallbackARB;
     PFNGLGETDEBUGMESSAGELOGARBPROC                  glGetDebugMessageLogARB;
 
     // ARB_robustness
-    bool extension_ARB_robustness;
     PFNGLGETGRAPHICSRESETSTATUSARBPROC              glGetGraphicsResetStatusARB;
     PFNGLGETNMAPDVARBPROC                           glGetnMapdvARB;
     PFNGLGETNMAPFVARBPROC                           glGetnMapfvARB;
@@ -687,8 +692,11 @@ public:
     PFNGLGETNUNIFORMUIVARBPROC                      glGetnUniformuivARB;
     PFNGLGETNUNIFORMDVARBPROC                       glGetnUniformdvARB;
 
+    // EXT_shader_image_load_store
+    PFNGLBINDIMAGETEXTUREEXTPROC                    glBindImageTextureEXT;
+    PFNGLMEMORYBARRIEREXTPROC                       glMemoryBarrierEXT;
+
     // EXT_direct_state_access
-    bool    extension_EXT_direct_state_access_available;
     // use GL_EXT_draw_buffers2
     PFNGLENABLEINDEXEDEXTPROC                       glEnableIndexedEXT;
     PFNGLDISABLEINDEXEDEXTPROC                      glDisableIndexedEXT;

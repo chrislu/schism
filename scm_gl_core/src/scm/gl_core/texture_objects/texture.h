@@ -2,6 +2,7 @@
 #ifndef SCM_GL_CORE_TEXTURE_H_INCLUDED
 #define SCM_GL_CORE_TEXTURE_H_INCLUDED
 
+#include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_core/render_device/context_bindable_object.h>
@@ -29,6 +30,14 @@ protected:
 
     void            bind(const render_context& in_context, int in_unit) const;
     void            unbind(const render_context& in_context, int in_unit) const;
+
+    void            bind_image(const render_context& in_context,
+                                     unsigned        in_unit,
+                                     data_format     in_format,
+                                     access_mode     in_access,
+                                     int             in_level,
+                                     int             in_layer) const;
+    void            unbind_image(const render_context& in_context, int in_unit) const;
 
 private:
     friend class render_device;

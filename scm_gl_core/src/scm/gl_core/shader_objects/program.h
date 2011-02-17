@@ -83,6 +83,7 @@ public:
     uniform_ptr                 uniform_raw(const std::string& name) const;
 
     uniform_sampler_ptr         uniform_sampler(const std::string& name) const;
+    uniform_image_ptr           uniform_image(const std::string& name) const;
 
     uniform_1f_ptr              uniform_1f(const std::string& name) const;
     uniform_vec2f_ptr           uniform_vec2f(const std::string& name) const;

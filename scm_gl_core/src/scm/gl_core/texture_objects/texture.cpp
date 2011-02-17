@@ -8,6 +8,8 @@
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
+#include <scm/gl_core/render_device/opengl/util/constants_helper.h>
+#include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
 namespace scm {
@@ -95,6 +97,47 @@ texture::unbind(const render_context& in_context, int in_unit) const
         //glapi.glDisable(object_target());
         glapi.glActiveTexture(GL_TEXTURE0);
     }
+
+    gl_assert(glapi, leaving texture::unbind());
+}
+
+void
+texture::bind_image(const render_context& in_context,
+                          unsigned        in_unit,
+                          data_format     in_format,
+                          access_mode     in_access,
+                          int             in_level,
+                          int             in_layer) const
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    assert(0 != object_id());
+    assert(0 != object_target());
+    assert(0 != object_binding());
+    assert(glapi.extension_EXT_direct_state_access_available == true);
+
+    // TODO runtime checks for level and layer, maybe format compatibility
+
+    glapi.glBindImageTextureEXT(in_unit, object_id(),
+                                in_level, (in_layer >= 0), in_layer >= 0 ? in_layer : 0,
+                                util::gl_image_access_mode(in_access),
+                                util::gl_internal_format(in_format));
+
+    gl_assert(glapi, leaving texture::unbind());
+}
+
+void
+texture::unbind_image(const render_context& in_context, int in_unit) const
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    assert(0 != object_id());
+    assert(0 != object_target());
+    assert(0 != object_binding());
+    assert(glapi.extension_EXT_direct_state_access_available == true);
+
+    glapi.glBindImageTextureEXT(in_unit, 0,
+                                0, false, 0,
+                                GL_READ_WRITE,
+                                GL_RGBA8);
 
     gl_assert(glapi, leaving texture::unbind());
 }

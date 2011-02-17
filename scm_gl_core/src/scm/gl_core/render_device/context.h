@@ -45,6 +45,16 @@ public:
         texture_ptr         _texture_image;
         sampler_state_ptr   _sampler_state;
     }; // struct texture_unit_binding
+    struct image_unit_binding {
+        image_unit_binding();
+        bool                operator==(const image_unit_binding& rhs) const; 
+        bool                operator!=(const image_unit_binding& rhs) const; 
+        texture_ptr         _texture_image;
+        data_format         _format;
+        access_mode         _access;
+        int                 _level;
+        int                 _layer;
+    }; // struct image_unit_binding
     struct buffer_binding {
         buffer_binding() : _offset(0), _size(0) {}
         bool                operator==(const buffer_binding& rhs) const; 
@@ -54,7 +64,9 @@ public:
         scm::size_t         _size;
     }; // struct uniform_buffer_binding
     typedef std::vector<texture_unit_binding>   texture_unit_array;
+    typedef std::vector<image_unit_binding>     image_unit_array;
     typedef std::vector<buffer_binding>         buffer_binding_array;
+
 private:
     struct binding_state_type {
         binding_state_type();
@@ -77,6 +89,7 @@ private:
         math::vec4f                         _blend_color;
         // texture units //////////////////////////////////////////////////////////////////////////
         texture_unit_array                  _texture_units;
+        image_unit_array                    _image_units;
         // framebuffer control ////////////////////////////////////////////////////////////////////
         frame_buffer_ptr                    _draw_framebuffer;
         frame_buffer_ptr                    _read_framebuffer;
@@ -116,8 +129,8 @@ protected:
 
     // buffer api /////////////////////////////////////////////////////////////////////////////////
 public:
-    void*                       map_buffer(const buffer_ptr& in_buffer, const buffer_access in_access) const;
-    void*                       map_buffer_range(const buffer_ptr& in_buffer, scm::size_t in_offset, scm::size_t in_size, const buffer_access in_access) const;
+    void*                       map_buffer(const buffer_ptr& in_buffer, const access_mode in_access) const;
+    void*                       map_buffer_range(const buffer_ptr& in_buffer, scm::size_t in_offset, scm::size_t in_size, const access_mode in_access) const;
     bool                        unmap_buffer(const buffer_ptr& in_buffer) const;
     bool                        orphane_buffer(const buffer_ptr& in_buffer) const;
 
@@ -181,8 +194,17 @@ public:
                                              const unsigned           in_unit);
     void                        set_texture_unit_state(const texture_unit_array& in_texture_units);
     const texture_unit_array&   current_texture_unit_state() const;
-
     void                        reset_texture_units();
+
+    void                        bind_image(const texture_ptr&       in_texture_image,
+                                                 data_format        in_format,
+                                                 access_mode        in_access,
+                                                 unsigned           in_unit,
+                                                 int                in_level = 0,
+                                                 int                in_layer = -1);
+    void                        set_image_unit_state(const image_unit_array& in_imageunits);
+    const image_unit_array&     current_image_unit_state() const;
+    void                        reset_image_units();
 
     bool                        update_sub_texture(const texture_image_ptr& in_texture,
                                                    const texture_region&    in_region,
@@ -197,6 +219,7 @@ public:
 
 protected:
     void                        apply_texture_units();
+    void                        apply_image_units();
 
     // frame buffer api ///////////////////////////////////////////////////////////////////////////
 public:
