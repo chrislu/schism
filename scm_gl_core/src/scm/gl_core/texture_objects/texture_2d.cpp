@@ -9,6 +9,11 @@
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 
+namespace {
+static const unsigned TEXTURE_IMMUTABLE_NVX = 0x8DEB;
+static const unsigned TEXTURE_VOLATILE_NVX  = 0x8DEC;
+}
+
 namespace scm {
 namespace gl {
 
@@ -175,6 +180,20 @@ texture_2d::image_data(const render_device&      in_device,
 
                 gl_assert(glapi, texture_2d::image_data() after glTexImage2D());
             }
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_R, GL_RED);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+            //glapi.glTexParameteri(object_target(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+            //glapi.glTexParameteri(object_target(), TEXTURE_VOLATILE_NVX, GL_TRUE);
+            //gl_assert(glapi, texture_2d::image_data() after glTexParameteri(TEXTURE_VOLATILE_NVX));
         }
         // multi sample texture
         else if (in_desc._samples > 1) {
