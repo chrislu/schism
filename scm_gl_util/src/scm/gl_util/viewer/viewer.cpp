@@ -153,7 +153,7 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
     }
     glout() << *_device << scm::log::end;
 
-    _trackball.dolly(3.0f);
+    _trackball.dolly(1.5f);
     _camera.view_matrix(_trackball.transform_matrix());
 }
 

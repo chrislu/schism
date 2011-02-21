@@ -21,6 +21,7 @@ public:
 
 public:
     accumulate_timer_query(const render_device_ptr& device);
+    /*virtual*/ ~accumulate_timer_query();
 
     void                    start(const render_context_ptr& context);
     void                    stop(const render_context_ptr& context);

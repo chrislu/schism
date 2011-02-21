@@ -184,6 +184,52 @@ frame_buffer::clear_color_buffer(const  render_context& in_context,
 }
 
 void
+frame_buffer::clear_color_buffer(const  render_context& in_context,
+                                 const unsigned         in_buffer,
+                                 const math::vec4i&     in_clear_color)
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    assert(0 != object_id());
+    assert(in_buffer < _draw_buffers.size());
+    
+    {
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
+
+        // apply attachments if they changed to get the correct attachment state for clearing
+        apply_attachments(in_context);
+        assert(check_completeness(in_context));
+
+        glapi.glClearBufferiv(GL_COLOR, in_buffer, in_clear_color.data_array);
+    }
+
+    gl_assert(glapi, leaving frame_buffer::clear_color_buffer());
+}
+
+void
+frame_buffer::clear_color_buffer(const  render_context& in_context,
+                                 const unsigned         in_buffer,
+                                 const math::vec4ui&    in_clear_color)
+{
+    const opengl::gl3_core& glapi = in_context.opengl_api();
+    assert(0 != object_id());
+    assert(in_buffer < _draw_buffers.size());
+    
+    {
+        util::framebuffer_binding_guard fbo_guard(glapi, object_target(), object_binding());
+        glapi.glBindFramebuffer(object_target(), object_id());
+
+        // apply attachments if they changed to get the correct attachment state for clearing
+        apply_attachments(in_context);
+        assert(check_completeness(in_context));
+
+        glapi.glClearBufferuiv(GL_COLOR, in_buffer, in_clear_color.data_array);
+    }
+
+    gl_assert(glapi, leaving frame_buffer::clear_color_buffer());
+}
+
+void
 frame_buffer::clear_color_buffers(const  render_context& in_context,
                                   const math::vec4f&     in_clear_color)
 {

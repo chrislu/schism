@@ -237,6 +237,12 @@ public:
     void                        clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                                    const unsigned          in_buffer,
                                                    const math::vec4f&      in_clear_color   = math::vec4f(0.0f)) const;
+    void                        clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                                   const unsigned          in_buffer,
+                                                   const math::vec4i&      in_clear_color   = math::vec4i(0)) const;
+    void                        clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                                   const unsigned          in_buffer,
+                                                   const math::vec4ui&     in_clear_color   = math::vec4ui(0u)) const;
     void                        clear_color_buffers(const frame_buffer_ptr& in_frame_buffer,
                                                     const math::vec4f&      in_clear_color   = math::vec4f(0.0f)) const;
     void                        clear_depth_stencil_buffer(const frame_buffer_ptr& in_frame_buffer,

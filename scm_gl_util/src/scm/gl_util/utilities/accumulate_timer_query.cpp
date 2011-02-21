@@ -1,6 +1,7 @@
 
 #include "accumulate_timer_query.h"
 
+#include <cassert>
 #include <exception>
 #include <stdexcept>
 
@@ -21,21 +22,29 @@ accumulate_timer_query::accumulate_timer_query(const render_device_ptr& device)
     }
 }
 
+accumulate_timer_query::~accumulate_timer_query()
+{
+    _timer_query.reset();
+}
+
 void
 accumulate_timer_query::start(const render_context_ptr& context)
 {
+    assert(_timer_query);
     context->begin_query(_timer_query);
 }
 
 void
 accumulate_timer_query::stop(const render_context_ptr& context)
 {
+    assert(_timer_query);
     context->end_query(_timer_query);
 }
 
 void
 accumulate_timer_query::collect(const render_context_ptr& context)
 {
+    assert(_timer_query);
     context->collect_query_results(_timer_query);
 
     _accumulated_duration += time::nanosec(_timer_query->result());

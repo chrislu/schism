@@ -56,6 +56,12 @@ protected:
 
     void                            clear_color_buffer(const render_context&  in_context,
                                                        const unsigned         in_buffer,
+                                                       const math::vec4i&     in_clear_color   = math::vec4i(0));
+    void                            clear_color_buffer(const render_context&  in_context,
+                                                       const unsigned         in_buffer,
+                                                       const math::vec4ui&    in_clear_color   = math::vec4ui(0u));
+    void                            clear_color_buffer(const render_context&  in_context,
+                                                       const unsigned         in_buffer,
                                                        const math::vec4f&     in_clear_color   = math::vec4f(0.0f));
     void                            clear_color_buffers(const render_context&  in_context,
                                                         const math::vec4f&     in_clear_color   = math::vec4f(0.0f));

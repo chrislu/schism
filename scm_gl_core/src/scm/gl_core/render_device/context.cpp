@@ -196,7 +196,7 @@ render_context::sync()
 {
     flush();
     opengl_api().glFinish();
-    //opengl_api().glMemoryBarrierEXT(GL_ALL_BARRIER_BITS_EXT);
+    opengl_api().glMemoryBarrierEXT(GL_ALL_BARRIER_BITS_EXT);
 }
 
 // debug api //////////////////////////////////////////////////////////////////////////////////
@@ -1028,6 +1028,86 @@ void
 render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                    const unsigned          in_buffer,
                                    const math::vec4f&      in_clear_color) const
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
+    if (1 == abops.size()) {
+        if (abops[0]._write_mask != COLOR_ALL) {
+            glapi.glColorMask(true, true, true, true);
+        }
+
+        in_frame_buffer->clear_color_buffer(*this, in_buffer, in_clear_color);
+        
+        if (abops[0]._write_mask != COLOR_ALL) {
+            glapi.glColorMask(util::masked(abops[0]._write_mask, COLOR_RED),  util::masked(abops[0]._write_mask, COLOR_GREEN),
+                              util::masked(abops[0]._write_mask, COLOR_BLUE), util::masked(abops[0]._write_mask, COLOR_ALPHA));
+        }
+    }
+    else if (in_buffer < abops.size()) {
+        if (abops[in_buffer]._write_mask != COLOR_ALL) {
+            glapi.glColorMaski(in_buffer, true, true, true, true);
+        }
+        
+        in_frame_buffer->clear_color_buffer(*this, in_buffer, in_clear_color);
+        
+        if (abops[in_buffer]._write_mask != COLOR_ALL) {
+            glapi.glColorMaski(in_buffer, util::masked(abops[in_buffer]._write_mask, COLOR_RED),  util::masked(abops[in_buffer]._write_mask, COLOR_GREEN),
+                                          util::masked(abops[in_buffer]._write_mask, COLOR_BLUE), util::masked(abops[in_buffer]._write_mask, COLOR_ALPHA));
+        }
+    }
+    else {
+        glerr() << log::warning
+                << "render_context::clear_color_buffer(): no blend state defined for color buffer " << in_buffer << log::end;
+    }
+
+    gl_assert(glapi, leaving render_context::clear_color_buffer());
+}
+
+void
+render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                   const unsigned          in_buffer,
+                                   const math::vec4i&      in_clear_color) const
+{
+    const opengl::gl3_core& glapi = opengl_api();
+
+    const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
+    if (1 == abops.size()) {
+        if (abops[0]._write_mask != COLOR_ALL) {
+            glapi.glColorMask(true, true, true, true);
+        }
+
+        in_frame_buffer->clear_color_buffer(*this, in_buffer, in_clear_color);
+        
+        if (abops[0]._write_mask != COLOR_ALL) {
+            glapi.glColorMask(util::masked(abops[0]._write_mask, COLOR_RED),  util::masked(abops[0]._write_mask, COLOR_GREEN),
+                              util::masked(abops[0]._write_mask, COLOR_BLUE), util::masked(abops[0]._write_mask, COLOR_ALPHA));
+        }
+    }
+    else if (in_buffer < abops.size()) {
+        if (abops[in_buffer]._write_mask != COLOR_ALL) {
+            glapi.glColorMaski(in_buffer, true, true, true, true);
+        }
+        
+        in_frame_buffer->clear_color_buffer(*this, in_buffer, in_clear_color);
+        
+        if (abops[in_buffer]._write_mask != COLOR_ALL) {
+            glapi.glColorMaski(in_buffer, util::masked(abops[in_buffer]._write_mask, COLOR_RED),  util::masked(abops[in_buffer]._write_mask, COLOR_GREEN),
+                                          util::masked(abops[in_buffer]._write_mask, COLOR_BLUE), util::masked(abops[in_buffer]._write_mask, COLOR_ALPHA));
+        }
+    }
+    else {
+        glerr() << log::warning
+                << "render_context::clear_color_buffer(): no blend state defined for color buffer " << in_buffer << log::end;
+    }
+
+    gl_assert(glapi, leaving render_context::clear_color_buffer());
+}
+
+void
+render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
+                                   const unsigned          in_buffer,
+                                   const math::vec4ui&     in_clear_color) const
 {
     const opengl::gl3_core& glapi = opengl_api();
 
