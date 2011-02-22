@@ -187,8 +187,49 @@ render_context::reset()
 void
 render_context::flush()
 {
+    //apply();
+    //apply_texture_units();
+    //apply_image_units();
+    //apply_frame_buffer();
+    //apply_vertex_input();
+
+    // bind the vertex_array
+    //if (_current_state._vertex_array != _applied_state._vertex_array) {
+    //    if (_current_state._vertex_array) {
+    //        glout() << "_current_state._vertex_array->bind(*this);" << log::end;
+    //        _current_state._vertex_array->bind(*this);
+    //    }
+    //    else {
+    //        _applied_state._vertex_array->unbind(*this);
+    //        glout() << "_applied_state._vertex_array->unbind(*this);" << log::end;
+    //    }
+    //    _applied_state._vertex_array = _current_state._vertex_array;
+    //}
+
+    //opengl_api().glBindVertexArray(0);
+
+    //if (_current_state._index_buffer_binding != _applied_state._index_buffer_binding) {
+    //    if (_current_state._index_buffer_binding._index_buffer != _applied_state._index_buffer_binding._index_buffer) {
+    //        if (_current_state._index_buffer_binding._index_buffer) {
+    //            glout() << "_current_state._index_buffer_binding._index_buffer->bind(*this, BIND_INDEX_BUFFER);" << log::end;
+    //            _current_state._index_buffer_binding._index_buffer->bind(*this, BIND_INDEX_BUFFER);
+    //        }
+    //        else {
+    //            glout() << "_applied_state._index_buffer_binding._index_buffer->unbind(*this, BIND_INDEX_BUFFER);" << log::end;
+    //            _applied_state._index_buffer_binding._index_buffer->unbind(*this, BIND_INDEX_BUFFER);
+    //        }
+    //    }
+    //    _applied_state._index_buffer_binding = _current_state._index_buffer_binding;
+    //}
+
+
+    //apply_state_objects();
+    //apply_uniform_buffer_bindings();
+    //apply_program();
+
     apply();
     opengl_api().glFlush();
+    //opengl_api().glFinish();
 }
 
 void
@@ -1107,7 +1148,7 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
 void
 render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                    const unsigned          in_buffer,
-                                   const math::vec4ui&     in_clear_color) const
+                                   const math::vec4ui&     in_clear_color)
 {
     const opengl::gl3_core& glapi = opengl_api();
 
@@ -1123,6 +1164,16 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
             glapi.glColorMask(util::masked(abops[0]._write_mask, COLOR_RED),  util::masked(abops[0]._write_mask, COLOR_GREEN),
                               util::masked(abops[0]._write_mask, COLOR_BLUE), util::masked(abops[0]._write_mask, COLOR_ALPHA));
         }
+    //glout() << "ok" << log::end;
+    ////apply_texture_units();
+    ////apply_image_units();
+    ////apply_frame_buffer();
+    ////apply_vertex_input();
+    ////apply_state_objects();
+    ////apply_uniform_buffer_bindings();
+    ////apply_program();
+    //apply();
+    //glapi.glFlush();
     }
     else if (in_buffer < abops.size()) {
         if (abops[in_buffer]._write_mask != COLOR_ALL) {
@@ -1140,6 +1191,10 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
         glerr() << log::warning
                 << "render_context::clear_color_buffer(): no blend state defined for color buffer " << in_buffer << log::end;
     }
+
+    //apply();
+    ////glapi.glBindVertexArray(0);
+    //glapi.glFlush();
 
     gl_assert(glapi, leaving render_context::clear_color_buffer());
 }

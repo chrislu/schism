@@ -143,8 +143,10 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
     buffer_slot_map::const_iterator slot     = _buffer_slots.begin();
     buffer_slot_map::const_iterator slot_end = _buffer_slots.end();
 
-#if !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
     util::vertex_array_binding_guard binding_guard(glapi);
+#if SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
+    glapi.glBindVertexArray(0); // W T F ?!?!
+#else
     glapi.glBindVertexArray(object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
 
@@ -173,6 +175,7 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
                                                               elmt->_offset);
                 }
                 else {
+    gl_assert(glapi, leaving vertex_array::initialize_array_object());
                     bool normalize = (is_integer_type(elmt->_type) && (elmt->_integer_handling == INT_FLOAT_NORMALIZE));
                     glapi.glVertexArrayVertexAttribOffsetEXT(object_id(), buf->object_id(),
                                                              elmt->_attrib_location,
@@ -181,6 +184,7 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
                                                              normalize,
                                                              elmt->_stride,
                                                              elmt->_offset);
+    gl_assert(glapi, leaving vertex_array::initialize_array_object());
                 }
                 if (glerror) {
                     state().set(glerror.to_object_state());
