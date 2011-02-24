@@ -607,7 +607,7 @@ program::retrieve_uniform_information(render_device& in_device)
                 if (act_routine_max_len > 0) {
                     temp_name = new char[act_routine_max_len + 1]; // reserve for null termination
                 }
-                for (int i = 1; i <= act_routines; ++i) {
+                for (int i = 0; i < act_routines; ++i) {
                     std::string         actual_routine_name;
                     unsigned            actual_routine_index = 0;
 
