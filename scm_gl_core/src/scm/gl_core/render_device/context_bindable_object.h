@@ -14,7 +14,7 @@ public:
     context_bindable_object();
     virtual ~context_bindable_object();
 
-protected:
+public:
     unsigned                object_id() const       { return (_gl_object_id); };
     unsigned                object_target() const   { return (_gl_object_target); };
     unsigned                object_binding() const  { return (_gl_object_binding); };
