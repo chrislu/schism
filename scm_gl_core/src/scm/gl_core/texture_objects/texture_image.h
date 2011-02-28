@@ -33,11 +33,11 @@ class __scm_export(gl_core) texture_image : public texture,
 public:
     virtual ~texture_image();
 
-protected:
-    texture_image(render_device& in_device);
-
     unsigned        object_id() const;
     unsigned        object_target() const;
+
+protected:
+    texture_image(render_device& in_device);
 
     void            generate_mipmaps(const render_context& in_context);
     virtual bool    image_sub_data(const render_context& in_context,
