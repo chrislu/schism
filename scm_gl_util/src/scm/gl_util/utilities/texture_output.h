@@ -29,13 +29,19 @@ public:
                               const math::vec4f&            scale,
                               const math::vec2ui&           position,
                               const math::vec2ui&           extend) const;
+    void draw_texture_2d_uint8_bit_rev(const gl::render_context_ptr& context,
+                                       const gl::texture_2d_ptr&     tex,
+                                       const math::vec2ui&           position,
+                                       const math::vec2ui&           extend) const;
  
 protected:
     gl::quad_geometry_ptr           _quad_geom;
     gl::program_ptr                 _fs_program_color;
     gl::program_ptr                 _fs_program_color_uint;
+    gl::program_ptr                 _fs_program_color_uint8_bit_rev;
     gl::program_ptr                 _fs_program_gray;
     gl::program_ptr                 _fs_program_gray_uint;
+    gl::program_ptr                 _fs_program_gray_uint8_bit_rev;
 
     gl::sampler_state_ptr           _filter_nearest;
     gl::rasterizer_state_ptr        _rstate_cull_back;
