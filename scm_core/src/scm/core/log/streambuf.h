@@ -7,7 +7,7 @@
 #include <iterator> 
 #include <iosfwd>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace string {

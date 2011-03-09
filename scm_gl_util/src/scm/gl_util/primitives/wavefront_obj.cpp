@@ -6,7 +6,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 #include <scm/core/utilities/foreach.h>
 
 #include <scm/gl_core/render_device.h>

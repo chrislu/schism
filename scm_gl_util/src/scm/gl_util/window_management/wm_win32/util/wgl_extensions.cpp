@@ -5,7 +5,7 @@
 
 #include <boost/tokenizer.hpp>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/wm_win32/util/classic_context_win32.h>
 

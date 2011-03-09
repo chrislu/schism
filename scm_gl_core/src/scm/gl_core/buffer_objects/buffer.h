@@ -3,7 +3,7 @@
 #define SCM_GL_CORE_BUFFER_H_INCLUDED
 
 #include <scm/core/numeric_types.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/gl_core_fwd.h>

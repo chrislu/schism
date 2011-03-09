@@ -8,7 +8,7 @@
 
 #include <X11/Xlib.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/display.h>
 

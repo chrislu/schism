@@ -5,7 +5,7 @@
 #include <list>
 #include <string>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace gl {

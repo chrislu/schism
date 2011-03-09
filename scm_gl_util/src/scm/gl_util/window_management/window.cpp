@@ -60,25 +60,25 @@ window::~window()
 void
 window::swap_buffers(int interval) const
 {
-    boost::static_pointer_cast<window_impl>(_impl)->swap_buffers(interval);
+    scm::static_pointer_cast<window_impl>(_impl)->swap_buffers(interval);
 }
 
 const window::handle
 window::window_handle() const
 {
-    return (boost::static_pointer_cast<window_impl>(_impl)->_window_handle);
+    return (scm::static_pointer_cast<window_impl>(_impl)->_window_handle);
 }
 
 void
 window::show()
 {
-    boost::static_pointer_cast<window_impl>(_impl)->show();
+    scm::static_pointer_cast<window_impl>(_impl)->show();
 }
 
 void
 window::hide()
 {
-    boost::static_pointer_cast<window_impl>(_impl)->hide();
+    scm::static_pointer_cast<window_impl>(_impl)->hide();
 }
 
 } // namespace wm

@@ -2,7 +2,7 @@
 #ifndef SCM_GL_CORE_UNIFORM_BUFFER_ADAPTOR_H_INCLUDED
 #define SCM_GL_CORE_UNIFORM_BUFFER_ADAPTOR_H_INCLUDED
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/buffer_objects/buffer_objects_fwd.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>

@@ -2,7 +2,7 @@
 #ifndef SCM_GL_CORE_BUFFER_OBJECTS_FWD_H_INCLUDED
 #define SCM_GL_CORE_BUFFER_OBJECTS_FWD_H_INCLUDED
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace gl {

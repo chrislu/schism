@@ -2,7 +2,7 @@
 #ifndef SCM_GL_UTIL_WM_HEADLESS_SURFACE_H_INCLUDED
 #define SCM_GL_UTIL_WM_HEADLESS_SURFACE_H_INCLUDED
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/wm_fwd.h>
 #include <scm/gl_util/window_management/surface.h>

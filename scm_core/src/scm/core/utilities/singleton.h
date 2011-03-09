@@ -7,7 +7,7 @@
 #include <boost/thread/mutex.hpp>
 #include <scm/core/utilities/boost_warning_enable.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 

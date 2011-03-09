@@ -5,7 +5,7 @@
 #include <string>
 
 #include <scm/core/math.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/wm_fwd.h>
 #include <scm/gl_util/window_management/surface.h>

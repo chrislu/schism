@@ -10,7 +10,7 @@
 #include <boost/thread/mutex.hpp>
 #include <scm/core/utilities/boost_warning_enable.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 #include <scm/core/utilities/singleton.h>
 
 #include <scm/core/platform/platform.h>

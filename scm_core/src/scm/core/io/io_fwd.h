@@ -2,7 +2,7 @@
 #ifndef SCM_CORE_IO_FWD_H_INCLUDED
 #define SCM_CORE_IO_FWD_H_INCLUDED
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace io {

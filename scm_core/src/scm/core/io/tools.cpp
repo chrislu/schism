@@ -6,7 +6,7 @@
 
 #include <scm/log.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 #include <scm/core/io/file.h>
 
 namespace scm {

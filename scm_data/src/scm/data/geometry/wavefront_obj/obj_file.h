@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 #include <scm/core/math/math.h>
 
 #include <scm/core/platform/platform.h>

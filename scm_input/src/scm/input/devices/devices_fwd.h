@@ -2,7 +2,7 @@
 #ifndef SCM_INPUT_DEVICES_FWD_H_INCLUDED
 #define SCM_INPUT_DEVICES_FWD_H_INCLUDED
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace inp {

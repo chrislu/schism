@@ -10,7 +10,7 @@
 #include <GL/GL.h>
 #include <scm/gl_util/window_management/GL/wglext.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/headless_surface.h>
 #include <scm/gl_util/window_management/window.h>

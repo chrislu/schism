@@ -5,7 +5,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/buffer_objects/buffer.h>

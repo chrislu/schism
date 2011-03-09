@@ -4,7 +4,7 @@
 
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_core/shader_objects/shader_objects_fwd.h>

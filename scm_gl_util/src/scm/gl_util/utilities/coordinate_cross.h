@@ -4,7 +4,7 @@
 
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/constants.h>

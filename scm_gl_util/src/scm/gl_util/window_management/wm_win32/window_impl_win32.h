@@ -8,7 +8,7 @@
 
 #include <scm/core/platform/windows.h>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/window.h>
 #include <scm/gl_util/window_management/wm_win32/surface_impl_win32.h>

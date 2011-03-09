@@ -16,16 +16,16 @@
 //    - texture objects
 //    - program objects
 #define SCM_GL_CORE_USE_DIRECT_STATE_ACCESS 1
-#undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+//#undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
 #define SCM_GL_CORE_WORKAROUND_AMD 1
 #undef SCM_GL_CORE_WORKAROUND_AMD
 
 #define SCM_GL_CORE_OPENGL_40 1
-#undef SCM_GL_CORE_OPENGL_40
+//#undef SCM_GL_CORE_OPENGL_40
 
 #define SCM_GL_CORE_OPENGL_41 1
-#undef SCM_GL_CORE_OPENGL_41
+//#undef SCM_GL_CORE_OPENGL_41
 
 // scm_gl_core internal ///////////////////////////////////////////////////////////////////////////
 #define SCM_GL_CORE_OPENGL_VERSION_330   330

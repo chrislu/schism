@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <scm/core/math.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>

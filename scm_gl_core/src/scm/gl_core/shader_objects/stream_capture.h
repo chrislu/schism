@@ -8,7 +8,7 @@
 
 #include <boost/variant.hpp>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_types.h>

@@ -9,7 +9,7 @@
 
 #include <ostream>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/surface.h>
 #include <scm/gl_util/window_management/wm_win32/util/wgl_extensions.h>

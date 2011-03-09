@@ -15,7 +15,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include <scm/log.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/wm_win32/util/classic_context_win32.h>
 #include <scm/gl_util/window_management/wm_win32/util/error_win32.h>

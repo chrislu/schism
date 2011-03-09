@@ -8,7 +8,7 @@
 #include <boost/static_assert.hpp>
 
 #include <scm/core/numeric_types.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 namespace scm {
 namespace data {

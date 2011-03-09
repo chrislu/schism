@@ -7,7 +7,7 @@
 #include <FreeImagePlus.h>
 
 #include <scm/core/math.h>
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 
 #include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/log.h>

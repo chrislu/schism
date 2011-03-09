@@ -10,7 +10,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <scm/core/pointer_types.h>
+#include <scm/core/memory.h>
 #include <scm/core/utilities/foreach.h>
 
 #include <scm/gl_core/log.h>

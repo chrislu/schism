@@ -8,7 +8,6 @@
 #include <map>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include <scm/core/resource/resource.h>
 #include <scm/core/resource/resource_pointer.h>
@@ -23,7 +22,7 @@ namespace res {
 class resource_pointer_base;
 
 class __scm_export(core) resource_manager_base : public system,
-                                                 public boost::enable_shared_from_this<resource_manager_base>
+                                                 public scm::enable_shared_from_this<resource_manager_base>
 {
 protected:
     typedef boost::shared_ptr<resource_base>    res_ptr_type;
