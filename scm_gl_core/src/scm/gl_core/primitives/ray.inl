@@ -50,10 +50,11 @@ ray_impl<s>::transform(const typename ray_impl<s>::mat4_type& t)
 {
     using namespace scm::math;
 
-    mat4_type inv_trans = transpose(inverse(t));
+    //mat4_type inv_trans = transpose(inverse(t));
 
-    _direction = vec3_type(inv_trans * vec4_type(_direction, typename vec4_type::value_type(0)));
-    _origin    = vec3_type(t         * vec4_type(_origin,    typename vec4_type::value_type(1)));
+    //_direction = vec3_type(inv_trans * vec4_type(_direction, typename vec4_type::value_type(0)));
+    _direction = vec3_type(t * vec4_type(_direction, typename vec4_type::value_type(0)));
+    _origin    = vec3_type(t * vec4_type(_origin,    typename vec4_type::value_type(1)));
 
     normalize();
 }
@@ -64,9 +65,10 @@ ray_impl<s>::transform_preinverted(const typename ray_impl<s>::mat4_type& it)
 {
     using namespace scm::math;
 
-    mat4_type inv_trans = transpose(it);
+    //mat4_type inv_trans = transpose(it);
 
-    _direction = vec3_type(inv_trans   * vec4_type(_direction, typename vec4_type::value_type(0)));
+    //_direction = vec3_type(inv_trans   * vec4_type(_direction, typename vec4_type::value_type(0)));
+    _direction = vec3_type(inverse(it) * vec4_type(_direction, typename vec4_type::value_type(0)));
     _origin    = vec3_type(inverse(it) * vec4_type(_origin,    typename vec4_type::value_type(1)));
 
     normalize();
