@@ -573,30 +573,43 @@ program::retrieve_uniform_information(render_device& in_device)
                     scoped_array<int> comp_routines;
                     glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
                                                          i, GL_NUM_COMPATIBLE_SUBROUTINES, &num_comp_routines);
-                gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
+                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
                     if (0 < num_comp_routines) {
                         temp_name.reset(new char[act_routine_max_len + 20]);
                         comp_routines.reset(new int[num_comp_routines]);
                         glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
                                                              i, GL_COMPATIBLE_SUBROUTINES, comp_routines.get());
-                gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
+                        gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
                     }
 
                     for (int r = 0; r < num_comp_routines; ++r) {
-                        std::string rname;
+                        std::string actual_routine_name;
+                        unsigned    actual_routine_index = 0;
+
                         unsigned ri = comp_routines[r];
                         glapi.glGetActiveSubroutineName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
                                                         ri, act_routine_max_len + 20, 0, temp_name.get());
-                gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
+                        gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
+                        actual_routine_name.assign(temp_name.get());
 
-                        rname.assign(temp_name.get());
+                        actual_routine_index = 
+                        glapi.glGetSubroutineIndex(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
+                                                   temp_name.get());
+                                                   //actual_routine_name.c_str());
+                        gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
+
+                        // init the subroutine struct
+                        subroutine_type actual_routine(actual_routine_name, actual_routine_index);
+                        _subroutines[stge][actual_routine_name] = actual_routine;
+                        gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
                     }
 
 
                 }
                 gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
             }
-            if (1){ // subroutines
+#if 0
+            if (0){ // subroutines
                 int act_routines = 0;
                 int act_routine_max_len = 0;
                 char*  temp_name = 0;
@@ -630,7 +643,6 @@ program::retrieve_uniform_information(render_device& in_device)
                 }
                 delete [] temp_name;
             }
-#if 0
                 // compatible routines
                 int                 num_comp_routines = 0;
                 scoped_array<int>   comp_routines;
