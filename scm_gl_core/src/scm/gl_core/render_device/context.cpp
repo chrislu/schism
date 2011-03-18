@@ -228,6 +228,9 @@ render_context::flush()
     //apply_program();
 
     apply();
+    if (opengl_api().extension_EXT_shader_image_load_store) {
+        opengl_api().glMemoryBarrierEXT(GL_ALL_BARRIER_BITS_EXT);
+    }
     opengl_api().glFlush();
     //opengl_api().glFinish();
 }
@@ -235,9 +238,6 @@ render_context::flush()
 void
 render_context::sync()
 {
-    if (opengl_api().extension_EXT_shader_image_load_store) {
-        opengl_api().glMemoryBarrierEXT(GL_ALL_BARRIER_BITS_EXT);
-    }
     flush();
     opengl_api().glFinish();
 }
