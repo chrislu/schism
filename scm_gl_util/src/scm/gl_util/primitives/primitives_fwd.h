@@ -15,19 +15,22 @@ typedef shared_ptr<const coordinate_cross>          coordinate_cross_cptr;
 class geometry;
 class geometry_highlight;
 class box_geometry;
+class box_volume_geometry;
 class quad_geometry;
 class wavefront_obj_geometry;
 
 typedef shared_ptr<geometry>                        geometry_ptr;
-typedef shared_ptr<const geometry>                  geometry_cptr;
+typedef shared_ptr<geometry const>                  geometry_cptr;
 typedef shared_ptr<geometry_highlight>              geometry_highlight_ptr;
-typedef shared_ptr<const geometry_highlight>        geometry_highlight_cptr;
+typedef shared_ptr<geometry_highlight const>        geometry_highlight_cptr;
 typedef shared_ptr<box_geometry>                    box_geometry_ptr;
-typedef shared_ptr<const box_geometry>              box_geometry_cptr;
+typedef shared_ptr<box_geometry const>              box_geometry_cptr;
+typedef shared_ptr<box_volume_geometry>             box_volume_geometry_ptr;
+typedef shared_ptr<box_volume_geometry const>       box_volume_geometry_cptr;
 typedef shared_ptr<quad_geometry>                   quad_geometry_ptr;
-typedef shared_ptr<const quad_geometry>             quad_geometry_cptr;
+typedef shared_ptr<quad_geometry const>             quad_geometry_cptr;
 typedef shared_ptr<wavefront_obj_geometry>          wavefront_obj_geometry_ptr;
-typedef shared_ptr<const wavefront_obj_geometry>    wavefront_obj_geometry_cptr;
+typedef shared_ptr<wavefront_obj_geometry const>    wavefront_obj_geometry_cptr;
 
 } // namespace gl
 } // namespace scm

@@ -22,10 +22,10 @@ public:
                  const math::vec3f&       in_max_vertex);
     virtual ~box_geometry();
 
-    void                update(const render_context_ptr& in_context,
+    virtual void        update(const render_context_ptr& in_context,
                                const math::vec3f&        in_min_vertex,
                                const math::vec3f&        in_max_vertex);
-    void                draw(const render_context_ptr& in_context,
+    virtual void        draw(const render_context_ptr& in_context,
                              const draw_mode           in_draw_mode = MODE_SOLID) const;
 
 protected:

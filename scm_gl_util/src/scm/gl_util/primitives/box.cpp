@@ -2,6 +2,8 @@
 #include "box.h"
 
 #include <cassert>
+#include <exception>
+#include <stdexcept>
 
 #include <boost/assign/list_of.hpp>
 
@@ -138,6 +140,7 @@ box_geometry::update(const render_context_ptr& in_context,
                      const math::vec3f& in_min_vertex,
                      const math::vec3f& in_max_vertex)
 {
+    throw std::runtime_error("box_geometry::update() not implemented");
 }
 
 void
