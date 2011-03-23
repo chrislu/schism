@@ -169,7 +169,8 @@ space_navigator_impl::update()
             _3d_sensor->get_Period(&period);
             double frame_time = scm::time::to_milliseconds(_timer.get_time());
             // detect interaction pauses
-            if (frame_time > 250.0) {
+            //if (frame_time > 250.0)
+            {
                 frame_time = period;
             }
             time_factor = frame_time / (period * 1000.0);
@@ -196,8 +197,14 @@ space_navigator_impl::update()
             translation->get_X(&trans_vec.x);
             translation->get_Y(&trans_vec.y);
             translation->get_Z(&trans_vec.z);
+            
+            //std::cout << trans_vec / 40.0 << " ";
+            trans_vec.x *= pow(trans_vec.x / 40.0, 2.0);
+            trans_vec.y *= pow(trans_vec.y / 40.0, 2.0);
+            trans_vec.z *= pow(trans_vec.z / 40.0, 2.0);
+            //std::cout << trans_vec / 40.0 << std::endl;
+            trans_vec   *= vec3d(_device->_translation_sensitivity) * time_factor;
 
-            trans_vec *= vec3d(_device->_translation_sensitivity) * time_factor;
             translate(_device->_translation, math::vec3f(trans_vec));
 
 
@@ -210,6 +217,9 @@ space_navigator_impl::update()
             //std::cout << std::fixed << std::setprecision(3)
             //          << scm::time::to_milliseconds(_timer.get_time()) << "\t"
             //          << trans_vec << "\t" << rot_axis << "\t" << rotation_angle << std::endl;
+
+            //std::cout << rotation_angle << std::endl;
+            rotation_angle *= pow(rotation_angle / 40.0, 2.0);
 
             rotation_angle *= time_factor;
             rotate(_device->_rotation, static_cast<float>(math::rad2deg(rotation_angle)), (math::vec3f(rot_axis)));
