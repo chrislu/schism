@@ -447,6 +447,17 @@ max(const vec<scal_type, 4>& a,
 template<typename scal_type>
 inline
 const vec<scal_type, 4>
+abs(const vec<scal_type, 4>& rhs)
+{
+    return (vec<scal_type, 4>(std::abs(rhs.x),
+                              std::abs(rhs.y),
+                              std::abs(rhs.z),
+                              std::abs(rhs.w)));
+}
+
+template<typename scal_type>
+inline
+const vec<scal_type, 4>
 floor(const vec<scal_type, 4>& rhs)
 {
     return (vec<scal_type, 4>(std::floor(rhs.x),
