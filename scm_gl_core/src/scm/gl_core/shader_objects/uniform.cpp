@@ -1,6 +1,8 @@
 
 #include "uniform.h"
 
+#include <cassert>
+
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/opengl/gl3_core.h>
@@ -16,7 +18,9 @@ namespace gl {
 template<typename T, data_type D>
 uniform<T, D>::uniform(const std::string& n, const int l, const unsigned e, const data_type t)
   : uniform_base(n, l, e, t)
+  , _value(e)
 {
+    assert(e > 0);
 }
 
 template<typename T, data_type D>
@@ -28,15 +32,31 @@ template<typename T, data_type D>
 typename uniform<T, D>::value_param_type
 uniform<T, D>::value() const
 {
-    return (_value);
+    return value(0);
 }
 
 template<typename T, data_type D>
 void
 uniform<T, D>::value(value_param_type v)
 {
-    if (v != _value) {
-        _value = v;
+    value(0, v);
+}
+
+template<typename T, data_type D>
+typename uniform<T, D>::value_param_type
+uniform<T, D>::value(int i) const
+{
+    assert(i < static_cast<int>(_elements));
+    return _value[i];
+}
+
+template<typename T, data_type D>
+void
+uniform<T, D>::value(int i, value_param_type v)
+{
+    assert(i < static_cast<int>(_elements));
+    if (v != _value[i]) {
+        _value[i] = v;
         _update_required = true;
     }
 }
@@ -105,31 +125,31 @@ uniform_base::~uniform_base()
 const std::string&
 uniform_base::name() const
 {
-    return (_name);
+    return _name;
 }
 
 const int
 uniform_base::location() const
 {
-    return (_location);
+    return _location;
 }
 
 const unsigned
 uniform_base::elements() const
 {
-    return (_elements);
+    return _elements;
 }
 
 const data_type
 uniform_base::type() const
 {
-    return (_type);
+    return _type;
 }
 
 bool
 uniform_base::update_required() const
 {
-    return (_update_required);
+    return _update_required;
 }
 
 // float types ////////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +158,7 @@ void
 uniform_1f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform1fv(_location, /*_elements*/ 1, &_value);
+    glapi.glUniform1fv(_location, _elements, &(_value.front()));
     gl_assert(glapi, leaving uniform_1f::apply_value());
 }
 
@@ -147,7 +167,7 @@ void
 uniform_vec2f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform2fv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform2fv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec2f::apply_value());
 }
 
@@ -156,7 +176,7 @@ void
 uniform_vec3f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform3fv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform3fv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec3f::apply_value());
 }
 
@@ -165,7 +185,7 @@ void
 uniform_vec4f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform4fv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform4fv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec4f::apply_value());
 }
 
@@ -174,7 +194,7 @@ void
 uniform_mat2f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix2fv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix2fv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat2f::apply_value());
 }
 
@@ -183,7 +203,7 @@ void
 uniform_mat3f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix3fv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix3fv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat3f::apply_value());
 }
 
@@ -192,7 +212,7 @@ void
 uniform_mat4f::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix4fv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix4fv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat4f::apply_value());
 }
 
@@ -203,7 +223,7 @@ void
 uniform_1d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform1dv(_location, /*_elements*/ 1, &_value);
+    glapi.glUniform1dv(_location, _elements, &(_value.front()));//&_value);
     gl_assert(glapi, leaving uniform_1d::apply_value());
 }
 
@@ -212,7 +232,7 @@ void
 uniform_vec2d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform2dv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform2dv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec2d::apply_value());
 }
 
@@ -221,7 +241,7 @@ void
 uniform_vec3d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform3dv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform3dv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec3d::apply_value());
 }
 
@@ -230,7 +250,7 @@ void
 uniform_vec4d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform4dv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform4dv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec4d::apply_value());
 }
 
@@ -239,7 +259,7 @@ void
 uniform_mat2d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix2dv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix2dv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat2d::apply_value());
 }
 
@@ -248,7 +268,7 @@ void
 uniform_mat3d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix3dv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix3dv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat3d::apply_value());
 }
 
@@ -257,7 +277,7 @@ void
 uniform_mat4d::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniformMatrix4dv(_location, /*_elements*/ 1, false, _value.data_array);
+    glapi.glUniformMatrix4dv(_location, _elements, false, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_mat4d::apply_value());
 }
 
@@ -269,7 +289,7 @@ void
 uniform_1i::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform1iv(_location, /*_elements*/ 1, &_value);
+    glapi.glUniform1iv(_location, _elements, &(_value.front()));//&_value);
     gl_assert(glapi, leaving uniform_1i::apply_value());
 }
 
@@ -278,7 +298,7 @@ void
 uniform_vec2i::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform2iv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform2iv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec2i::apply_value());
 }
 
@@ -287,7 +307,7 @@ void
 uniform_vec3i::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform3iv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform3iv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec3i::apply_value());
 }
 
@@ -296,7 +316,7 @@ void
 uniform_vec4i::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform4iv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform4iv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec4i::apply_value());
 }
 
@@ -306,7 +326,7 @@ void
 uniform_1ui::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform1uiv(_location, /*_elements*/ 1, &_value);
+    glapi.glUniform1uiv(_location, _elements, &(_value.front()));//&_value);
     gl_assert(glapi, leaving uniform_1ui::apply_value());
 }
 
@@ -315,7 +335,7 @@ void
 uniform_vec2ui::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform2uiv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform2uiv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec2ui::apply_value());
 }
 
@@ -324,7 +344,7 @@ void
 uniform_vec3ui::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform3uiv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform3uiv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec3ui::apply_value());
 }
 
@@ -333,7 +353,7 @@ void
 uniform_vec4ui::apply_value(const render_context& context, const program& p)
 {
     const opengl::gl3_core& glapi = context.opengl_api();
-    glapi.glUniform4uiv(_location, /*_elements*/ 1, _value.data_array);
+    glapi.glUniform4uiv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec4ui::apply_value());
 }
 

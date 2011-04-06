@@ -3,6 +3,7 @@
 #define SCM_GL_CORE_UNIFORM_H_INCLUDED
 
 #include <string>
+#include <vector>
 
 #include <boost/call_traits.hpp>
 
@@ -55,6 +56,7 @@ public:
 
 protected:
     typedef typename boost::call_traits<value_type>::param_type value_param_type;
+    typedef std::vector<value_type>                             value_array;
 
 public:
     uniform(const std::string& n, const int l, const unsigned e, const data_type t);
@@ -62,11 +64,14 @@ public:
 
     value_param_type        value() const;
     void                    value(value_param_type v);
+
+    value_param_type        value(int i) const;
+    void                    value(int i, value_param_type v);
     
     void                    apply_value(const render_context& context, const program& p);
 
 protected:
-    value_type              _value;
+    value_array             _value;
 
 }; // class uniform
 

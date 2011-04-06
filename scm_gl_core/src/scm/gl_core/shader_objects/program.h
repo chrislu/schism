@@ -79,6 +79,7 @@ public:
     const std::string&          info_log() const;
 
     template<typename T> void   uniform(const std::string& name, const T& v) const;
+    template<typename T> void   uniform(const std::string& name, int i, const T& v) const;
 
     uniform_ptr                 uniform_raw(const std::string& name) const;
 

@@ -11,12 +11,19 @@ template<typename T>
 inline
 void
 program::uniform(const std::string& name, const T& v) const {
+    uniform(name, 0, v);
+}
+
+template<typename T>
+inline
+void
+program::uniform(const std::string& name, int i, const T& v) const {
     const uniform_ptr u = uniform_raw(name);
     if (u) {
         typedef typename scm::gl::uniform_type<T>::type cur_uniform_type;
         const shared_ptr<cur_uniform_type> ut = dynamic_pointer_cast<cur_uniform_type>(u);
         if (ut) {
-            ut->value(v);
+            ut->value(i, v);
         }
         else {
             SCM_GL_DGB("program::uniform(): found non matching uniform type '" << type_string(uniform_data_type<T>::type)
