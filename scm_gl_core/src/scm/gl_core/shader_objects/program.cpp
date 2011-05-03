@@ -483,6 +483,17 @@ program::retrieve_uniform_information(render_device& in_device)
                 //continue;
             }
 
+            // uniform arrays may be reported as {array_name}[0]
+            // truncate to {array_name}
+            size_t br_delim_pos = actual_uniform_name.find('[');
+            if (br_delim_pos != std::string::npos) {
+                if (actual_uniform_name[br_delim_pos + 1] != '0') {
+                    continue;
+                } else {
+                    actual_uniform_name = actual_uniform_name.substr(0, br_delim_pos);
+                }
+            }
+
             if (!boost::starts_with(actual_uniform_name, "gl_")) {
                 actual_uniform_location = glapi.glGetUniformLocation(_gl_program_obj, actual_uniform_name.c_str());
 
