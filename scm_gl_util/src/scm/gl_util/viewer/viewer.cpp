@@ -568,7 +568,7 @@ viewer::initialize_render_target()
     using boost::assign::list_of;
 
     // shader programs
-    if (   _attributes._post_process_aa
+    if (   !_attributes._post_process_aa
         && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
 
         _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
@@ -628,12 +628,6 @@ viewer::initialize_render_target()
     if (    _attributes._post_process_aa
         || (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
 
-        vec2f vp_size = vec2f(_viewport._dimensions);
-        _render_target->_post_process_aa_program->uniform("mvp",            make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
-        _render_target->_post_process_aa_program->uniform("in_texture",     0);
-        //_render_target->_post_process_aa_program->uniform("in_vp_size",     vp_size);
-        _render_target->_post_process_aa_program->uniform("in_vp_size_rec", vec2f(1.0) / vp_size);
-
         _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
 
         if (!_render_target->_color_buffer_resolved) {
@@ -650,6 +644,12 @@ viewer::initialize_render_target()
 
         _render_target->_framebuffer_resolved->attach_color_buffer(0, _render_target->_color_buffer_resolved);
         if (_attributes._post_process_aa) {
+            vec2f vp_size = vec2f(_viewport._dimensions);
+            _render_target->_post_process_aa_program->uniform("mvp",            make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
+            _render_target->_post_process_aa_program->uniform("in_texture",     0);
+            //_render_target->_post_process_aa_program->uniform("in_vp_size",     vp_size);
+            _render_target->_post_process_aa_program->uniform("in_vp_size_rec", vec2f(1.0) / vp_size);
+
             _render_target->_depth_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8);
 
             if (!_render_target->_depth_buffer_resolved) {
