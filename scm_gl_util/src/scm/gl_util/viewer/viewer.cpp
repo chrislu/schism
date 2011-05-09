@@ -36,33 +36,33 @@
 
 namespace {
 
-const std::string color_present_vsrc = "\
-    #version 330 core\n\
-    \n\
-    uniform mat4 mvp;\n\
-    out vec2 tex_coord;\n\
-    layout(location = 0) in vec3 in_position;\n\
-    layout(location = 2) in vec2 in_texture_coord;\n\
-    \n\
-    void main()\n\
-    {\n\
-        gl_Position = mvp * vec4(in_position, 1.0);\n\
-        tex_coord = in_texture_coord;\n\
-    }\n\
+const std::string color_present_vsrc = "                                                \
+    #version 330 core                                                                   \n\
+                                                                                        \n\
+    uniform mat4 mvp;                                                                   \n\
+    out vec2 tex_coord;                                                                 \n\
+    layout(location = 0) in vec3 in_position;                                           \n\
+    layout(location = 2) in vec2 in_texture_coord;                                      \n\
+                                                                                        \n\
+    void main()                                                                         \n\
+    {                                                                                   \n\
+        gl_Position = mvp * vec4(in_position, 1.0);                                     \n\
+        tex_coord = in_texture_coord;                                                   \n\
+    }                                                                                   \n\
     ";
 
-const std::string color_present_fsrc = "\
-    #version 330 core\n\
-    \n\
-    in vec2 tex_coord;\n\
-    uniform sampler2D in_texture;\n\
-    uniform int       in_level;\n\
-    \n\
-    layout(location = 0) out vec4 out_color;\n\
-    void main()\n\
-    {\n\
-        out_color = texelFetch(in_texture, ivec2(gl_FragCoord.xy), in_level).rgba;\n\
-    }\n\
+const std::string color_present_fsrc = "                                                \
+    #version 330 core                                                                   \n\
+                                                                                        \n\
+    in vec2 tex_coord;                                                                  \n\
+    uniform sampler2D in_texture;                                                       \n\
+    uniform int       in_level;                                                         \n\
+                                                                                        \n\
+    layout(location = 0) out vec4 out_color;                                            \n\
+    void main()                                                                         \n\
+    {                                                                                   \n\
+        out_color = texelFetch(in_texture, ivec2(gl_FragCoord.xy), in_level).rgba;      \n\
+    }                                                                                   \n\
     ";
 
 } // namespace 
@@ -81,13 +81,14 @@ viewer::viewer_settings::viewer_settings()
 }
 
 viewer::viewer_attributes::viewer_attributes()
-  : _multi_samples(1)
+  : _post_process_aa(false)
+  , _multi_samples(1)
   , _super_samples(1)
 {
 }
 
 viewer::render_target::render_target()
-  : _viewport_scale(0)
+  : _viewport_scale(1)
   , _viewport_color_mip_level(0)
 {
 }
@@ -95,15 +96,18 @@ viewer::render_target::render_target()
 viewer::render_target::~render_target()
 {
     _color_present_program.reset();
+    _post_process_aa_program.reset();
 
-    _color_buffer.reset();
+    _color_buffer_aa.reset();
+    _depth_buffer_aa.reset();
+    _depth_buffer_resolved.reset();
     _color_buffer_resolved.reset();
-    _depth_buffer.reset();
 
-    _framebuffer.reset();
+    _framebuffer_aa.reset();
     _framebuffer_resolved.reset();
 
     _filter_nearest.reset();
+    _filter_linear.reset();
     _no_blend.reset();
     _dstate_no_zwrite.reset();
     _cull_back.reset();
@@ -176,55 +180,55 @@ viewer::~viewer()
 const render_device_ptr&
 viewer::device() const
 {
-    return (_device);
+    return _device;
 }
 
 const render_context_ptr&
 viewer::context() const
 {
-    return (_context);
+    return _context;
 }
 
 const viewer::viewer_settings&
 viewer::settings() const
 {
-    return (_settings);
+    return _settings;
 }
 
 viewer::viewer_settings&
 viewer::settings()
 {
-    return (_settings);
+    return _settings;
 }
 
 const wm::window_ptr&
 viewer::window() const
 {
-    return (_window);
+    return _window;
 }
 
 const wm::context_ptr&
 viewer::window_context() const
 {
-    return (_window_context);
+    return _window_context;
 }
 
 const camera&
 viewer::main_camera() const
 {
-    return (_camera);
+    return _camera;
 }
 
 camera&
 viewer::main_camera()
 {
-    return (_camera);
+    return _camera;
 }
 
 const viewport&
 viewer::main_viewport() const
 {
-    return (_viewport);
+    return _viewport;
 }
 
 void
@@ -232,9 +236,11 @@ viewer::clear_color() const
 {
     using namespace scm::math;
 
-    if (   (_attributes._multi_samples > 1)
-        || (_attributes._super_samples > 1)) {
-        context()->clear_color_buffer(_render_target->_framebuffer, 0, _settings._clear_color);
+    if (   !_attributes._post_process_aa
+        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+        context()->clear_color_buffer(_render_target->_framebuffer_aa, 0, _settings._clear_color);
+    }
+    else if (_attributes._post_process_aa) {
         context()->clear_color_buffer(_render_target->_framebuffer_resolved, 0, _settings._clear_color);
     }
     else {
@@ -247,9 +253,12 @@ viewer::clear_depth_stencil() const
 {
     using namespace scm::math;
 
-    if (   (_attributes._multi_samples > 1)
-        || (_attributes._super_samples > 1)) {
-        context()->clear_depth_stencil_buffer(_render_target->_framebuffer, _settings._clear_depth, _settings._clear_stencil);
+    if (   !_attributes._post_process_aa
+        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+        context()->clear_depth_stencil_buffer(_render_target->_framebuffer_aa, _settings._clear_depth, _settings._clear_stencil);
+    }
+    else if (_attributes._post_process_aa) {
+        context()->clear_depth_stencil_buffer(_render_target->_framebuffer_resolved, _settings._clear_depth, _settings._clear_stencil);
     }
     else {
         context()->clear_default_depth_stencil_buffer(_settings._clear_depth, _settings._clear_stencil);
@@ -344,29 +353,22 @@ viewer::send_render_display()
         context_all_guard cguard(context());
 
         // for AA (multi or super sampling) render to render target
-        if (   (_attributes._multi_samples > 1) || (_attributes._super_samples > 1)) {
+        if (   !_attributes._post_process_aa
+            && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
             context_all_guard fguard(context());
 
             // set the render target
-            context()->set_frame_buffer(_render_target->_framebuffer);
+            context()->set_frame_buffer(_render_target->_framebuffer_aa);
             context()->set_viewport(viewport(vec2ui(0, 0), vec2ui(_viewport._dimensions) * _render_target->_viewport_scale));
             
             // client code
             _display_func(context());
 
             // resolve framebuffer
-            context()->resolve_multi_sample_buffer(_render_target->_framebuffer, _render_target->_framebuffer_resolved);
+            context()->resolve_multi_sample_buffer(_render_target->_framebuffer_aa, _render_target->_framebuffer_resolved);
             if (_attributes._super_samples > 1) {
                 context()->generate_mipmaps(_render_target->_color_buffer_resolved);
             }
-
-            // present color buffer
-            mat4f   pass_mvp = mat4f::identity();
-            ortho_matrix(pass_mvp, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-
-            _render_target->_color_present_program->uniform("in_texture", 0);
-            _render_target->_color_present_program->uniform("in_level", _render_target->_viewport_color_mip_level);
-            _render_target->_color_present_program->uniform("mvp", pass_mvp);
 
             context()->set_default_frame_buffer();
             context()->set_viewport(_viewport);
@@ -376,6 +378,27 @@ viewer::send_render_display()
 
             context()->bind_program(_render_target->_color_present_program);
             context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_nearest, 0);
+
+            _render_target->_quad_geom->draw(context());
+        }
+        else if (_attributes._post_process_aa) {
+            context_all_guard fguard(context());
+
+            // set the render target
+            context()->set_frame_buffer(_render_target->_framebuffer_resolved);
+            
+            {
+                // client code
+                _display_func(context());
+            }
+            context()->set_default_frame_buffer();
+            
+            context()->set_depth_stencil_state(_render_target->_dstate_no_zwrite);
+            context()->set_blend_state(_render_target->_no_blend);
+
+            context()->bind_program(_render_target->_post_process_aa_program);
+            context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_linear, 0);
+
             _render_target->_quad_geom->draw(context());
         }
         else {
@@ -383,9 +406,8 @@ viewer::send_render_display()
         }
 
         if (_settings._show_frame_times) {
-            mat4f   fs_projection = mat4f::identity();
-            ortho_matrix(fs_projection, 0.0f, _viewport._dimensions.x,
-                                        0.0f, _viewport._dimensions.y, -1.0f, 1.0f);
+            mat4f   fs_projection = make_ortho_matrix(0.0f, _viewport._dimensions.x,
+                                                      0.0f, _viewport._dimensions.y, -1.0f, 1.0f);
             _text_renderer->projection_matrix(fs_projection);
 
             vec2i text_ur = vec2i(_viewport._dimensions) - _frame_counter_text->text_bounding_box();
@@ -521,8 +543,8 @@ viewer::norm_viewport_coords(const math::vec2i& pos) const
     float dim_x = static_cast<float>(_viewport._dimensions.x);
     float dim_y = static_cast<float>(_viewport._dimensions.y);
 
-    return (math::vec2f(2.0f * (        x - dim_x * 0.5f) / dim_x,
-                        2.0f * (dim_y - y - dim_y * 0.5f) / dim_y));
+    return math::vec2f(2.0f * (        x - dim_x * 0.5f) / dim_x,
+                       2.0f * (dim_y - y - dim_y * 0.5f) / dim_y);
 }
 
 void
@@ -534,7 +556,7 @@ viewer::enable_main_manipulator(const bool f)
 bool
 viewer::main_manipulator_enabled() const
 {
-    return (_trackball_enabled);
+    return _trackball_enabled;
 }
 
 bool
@@ -545,38 +567,101 @@ viewer::initialize_render_target()
     using namespace scm::math;
     using boost::assign::list_of;
 
-    if (   (_attributes._multi_samples > 1) || (_attributes._super_samples > 1)) {
+    // shader programs
+    if (   _attributes._post_process_aa
+        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+
+        _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
+                                                                                 (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
+                                                                          "viewer::color_present_program");
+        if (   !_render_target->_color_present_program) {
+            scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
+            return false;
+        }
+    }
+
+    if (_attributes._post_process_aa) {
+        _render_target->_post_process_aa_program = device()->create_program(list_of(device()->create_shader_from_file(STAGE_VERTEX_SHADER,   "../../../res/shader/fxaa_nv.glslv"))
+                                                                                   (device()->create_shader_from_file(STAGE_FRAGMENT_SHADER, "../../../res/shader/fxaa_nv.glslf")),
+                                                                          "viewer::post_process_aa_program");
+        if (   !_render_target->_post_process_aa_program) {
+            scm::out() << log::warning
+                       << "viewer::initialize_render_target(): error creating post process AA shader program"
+                       << "(disabling post process AA support)" << log::end;
+            _attributes._post_process_aa = false;
+        }
+    }
+
+    // render targets
+    if (   !_attributes._post_process_aa
+        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
         _render_target->_viewport_scale           = static_cast<int>(floor(sqrt(static_cast<double>(_attributes._super_samples))));
         _render_target->_viewport_color_mip_level = floor_log2(static_cast<uint32>(_render_target->_viewport_scale));
 
-         // textures
-        _render_target->_color_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, 1, 1, _attributes._multi_samples);
-        _render_target->_depth_buffer          = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8, 1, 1, _attributes._multi_samples);
-        _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
+        // set default uniforms
+        _render_target->_color_present_program->uniform("mvp",          make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
+        _render_target->_color_present_program->uniform("in_texture",   0);
+        _render_target->_color_present_program->uniform("in_level",     _render_target->_viewport_color_mip_level);
 
-        if (   !_render_target->_color_buffer
-            || !_render_target->_color_buffer_resolved
-            || !_render_target->_depth_buffer) {
+         // textures
+        _render_target->_color_buffer_aa = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, 1, 1, _attributes._multi_samples);
+        _render_target->_depth_buffer_aa = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8, 1, 1, _attributes._multi_samples);
+
+        if (   !_render_target->_color_buffer_aa
+            || !_render_target->_depth_buffer_aa) {
             err() << "viewer::initialize_render_target(): error creating textures" << log::end;
-            return (false);
+            return false;
         }
 
         // framebuffers
-        _render_target->_framebuffer           = device()->create_frame_buffer();
-        _render_target->_framebuffer_resolved  = device()->create_frame_buffer();
+        _render_target->_framebuffer_aa = device()->create_frame_buffer();
 
-        if (   !_render_target->_framebuffer
-            || !_render_target->_framebuffer_resolved) {
-            err() << "viewer::initialize_render_target(): error creating framebuffers" << log::end;
-            return (false);
+        if (   !_render_target->_framebuffer_aa) {
+            err() << "viewer::initialize_render_target(): error creating aa framebuffer" << log::end;
+            return false;
         }
 
-        _render_target->_framebuffer->attach_color_buffer(0, _render_target->_color_buffer);
-        _render_target->_framebuffer->attach_depth_stencil_buffer(_render_target->_depth_buffer);
+        _render_target->_framebuffer_aa->attach_color_buffer(0, _render_target->_color_buffer_aa);
+        _render_target->_framebuffer_aa->attach_depth_stencil_buffer(_render_target->_depth_buffer_aa);
+    }
+
+    if (    _attributes._post_process_aa
+        || (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+
+        vec2f vp_size = vec2f(_viewport._dimensions);
+        _render_target->_post_process_aa_program->uniform("mvp",            make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
+        _render_target->_post_process_aa_program->uniform("in_texture",     0);
+        //_render_target->_post_process_aa_program->uniform("in_vp_size",     vp_size);
+        _render_target->_post_process_aa_program->uniform("in_vp_size_rec", vec2f(1.0) / vp_size);
+
+        _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
+
+        if (!_render_target->_color_buffer_resolved) {
+            err() << "viewer::initialize_render_target(): error creating resolve color texture" << log::end;
+            return false;
+        }
+
+        _render_target->_framebuffer_resolved  = device()->create_frame_buffer();
+
+        if (!_render_target->_framebuffer_resolved) {
+            err() << "viewer::initialize_render_target(): error creating resolve framebuffer" << log::end;
+            return false;
+        }
+
         _render_target->_framebuffer_resolved->attach_color_buffer(0, _render_target->_color_buffer_resolved);
+        if (_attributes._post_process_aa) {
+            _render_target->_depth_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8);
+
+            if (!_render_target->_depth_buffer_resolved) {
+                err() << "viewer::initialize_render_target(): error creating resolve depth texture" << log::end;
+                return false;
+            }
+            _render_target->_framebuffer_resolved->attach_depth_stencil_buffer(_render_target->_depth_buffer_resolved);
+        }
 
         // state objects
         _render_target->_filter_nearest   = device()->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
+        _render_target->_filter_linear    = device()->create_sampler_state(FILTER_MIN_MAG_LINEAR, WRAP_CLAMP_TO_EDGE);
         _render_target->_no_blend         = device()->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
         _render_target->_dstate_no_zwrite = device()->create_depth_stencil_state(false, false);
         _render_target->_cull_back        = device()->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW);
@@ -586,21 +671,13 @@ viewer::initialize_render_target()
             || !_render_target->_dstate_no_zwrite
             || !_render_target->_cull_back) {
             err() << "viewer::initialize_render_target(): error creating state objects" << log::end;
-            return (false);
-        }
-
-        // shader programs
-        _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
-                                                                                 (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
-                                                                          "viewer::_color_present_program");
-        if (   !_render_target->_color_present_program) {
-            scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
-            return (false);
+            return false;
         }
 
         _render_target->_quad_geom = make_shared<gl::quad_geometry>(device(), vec2f(0.0f, 0.0f), vec2f(1.0f, 1.0f));
     }
-    return (true);
+
+    return true;
 }
 
 bool

@@ -42,6 +42,7 @@ public:
     struct __scm_export(gl_util) viewer_attributes {
         viewer_attributes();
 
+        bool            _post_process_aa;
         unsigned        _multi_samples;
         unsigned        _super_samples;
     }; // struct viewer_attributes
@@ -149,19 +150,22 @@ protected:
         render_target();
         ~render_target();
         gl::program_ptr                 _color_present_program;
+        gl::program_ptr                 _post_process_aa_program;
         int                             _viewport_scale;
         int                             _viewport_color_mip_level;
 
         // frame buffer
-        gl::texture_2d_ptr              _color_buffer;
+        gl::texture_2d_ptr              _color_buffer_aa;
+        gl::texture_2d_ptr              _depth_buffer_aa;
         gl::texture_2d_ptr              _color_buffer_resolved;
-        gl::texture_2d_ptr              _depth_buffer;
+        gl::texture_2d_ptr              _depth_buffer_resolved;
 
-        gl::frame_buffer_ptr            _framebuffer;
+        gl::frame_buffer_ptr            _framebuffer_aa;
         gl::frame_buffer_ptr            _framebuffer_resolved;
    
         // state objects
         gl::sampler_state_ptr           _filter_nearest;
+        gl::sampler_state_ptr           _filter_linear;
         gl::blend_state_ptr             _no_blend;
         gl::depth_stencil_state_ptr     _dstate_no_zwrite;
         gl::rasterizer_state_ptr        _cull_back;
