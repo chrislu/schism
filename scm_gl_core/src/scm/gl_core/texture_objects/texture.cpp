@@ -113,14 +113,22 @@ texture::bind_image(const render_context& in_context,
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
-    assert(glapi.extension_EXT_direct_state_access_available == true);
-
+    
     // TODO runtime checks for level and layer, maybe format compatibility
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+        glapi.glBindImageTexture(in_unit, object_id(),
+                                 in_level, (in_layer >= 0), in_layer >= 0 ? in_layer : 0,
+                                 util::gl_image_access_mode(in_access),
+                                 util::gl_internal_format(in_format));
+    }
+    else { // fall back to EXT_shader_image_load_store
+        assert(glapi.extension_EXT_shader_image_load_store == true);
 
-    glapi.glBindImageTextureEXT(in_unit, object_id(),
-                                in_level, (in_layer >= 0), in_layer >= 0 ? in_layer : 0,
-                                util::gl_image_access_mode(in_access),
-                                util::gl_internal_format(in_format));
+        glapi.glBindImageTextureEXT(in_unit, object_id(),
+                                    in_level, (in_layer >= 0), in_layer >= 0 ? in_layer : 0,
+                                    util::gl_image_access_mode(in_access),
+                                    util::gl_internal_format(in_format));
+    }
 
     gl_assert(glapi, leaving texture::unbind());
 }
@@ -132,13 +140,21 @@ texture::unbind_image(const render_context& in_context, int in_unit) const
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
-    assert(glapi.extension_EXT_direct_state_access_available == true);
 
-    glapi.glBindImageTextureEXT(in_unit, 0,
-                                0, false, 0,
-                                GL_READ_WRITE,
-                                GL_RGBA8);
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+        glapi.glBindImageTexture(in_unit, 0,
+                                 0, false, 0,
+                                 GL_READ_WRITE,
+                                 GL_RGBA8);
+    }
+    else { // fall back to EXT_shader_image_load_store
+        assert(glapi.extension_EXT_shader_image_load_store == true);
 
+        glapi.glBindImageTextureEXT(in_unit, 0,
+                                    0, false, 0,
+                                    GL_READ_WRITE,
+                                    GL_RGBA8);
+    }
     gl_assert(glapi, leaving texture::unbind());
 }
 

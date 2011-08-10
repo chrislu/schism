@@ -109,6 +109,7 @@ gl3_core::gl3_core()
     version_3_3_available   = false;
     version_4_0_available   = false;
     version_4_1_available   = false;
+    version_4_2_available   = false;
 
     extension_ARB_shading_language_include      = false;
     extension_ARB_cl_event                      = false;
@@ -893,6 +894,36 @@ gl3_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLGETFLOATI_VPROC, glGetFloati_v, "OpenGL Core 4.1", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETDOUBLEI_VPROC, glGetDoublei_v, "OpenGL Core 4.1", init_success);
     version_4_1_available = version_4_0_available && init_success;
+
+    // version 4.2 ////////////////////////////////////////////////////////////////////////////////
+    init_success = true;
+    // ARB_base_instance
+    SCM_INIT_GL_ENTRY(PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC, glDrawArraysInstancedBaseInstance, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC, glDrawElementsInstancedBaseInstance, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC, glDrawElementsInstancedBaseVertexBaseInstance, "OpenGL Core 4.2", init_success);
+    // ARB_shading_language_420pack (no entry points)
+    // ARB_transform_feedback_instanced
+    SCM_INIT_GL_ENTRY(PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC, glDrawTransformFeedbackInstanced, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC, glDrawTransformFeedbackStreamInstanced, "OpenGL Core 4.2", init_success);
+    // ARB_compressed_texture_pixel_storage (no entry points)
+    // ARB_conservative_depth (no entry points)
+    // ARB_internalformat_query
+    SCM_INIT_GL_ENTRY(PFNGLGETINTERNALFORMATIVPROC, glGetInternalformativ, "OpenGL Core 4.2", init_success);
+    // ARB_map_buffer_alignment (no entry points)
+    // ARB_shader_atomic_counters
+    SCM_INIT_GL_ENTRY(PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC, glGetActiveAtomicCounterBufferiv, "OpenGL Core 4.2", init_success);
+    // ARB_shader_image_load_store
+    SCM_INIT_GL_ENTRY(PFNGLBINDIMAGETEXTUREPROC, glBindImageTexture, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMEMORYBARRIERPROC, glMemoryBarrier, "OpenGL Core 4.2", init_success);
+    // ARB_shading_language_packing (no entry points)
+    // ARB_texture_storage
+    SCM_INIT_GL_ENTRY(PFNGLTEXSTORAGE1DPROC, glTexStorage1D, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXSTORAGE2DPROC, glTexStorage2D, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXSTORAGE3DPROC, glTexStorage3D, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE1DEXTPROC, glTextureStorage1DEXT, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE2DEXTPROC, glTextureStorage2DEXT, "OpenGL Core 4.2", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE3DEXTPROC, glTextureStorage3DEXT, "OpenGL Core 4.2", init_success);
+    version_4_2_available = version_4_1_available && init_success;
 
     // GL_ARB_shading_language_include
     init_success = true;

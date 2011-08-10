@@ -13,7 +13,7 @@ max_mip_levels(const unsigned      in_tex_size)
     double max_size   = in_tex_size;
     double log2_msize = math::log(max_size) / math::log(2.0);
 
-    return (static_cast<unsigned>(floor(log2_msize)) + 1);
+    return static_cast<unsigned>(floor(log2_msize)) + 1;
 }
 
 inline
@@ -25,7 +25,7 @@ max_mip_levels(const math::vec2ui& in_tex_size)
     double max_size   = max(in_tex_size.x, in_tex_size.y);
     double log2_msize = math::log(max_size) / math::log(2.0);
 
-    return (static_cast<unsigned>(floor(log2_msize)) + 1);
+    return static_cast<unsigned>(floor(log2_msize)) + 1;
 }
 
 inline
@@ -37,7 +37,7 @@ max_mip_levels(const math::vec3ui& in_tex_size)
     double max_size   = max(max(in_tex_size.x, in_tex_size.y), in_tex_size.z);
     double log2_msize = math::log(max_size) / math::log(2.0);
 
-    return (static_cast<unsigned>(floor(log2_msize)) + 1);
+    return static_cast<unsigned>(floor(log2_msize)) + 1;
 }
 
 inline
@@ -53,7 +53,7 @@ mip_level_dimensions(const unsigned      in_tex_size,
     unsigned ret_value;
     ret_value = math::max(1u, static_cast<unsigned>(floor(lsize)));
 
-    return (ret_value);
+    return ret_value;
 }
 
 
@@ -71,7 +71,7 @@ mip_level_dimensions(const math::vec2ui& in_tex_size,
     ret_value.x = math::max(1u, static_cast<unsigned>(floor(lsize.x)));
     ret_value.y = math::max(1u, static_cast<unsigned>(floor(lsize.y)));
 
-    return (ret_value);
+    return ret_value;
 }
 
 inline
@@ -89,7 +89,7 @@ mip_level_dimensions(const math::vec3ui& in_tex_size,
     ret_value.y = math::max(1u, static_cast<unsigned>(floor(lsize.y)));
     ret_value.z = math::max(1u, static_cast<unsigned>(floor(lsize.z)));
 
-    return (ret_value);
+    return ret_value;
 }
 } // namespace util
 } // namespace gl

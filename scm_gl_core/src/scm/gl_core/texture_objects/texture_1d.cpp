@@ -119,7 +119,7 @@ texture_1d::image_data(const render_device&      in_device,
         }
         else {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
-            return (false);
+            return false;
         }
     }
 
@@ -132,93 +132,205 @@ texture_1d::image_data(const render_device&      in_device,
         glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
 
-        for (unsigned i = 0; i < init_mip_levels; ++i) {
-            unsigned lev_size = in_desc._size;
-            if (i > 0) {
-                lev_size = util::mip_level_dimensions(in_desc._size, i);
-            }
-            const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+        if (false) { //BUG r280 SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
             if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-                glapi.glTextureImage1DEXT(object_id(), object_target(),
-                                          i,
-                                          util::gl_internal_format(in_desc._format),
-                                          lev_size,
-                                          0,
-                                          gl_base_format,
-                                          gl_base_type,
-                                          init_lev_data);
+                //glout() << "4.2 dsa" << log::end;
+                glapi.glTextureStorage1DEXT(object_id(), object_target(),
+                                            init_mip_levels,
+                                            util::gl_internal_format(in_desc._format),
+                                            in_desc._size);
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
+                if (inital_data) {
+                    for (unsigned i = 0; i < init_mip_levels; ++i) {
+                        unsigned    lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                        const void* init_lev_data = in_initial_mip_level_data[i];
+                        glapi.glTextureSubImage1DEXT(object_id(), object_target(),
+                                                     i,
+                                                     0,
+                                                     lev_size,
+                                                     gl_base_format,
+                                                     gl_base_type,
+                                                     init_lev_data);
+                        if (glerror) {
+                            state().set(glerror.to_object_state());
+                            return false;
+                        }
+                    }
+                }
             }
-            else { 
-                glapi.glTexImage1D(object_target(),
-                                   i,
-                                   util::gl_internal_format(in_desc._format),
-                                   lev_size,
-                                   0,
-                                   gl_base_format,
-                                   gl_base_type,
-                                   init_lev_data);
+            else { // no EXT_DIRECT_STATE_ACCESS
+                glapi.glTexStorage1D(object_target(),
+                                     init_mip_levels,
+                                     util::gl_internal_format(in_desc._format),
+                                     in_desc._size);
+                //glout() << "4.2 no dsa" << log::end;
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
+                if (inital_data) {
+                    for (unsigned i = 0; i < init_mip_levels; ++i) {
+                        unsigned    lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                        const void* init_lev_data = in_initial_mip_level_data[i];
+                        glapi.glTexSubImage1D(object_target(), i, 0, lev_size, gl_base_format, gl_base_type, init_lev_data);
+                        if (glerror) {
+                            state().set(glerror.to_object_state());
+                            return false;
+                        }
+                    }
+                }
             }
-            if (glerror) {
-                state().set(glerror.to_object_state());
-                return (false);
-            }
+        }
+        else { // SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_420
+            for (unsigned i = 0; i < init_mip_levels; ++i) {
+                unsigned lev_size = in_desc._size;
+                if (i > 0) {
+                    lev_size = util::mip_level_dimensions(in_desc._size, i);
+                }
+                const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+                if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                    glapi.glTextureImage1DEXT(object_id(), object_target(),
+                                              i,
+                                              util::gl_internal_format(in_desc._format),
+                                              lev_size,
+                                              0,
+                                              gl_base_format,
+                                              gl_base_type,
+                                              init_lev_data);
+                }
+                else { 
+                    glapi.glTexImage1D(object_target(),
+                                       i,
+                                       util::gl_internal_format(in_desc._format),
+                                       lev_size,
+                                       0,
+                                       gl_base_format,
+                                       gl_base_type,
+                                       init_lev_data);
+                }
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
 
-            gl_assert(glapi, texture_1d::image_data() after glTexImage2D());
+                gl_assert(glapi, texture_1d::image_data() after glTexImage2D());
+            }
         }
     }
     // array textures
     else if (in_desc._array_layers > 1) {
         // non multi sample texture
-        context_bindable_object::_gl_object_target   = GL_TEXTURE_1D_ARRAY;
+        context_bindable_object::_gl_object_target  = GL_TEXTURE_1D_ARRAY;
         context_bindable_object::_gl_object_binding = GL_TEXTURE_BINDING_1D_ARRAY;
 
 #if !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
         util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
         glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
-
-        for (unsigned i = 0; i < init_mip_levels; ++i) {
-            unsigned lev_size = in_desc._size;
-            if (i > 0) {
-                lev_size = util::mip_level_dimensions(in_desc._size, i);
-            }
-            const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+        if (false) { //BUG r280 SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
             if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-                glapi.glTextureImage2DEXT(object_id(), object_target(),
-                                          i,
-                                          util::gl_internal_format(in_desc._format),
-                                          lev_size, in_desc._array_layers,
-                                          0,
-                                          gl_base_format,
-                                          gl_base_type,
-                                          init_lev_data);
+                glapi.glTextureStorage2DEXT(object_id(), object_target(),
+                                            init_mip_levels,
+                                            util::gl_internal_format(in_desc._format),
+                                            in_desc._size,
+                                            in_desc._array_layers);
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
+                if (inital_data) {
+                    for (unsigned i = 0; i < init_mip_levels; ++i) {
+                        unsigned    lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                        const void* init_lev_data = in_initial_mip_level_data[i];
+                        glapi.glTextureSubImage2DEXT(object_id(), object_target(),
+                                                     i,
+                                                     0, 0,
+                                                     lev_size, in_desc._array_layers,
+                                                     gl_base_format,
+                                                     gl_base_type,
+                                                     init_lev_data);
+                        if (glerror) {
+                            state().set(glerror.to_object_state());
+                            return false;
+                        }
+                    }
+                }
             }
-            else {
-                glapi.glTexImage2D(object_target(),
-                                   i,
-                                   util::gl_internal_format(in_desc._format),
-                                   lev_size, in_desc._array_layers,
-                                   0,
-                                   gl_base_format,
-                                   gl_base_type,
-                                   init_lev_data);
+            else { // no EXT_DIRECT_STATE_ACCESS
+                glapi.glTexStorage2D(object_target(),
+                                     init_mip_levels,
+                                     util::gl_internal_format(in_desc._format),
+                                     in_desc._size,
+                                     in_desc._array_layers);
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
+                if (inital_data) {
+                    for (unsigned i = 0; i < init_mip_levels; ++i) {
+                        unsigned    lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                        const void* init_lev_data = in_initial_mip_level_data[i];
+                        glapi.glTexSubImage2D(object_target(),
+                                              i,
+                                              0, 0,
+                                              lev_size, in_desc._array_layers,
+                                              gl_base_format,
+                                              gl_base_type, init_lev_data);
+                        if (glerror) {
+                            state().set(glerror.to_object_state());
+                            return false;
+                        }
+                    }
+                }
             }
-            if (glerror) {
-                state().set(glerror.to_object_state());
-                return (false);
-            }
+        }
+        else { // SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_420
+            for (unsigned i = 0; i < init_mip_levels; ++i) {
+                unsigned lev_size = in_desc._size;
+                if (i > 0) {
+                    lev_size = util::mip_level_dimensions(in_desc._size, i);
+                }
+                const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+                if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                    glapi.glTextureImage2DEXT(object_id(), object_target(),
+                                              i,
+                                              util::gl_internal_format(in_desc._format),
+                                              lev_size, in_desc._array_layers,
+                                              0,
+                                              gl_base_format,
+                                              gl_base_type,
+                                              init_lev_data);
+                }
+                else {
+                    glapi.glTexImage2D(object_target(),
+                                       i,
+                                       util::gl_internal_format(in_desc._format),
+                                       lev_size, in_desc._array_layers,
+                                       0,
+                                       gl_base_format,
+                                       gl_base_type,
+                                       init_lev_data);
+                }
+                if (glerror) {
+                    state().set(glerror.to_object_state());
+                    return false;
+                }
 
-            gl_assert(glapi, texture_1d::image_data() after glTexImage3D());
+                gl_assert(glapi, texture_1d::image_data() after glTexImage3D());
+            }
         }
     }
     else {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
-        return (false);
+        return false;
     }
 
     gl_assert(glapi, leaving texture_1d::image_data());
 
-    return (true);
+    return true;
 }
 
 bool
@@ -230,37 +342,37 @@ texture_1d::image_sub_data(const render_context& in_context,
 {
     glerr() << log::error << "texture_1d::image_sub_data() not yet implemented" << log::end;
 
-    return (false);
+    return false;
 }
 
 data_format
 texture_1d::format() const
 {
-    return (_descriptor._format);
+    return _descriptor._format;
 }
 
 math::vec2ui
 texture_1d::dimensions() const
 {
-    return (math::vec2ui(_descriptor._size, 1));
+    return math::vec2ui(_descriptor._size, 1);
 }
 
 unsigned
 texture_1d::array_layers() const
 {
-    return (_descriptor._array_layers);
+    return _descriptor._array_layers;
 }
 
 unsigned
 texture_1d::mip_map_layers() const
 {
-    return (_descriptor._mip_levels);
+    return _descriptor._mip_levels;
 }
 
 unsigned
 texture_1d::samples() const
 {
-    return (1);
+    return 1;
 }
 
 } // namespace gl

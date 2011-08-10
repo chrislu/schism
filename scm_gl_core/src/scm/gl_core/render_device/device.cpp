@@ -195,7 +195,10 @@ render_device::init_capabilities()
     assert(_capabilities._max_transform_feedback_buffers > 0);
     assert(_capabilities._max_vertex_streams > 0);
 
-    if (glcore.extension_EXT_shader_image_load_store) {
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+        glcore.glGetIntegerv(GL_MAX_IMAGE_UNITS, &_capabilities._max_image_units);
+    }
+    else if (glcore.extension_EXT_shader_image_load_store) {
         glcore.glGetIntegerv(GL_MAX_IMAGE_UNITS_EXT, &_capabilities._max_image_units);
     }
     else {

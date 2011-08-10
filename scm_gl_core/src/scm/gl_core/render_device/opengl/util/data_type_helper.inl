@@ -133,44 +133,86 @@ inline
 bool
 is_image_type(unsigned gl_type)
 {
-    switch(gl_type) {
-        case GL_IMAGE_1D_EXT:
-        case GL_IMAGE_2D_EXT:
-        case GL_IMAGE_3D_EXT:
-        case GL_IMAGE_2D_RECT_EXT:
-        case GL_IMAGE_CUBE_EXT:
-        case GL_IMAGE_BUFFER_EXT:
-        case GL_IMAGE_1D_ARRAY_EXT:
-        case GL_IMAGE_2D_ARRAY_EXT:
-        case GL_IMAGE_CUBE_MAP_ARRAY_EXT:
-        case GL_IMAGE_2D_MULTISAMPLE_EXT:
-        case GL_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
-        case GL_INT_IMAGE_1D_EXT:
-        case GL_INT_IMAGE_2D_EXT:
-        case GL_INT_IMAGE_3D_EXT:
-        case GL_INT_IMAGE_2D_RECT_EXT:
-        case GL_INT_IMAGE_CUBE_EXT:
-        case GL_INT_IMAGE_BUFFER_EXT:
-        case GL_INT_IMAGE_1D_ARRAY_EXT:
-        case GL_INT_IMAGE_2D_ARRAY_EXT:
-        case GL_INT_IMAGE_CUBE_MAP_ARRAY_EXT:
-        case GL_INT_IMAGE_2D_MULTISAMPLE_EXT:
-        case GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
-        case GL_UNSIGNED_INT_IMAGE_1D_EXT:
-        case GL_UNSIGNED_INT_IMAGE_2D_EXT:
-        case GL_UNSIGNED_INT_IMAGE_3D_EXT:
-        case GL_UNSIGNED_INT_IMAGE_2D_RECT_EXT:
-        case GL_UNSIGNED_INT_IMAGE_CUBE_EXT:
-        case GL_UNSIGNED_INT_IMAGE_BUFFER_EXT:
-        case GL_UNSIGNED_INT_IMAGE_1D_ARRAY_EXT:
-        case GL_UNSIGNED_INT_IMAGE_2D_ARRAY_EXT:
-        case GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY_EXT:
-        case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_EXT:
-        case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
-            return true;
-        default:
-            return false;
-    };
+    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+        switch(gl_type) {
+            case GL_IMAGE_1D:
+            case GL_IMAGE_2D:
+            case GL_IMAGE_3D:
+            case GL_IMAGE_2D_RECT:
+            case GL_IMAGE_CUBE:
+            case GL_IMAGE_BUFFER:
+            case GL_IMAGE_1D_ARRAY:
+            case GL_IMAGE_2D_ARRAY:
+            case GL_IMAGE_CUBE_MAP_ARRAY:
+            case GL_IMAGE_2D_MULTISAMPLE:
+            case GL_IMAGE_2D_MULTISAMPLE_ARRAY:
+            case GL_INT_IMAGE_1D:
+            case GL_INT_IMAGE_2D:
+            case GL_INT_IMAGE_3D:
+            case GL_INT_IMAGE_2D_RECT:
+            case GL_INT_IMAGE_CUBE:
+            case GL_INT_IMAGE_BUFFER:
+            case GL_INT_IMAGE_1D_ARRAY:
+            case GL_INT_IMAGE_2D_ARRAY:
+            case GL_INT_IMAGE_CUBE_MAP_ARRAY:
+            case GL_INT_IMAGE_2D_MULTISAMPLE:
+            case GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY:
+            case GL_UNSIGNED_INT_IMAGE_1D:
+            case GL_UNSIGNED_INT_IMAGE_2D:
+            case GL_UNSIGNED_INT_IMAGE_3D:
+            case GL_UNSIGNED_INT_IMAGE_2D_RECT:
+            case GL_UNSIGNED_INT_IMAGE_CUBE:
+            case GL_UNSIGNED_INT_IMAGE_BUFFER:
+            case GL_UNSIGNED_INT_IMAGE_1D_ARRAY:
+            case GL_UNSIGNED_INT_IMAGE_2D_ARRAY:
+            case GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY:
+            case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE:
+            case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY:
+                return true;
+            default:
+                return false;
+        };
+    }
+    else { // fall back to EXT_shader_image_load_store
+        switch(gl_type) {
+            case GL_IMAGE_1D_EXT:
+            case GL_IMAGE_2D_EXT:
+            case GL_IMAGE_3D_EXT:
+            case GL_IMAGE_2D_RECT_EXT:
+            case GL_IMAGE_CUBE_EXT:
+            case GL_IMAGE_BUFFER_EXT:
+            case GL_IMAGE_1D_ARRAY_EXT:
+            case GL_IMAGE_2D_ARRAY_EXT:
+            case GL_IMAGE_CUBE_MAP_ARRAY_EXT:
+            case GL_IMAGE_2D_MULTISAMPLE_EXT:
+            case GL_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
+            case GL_INT_IMAGE_1D_EXT:
+            case GL_INT_IMAGE_2D_EXT:
+            case GL_INT_IMAGE_3D_EXT:
+            case GL_INT_IMAGE_2D_RECT_EXT:
+            case GL_INT_IMAGE_CUBE_EXT:
+            case GL_INT_IMAGE_BUFFER_EXT:
+            case GL_INT_IMAGE_1D_ARRAY_EXT:
+            case GL_INT_IMAGE_2D_ARRAY_EXT:
+            case GL_INT_IMAGE_CUBE_MAP_ARRAY_EXT:
+            case GL_INT_IMAGE_2D_MULTISAMPLE_EXT:
+            case GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
+            case GL_UNSIGNED_INT_IMAGE_1D_EXT:
+            case GL_UNSIGNED_INT_IMAGE_2D_EXT:
+            case GL_UNSIGNED_INT_IMAGE_3D_EXT:
+            case GL_UNSIGNED_INT_IMAGE_2D_RECT_EXT:
+            case GL_UNSIGNED_INT_IMAGE_CUBE_EXT:
+            case GL_UNSIGNED_INT_IMAGE_BUFFER_EXT:
+            case GL_UNSIGNED_INT_IMAGE_1D_ARRAY_EXT:
+            case GL_UNSIGNED_INT_IMAGE_2D_ARRAY_EXT:
+            case GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY_EXT:
+            case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_EXT:
+            case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY_EXT:
+                return true;
+            default:
+                return false;
+        };
+    }
 }
 
 

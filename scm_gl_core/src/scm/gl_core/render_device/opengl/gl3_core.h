@@ -89,6 +89,7 @@ public:
     bool version_3_3_available;
     bool version_4_0_available;
     bool version_4_1_available;
+    bool version_4_2_available;
 
 
     bool extension_ARB_shading_language_include;
@@ -653,6 +654,34 @@ public:
     PFNGLGETFLOATI_VPROC                            glGetFloati_v;
     PFNGLGETDOUBLEI_VPROC                           glGetDoublei_v;
 
+    // version 4.2 ////////////////////////////////////////////////////////////////////////////////
+    // ARB_base_instance
+    PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC        glDrawArraysInstancedBaseInstance;
+    PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC      glDrawElementsInstancedBaseInstance;
+    PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC glDrawElementsInstancedBaseVertexBaseInstance;
+    // ARB_shading_language_420pack (no entry points)
+    // ARB_transform_feedback_instanced
+    PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC         glDrawTransformFeedbackInstanced;
+    PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC   glDrawTransformFeedbackStreamInstanced;
+    // ARB_compressed_texture_pixel_storage (no entry points)
+    // ARB_conservative_depth (no entry points)
+    // ARB_internalformat_query
+    PFNGLGETINTERNALFORMATIVPROC                    glGetInternalformativ;
+    // ARB_map_buffer_alignment (no entry points)
+    // ARB_shader_atomic_counters
+    PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC         glGetActiveAtomicCounterBufferiv;
+    // ARB_shader_image_load_store
+    PFNGLBINDIMAGETEXTUREPROC                       glBindImageTexture;
+    PFNGLMEMORYBARRIERPROC                          glMemoryBarrier;
+    // ARB_shading_language_packing (no entry points)
+    // ARB_texture_storage
+    PFNGLTEXSTORAGE1DPROC                           glTexStorage1D;
+    PFNGLTEXSTORAGE2DPROC                           glTexStorage2D;
+    PFNGLTEXSTORAGE3DPROC                           glTexStorage3D;
+    PFNGLTEXTURESTORAGE1DEXTPROC                    glTextureStorage1DEXT;
+    PFNGLTEXTURESTORAGE2DEXTPROC                    glTextureStorage2DEXT;
+    PFNGLTEXTURESTORAGE3DEXTPROC                    glTextureStorage3DEXT;
+
     // GL_ARB_shading_language_include
     PFNGLNAMEDSTRINGARBPROC                         glNamedStringARB;
     PFNGLDELETENAMEDSTRINGARBPROC                   glDeleteNamedStringARB;
@@ -691,6 +720,7 @@ public:
     PFNGLGETNUNIFORMIVARBPROC                       glGetnUniformivARB;
     PFNGLGETNUNIFORMUIVARBPROC                      glGetnUniformuivARB;
     PFNGLGETNUNIFORMDVARBPROC                       glGetnUniformdvARB;
+
 
     // EXT_shader_image_load_store
     PFNGLBINDIMAGETEXTUREEXTPROC                    glBindImageTextureEXT;

@@ -126,40 +126,99 @@ texture_3d::image_data(const render_device&      in_device,
     util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
     glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
-
-    for (unsigned i = 0; i < init_mip_levels; ++i) {
-        math::vec3ui lev_size = in_desc._size;
-        if (i > 0) {
-            lev_size = util::mip_level_dimensions(in_desc._size, i);
-        }
-        const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+    if (false) { //BUG r280 SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {//
         if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-            glapi.glTextureImage3DEXT(object_id(), object_target(),
-                                      i,
-                                      util::gl_internal_format(in_desc._format),
-                                      lev_size.x, lev_size.y, lev_size.z,
-                                      0,
-                                      gl_base_format,
-                                      gl_base_type,
-                                      init_lev_data);
+            glout() << "4.2 dsa" << log::end;
+            glapi.glTextureStorage3DEXT(object_id(), object_target(),
+                                        init_mip_levels,
+                                        util::gl_internal_format(in_desc._format),
+                                        in_desc._size.x, in_desc._size.y, in_desc._size.z);
+            if (glerror) {
+                state().set(glerror.to_object_state());
+                return false;
+            }
+            if (inital_data) {
+                for (unsigned i = 0; i < init_mip_levels; ++i) {
+                    math::vec3ui lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                    const void*  init_lev_data = in_initial_mip_level_data[i];
+                    glapi.glTextureSubImage3DEXT(object_id(), object_target(),
+                                                    i,
+                                                    0, 0, 0,
+                                                    lev_size.x, lev_size.y, lev_size.z,
+                                                    gl_base_format,
+                                                    gl_base_type,
+                                                    init_lev_data);
+                    if (glerror) {
+                        state().set(glerror.to_object_state());
+                        return false;
+                    }
+                }
+            }
         }
-        else {
-            glapi.glTexImage3D(object_target(),
-                               i,
-                               util::gl_internal_format(in_desc._format),
-                               lev_size.x, lev_size.y, lev_size.z,
-                               0,
-                               gl_base_format,
-                               gl_base_type,
-                               init_lev_data);
+        else { // no EXT_DIRECT_STATE_ACCESS
+            glapi.glTexStorage3D(object_target(),
+                                 init_mip_levels,
+                                 util::gl_internal_format(in_desc._format),
+                                 in_desc._size.x, in_desc._size.y, in_desc._size.z);
+            glout() << "4.2 no dsa" << log::end;
+            if (glerror) {
+                state().set(glerror.to_object_state());
+                return false;
+            }
+            if (inital_data) {
+                for (unsigned i = 0; i < init_mip_levels; ++i) {
+                    math::vec3ui lev_size      = util::mip_level_dimensions(in_desc._size, i);
+                    const void*  init_lev_data = in_initial_mip_level_data[i];
+                    glapi.glTexSubImage3D(object_target(),
+                                          i,
+                                          0, 0, 0,
+                                          lev_size.x, lev_size.y, lev_size.z,
+                                          gl_base_format,
+                                          gl_base_type,
+                                          init_lev_data);
+                    if (glerror) {
+                        state().set(glerror.to_object_state());
+                        return false;
+                    }
+                }
+            }
         }
+    }
+    else { // SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_420
+        for (unsigned i = 0; i < init_mip_levels; ++i) {
+            math::vec3ui lev_size = in_desc._size;
+            if (i > 0) {
+                lev_size = util::mip_level_dimensions(in_desc._size, i);
+            }
+            const void* init_lev_data = inital_data ? in_initial_mip_level_data[i] : 0;
+            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                glapi.glTextureImage3DEXT(object_id(), object_target(),
+                                          i,
+                                          util::gl_internal_format(in_desc._format),
+                                          lev_size.x, lev_size.y, lev_size.z,
+                                          0,
+                                          gl_base_format,
+                                          gl_base_type,
+                                          init_lev_data);
+            }
+            else {
+                glapi.glTexImage3D(object_target(),
+                                   i,
+                                   util::gl_internal_format(in_desc._format),
+                                   lev_size.x, lev_size.y, lev_size.z,
+                                   0,
+                                   gl_base_format,
+                                   gl_base_type,
+                                   init_lev_data);
+            }
 
-        if (glerror) {
-            state().set(glerror.to_object_state());
-            return (false);
-        }
+            if (glerror) {
+                state().set(glerror.to_object_state());
+                return (false);
+            }
 
-        gl_assert(glapi, texture_3d::image_data() after glTexImage3D());
+            gl_assert(glapi, texture_3d::image_data() after glTexImage3D());
+        }
     }
 
     gl_assert(glapi, leaving texture_3d::image_data());
