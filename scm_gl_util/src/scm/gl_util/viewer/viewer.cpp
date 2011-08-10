@@ -134,6 +134,8 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
         _window_context.reset(new wm::context(_window, ctx_attrib));
         _window_context->make_current(_window);
 
+        glout() << *_window_context << scm::log::end;
+
         _device.reset(new render_device());
         _context = _device->main_context();
 

@@ -64,6 +64,8 @@ private:
     string_set      _wgl_extensions;
     bool            _initialized;
 
+    friend std::ostream& operator<<(std::ostream& out_stream, const wgl_extensions& c);
+
 }; // class wgl_extensions
 
 } // namespace util

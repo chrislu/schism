@@ -122,6 +122,11 @@ context::context_impl::cleanup()
     }
 }
 
+void
+context::context_impl::print_context_informations(std::ostream& os) const
+{
+}
+
 } // namespace wm
 } // namepspace gl
 } // namepspace scm

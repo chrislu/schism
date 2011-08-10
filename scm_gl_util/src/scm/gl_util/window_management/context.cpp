@@ -1,7 +1,6 @@
 
 #include "context.h"
 
-
 #include <exception>
 #include <stdexcept>
 
@@ -90,6 +89,18 @@ context::default_attributes()
 {
     static attribute_desc   default_attrib(0, 0);
     return (default_attrib);
+}
+
+void
+context::print_context_informations(std::ostream& os) const
+{
+    _impl->print_context_informations(os);
+}
+
+std::ostream& operator<<(std::ostream& os, const context& ctx)
+{
+    ctx.print_context_informations(os);
+    return (os);
 }
 
 } // namespace wm

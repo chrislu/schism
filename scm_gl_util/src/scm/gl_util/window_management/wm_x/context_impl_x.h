@@ -2,6 +2,8 @@
 #ifndef SCM_GL_UTIL_WM_WIN32_CONTEXT_IMPL_X_H_INCLUDED
 #define SCM_GL_UTIL_WM_WIN32_CONTEXT_IMPL_X_H_INCLUDED
 
+#include <iosfwd>
+
 #include <scm/core/platform/platform.h>
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
@@ -32,6 +34,8 @@ struct context::context_impl
 
     bool                    make_current(const surface_ptr& in_surface, bool current) const;
     void                    cleanup();
+
+    void                    print_context_informations(std::ostream& os) const;
 
     GLXContext              _context_handle;
     ::Display*const         _display;

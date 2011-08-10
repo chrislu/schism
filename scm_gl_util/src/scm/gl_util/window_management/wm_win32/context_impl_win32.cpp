@@ -40,7 +40,7 @@ context::context_impl::context_impl(const surface_ptr&     in_surface,
         }
         std::vector<int>  ctx_attribs;
 
-		if(in_attributes._version_major > 2) {
+        if(in_attributes._version_major > 2) {
             ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_major);
             ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_minor);
             int ctx_flags = 0;
@@ -59,7 +59,7 @@ context::context_impl::context_impl(const surface_ptr&     in_surface,
             else {
                 ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
             }
-		}
+        }
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
         HGLRC share_ctx = 0;
@@ -125,6 +125,13 @@ context::context_impl::cleanup()
                   << "(system message: " << util::win32_error_message() << ")" << log::end;
         }
     }
+}
+
+void
+context::context_impl::print_context_informations(std::ostream& os) const
+{
+    os << "OpenGL WGL render device" << std::endl;
+    os << *_wgl_extensions;
 }
 
 } // namespace wm

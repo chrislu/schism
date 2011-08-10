@@ -3,6 +3,8 @@
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
+#include <ostream>
+
 #include <boost/tokenizer.hpp>
 
 #include <scm/core/memory.h>
@@ -157,6 +159,19 @@ wgl_extensions::is_supported(const std::string& ext) const
     else {
         return (false);
     }
+}
+
+std::ostream& operator<<(std::ostream& out_stream, const wgl_extensions& w)
+{
+    std::ostream::sentry const  out_sentry(out_stream);
+
+    out_stream << "extensions :      " << "(found " << w._wgl_extensions.size() << ")" << std::endl;
+
+    for (wgl_extensions::string_set::const_iterator i = w._wgl_extensions.begin(); i != w._wgl_extensions.end(); ++i) {
+        out_stream << "                  " << *i << std::endl;
+    }
+
+    return out_stream;
 }
 
 } // namespace util

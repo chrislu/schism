@@ -2,6 +2,8 @@
 #ifndef SCM_GL_UTIL_WM_CONTEXT_H_INCLUDED
 #define SCM_GL_UTIL_WM_CONTEXT_H_INCLUDED
 
+#include <iosfwd>
+
 #include <scm/core/memory.h>
 
 #include <scm/gl_util/window_management/wm_fwd.h>
@@ -41,6 +43,8 @@ public:
 
     static const attribute_desc&    default_attributes();
 
+    void                            print_context_informations(std::ostream& os) const;
+
 protected:
     const display_ptr&              _associated_display;
     surface::format_desc            _surface_format;
@@ -58,6 +62,8 @@ private:
     context& operator=(const context&);
 
 }; // class context
+
+__scm_export(gl_util) std::ostream& operator<<(std::ostream& os, const context& ctx);
 
 } // namespace wm
 } // namepspace gl
