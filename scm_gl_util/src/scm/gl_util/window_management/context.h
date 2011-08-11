@@ -25,9 +25,10 @@ public:
         bool            _compatibility_profile;
         bool            _debug;
         bool            _forward_compatible;
+        bool            _es_profile;
 
         attribute_desc(int version_major, int version_minor,
-                       bool compatibility = false, bool debug = false, bool forward = false);
+                       bool compatibility = false, bool debug = false, bool forward = false, bool es = false);
     }; // struct attribute_desc
 public:
     context(const surface_ptr&      in_surface,

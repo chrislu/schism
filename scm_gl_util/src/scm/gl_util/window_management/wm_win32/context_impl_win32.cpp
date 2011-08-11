@@ -40,25 +40,32 @@ context::context_impl::context_impl(const surface_ptr&     in_surface,
         }
         std::vector<int>  ctx_attribs;
 
-        if(in_attributes._version_major > 2) {
+        if (!in_attributes._es_profile) {
+            if(in_attributes._version_major > 2) {
+                ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_major);
+                ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_minor);
+                int ctx_flags = 0;
+                if (in_attributes._forward_compatible) {
+                    ctx_flags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+                }
+                if (in_attributes._debug) {
+                    ctx_flags |= WGL_CONTEXT_DEBUG_BIT_ARB;
+                }
+                if (0 != ctx_flags) {
+                    ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(ctx_flags);
+                }
+                if (in_attributes._compatibility_profile) {
+                    ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
+                }
+                else {
+                    ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+                }
+            }
+        }
+        else {
             ctx_attribs.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_major);
             ctx_attribs.push_back(WGL_CONTEXT_MINOR_VERSION_ARB);       ctx_attribs.push_back(in_attributes._version_minor);
-            int ctx_flags = 0;
-            if (in_attributes._forward_compatible) {
-                ctx_flags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
-            }
-            if (in_attributes._debug) {
-                ctx_flags |= WGL_CONTEXT_DEBUG_BIT_ARB;
-            }
-            if (0 != ctx_flags) {
-                ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);           ctx_attribs.push_back(ctx_flags);
-            }
-            if (in_attributes._compatibility_profile) {
-                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
-            }
-            else {
-                ctx_attribs.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);    ctx_attribs.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
-            }
+            ctx_attribs.push_back(WGL_CONTEXT_FLAGS_ARB);               ctx_attribs.push_back(WGL_CONTEXT_ES2_PROFILE_BIT_EXT);
         }
         ctx_attribs.push_back(0);                                   ctx_attribs.push_back(0); // terminate list
 
