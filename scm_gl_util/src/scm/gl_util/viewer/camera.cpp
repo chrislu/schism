@@ -182,12 +182,28 @@ camera::generate_ray(const math::vec2f& nrm_coord) const
     using namespace scm::gl;
     using namespace scm::math;
 
-    vec4f p = inverse(_view_projection_matrix) * vec4f(nrm_coord.x, nrm_coord.y, -1.0f, 1.0f);
-    p /= p.w;
+    ray     pick_ray;
 
-    vec4f o = inverse(_view_matrix).column(3);
+    if (type() == ortho) {
+        vec4f p = view_projection_matrix_inverse() * vec4f(nrm_coord.x, nrm_coord.y, -1.0f, 1.0f);
+        p /= p.w;
 
-    return (ray(o, p - o));
+        vec4f o = p;
+        o.z = -1.5f;
+        o.w =  0.0f; 
+
+        pick_ray = (ray(o, p - o));
+    }
+    else {
+        vec4f p = inverse(_view_projection_matrix) * vec4f(nrm_coord.x, nrm_coord.y, -1.0f, 1.0f);
+        p /= p.w;
+
+        vec4f o = inverse(_view_matrix).column(3);
+
+        pick_ray = ray(o, p - o);
+    }
+
+    return (pick_ray);
 }
 
 camera::projection_type
