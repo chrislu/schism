@@ -32,7 +32,7 @@ namespace scm {
 namespace gl {
 
 namespace opengl {
-class gl3_core;
+class gl_core;
 } // namespace detail
 
 class __scm_export(gl_core) render_device : boost::noncopyable
@@ -82,7 +82,7 @@ public:
     virtual ~render_device();
 
     // device /////////////////////////////////////////////////////////////////////////////////////
-    const opengl::gl3_core&         opengl3_api() const;
+    const opengl::gl_core&         opengl_api() const;
     render_context_ptr              main_context() const;
     render_context_ptr              create_context();
     const device_capabilities&      capabilities() const;
@@ -281,7 +281,7 @@ public:
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:
     // device /////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr<opengl::gl3_core>    _opengl3_api_core;
+    shared_ptr<opengl::gl_core>    _opengl_api_core;
     render_context_ptr              _main_context;
 
     // shader api /////////////////////////////////////////////////////////////////////////////////

@@ -19,25 +19,6 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_util) texture_image_data
-{
-public:
-    texture_image_data(const math::vec2ui&        img_size,
-                       const data_format          img_format,
-                       const shared_array<uint8>& img_data);
-    /*virtual*/ ~texture_image_data();
-
-    const math::vec2ui&         size() const;
-    const data_format           format() const;
-    const shared_array<uint8>&  data() const;
-
-protected:
-    math::vec2ui        _size;
-    data_format         _format;
-    shared_array<uint8> _data;
-
-}; // struct texture_image_data
-
 class __scm_export(gl_util) texture_loader
 {
 

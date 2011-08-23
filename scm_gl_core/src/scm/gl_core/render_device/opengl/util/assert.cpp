@@ -10,7 +10,7 @@
 namespace scm {
 namespace gl {
 
-void _gl_assert(const opengl::gl3_core& glcore,
+void _gl_assert(const opengl::gl_core& glcore,
                 const char* message,
                 const char* in_file,
                 unsigned    at_line)

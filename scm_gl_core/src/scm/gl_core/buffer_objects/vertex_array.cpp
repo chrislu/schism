@@ -7,7 +7,7 @@
 #include <scm/gl_core/buffer_objects/buffer.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
 #include <scm/gl_core/shader_objects/program.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -23,7 +23,7 @@ vertex_array::vertex_array(      render_device&           ren_dev,
   : render_device_child(ren_dev),
     _vertex_format(in_vert_format)
 {
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
     util::gl_error          glerror(glapi);
 
     glapi.glGenVertexArrays(1, &(context_bindable_object::_gl_object_id));
@@ -43,7 +43,7 @@ vertex_array::vertex_array(      render_device&           ren_dev,
 
 vertex_array::~vertex_array()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != object_id());
     glapi.glDeleteVertexArrays(1, &(context_bindable_object::_gl_object_id));
@@ -57,7 +57,7 @@ vertex_array::bind(render_context& ren_ctx) const
     assert(object_id() != 0);
     assert(state().ok());
 
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     glapi.glBindVertexArray(object_id());
 
@@ -69,7 +69,7 @@ vertex_array::unbind(render_context& ren_ctx) const
 {
     assert(state().ok());
 
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     glapi.glBindVertexArray(0);
 
@@ -137,16 +137,17 @@ vertex_array::initialize_array_object(const render_device& ren_dev)
 {
     assert(object_id() != 0);
 
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
     util::gl_error          glerror(glapi);
 
     buffer_slot_map::const_iterator slot     = _buffer_slots.begin();
     buffer_slot_map::const_iterator slot_end = _buffer_slots.end();
 
-    util::vertex_array_binding_guard binding_guard(glapi);
 #if SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
-    glapi.glBindVertexArray(0); // W T F ?!?!
+    //glapi.glBindVertexArray(0); // W T F ?!?!
+    //glapi.glBindVertexArray(object_id());
 #else
+    util::vertex_array_binding_guard binding_guard(glapi);
     glapi.glBindVertexArray(object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
 

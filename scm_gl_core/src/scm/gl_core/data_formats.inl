@@ -13,65 +13,80 @@ inline
 bool is_normalized(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_R_8 <= d && d <= FORMAT_SRGBA_8);
+    return    (FORMAT_R_8      <= d && d <= FORMAT_SRGBA_8)
+           || (FORMAT_BC1_RGBA <= d && d <= FORMAT_BC5_RG_S)
+           || (FORMAT_BC7_RGBA <= d && d <= FORMAT_BC7_SRGBA);
 }
 
 inline
 bool is_unnormalized(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_R_8I <= d && d <= FORMAT_RGBA_32UI);
+    return FORMAT_R_8I <= d && d <= FORMAT_RGBA_32UI;
 }
 
 inline
 bool is_integer_type(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_R_8 <= d && d <= FORMAT_RGBA_32UI);
+    return FORMAT_R_8 <= d && d <= FORMAT_RGBA_32UI;
 }
 
 inline
 bool is_float_type(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (   FORMAT_R_16F <= d && d <= FORMAT_R11B11G10F
-            || FORMAT_D32F == d
-            || FORMAT_D32F_S8 == d);
+    return    FORMAT_R_16F <= d && d <= FORMAT_R11B11G10F
+           || FORMAT_BC6H_RGB_F <= d && d <= FORMAT_BC6H_RGB_UF
+           || FORMAT_D32F == d
+           || FORMAT_D32F_S8 == d;
 }
 
 inline
 bool is_depth_format(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_D16 <= d && d <= FORMAT_D32F_S8);
+    return FORMAT_D16 <= d && d <= FORMAT_D32F_S8;
 }
 
 inline
 bool is_stencil_format(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_D24_S8 <= d && d <= FORMAT_D32F_S8);
+    return FORMAT_D24_S8 <= d && d <= FORMAT_D32F_S8;
 }
 
 inline
 bool is_packed_format(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_RGB9_E5 <= d && d <= FORMAT_R11B11G10F);
+    return FORMAT_RGB9_E5 <= d && d <= FORMAT_R11B11G10F;
 }
 
 inline
 bool is_plain_format(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (d <= FORMAT_RGBA_32F);
+    return d <= FORMAT_RGBA_32F;
 }
 
 inline
 bool is_srgb_format(data_format d)
 {
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (FORMAT_SRGB_8 <= d && d <= FORMAT_SRGBA_8);
+    return    FORMAT_SRGB_8 <= d && d <= FORMAT_SRGBA_8
+           || d == FORMAT_BC1_SRGBA
+           || d == FORMAT_BC2_SRGBA
+           || d == FORMAT_BC3_SRGBA
+           || d == FORMAT_BC7_SRGBA;
+}
+
+inline
+bool
+is_compressed_format(data_format d)
+{
+    assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
+    return FORMAT_BC1_RGBA <= d && d <= FORMAT_BC7_SRGBA;
 }
 
 inline
@@ -100,6 +115,21 @@ int channel_count(data_format d)
         1, 2, 3, 4, // FORMAT_RGBA_32F
         // special packed formats
         3, 3,
+        // compressed formats
+        4, // FORMAT_BC1_RGBA,        // DXT1
+        4, // FORMAT_BC1_SRGBA,       // DXT1
+        4, // FORMAT_BC2_RGBA,        // DXT3
+        4, // FORMAT_BC2_SRGBA,       // DXT3
+        4, // FORMAT_BC3_RGBA,        // DXT5
+        4, // FORMAT_BC3_SRGBA,       // DXT5
+        1, // FORMAT_BC4_R,           // RGTC1
+        1, // FORMAT_BC4_R_S,         // RGTC1
+        2, // FORMAT_BC5_RG,          // RGTC2
+        2, // FORMAT_BC5_RG_S,        // RGTC2
+        3, // FORMAT_BC6H_RGB_F,      // BPTC
+        3, // FORMAT_BC6H_RGB_UF,     // BPTC
+        4, // FORMAT_BC7_RGBA,        // BPTC
+        4, // FORMAT_BC7_SRGBA,       // BPTC
         // depth stencil formats
         1, 1, 1, 1, 2, 2
     };
@@ -107,7 +137,7 @@ int channel_count(data_format d)
     BOOST_STATIC_ASSERT((sizeof(channel_counts) / sizeof(int)) == FORMAT_COUNT);
 
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (channel_counts[d]);
+    return channel_counts[d];
 }
 
 inline
@@ -136,6 +166,21 @@ int size_of_channel(data_format d)
         4, 4, 4, 4, // FORMAT_RGBA_32F
         // special packed formats
         0, 0,
+        // compressed formats
+        0, // FORMAT_BC1_RGBA,        // DXT1
+        0, // FORMAT_BC1_SRGBA,       // DXT1
+        0, // FORMAT_BC2_RGBA,        // DXT3
+        0, // FORMAT_BC2_SRGBA,       // DXT3
+        0, // FORMAT_BC3_RGBA,        // DXT5
+        0, // FORMAT_BC3_SRGBA,       // DXT5
+        0, // FORMAT_BC4_R,           // RGTC1
+        0, // FORMAT_BC4_R_S,         // RGTC1
+        0, // FORMAT_BC5_RG,          // RGTC2
+        0, // FORMAT_BC5_RG_S,        // RGTC2
+        0, // FORMAT_BC6H_RGB_F,      // BPTC
+        0, // FORMAT_BC6H_RGB_UF,     // BPTC
+        0, // FORMAT_BC7_RGBA,        // BPTC
+        0, // FORMAT_BC7_SRGBA,       // BPTC
         // depth stencil formats
         0, 0, 0, 0, 0, 0
     };
@@ -143,7 +188,7 @@ int size_of_channel(data_format d)
     BOOST_STATIC_ASSERT((sizeof(channel_sizes) / sizeof(int)) == FORMAT_COUNT);
 
     assert(FORMAT_NULL <= d && d <= FORMAT_RGBA_32F);
-    return (channel_sizes[d]);
+    return channel_sizes[d];
 }
 
 inline
@@ -172,6 +217,21 @@ int size_of_format(data_format d)
         4, 8, 12, 16, // FORMAT_RGBA_32F
         // special packed formats
         4, 4,
+        // compressed formats
+        0, // FORMAT_BC1_RGBA,        // DXT1   // BEWARE
+        0, // FORMAT_BC1_SRGBA,       // DXT1   // BEWARE
+        0, // FORMAT_BC2_RGBA,        // DXT3
+        0, // FORMAT_BC2_SRGBA,       // DXT3
+        0, // FORMAT_BC3_RGBA,        // DXT5
+        0, // FORMAT_BC3_SRGBA,       // DXT5
+        0, // FORMAT_BC4_R,           // RGTC1
+        0, // FORMAT_BC4_R_S,         // RGTC1
+        0, // FORMAT_BC5_RG,          // RGTC2
+        0, // FORMAT_BC5_RG_S,        // RGTC2
+        0, // FORMAT_BC6H_RGB_F,      // BPTC
+        0, // FORMAT_BC6H_RGB_UF,     // BPTC
+        0, // FORMAT_BC7_RGBA,        // BPTC
+        0, // FORMAT_BC7_SRGBA,       // BPTC
         // depth stencil formats
         2, 3, 4, 4, 4, 8
     };
@@ -179,7 +239,7 @@ int size_of_format(data_format d)
     BOOST_STATIC_ASSERT((sizeof(format_sizes) / sizeof(int)) == FORMAT_COUNT);
 
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (format_sizes[d]);
+    return format_sizes[d];
 }
 
 inline
@@ -188,13 +248,13 @@ size_of_depth_component(data_format d)
 {
     assert(FORMAT_D16 <= d && d <= FORMAT_D32F_S8);
     switch (d) {
-        case FORMAT_D16:        return (2);
-        case FORMAT_D24:        return (3);
-        case FORMAT_D32:        return (4);
-        case FORMAT_D32F:       return (4);
-        case FORMAT_D24_S8:     return (3);
-        case FORMAT_D32F_S8:    return (4);
-        default:                return (0);
+        case FORMAT_D16:        return 2;
+        case FORMAT_D24:        return 3;
+        case FORMAT_D32:        return 4;
+        case FORMAT_D32F:       return 4;
+        case FORMAT_D24_S8:     return 3;
+        case FORMAT_D32F_S8:    return 4;
+        default:                return 0;
     }
 }
 
@@ -203,13 +263,13 @@ int size_of_stencil_component(data_format d)
 {
     assert(FORMAT_D16 <= d && d <= FORMAT_D32F_S8);
     switch (d) {
-        case FORMAT_D16:        return (0);
-        case FORMAT_D24:        return (0);
-        case FORMAT_D32:        return (0);
-        case FORMAT_D32F:       return (0);
-        case FORMAT_D24_S8:     return (1);
-        case FORMAT_D32F_S8:    return (1);
-        default:                return (0);
+        case FORMAT_D16:        return 0;
+        case FORMAT_D24:        return 0;
+        case FORMAT_D32:        return 0;
+        case FORMAT_D32F:       return 0;
+        case FORMAT_D24_S8:     return 1;
+        case FORMAT_D32F_S8:    return 1;
+        default:                return 0;
     }
 }
 

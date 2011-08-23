@@ -1,5 +1,5 @@
 
-#include "gl3_core.h"
+#include "gl_core.h"
 
 #include <ostream>
 
@@ -58,13 +58,13 @@ namespace gl {
 namespace opengl {
 
 bool
-gl3_core::is_initialized() const
+gl_core::is_initialized() const
 {
     return (_initialized);
 }
 
 bool
-gl3_core::is_supported(const std::string& ext) const
+gl_core::is_supported(const std::string& ext) const
 {
     if (_extensions.find(ext) != _extensions.end()) {
         return (true);
@@ -75,7 +75,7 @@ gl3_core::is_supported(const std::string& ext) const
 }
 
 bool
-gl3_core::version_supported(unsigned in_major, unsigned in_minor) const
+gl_core::version_supported(unsigned in_major, unsigned in_minor) const
 {
     unsigned avail_version =   _context_info._version_major * 1000
                              + _context_info._version_minor * 10;
@@ -85,13 +85,13 @@ gl3_core::version_supported(unsigned in_major, unsigned in_minor) const
     return (avail_version >= asked_version);
 }
 
-const gl3_core::context_info&
-gl3_core::context_information() const
+const gl_core::context_info&
+gl_core::context_information() const
 {
     return (_context_info);
 }
 
-gl3_core::gl3_core()
+gl_core::gl_core()
 {
     _initialized = false;
 
@@ -117,22 +117,24 @@ gl3_core::gl3_core()
     extension_ARB_robustness                    = false;
     extension_EXT_shader_image_load_store       = false;
     extension_EXT_direct_state_access_available = false;
+    extension_EXT_texture_compression_s3tc      = false;
+    extension_ARB_texture_compression_bptc      = false;
 }
 
 bool
-gl3_core::initialize()
+gl_core::initialize()
 {
     if (is_initialized()) {
         return (true);
     }
     log::logger_format_saver save_indent(glout().associated_logger());
-    glout() << log::info << "gl3_core::initialize(): starting to initialize gl core:" << log::end;
+    glout() << log::info << "gl_core::initialize(): starting to initialize gl core:" << log::end;
     glout() << log::indent;
 
     init_entry_points();
 
     if (!version_1_1_available) {
-        glerr() << log::fatal << "gl3_core::initialize(): unable to initialize gl core, missing vital entry points" << log::end;
+        glerr() << log::fatal << "gl_core::initialize(): unable to initialize gl core, missing vital entry points" << log::end;
         return (false);
     }
 
@@ -155,7 +157,7 @@ gl3_core::initialize()
         if (   !qi::phrase_parse(b, e, gl_version_string_format, boost::spirit::ascii::space)
             || b != e) {
             glerr() << log::error
-                    << "gl3_core::initialize(): "
+                    << "gl_core::initialize(): "
                     << "unable to parse OpenGL Version string, malformed version string ('"
                     << gl_version_string << "')" << log::end;
             return (false);
@@ -168,28 +170,28 @@ gl3_core::initialize()
 
     if (_context_info._version_major == 3) {
         if (    _context_info._version_minor == 0 && !version_3_0_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 3.0 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 3.0 reported but missing entry points detected" << log::end;
         }
         if (    _context_info._version_minor == 1 && !version_3_1_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 3.1 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 3.1 reported but missing entry points detected" << log::end;
         }
         if (    _context_info._version_minor == 2 && !version_3_2_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 3.2 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 3.2 reported but missing entry points detected" << log::end;
         }
         if (    _context_info._version_minor == 3 && !version_3_3_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 3.3 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 3.3 reported but missing entry points detected" << log::end;
         }
     }
     else if (_context_info._version_major == 4) {
         if (    _context_info._version_minor == 0 && !version_4_0_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 4.0 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 4.0 reported but missing entry points detected" << log::end;
         }
         if (    _context_info._version_minor == 1 && !version_4_1_available) {
-            glout() << log::warning << "gl3_core::initialize(): OpenGL version 4.1 reported but missing entry points detected" << log::end;
+            glout() << log::warning << "gl_core::initialize(): OpenGL version 4.1 reported but missing entry points detected" << log::end;
         }
     }
     else if (_context_info._version_major < 3) {
-        glerr() << log::fatal << "gl3_core::initialize(): at least OpenGL version 3.0 requiered" << log::end;
+        glerr() << log::fatal << "gl_core::initialize(): at least OpenGL version 3.0 requiered" << log::end;
         return (false);
     }
 
@@ -233,13 +235,13 @@ gl3_core::initialize()
     //    }
     //}
     if (is_supported("GL_ARB_cl_event") && !extension_ARB_cl_event) {
-        glout() << log::warning << "gl3_core::initialize(): GL_ARB_cl_event reported but missing entry points detected" << log::end;
+        glout() << log::warning << "gl_core::initialize(): GL_ARB_cl_event reported but missing entry points detected" << log::end;
     }
     if (is_supported("GL_ARB_debug_output") && !extension_ARB_debug_output) {
-        glout() << log::warning << "gl3_core::initialize(): GL_ARB_debug_output reported but missing entry points detected" << log::end;
+        glout() << log::warning << "gl_core::initialize(): GL_ARB_debug_output reported but missing entry points detected" << log::end;
     }
     if (is_supported("GL_ARB_robustness") && !extension_ARB_robustness) {
-        glout() << log::warning << "gl3_core::initialize(): ARB_robustness reported but missing entry points detected" << log::end;
+        glout() << log::warning << "gl_core::initialize(): ARB_robustness reported but missing entry points detected" << log::end;
     }
 
     extension_ARB_shading_language_include = extension_ARB_shading_language_include && is_supported("GL_ARB_shading_language_include");
@@ -248,10 +250,13 @@ gl3_core::initialize()
     extension_ARB_robustness               = extension_ARB_robustness               && is_supported("GL_ARB_robustness");
     extension_EXT_shader_image_load_store  = extension_EXT_shader_image_load_store  && is_supported("GL_EXT_shader_image_load_store");
 
+    extension_EXT_texture_compression_s3tc = is_supported("GL_EXT_texture_compression_s3tc");
+    extension_ARB_texture_compression_bptc = is_supported("GL_ARB_texture_compression_bptc");
+
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
         glout() << log::warning
-                << "gl3_core::initialize(): "
+                << "gl_core::initialize(): "
                 << "GL_EXT_direct_state_access not supported but enabled for scm_gl_core use "
                 << "(undefine SCM_GL_CORE_USE_DIRECT_STATE_ACCESS!)" << log::end;
     }
@@ -260,12 +265,12 @@ gl3_core::initialize()
 #endif // SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
     glout() << log::outdent;
-    glout() << log::info << "gl3_core::initialize(): finished to initializing gl core." << log::end;
+    glout() << log::info << "gl_core::initialize(): finished to initializing gl core." << log::end;
 
     return (true);
 }
 
-std::ostream& operator<<(std::ostream& out_stream, const gl3_core& c)
+std::ostream& operator<<(std::ostream& out_stream, const gl_core& c)
 {
     std::ostream::sentry const  out_sentry(out_stream);
 
@@ -283,7 +288,7 @@ std::ostream& operator<<(std::ostream& out_stream, const gl3_core& c)
     out_stream << std::endl;
     out_stream << "extensions :      " << "(found " << c._extensions.size() << ")" << std::endl;
 
-    for (gl3_core::string_set::const_iterator i = c._extensions.begin(); i != c._extensions.end(); ++i) {
+    for (gl_core::string_set::const_iterator i = c._extensions.begin(); i != c._extensions.end(); ++i) {
         out_stream << "                  " << *i << std::endl;
     }
 
@@ -291,7 +296,7 @@ std::ostream& operator<<(std::ostream& out_stream, const gl3_core& c)
 }
 
 void
-gl3_core::init_entry_points()
+gl_core::init_entry_points()
 {
     /* Visual Studio regex find and replace
         find:           {PFN[^ ]+}[ ]+{gl[^;]+}

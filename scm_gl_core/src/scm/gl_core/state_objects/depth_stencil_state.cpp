@@ -6,7 +6,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -94,7 +94,7 @@ void
 depth_stencil_state::apply(const render_context& in_context, unsigned in_stencil_ref,
                            const depth_stencil_state& in_applied_state, unsigned in_applied_stencil_ref) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     // depth state
     if (_descriptor._depth_test != in_applied_state._descriptor._depth_test) {
@@ -158,7 +158,7 @@ depth_stencil_state::apply(const render_context& in_context, unsigned in_stencil
 void
 depth_stencil_state::force_apply(const render_context& in_context, unsigned in_stencil_ref) const
 {
-    const opengl::gl3_core&         glapi         = in_context.opengl_api();
+    const opengl::gl_core&         glapi         = in_context.opengl_api();
 
     // depth state
     if (_descriptor._depth_test) {

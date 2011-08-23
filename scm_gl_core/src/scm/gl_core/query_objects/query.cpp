@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
@@ -17,7 +17,7 @@ query::query(render_device& in_device)
   , _gl_query_id(0)
   , _gl_query_type(0)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
 
     glapi.glGenQueries(1, &_gl_query_id);
     if (0 == _gl_query_id) {
@@ -29,7 +29,7 @@ query::query(render_device& in_device)
 
 query::~query()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != _gl_query_id);
     glapi.glDeleteQueries(1, &_gl_query_id);
@@ -40,7 +40,7 @@ query::~query()
 void
 query::begin(const render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != query_type());
 
@@ -52,7 +52,7 @@ query::begin(const render_context& in_context) const
 void
 query::end(const render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != query_type());
 

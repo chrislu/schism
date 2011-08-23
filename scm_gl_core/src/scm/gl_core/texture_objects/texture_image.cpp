@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -28,7 +28,7 @@ texture_image::~texture_image()
 void
 texture_image::generate_mipmaps(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
         glapi.glGenerateTextureMipmapEXT(object_id(), object_target());

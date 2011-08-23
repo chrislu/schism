@@ -198,6 +198,7 @@ space_navigator_impl::update()
             translation->get_Y(&trans_vec.y);
             translation->get_Z(&trans_vec.z);
             
+            //std::cout << trans_vec << " ";
             //std::cout << trans_vec / 40.0 << " ";
             trans_vec.x *= pow(trans_vec.x / 40.0, 2.0);
             trans_vec.y *= pow(trans_vec.y / 40.0, 2.0);

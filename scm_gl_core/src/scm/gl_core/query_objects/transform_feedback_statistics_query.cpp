@@ -6,7 +6,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/log.h>
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
@@ -26,9 +26,9 @@ transform_feedback_statistics_query::transform_feedback_statistics_query(render_
     _gl_query_type          = GL_PRIMITIVES_GENERATED;
     _query_type_xfb_written = GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN;
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         // GL3.x
         if (stream > 0) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
@@ -58,7 +58,7 @@ transform_feedback_statistics_query::transform_feedback_statistics_query(render_
 
 transform_feedback_statistics_query::~transform_feedback_statistics_query()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != _query_id_xfb_written);
     glapi.glDeleteQueries(1, &_query_id_xfb_written);
@@ -69,14 +69,14 @@ transform_feedback_statistics_query::~transform_feedback_statistics_query()
 void
 transform_feedback_statistics_query::begin(const render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != _query_id_xfb_written);
     assert(0 != query_type());
     assert(0 != _query_type_xfb_written);
 
     if (index() > 0) {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
             glapi.glBeginQueryIndexed(query_type(),            index(), query_id());
             glapi.glBeginQueryIndexed(_query_type_xfb_written, index(), _query_id_xfb_written);
         }
@@ -95,14 +95,14 @@ transform_feedback_statistics_query::begin(const render_context& in_context) con
 void
 transform_feedback_statistics_query::end(const render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != _query_id_xfb_written);
     assert(0 != query_type());
     assert(0 != _query_type_xfb_written);
 
     if (index() > 0) {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
             glapi.glEndQueryIndexed(query_type(),            index());
             glapi.glEndQueryIndexed(_query_type_xfb_written, index());
         }
@@ -121,7 +121,7 @@ transform_feedback_statistics_query::end(const render_context& in_context) const
 void
 transform_feedback_statistics_query::collect(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != _query_id_xfb_written);
     assert(0 != query_type());

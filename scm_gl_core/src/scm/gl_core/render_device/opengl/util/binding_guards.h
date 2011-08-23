@@ -8,7 +8,7 @@ namespace scm {
 namespace gl {
 
 namespace opengl {
-class gl3_core;
+class gl_core;
 }
 
 namespace util {
@@ -16,7 +16,7 @@ namespace util {
 class texture_binding_guard
 {
 public:
-    explicit texture_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit texture_binding_guard(const opengl::gl_core& in_glapi,
                           unsigned                in_target,
                           unsigned                in_binding);
     virtual ~texture_binding_guard();
@@ -25,23 +25,23 @@ private:
     int                     _save_texture_object;
     unsigned                _binding;
     unsigned                _target;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 class program_binding_guard
 {
 public:
-    explicit program_binding_guard(const opengl::gl3_core& in_glapi);
+    explicit program_binding_guard(const opengl::gl_core& in_glapi);
     virtual ~program_binding_guard();
 private:
     int                     _active_program;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 class buffer_binding_guard
 {
 public:
-    explicit buffer_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit buffer_binding_guard(const opengl::gl_core& in_glapi,
                          unsigned                in_target,
                          unsigned                in_binding);
     virtual ~buffer_binding_guard();
@@ -49,23 +49,23 @@ private:
     int             _save;
     unsigned        _binding;
     unsigned        _target;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 class vertex_array_binding_guard
 {
 public:
-    explicit vertex_array_binding_guard(const opengl::gl3_core& in_glapi);
+    explicit vertex_array_binding_guard(const opengl::gl_core& in_glapi);
     virtual ~vertex_array_binding_guard();
 private:
     int             _save;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 class framebuffer_binding_guard
 {
 public:
-    explicit framebuffer_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit framebuffer_binding_guard(const opengl::gl_core& in_glapi,
                                        unsigned                in_target,
                                        unsigned                in_binding);
     virtual ~framebuffer_binding_guard();
@@ -73,13 +73,13 @@ private:
     int             _save;
     unsigned        _target;
     unsigned        _binding;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 class transform_feedback_binding_guard
 {
 public:
-    explicit transform_feedback_binding_guard(const opengl::gl3_core& in_glapi,
+    explicit transform_feedback_binding_guard(const opengl::gl_core& in_glapi,
                                               unsigned                in_target,
                                               unsigned                in_binding);
     virtual ~transform_feedback_binding_guard();
@@ -87,7 +87,7 @@ private:
     int             _save;
     unsigned        _target;
     unsigned        _binding;
-    const opengl::gl3_core& _gl_api;
+    const opengl::gl_core& _gl_api;
 };
 
 } // namespace util

@@ -15,10 +15,10 @@
 namespace scm {
 namespace gl {
 namespace opengl {
-class gl3_core;
+class gl_core;
 } // namespace opengl
 
-__scm_export(gl_core) void _gl_assert(const opengl::gl3_core& glcore,
+__scm_export(gl_core) void _gl_assert(const opengl::gl_core& glcore,
                                       const char* message,
                                       const char* in_file,
                                       unsigned    at_line);

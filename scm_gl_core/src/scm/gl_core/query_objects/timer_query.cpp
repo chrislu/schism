@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
@@ -28,7 +28,7 @@ timer_query::~timer_query()
 void
 timer_query::collect(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != query_id());
     assert(0 != query_type());
 

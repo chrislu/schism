@@ -3,6 +3,7 @@
 #define SCM_GL_CORE_OPENGL_CONFIG_H_INCLUDED
 
 #include <scm/core/platform/platform.h>
+#include <scm/gl_core/config_defines.h>
 
 // gl debugging
 #if SCM_DEBUG
@@ -11,49 +12,38 @@
 #   define SCM_GL_DEBUG 0
 #endif
 
+#define SCM_GL_CORE_OPENGL_PROFILE          SCM_GL_CORE_OPENGL_330_PROFILE
+
 // to use the direct state access extension define this token
 //  - currently used in:
 //    - texture objects
 //    - program objects
+//    - buffer objects
+//    - vertex array objects
 #define SCM_GL_CORE_USE_DIRECT_STATE_ACCESS 1
 #undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
 #define SCM_GL_CORE_WORKAROUND_AMD 1
 #undef SCM_GL_CORE_WORKAROUND_AMD
 
-#define SCM_GL_CORE_OPENGL_40 1
-#undef SCM_GL_CORE_OPENGL_40
-
-#define SCM_GL_CORE_OPENGL_41 1
-#undef SCM_GL_CORE_OPENGL_41
-
-#define SCM_GL_CORE_OPENGL_42 1
-#undef SCM_GL_CORE_OPENGL_42
-
 // scm_gl_core internal ///////////////////////////////////////////////////////////////////////////
-#define SCM_GL_CORE_OPENGL_VERSION_330   330
-#define SCM_GL_CORE_OPENGL_VERSION_400   400
-#define SCM_GL_CORE_OPENGL_VERSION_410   410
-#define SCM_GL_CORE_OPENGL_VERSION_420   420
+// helper macros //////////////////////////////////////////////////////////////////////////////////
+#define SCM_GL_CORE_OPENGL_TYPE         ((SCM_GL_CORE_OPENGL_PROFILE) & SCM_GL_CORE_OPENGL_PLATFORM_MASK)
+#define SCM_GL_CORE_OPENGL_VERSION      ((SCM_GL_CORE_OPENGL_PROFILE) & SCM_GL_CORE_OPENGL_VERSION_MASK)
 
-#define SCM_GL_CORE_MIN_OPENGL_VERSION   SCM_GL_CORE_OPENGL_VERSION_330
-#define SCM_GL_CORE_BASE_OPENGL_VERSION  SCM_GL_CORE_MIN_OPENGL_VERSION
+#if SCM_GL_CORE_OPENGL_TYPE == SCM_GL_CORE_OPENGL_CORE_TYPE
+#   define SCM_GL_CORE_OPENGL_CORE_VERSION      (SCM_GL_CORE_OPENGL_VERSION)
+#else
+#   define SCM_GL_CORE_OPENGL_CORE_VERSION      0u
+#endif
 
-#if SCM_GL_CORE_OPENGL_40
-#undef SCM_GL_CORE_BASE_OPENGL_VERSION
-#define SCM_GL_CORE_BASE_OPENGL_VERSION SCM_GL_CORE_OPENGL_VERSION_400
-#endif // SCM_GL_CORE_OPENGL_40
+#if SCM_GL_CORE_OPENGL_TYPE == SCM_GL_CORE_OPENGL_ES2_TYPE
+#   define SCM_GL_CORE_OPENGL_ES2_VERSION       (SCM_GL_CORE_OPENGL_VERSION)
+#else
+#   define SCM_GL_CORE_OPENGL_ES2_VERSION       0u
+#endif
 
-#if SCM_GL_CORE_OPENGL_41
-#undef SCM_GL_CORE_BASE_OPENGL_VERSION
-#define SCM_GL_CORE_BASE_OPENGL_VERSION SCM_GL_CORE_OPENGL_VERSION_410
-#endif // SCM_GL_CORE_OPENGL_41
-
-#if SCM_GL_CORE_OPENGL_42
-#undef SCM_GL_CORE_BASE_OPENGL_VERSION
-#define SCM_GL_CORE_BASE_OPENGL_VERSION SCM_GL_CORE_OPENGL_VERSION_420
-#endif // SCM_GL_CORE_OPENGL_42
-
+// extension macros ///////////////////////////////////////////////////////////////////////////////
 #if SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 #   define SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS 1
 #else

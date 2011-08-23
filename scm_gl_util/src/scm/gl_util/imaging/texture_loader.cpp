@@ -14,6 +14,8 @@
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/texture_objects.h>
 
+#include <scm/gl_util/imaging/texture_image_data.h>
+
 namespace scm {
 namespace gl {
 namespace {
@@ -54,38 +56,6 @@ void scale_colors(float r, float g, float b,
 }
 
 } // namespace
-
-texture_image_data::texture_image_data(const math::vec2ui&        img_size,
-                                       const data_format          img_format,
-                                       const shared_array<uint8>& img_data)
-  : _size(img_size)
-  , _format(img_format)
-  , _data(img_data)
-{
-}
-
-texture_image_data::~texture_image_data()
-{
-    _data.reset();
-}
-
-const math::vec2ui&
-texture_image_data::size() const
-{
-    return (_size);
-}
-
-const data_format
-texture_image_data::format() const
-{
-    return (_format);
-}
-
-const shared_array<uint8>&
-texture_image_data::data() const
-{
-    return (_data);
-}
 
 texture_2d_ptr
 texture_loader::load_texture_2d(render_device&       in_device,
@@ -345,7 +315,10 @@ texture_loader::load_image_data(const std::string&  in_image_path)
         return (texture_image_data_ptr());
     }
 
-    texture_image_data_ptr ret_data(new texture_image_data(image_size, image_format, image_data));
+    texture_image_data::level_vector    mip_vec;
+    mip_vec.push_back(texture_image_data::level(math::vec3ui(image_size, 1), image_data));
+
+    texture_image_data_ptr ret_data(new texture_image_data(image_format, mip_vec));
     
     return (ret_data);
 }

@@ -8,7 +8,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -204,7 +204,7 @@ void
 blend_state::apply(const render_context& in_context, const math::vec4f& in_blend_color,
                    const blend_state&    in_applied_state, const math::vec4f& in_applied_blend_color) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (_descriptor._alpha_to_coverage != in_applied_state._descriptor._alpha_to_coverage) {
         if (_descriptor._alpha_to_coverage) {
@@ -234,7 +234,7 @@ blend_state::apply(const render_context& in_context, const math::vec4f& in_blend
         }
     }
     else {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
             glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
                                           util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
             glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
@@ -265,7 +265,7 @@ blend_state::apply(const render_context& in_context, const math::vec4f& in_blend
 void
 blend_state::force_apply(const render_context& in_context, const math::vec4f& in_blend_color) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (_descriptor._alpha_to_coverage) {
         glapi.glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
@@ -283,7 +283,7 @@ blend_state::force_apply(const render_context& in_context, const math::vec4f& in
         force_apply(in_context, _descriptor._blend_ops[0]);
     }
     else {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION < SCM_GL_CORE_OPENGL_VERSION_400) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
             glapi.glBlendEquationSeparate(util::gl_blend_equation(_descriptor._blend_ops[0]._rgb_equation),
                                           util::gl_blend_equation(_descriptor._blend_ops[0]._alpha_equation));
             glapi.glBlendFuncSeparate(util::gl_blend_func(_descriptor._blend_ops[0]._src_rgb_func),
@@ -304,7 +304,7 @@ void
 blend_state::force_apply(const render_context& in_context,
                          const blend_ops&      in_blend_ops) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (in_blend_ops._enabled) {
         glapi.glEnable(GL_BLEND);
@@ -329,7 +329,7 @@ blend_state::force_apply_i(const render_context& in_context,
                            unsigned              in_index,
                            const blend_ops&      in_blend_ops) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (in_blend_ops._enabled) {
         glapi.glEnablei(GL_BLEND, in_index);
@@ -341,7 +341,7 @@ blend_state::force_apply_i(const render_context& in_context,
     glapi.glColorMaski(in_index, util::masked(in_blend_ops._write_mask, COLOR_RED),  util::masked(in_blend_ops._write_mask, COLOR_GREEN),
                                  util::masked(in_blend_ops._write_mask, COLOR_BLUE), util::masked(in_blend_ops._write_mask, COLOR_ALPHA));
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
                                                  util::gl_blend_equation(in_blend_ops._alpha_equation));
         glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),
@@ -356,7 +356,7 @@ blend_state::checked_apply(const render_context& in_context,
                            const blend_ops&      in_blend_ops,
                            const blend_ops&      in_applied_blend_ops) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (in_blend_ops._enabled != in_applied_blend_ops._enabled) {
         if (in_blend_ops._enabled) {
@@ -384,7 +384,7 @@ blend_state::checked_apply_i(const render_context& in_context,
                              const blend_ops&      in_blend_ops,
                              const blend_ops&      in_applied_blend_ops) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (in_blend_ops._enabled != in_applied_blend_ops._enabled) {
         if (in_blend_ops._enabled) {
@@ -398,7 +398,7 @@ blend_state::checked_apply_i(const render_context& in_context,
         glapi.glColorMaski(in_index, util::masked(in_blend_ops._write_mask, COLOR_RED),  util::masked(in_blend_ops._write_mask, COLOR_GREEN),
                                      util::masked(in_blend_ops._write_mask, COLOR_BLUE), util::masked(in_blend_ops._write_mask, COLOR_ALPHA));
     }
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         glapi.glBlendEquationSeparatei(in_index, util::gl_blend_equation(in_blend_ops._rgb_equation),
                                                  util::gl_blend_equation(in_blend_ops._alpha_equation));
         glapi.glBlendFuncSeparatei(in_index, util::gl_blend_func(in_blend_ops._src_rgb_func),   util::gl_blend_func(in_blend_ops._dst_rgb_func),

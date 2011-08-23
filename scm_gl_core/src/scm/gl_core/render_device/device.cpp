@@ -20,7 +20,7 @@
 #include <scm/gl_core/frame_buffer_objects.h>
 #include <scm/gl_core/query_objects.h>
 #include <scm/gl_core/render_device/context.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 #include <scm/gl_core/shader_objects/program.h>
@@ -36,25 +36,25 @@ namespace gl {
 
 render_device::render_device()
 {
-    _opengl3_api_core.reset(new opengl::gl3_core());
+    _opengl_api_core.reset(new opengl::gl_core());
 
-    if (!_opengl3_api_core->initialize()) {
+    if (!_opengl_api_core->initialize()) {
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core.";
         glerr() << log::fatal << s.str() << log::end;
         throw(std::runtime_error(s.str()));
     }
-    unsigned req_version_major = SCM_GL_CORE_BASE_OPENGL_VERSION / 100;
-    unsigned req_version_minor = (SCM_GL_CORE_BASE_OPENGL_VERSION - req_version_major * 100) / 10;
+    unsigned req_version_major = SCM_GL_CORE_OPENGL_CORE_VERSION / 100;
+    unsigned req_version_minor = (SCM_GL_CORE_OPENGL_CORE_VERSION - req_version_major * 100) / 10;
 
-    if (!_opengl3_api_core->version_supported(req_version_major, req_version_minor)) {
+    if (!_opengl_api_core->version_supported(req_version_major, req_version_minor)) {
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core "
           << "(at least OpenGL "
           << req_version_major << "." << req_version_minor
           << " requiered, encountered version "
-          << _opengl3_api_core->context_information()._version_major << "."
-          << _opengl3_api_core->context_information()._version_minor << ").";
+          << _opengl_api_core->context_information()._version_major << "."
+          << _opengl_api_core->context_information()._version_minor << ").";
         glerr() << log::fatal << s.str() << log::end;
         throw(std::runtime_error(s.str()));
     }
@@ -63,13 +63,13 @@ render_device::render_device()
                 << "scm_gl_core OpenGL "
                 << req_version_major << "." << req_version_minor
                 << " support enabled on "
-                << _opengl3_api_core->context_information()._version_major << "."
-                << _opengl3_api_core->context_information()._version_minor
+                << _opengl_api_core->context_information()._version_major << "."
+                << _opengl_api_core->context_information()._version_minor
                 << " context." << log::end;
     }
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
-    if (!_opengl3_api_core->is_supported("GL_EXT_direct_state_access")) {
+    if (!_opengl_api_core->is_supported("GL_EXT_direct_state_access")) {
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core "
           << "(missing requiered extension GL_EXT_direct_state_access).";
@@ -101,10 +101,10 @@ render_device::~render_device()
     assert(0 == _registered_resources.size());
 }
 
-const opengl::gl3_core&
-render_device::opengl3_api() const
+const opengl::gl_core&
+render_device::opengl_api() const
 {
-    return (*_opengl3_api_core);
+    return (*_opengl_api_core);
 }
 
 render_context_ptr
@@ -128,7 +128,7 @@ render_device::capabilities() const
 void
 render_device::init_capabilities()
 {
-    const opengl::gl3_core& glcore = opengl3_api();
+    const opengl::gl_core& glcore = opengl_api();
 
     glcore.glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,           &_capabilities._max_vertex_attributes);
     glcore.glGetIntegerv(GL_MAX_DRAW_BUFFERS,             &_capabilities._max_draw_buffers);
@@ -174,7 +174,7 @@ render_device::init_capabilities()
     assert(_capabilities._max_uniform_buffer_bindings > 0);
     assert(_capabilities._uniform_buffer_offset_alignment > 0);
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_410) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
         glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
     }
     else {
@@ -183,7 +183,7 @@ render_device::init_capabilities()
     assert(_capabilities._max_viewports > 0);
 
     glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS, &_capabilities._max_transform_feedback_separate_attribs);
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         glcore.glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &_capabilities._max_transform_feedback_buffers);
         glcore.glGetIntegerv(GL_MAX_VERTEX_STREAMS, &_capabilities._max_vertex_streams);
     }
@@ -195,7 +195,7 @@ render_device::init_capabilities()
     assert(_capabilities._max_transform_feedback_buffers > 0);
     assert(_capabilities._max_vertex_streams > 0);
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {
         glcore.glGetIntegerv(GL_MAX_IMAGE_UNITS, &_capabilities._max_image_units);
     }
     else if (glcore.extension_EXT_shader_image_load_store) {
@@ -412,7 +412,7 @@ bool
 render_device::add_include_string(const std::string& in_path,
                                   const std::string& in_source_string)
 {
-    const opengl::gl3_core& glcore = opengl3_api();
+    const opengl::gl_core& glcore = opengl_api();
     util::gl_error          glerror(glcore);
 
     if (!glcore.extension_ARB_shading_language_include) {
@@ -1071,37 +1071,37 @@ void
 render_device::print_device_informations(std::ostream& os) const
 {
     os << "OpenGL render device" << std::endl;
-    os << *_opengl3_api_core;
+    os << *_opengl_api_core;
 }
 const std::string
 render_device::device_vendor() const
 {
-    return _opengl3_api_core->context_information()._vendor;
+    return _opengl_api_core->context_information()._vendor;
 }
 
 const std::string
 render_device::device_renderer() const
 {
-    return _opengl3_api_core->context_information()._renderer;
+    return _opengl_api_core->context_information()._renderer;
 }
 
 const std::string
 render_device::device_shader_compiler() const
 {
-    return _opengl3_api_core->context_information()._glsl_version_info;
+    return _opengl_api_core->context_information()._glsl_version_info;
 }
 
 const std::string
 render_device::device_context_version() const
 {
     std::stringstream s;
-    s << _opengl3_api_core->context_information()._version_major << "." 
-      << _opengl3_api_core->context_information()._version_minor << "." 
-      << _opengl3_api_core->context_information()._version_release;
-    if (!_opengl3_api_core->context_information()._version_info.empty())
-         s << " " << _opengl3_api_core->context_information()._version_info;
-    if (!_opengl3_api_core->context_information()._profile_string.empty())
-         s << " " << _opengl3_api_core->context_information()._profile_string;
+    s << _opengl_api_core->context_information()._version_major << "." 
+      << _opengl_api_core->context_information()._version_minor << "." 
+      << _opengl_api_core->context_information()._version_release;
+    if (!_opengl_api_core->context_information()._version_info.empty())
+         s << " " << _opengl_api_core->context_information()._version_info;
+    if (!_opengl_api_core->context_information()._profile_string.empty())
+         s << " " << _opengl_api_core->context_information()._profile_string;
 
     return s.str();
 }

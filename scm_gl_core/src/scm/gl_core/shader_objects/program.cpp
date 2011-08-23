@@ -17,7 +17,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/context.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
@@ -40,7 +40,7 @@ program::program(render_device&              in_device,
   : render_device_child(in_device)
   , _rasterization_discard(in_rasterization_discard)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     _gl_program_obj = glapi.glCreateProgram();
@@ -99,7 +99,7 @@ program::program(render_device&              in_device,
 
 program::~program()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     // TODO detach all shaders and remove them from _shaders;
 
@@ -120,7 +120,7 @@ program::link(render_device& ren_dev)
 {
     assert(_gl_program_obj != 0);
 
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
     util::gl_error          glerror(glapi);
 
     int link_state  = 0;
@@ -158,7 +158,7 @@ program::bind(render_context& ren_ctx) const
     assert(_gl_program_obj != 0);
     assert(state().ok());
 
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     glapi.glUseProgram(_gl_program_obj);
 
@@ -172,7 +172,7 @@ program::bind_uniforms(render_context& ren_ctx) const
     assert(state().ok());
     //assert();
 
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     { // uniforms
         name_uniform_map::const_iterator u = _uniforms.begin();
@@ -236,13 +236,13 @@ program::apply_transform_feedback_varyings(render_device& in_device, const strea
 {
     assert(_gl_program_obj != 0);
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     int  max_stream_count    = 0;
 
     // error handling
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         // GL 4.0+
         max_stream_count = in_device.capabilities()._max_transform_feedback_buffers;
         if (in_capture.used_streams() > max_stream_count) {
@@ -297,7 +297,7 @@ program::apply_transform_feedback_varyings(render_device& in_device, const strea
     std::vector<std::string>    varying_names;
     varying_names.reserve(in_capture.captures_count() + max_stream_count);
     for (int stream = 0; stream < in_capture.used_streams(); ++stream) {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
             if (stream > 0 && in_capture.interleaved_streams()) {
                 varying_names.push_back(next_buffer_string);
             }
@@ -346,7 +346,7 @@ program::retrieve_attribute_information(render_device& in_device)
 {
     assert(_gl_program_obj != 0);
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     int act_attribs = 0;
@@ -406,7 +406,7 @@ program::retrieve_fragdata_information(render_device& in_device)
 {
     assert(_gl_program_obj != 0);
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     // TODO
@@ -419,7 +419,7 @@ program::retrieve_uniform_information(render_device& in_device)
 {
     assert(_gl_program_obj != 0);
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     { // uniform blocks
@@ -514,7 +514,7 @@ program::retrieve_uniform_information(render_device& in_device)
                         case GL_FLOAT_MAT2:             current_uniform.reset(new scm::gl::uniform_mat2f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_FLOAT_MAT3:             current_uniform.reset(new scm::gl::uniform_mat3f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_FLOAT_MAT4:             current_uniform.reset(new scm::gl::uniform_mat4f(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
-#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
                         case GL_DOUBLE:                 current_uniform.reset(new scm::gl::uniform_1d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_VEC2:            current_uniform.reset(new scm::gl::uniform_vec2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_VEC3:            current_uniform.reset(new scm::gl::uniform_vec3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
@@ -522,7 +522,7 @@ program::retrieve_uniform_information(render_device& in_device)
                         case GL_DOUBLE_MAT2:            current_uniform.reset(new scm::gl::uniform_mat2d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_MAT3:            current_uniform.reset(new scm::gl::uniform_mat3d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_DOUBLE_MAT4:            current_uniform.reset(new scm::gl::uniform_mat4d(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
-#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
                         case GL_INT:                    current_uniform.reset(new scm::gl::uniform_1i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_INT_VEC2:               current_uniform.reset(new scm::gl::uniform_vec2i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_INT_VEC3:               current_uniform.reset(new scm::gl::uniform_vec3i(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
@@ -549,7 +549,7 @@ program::retrieve_uniform_information(render_device& in_device)
             }
         }
     }
-#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
     { // subroutines
         for (int stge = 0; stge < SHADER_STAGE_COUNT; ++stge) {
             { // subrountine uniforms
@@ -679,7 +679,7 @@ program::retrieve_uniform_information(render_device& in_device)
 #endif
         }
     }
-#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
 
     gl_assert(glapi, leaving program::retrieve_uniform_information());
 }

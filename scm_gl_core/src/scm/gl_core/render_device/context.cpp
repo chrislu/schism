@@ -10,7 +10,7 @@
 #include <scm/gl_core/state_objects.h>
 #include <scm/gl_core/texture_objects.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
@@ -103,9 +103,9 @@ render_context::binding_state_type::binding_state_type()
 
 render_context::render_context(render_device& in_device)
   : render_device_child(in_device)
-  , _opengl_api_core(in_device.opengl3_api())
+  , _opengl_api_core(in_device.opengl_api())
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     _default_depth_stencil_state = in_device.create_depth_stencil_state(depth_stencil_state_desc());
     _default_depth_stencil_state->force_apply(*this, _current_state._stencil_ref_value);
@@ -148,7 +148,7 @@ render_context::~render_context()
     _default_depth_stencil_state.reset();
 }
 
-const opengl::gl3_core&
+const opengl::gl_core&
 render_context::opengl_api() const
 {
     return (_opengl_api_core);
@@ -246,7 +246,7 @@ render_context::sync()
 void
 render_context::register_debug_callback(const debug_output_ptr& f)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     //if (!glapi.is_supported("GL_ARB_debug_output")) {
     if (!glapi.extension_ARB_debug_output) {
@@ -283,7 +283,7 @@ render_context::register_debug_callback(const debug_output_ptr& f)
 void
 render_context::unregister_debug_callback(const debug_output_ptr& f)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     //if (!glapi.is_supported("GL_ARB_debug_output")) {
     if (!glapi.extension_ARB_debug_output) {
@@ -311,7 +311,7 @@ render_context::unregister_debug_callback(const debug_output_ptr& f)
 const std::string
 render_context::retrieve_debug_log() const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     // if (!glapi.is_supported("GL_ARB_debug_output")) {
     if (!glapi.extension_ARB_debug_output) {
@@ -359,7 +359,7 @@ render_context::synchronous_reporting(bool e)
     if (e != _debug_synchronous_reporting) {
         _debug_synchronous_reporting = e;
 
-        const opengl::gl3_core& glapi = opengl_api();
+        const opengl::gl_core& glapi = opengl_api();
         if (glapi.extension_ARB_debug_output) {
             if (_debug_synchronous_reporting) {
                 glapi.glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
@@ -615,8 +615,8 @@ render_context::active_transform_feedback() const
 void
 render_context::draw_transform_feedback(const primitive_topology in_topology, const transform_feedback_ptr& in_transform_feedback, int stream)
 {
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        const opengl::gl3_core& glapi = opengl_api();
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        const opengl::gl_core& glapi = opengl_api();
 
         // check if feedback object is currently active and give warning
         if (active_transform_feedback() == in_transform_feedback) {
@@ -655,7 +655,7 @@ render_context::draw_transform_feedback(const primitive_topology in_topology, co
 void
 render_context::draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (   (0 > in_first_index)
         || (0 > in_count)) {
@@ -674,7 +674,7 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
 void
 render_context::draw_elements(const int in_count, const int in_start_index, const int in_base_vertex)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (!util::is_vaild_index_type(_applied_state._index_buffer_binding._index_data_type)) {
         state().set(object_state::OS_ERROR_INVALID_ENUM);
@@ -704,7 +704,7 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
 void
 render_context::pre_draw_setup()
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     gl_assert(glapi, entering render_context::pre_draw());
     assert(state().ok());
@@ -715,7 +715,7 @@ render_context::pre_draw_setup()
         glapi.glEnable(GL_RASTERIZER_DISCARD);
     }
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         int patch_control_points = primitive_patch_control_points(_applied_state._index_buffer_binding._primitive_topology);
         if (0 != patch_control_points) {
             glapi.glPatchParameteri(GL_PATCH_VERTICES, patch_control_points);
@@ -730,7 +730,7 @@ render_context::pre_draw_setup()
 void
 render_context::post_draw_setup()
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     gl_assert(glapi, entering render_context::post_draw());
     
@@ -1072,7 +1072,7 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                    const unsigned          in_buffer,
                                    const math::vec4f&      in_clear_color) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
     if (1 == abops.size()) {
@@ -1112,7 +1112,7 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                    const unsigned          in_buffer,
                                    const math::vec4i&      in_clear_color) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
     if (1 == abops.size()) {
@@ -1152,7 +1152,7 @@ render_context::clear_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                    const unsigned          in_buffer,
                                    const math::vec4ui&     in_clear_color)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
     if (1 == abops.size()) {
@@ -1205,7 +1205,7 @@ void
 render_context::clear_color_buffers(const frame_buffer_ptr& in_frame_buffer,
                                     const math::vec4f&      in_clear_color) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     const blend_ops_array& abops = _applied_state._blend_state->descriptor()._blend_ops;
     if (1 == abops.size()) {
@@ -1243,7 +1243,7 @@ render_context::clear_depth_stencil_buffer(const frame_buffer_ptr& in_frame_buff
                                            const float             in_clear_depth,
                                            const int               in_clear_stencil) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (   (false == _applied_state._depth_stencil_state->_descriptor._depth_mask)
         || (0     == _applied_state._depth_stencil_state->_descriptor._stencil_wmask)) {
@@ -1266,7 +1266,7 @@ void
 render_context::clear_default_color_buffer(const frame_buffer_target in_target,
                                            const math::vec4f&        in_clear_color) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (_applied_state._draw_framebuffer) {
         _applied_state._draw_framebuffer->unbind(*this);
@@ -1327,7 +1327,7 @@ void
 render_context::clear_default_depth_stencil_buffer(const float in_clear_depth,
                                                    const int   in_clear_stencil) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (_applied_state._draw_framebuffer) {
         _applied_state._draw_framebuffer->unbind(*this);
@@ -1382,7 +1382,7 @@ void
 render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buffer,
                                             const frame_buffer_ptr& in_draw_buffer) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (_applied_state._draw_framebuffer != in_draw_buffer) {
         in_draw_buffer->apply_attachments(*this);
@@ -1427,7 +1427,7 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 void
 render_context::generate_mipmaps(const texture_image_ptr& in_texture) const
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     in_texture->generate_mipmaps(*this);
 
@@ -1442,7 +1442,7 @@ render_context::capture_color_buffer(const frame_buffer_ptr& in_frame_buffer,
                                      const buffer_ptr&       in_target_buffer,
                                      const size_t            in_offset)
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     in_frame_buffer->capture_color_buffer(*this, in_buffer, in_region, in_data_format, in_target_buffer, in_offset);
 
@@ -1452,7 +1452,7 @@ render_context::capture_color_buffer(const frame_buffer_ptr& in_frame_buffer,
 void
 render_context::apply_frame_buffer()
 {
-    const opengl::gl3_core& glapi = opengl_api();
+    const opengl::gl_core& glapi = opengl_api();
 
     if (_current_state._draw_framebuffer) {
         _current_state._draw_framebuffer->apply_attachments(*this);
@@ -1483,7 +1483,7 @@ render_context::apply_frame_buffer()
     }
 
     if (_current_state._viewports != _applied_state._viewports) {
-        if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_410) {
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
             using namespace scm::math;
             int vp_array_size = parent_device().capabilities()._max_viewports;
             scoped_array<vec4f> vp_array(new vec4f[vp_array_size]);

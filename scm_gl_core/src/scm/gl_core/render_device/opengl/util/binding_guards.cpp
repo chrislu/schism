@@ -2,7 +2,7 @@
 #include "binding_guards.h"
 
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
@@ -13,7 +13,7 @@ namespace gl {
 
 namespace util {
 
-texture_binding_guard::texture_binding_guard(const opengl::gl3_core& in_glapi,
+texture_binding_guard::texture_binding_guard(const opengl::gl_core& in_glapi,
                                              unsigned                in_target,
                                              unsigned                in_binding)
   : _save_active_texture_unit(0),
@@ -40,12 +40,12 @@ texture_binding_guard::~texture_binding_guard()
     gl_assert(_gl_api, leaving texture_binding_guard::~texture_binding_guard());
 }
 
-program_binding_guard::program_binding_guard(const opengl::gl3_core& in_glapi)
+program_binding_guard::program_binding_guard(const opengl::gl_core& in_glapi)
   : _gl_api(in_glapi)
 {
     gl_assert(_gl_api, entering program_binding_guard::program_binding_guard());
 
-    //if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_410) {
+    //if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
     //    _gl_api.glGetIntegerv(GL_ACTIVE_PROGRAM, &_active_program);
     //}
     //else {
@@ -64,7 +64,7 @@ program_binding_guard::~program_binding_guard()
     gl_assert(_gl_api, leaving program_binding_guard::~program_binding_guard());
 }
 
-buffer_binding_guard::buffer_binding_guard(const opengl::gl3_core& in_glapi,
+buffer_binding_guard::buffer_binding_guard(const opengl::gl_core& in_glapi,
                                            unsigned                in_target,
                                            unsigned                in_binding)
   : _binding(in_binding),
@@ -88,7 +88,7 @@ buffer_binding_guard::~buffer_binding_guard()
     gl_assert(_gl_api, leaving buffer_binding_guard::~buffer_binding_guard());
 }
 
-vertex_array_binding_guard::vertex_array_binding_guard(const opengl::gl3_core& in_glapi)
+vertex_array_binding_guard::vertex_array_binding_guard(const opengl::gl_core& in_glapi)
   : _gl_api(in_glapi),
     _save(0)
 {
@@ -108,7 +108,7 @@ vertex_array_binding_guard::~vertex_array_binding_guard()
     gl_assert(_gl_api, leaving vertex_array_binding_guard::~vertex_array_binding_guard());
 }
 
-framebuffer_binding_guard::framebuffer_binding_guard(const opengl::gl3_core& in_glapi,
+framebuffer_binding_guard::framebuffer_binding_guard(const opengl::gl_core& in_glapi,
                                                      unsigned                in_target,
                                                      unsigned                in_binding)
   : _gl_api(in_glapi),
@@ -134,7 +134,7 @@ framebuffer_binding_guard::~framebuffer_binding_guard()
 
 }
 
-transform_feedback_binding_guard::transform_feedback_binding_guard(const opengl::gl3_core& in_glapi,
+transform_feedback_binding_guard::transform_feedback_binding_guard(const opengl::gl_core& in_glapi,
                                                                    unsigned                in_target,
                                                                    unsigned                in_binding)
   : _gl_api(in_glapi)

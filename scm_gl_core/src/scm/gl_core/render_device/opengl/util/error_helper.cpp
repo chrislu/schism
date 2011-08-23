@@ -2,13 +2,13 @@
 #include "error_helper.h"
 
 #include <scm/gl_core/object_state.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 
 namespace scm {
 namespace gl {
 namespace util {
 
-gl_error::gl_error(const opengl::gl3_core& glcore)
+gl_error::gl_error(const opengl::gl_core& glcore)
   : _glcore(glcore)
 {
 }

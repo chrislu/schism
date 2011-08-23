@@ -25,7 +25,7 @@ namespace scm {
 namespace gl {
 
 namespace opengl {
-class gl3_core;
+class gl_core;
 } // namespace opengl
 
 class __scm_export(gl_core) render_context : public render_device_child
@@ -101,7 +101,7 @@ private:
 public:
     virtual ~render_context();
 
-    const opengl::gl3_core&     opengl_api() const;
+    const opengl::gl_core&     opengl_api() const;
     void                        apply();
 
     void                        reset();
@@ -301,7 +301,7 @@ protected:
     render_context(render_device& in_device);
 
 private:
-    const opengl::gl3_core&     _opengl_api_core;
+    const opengl::gl_core&     _opengl_api_core;
 
     binding_state_type          _current_state;
     binding_state_type          _applied_state;

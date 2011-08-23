@@ -19,14 +19,14 @@ size_of_type(data_type d)
         sizeof(float) * 2 * 3, sizeof(float) * 2 * 4, sizeof(float) * 3 * 2,
         sizeof(float) * 3 * 4, sizeof(float) * 4 * 2, sizeof(float) * 4 * 3,
 
-#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
         // double
         sizeof(double), sizeof(double) * 2, sizeof(double) * 3, sizeof(double) * 4,
         // matrices
         sizeof(double) * 4, sizeof(double) * 9, sizeof(double) * 16,
         sizeof(double) * 2 * 3, sizeof(double) * 2 * 4, sizeof(double) * 3 * 2,
         sizeof(double) * 3 * 4, sizeof(double) * 4 * 2, sizeof(double) * 4 * 3,
-#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
         // int
         sizeof(int), sizeof(int) * 2, sizeof(int) * 3, sizeof(int) * 4,
         // unsigned int
@@ -60,14 +60,14 @@ components(data_type d)
         4, 9, 16,
         2 * 3, 2 * 4, 3 * 2,
         3 * 4, 4 * 2, 4 * 3,
-#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
         // double
         1, 2, 3, 4,
         // matrices
         4, 9, 16,
         2 * 3, 2 * 4, 3 * 2,
         3 * 4, 4 * 2, 4 * 3,
-#endif // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
         // int
         1, 2, 3, 4,
         // unsigned int
@@ -100,11 +100,11 @@ inline
 bool is_float_type(data_type d)
 {
     assert(TYPE_UNKNOWN <= d && d < TYPE_COUNT);
-#if SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
     return (TYPE_FLOAT <= d && d <= TYPE_MAT4X3D);
-#else // SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#else // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
     return (TYPE_FLOAT <= d && d <= TYPE_MAT4X3F);
-#endif //SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400
+#endif //SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
 }
 
 } // namespace gl

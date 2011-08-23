@@ -12,7 +12,7 @@ namespace gl {
 
 namespace opengl {
 
-class gl3_core;
+class gl_core;
 
 } // namespace opengl
 
@@ -21,10 +21,10 @@ namespace util {
 class __scm_export(gl_core) gl_error
 {
     mutable unsigned        _error;
-    const opengl::gl3_core& _glcore;
+    const opengl::gl_core& _glcore;
 
 public:
-    gl_error(const opengl::gl3_core& glcore);
+    gl_error(const opengl::gl_core& glcore);
 
 
     operator bool() const;

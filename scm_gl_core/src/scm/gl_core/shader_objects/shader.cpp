@@ -13,7 +13,7 @@
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -69,7 +69,7 @@ shader::shader(render_device&                  ren_dev,
     _type(in_type),
     _gl_shader_obj(0)
 {
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
     util::gl_error          glerror(glapi);
 
     _gl_shader_obj = glapi.glCreateShader(util::gl_shader_types(in_type));
@@ -91,7 +91,7 @@ shader::shader(render_device&                  ren_dev,
 
 shader::~shader()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != _gl_shader_obj);
     glapi.glDeleteShader(_gl_shader_obj);
@@ -127,7 +127,7 @@ shader::preprocess_source_string(      render_device&      ren_dev,
                               >>   *_s >> !((version_line_open_mlo = "/*") >> -*_ >> !(version_line_open_mlc = "*/") >> *_s);
 
     std::string         src_name = (    in_src_name.empty()
-                                    || !ren_dev.opengl3_api().extension_ARB_shading_language_include
+                                    || !ren_dev.opengl_api().extension_ARB_shading_language_include
                                     ? "0"
                                     : in_src_name);
 
@@ -203,7 +203,7 @@ shader::compile_source_string(      render_device&            ren_dev,
                               const std::string&              in_src,
                               const shader_include_path_list& in_inc_paths)
 {
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
     util::gl_error          glerror(glapi);
 
     const char* source_string = in_src.c_str();                                                                         gl_assert(glapi, shader::compile_source_string() before glShaderSource);

@@ -10,7 +10,7 @@
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/frame_buffer_objects/render_buffer.h>
 #include <scm/gl_core/frame_buffer_objects/render_target.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
@@ -49,7 +49,7 @@ frame_buffer::frame_buffer(render_device& in_device)
     _current_gl_binding(0),
     _attachments_dirty(true)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
 
     glapi.glGenFramebuffers(1, &(context_bindable_object::_gl_object_id));
     if (0 == object_id()) {
@@ -70,7 +70,7 @@ frame_buffer::frame_buffer(render_device& in_device)
 
 frame_buffer::~frame_buffer()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != object_id());
     glapi.glDeleteFramebuffers(1, &(context_bindable_object::_gl_object_id));
@@ -135,7 +135,7 @@ frame_buffer::drawable_region() const
 void
 frame_buffer::bind(const render_context& in_context, frame_buffer_binding in_binding) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
 
     _current_gl_binding = util::gl_framebuffer_binding(in_binding);
@@ -147,7 +147,7 @@ frame_buffer::bind(const render_context& in_context, frame_buffer_binding in_bin
 void
 frame_buffer::unbind(const render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(0 != _current_gl_binding);
 
@@ -165,7 +165,7 @@ frame_buffer::clear_color_buffer(const  render_context& in_context,
                                  const unsigned         in_buffer,
                                  const math::vec4f&     in_clear_color)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(in_buffer < _draw_buffers.size());
     
@@ -188,7 +188,7 @@ frame_buffer::clear_color_buffer(const  render_context& in_context,
                                  const unsigned         in_buffer,
                                  const math::vec4i&     in_clear_color)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(in_buffer < _draw_buffers.size());
     
@@ -211,7 +211,7 @@ frame_buffer::clear_color_buffer(const  render_context& in_context,
                                  const unsigned         in_buffer,
                                  const math::vec4ui&    in_clear_color)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(in_buffer < _draw_buffers.size());
     
@@ -233,7 +233,7 @@ void
 frame_buffer::clear_color_buffers(const  render_context& in_context,
                                   const math::vec4f&     in_clear_color)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     
     {
@@ -258,7 +258,7 @@ frame_buffer::clear_depth_stencil_buffer(const  render_context& in_context,
                                          const float            in_clear_depth,
                                          const int              in_clear_stencil)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     
     {
@@ -295,7 +295,7 @@ frame_buffer::capture_color_buffer(      render_context& in_context,
                                    const buffer_ptr&     in_target_buffer,
                                    const size_t          in_offset)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     
     {
@@ -342,7 +342,7 @@ frame_buffer::capture_color_buffer(      render_context& in_context,
 bool
 frame_buffer::check_completeness(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     unsigned status = 0;
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
@@ -395,7 +395,7 @@ frame_buffer::check_completeness(const render_context& in_context)
 void
 frame_buffer::apply_attachments(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (_attachments_dirty) {
 
@@ -475,7 +475,7 @@ frame_buffer::apply_attachments(const render_context& in_context)
 void
 frame_buffer::apply_attachment(const render_context& in_context, unsigned in_attach_point, const attachment& in_attachment)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (GL_RENDERBUFFER == in_attachment._target->object_target()) {
         if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
@@ -532,7 +532,7 @@ frame_buffer::apply_attachment(const render_context& in_context, unsigned in_att
 void
 frame_buffer::clear_attachment(const render_context& in_context, unsigned in_attach_point)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
         glapi.glNamedFramebufferRenderbufferEXT(object_id(), in_attach_point, GL_RENDERBUFFER, 0);

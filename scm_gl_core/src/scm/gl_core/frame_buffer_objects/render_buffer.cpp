@@ -6,7 +6,7 @@
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
@@ -47,7 +47,7 @@ render_buffer::render_buffer(render_device&            in_device,
   , render_device_resource(in_device)
   , _descriptor(in_desc)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     glapi.glGenRenderbuffers(1, &(context_bindable_object::_gl_object_id));
@@ -107,7 +107,7 @@ render_buffer::render_buffer(render_device&            in_device,
 
 render_buffer::~render_buffer()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != object_id());
     glapi.glDeleteRenderbuffers(1, &(context_bindable_object::_gl_object_id));

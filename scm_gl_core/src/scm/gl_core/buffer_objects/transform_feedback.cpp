@@ -8,7 +8,7 @@
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
@@ -101,8 +101,8 @@ transform_feedback::transform_feedback(      render_device&         in_device,
   , _active(false)
   , _captured_topology(PRIMITIVE_POINTS)
 {
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        const opengl::gl3_core& glapi = in_device.opengl3_api();
+    if (SCM_GL_CORE_OPENGL_TYPE >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        const opengl::gl_core& glapi = in_device.opengl_api();
         util::gl_error          glerror(glapi);
 
         glapi.glGenTransformFeedbacks(1, &(context_bindable_object::_gl_object_id));
@@ -123,8 +123,8 @@ transform_feedback::transform_feedback(      render_device&         in_device,
 
 transform_feedback::~transform_feedback()
 {
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    if (SCM_GL_CORE_OPENGL_TYPE >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        const opengl::gl_core& glapi = parent_device().opengl_api();
 
         assert(0 != object_id());
         glapi.glDeleteTransformFeedbacks(1, &(context_bindable_object::_gl_object_id));
@@ -169,10 +169,10 @@ transform_feedback::bind(render_context& in_context) const
 {
     assert(state().ok());
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         assert(object_id() != 0);
 
-        const opengl::gl3_core& glapi = in_context.opengl_api();
+        const opengl::gl_core& glapi = in_context.opengl_api();
         
         glapi.glBindTransformFeedback(object_target(), object_id());
         
@@ -190,10 +190,10 @@ transform_feedback::unbind(render_context& in_context) const
 {
     assert(state().ok());
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         assert(object_id() != 0);
 
-        const opengl::gl3_core& glapi = in_context.opengl_api();
+        const opengl::gl_core& glapi = in_context.opengl_api();
 
         glapi.glBindTransformFeedback(object_target(), 0);
 
@@ -212,7 +212,7 @@ transform_feedback::begin(render_context& in_context, primitive_type in_topology
     assert(state().ok());
     gl_assert(in_context.opengl_api(), entering transform_feedback:begin());
 
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     bind(in_context);
     if (!active()) {
@@ -232,7 +232,7 @@ transform_feedback::end(render_context& in_context)
     assert(state().ok());
     gl_assert(in_context.opengl_api(), entering transform_feedback:end());
 
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (active()) {
         glapi.glEndTransformFeedback();
@@ -252,7 +252,7 @@ transform_feedback::initialize_transform_feedback_object(const render_device& in
         return false;
     }
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
         // GL4.x MAX_TRANSFORM_FEEDBACK_BUFFERS
         if (_stream_out_setup.used_streams() > in_device.capabilities()._max_transform_feedback_buffers) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
@@ -269,8 +269,8 @@ transform_feedback::initialize_transform_feedback_object(const render_device& in
 
     const render_context_ptr    context = in_device.main_context();
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_400) {
-        const opengl::gl3_core& glapi = in_device.opengl3_api();
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        const opengl::gl_core& glapi = in_device.opengl_api();
         util::gl_error          glerror(glapi);
 
         util::transform_feedback_binding_guard guard(glapi, object_target(), object_binding());
@@ -291,7 +291,7 @@ transform_feedback::initialize_transform_feedback_object(const render_device& in
 void
 transform_feedback::bind_stream_out_buffers(render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     for (int bind_index = 0; bind_index < _stream_out_setup.used_streams(); ++bind_index) {
         const buffer_ptr& cur_buffer = _stream_out_setup[bind_index].first;
@@ -307,7 +307,7 @@ transform_feedback::bind_stream_out_buffers(render_context& in_context) const
 void
 transform_feedback::unbind_stream_out_buffers(render_context& in_context) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     for (int bind_index = 0; bind_index < _stream_out_setup.used_streams(); ++bind_index) {
         const buffer_ptr& cur_buffer = _stream_out_setup[bind_index].first;

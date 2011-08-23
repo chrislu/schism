@@ -8,7 +8,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -85,7 +85,7 @@ rasterizer_state::apply(const render_context&   in_context,
                         const float             in_applied_line_width,
                         const float             in_applied_point_size) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     if (_descriptor._fill_mode != in_applied_state._descriptor._fill_mode) {
         glapi.glPolygonMode(GL_FRONT_AND_BACK, util::gl_fill_mode(_descriptor._fill_mode));
@@ -161,7 +161,7 @@ rasterizer_state::force_apply(const render_context&   in_context,
                               const float             in_line_width,
                               const float             in_point_size) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     glapi.glPolygonMode(GL_FRONT_AND_BACK, util::gl_fill_mode(_descriptor._fill_mode));
     gl_assert(glapi, rasterizer_state::force_apply() after glPolygonMode);

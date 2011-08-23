@@ -1,6 +1,6 @@
 
-#ifndef SCM_GL_CORE_OPENGL_DETAIL_GL3_CORE_H_INCLUDED
-#define SCM_GL_CORE_OPENGL_DETAIL_GL3_CORE_H_INCLUDED
+#ifndef SCM_GL_CORE_OPENGL_DETAIL_GL_CORE_H_INCLUDED
+#define SCM_GL_CORE_OPENGL_DETAIL_GL_CORE_H_INCLUDED
 
 #include <set>
 #include <string>
@@ -20,7 +20,7 @@ namespace scm {
 namespace gl {
 namespace opengl {
 
-class gl3_core
+class gl_core
 {
 public:
     struct context_info {
@@ -56,7 +56,7 @@ private:
     typedef std::set<std::string>   string_set;
 
 public:
-    gl3_core();
+    gl_core();
 
     bool                    initialize();
     const context_info&     context_information() const;
@@ -72,7 +72,7 @@ private:
     bool            _initialized;
     context_info    _context_info;
 
-    friend std::ostream& operator<<(std::ostream& out_stream, const gl3_core& c);
+    friend std::ostream& operator<<(std::ostream& out_stream, const gl_core& c);
 
 public:
     bool version_1_0_available;
@@ -98,6 +98,8 @@ public:
     bool extension_ARB_robustness;
     bool extension_EXT_shader_image_load_store;
     bool extension_EXT_direct_state_access_available;
+    bool extension_EXT_texture_compression_s3tc;
+    bool extension_ARB_texture_compression_bptc;
 
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
     PFNGLCULLFACEPROC                               glCullFace;
@@ -820,10 +822,10 @@ public:
     PFNGLNAMEDFRAMEBUFFERTEXTUREEXTPROC                     glNamedFramebufferTextureEXT;
     PFNGLNAMEDFRAMEBUFFERTEXTURELAYEREXTPROC                glNamedFramebufferTextureLayerEXT;
 
-}; // class gl3_core
+}; // class gl_core
 
 } // namespace opengl
 } // namespace gl
 } // namespace scm
 
-#endif // SCM_GL_CORE_OPENGL_DETAIL_GL3_CORE_H_INCLUDED
+#endif // SCM_GL_CORE_OPENGL_DETAIL_GL_CORE_H_INCLUDED

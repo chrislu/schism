@@ -1,7 +1,9 @@
 
 #include <cassert>
 
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <boost/static_assert.hpp>
+
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 
 namespace scm {
 namespace gl {
@@ -89,6 +91,22 @@ gl_internal_format(const data_format d)
         GL_RGB9_E5,     // FORMAT_RGB9_E5,
         GL_R11F_G11F_B10F,// FORMAT_R11B11G10F,
 
+        // compressed formats
+        GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,           //FORMAT_BC1_RGBA,        // DXT1
+        GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,     //FORMAT_BC1_SRGBA,       // DXT1
+        GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,           //FORMAT_BC2_RGBA,        // DXT3
+        GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,     //FORMAT_BC2_SRGBA,       // DXT3
+        GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,           //FORMAT_BC3_RGBA,        // DXT5
+        GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,     //FORMAT_BC3_SRGBA,       // DXT5
+        GL_COMPRESSED_RED_RGTC1,                    //FORMAT_BC4_R,           // RGTC1
+        GL_COMPRESSED_SIGNED_RED_RGTC1,             //FORMAT_BC4_R_S,         // RGTC1
+        GL_COMPRESSED_RG_RGTC2,                     //FORMAT_BC5_RG,          // RGTC2
+        GL_COMPRESSED_SIGNED_RG_RGTC2,              //FORMAT_BC5_RG_S,        // RGTC2
+        GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,    //FORMAT_BC6H_RGB_F,      // BPTC
+        GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB,  //FORMAT_BC6H_RGB_UF,     // BPTC
+        GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,          //FORMAT_BC7_RGBA,        // BPTC
+        GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB,    //FORMAT_BC8_SRGBA,       // BPTC
+
         // depth stencil formats
         GL_DEPTH_COMPONENT16, // FORMAT_D16,
         GL_DEPTH_COMPONENT24, // FORMAT_D24,
@@ -98,10 +116,11 @@ gl_internal_format(const data_format d)
         GL_DEPTH32F_STENCIL8 // FORMAT_D32F_S8,
     };
 
-    assert((sizeof(gl_int_fmts) / sizeof(unsigned)) == FORMAT_COUNT);
+    BOOST_STATIC_ASSERT((sizeof(gl_int_fmts) / sizeof(unsigned)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
 
-    return (gl_int_fmts[d]);
+    return gl_int_fmts[d];
 }
 
 inline
@@ -186,6 +205,22 @@ gl_base_format(const data_format d)
         GL_RGB,         // FORMAT_RGB9_E5,
         GL_RGB,         // FORMAT_R11B11G10F,
 
+        // compressed formats
+        GL_RGBA,        //FORMAT_BC1_RGBA,        // DXT1
+        GL_RGBA,        //FORMAT_BC1_SRGBA,       // DXT1
+        GL_RGBA,        //FORMAT_BC2_RGBA,        // DXT3
+        GL_RGBA,        //FORMAT_BC2_SRGBA,       // DXT3
+        GL_RGBA,        //FORMAT_BC3_RGBA,        // DXT5
+        GL_RGBA,        //FORMAT_BC3_SRGBA,       // DXT5
+        GL_RED,         //FORMAT_BC4_R,           // RGTC1
+        GL_RED,         //FORMAT_BC4_R_S,         // RGTC1
+        GL_RG,          //FORMAT_BC5_RG,          // RGTC2
+        GL_RG,          //FORMAT_BC5_RG_S,        // RGTC2
+        GL_RGB,         //FORMAT_BC6H_RGB_F,      // BPTC
+        GL_RGB,         //FORMAT_BC6H_RGB_UF,     // BPTC
+        GL_RGBA,        //FORMAT_BC7_RGBA,        // BPTC
+        GL_RGBA,        //FORMAT_BC7_SRGBA,       // BPTC
+
         // depth stencil formats
         GL_DEPTH_COMPONENT, // FORMAT_D16,
         GL_DEPTH_COMPONENT, // FORMAT_D24,
@@ -195,10 +230,11 @@ gl_base_format(const data_format d)
         GL_DEPTH_STENCIL // FORMAT_D32F_S8,
     };
 
-    assert((sizeof(gl_int_bfmts) / sizeof(unsigned)) == FORMAT_COUNT);
+    BOOST_STATIC_ASSERT((sizeof(gl_int_bfmts) / sizeof(unsigned)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
 
-    return (gl_int_bfmts[d]);
+    return gl_int_bfmts[d];
 }
 
 inline
@@ -283,6 +319,22 @@ gl_base_type(const data_format d)
         GL_FLOAT,     // FORMAT_RGB9_E5,
         GL_FLOAT,// FORMAT_R11B11G10F,
 
+        // compressed formats
+        GL_UNSIGNED_BYTE,   //FORMAT_BC1_RGBA,        // DXT1
+        GL_UNSIGNED_BYTE,   //FORMAT_BC1_SRGBA,       // DXT1
+        GL_UNSIGNED_BYTE,   //FORMAT_BC2_RGBA,        // DXT3
+        GL_UNSIGNED_BYTE,   //FORMAT_BC2_SRGBA,       // DXT3
+        GL_UNSIGNED_BYTE,   //FORMAT_BC3_RGBA,        // DXT5
+        GL_UNSIGNED_BYTE,   //FORMAT_BC3_SRGBA,       // DXT5
+        GL_UNSIGNED_BYTE,   //FORMAT_BC4_R,           // RGTC1
+        GL_UNSIGNED_BYTE,   //FORMAT_BC4_R_S,         // RGTC1
+        GL_UNSIGNED_BYTE,   //FORMAT_BC5_RG,          // RGTC2
+        GL_UNSIGNED_BYTE,   //FORMAT_BC5_RG_S,        // RGTC2
+        GL_FLOAT,           // FORMAT_BC6H_RGB_F,      // BPTC
+        GL_FLOAT,           // FORMAT_BC6H_RGB_UF,     // BPTC
+        GL_UNSIGNED_BYTE,   //FORMAT_BC7_RGBA,        // BPTC
+        GL_UNSIGNED_BYTE,   //FORMAT_BC7_SRGBA,       // BPTC
+
         // depth stencil formats
         GL_UNSIGNED_SHORT, // FORMAT_D16,
         GL_UNSIGNED_INT, // FORMAT_D24,
@@ -292,10 +344,11 @@ gl_base_type(const data_format d)
         GL_FLOAT_32_UNSIGNED_INT_24_8_REV// FORMAT_D32F_S8,
     };
 
-    assert((sizeof(gl_btypes) / sizeof(unsigned)) == FORMAT_COUNT);
+    BOOST_STATIC_ASSERT((sizeof(gl_btypes) / sizeof(unsigned)) == FORMAT_COUNT);
+
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
 
-    return (gl_btypes[d]);
+    return gl_btypes[d];
 }
 
 } // namespace util

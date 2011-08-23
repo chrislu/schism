@@ -40,7 +40,7 @@ enum data_format {
     FORMAT_SRGB_8,
     FORMAT_SRGBA_8,
 
-    // unnormalized integer formats (UNORM)
+    // unnormalized integer formats
     FORMAT_R_8I,
     FORMAT_RG_8I,
     FORMAT_RGB_8I,
@@ -86,6 +86,22 @@ enum data_format {
     FORMAT_RGB9_E5,
     FORMAT_R11B11G10F,
 
+    // compressed formats
+    FORMAT_BC1_RGBA,        // DXT1
+    FORMAT_BC1_SRGBA,       // DXT1
+    FORMAT_BC2_RGBA,        // DXT3
+    FORMAT_BC2_SRGBA,       // DXT3
+    FORMAT_BC3_RGBA,        // DXT5
+    FORMAT_BC3_SRGBA,       // DXT5
+    FORMAT_BC4_R,           // RGTC1
+    FORMAT_BC4_R_S,         // RGTC1
+    FORMAT_BC5_RG,          // RGTC2
+    FORMAT_BC5_RG_S,        // RGTC2
+    FORMAT_BC6H_RGB_F,      // BPTC
+    FORMAT_BC6H_RGB_UF,     // BPTC
+    FORMAT_BC7_RGBA,        // BPTC
+    FORMAT_BC7_SRGBA,       // BPTC
+
     // depth stencil formats
     FORMAT_D16,
     FORMAT_D24,
@@ -110,6 +126,8 @@ bool is_packed_format(data_format d);
 bool is_plain_format(data_format d);
 
 bool is_srgb_format(data_format d);
+
+bool is_compressed_format(data_format d);
 
 int channel_count(data_format d);
 int size_of_channel(data_format d);

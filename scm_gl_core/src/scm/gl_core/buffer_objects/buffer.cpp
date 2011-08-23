@@ -7,7 +7,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
@@ -26,7 +26,7 @@ buffer::buffer(render_device&     ren_dev,
     _mapped_interval_offset(0),
     _mapped_interval_length(0)
 {
-    const opengl::gl3_core& glapi = ren_dev.opengl3_api();
+    const opengl::gl_core& glapi = ren_dev.opengl_api();
 
     glapi.glGenBuffers(1, &(context_bindable_object::_gl_object_id));
     if (0 == object_id()) {
@@ -42,7 +42,7 @@ buffer::buffer(render_device&     ren_dev,
 
 buffer::~buffer()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != object_id());
     glapi.glDeleteBuffers(1, &(context_bindable_object::_gl_object_id));
@@ -53,7 +53,7 @@ buffer::~buffer()
 void
 buffer::bind(render_context& ren_ctx, buffer_binding target) const
 {
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     gl_assert(glapi, entering buffer::bind());
 
@@ -68,7 +68,7 @@ buffer::bind(render_context& ren_ctx, buffer_binding target) const
 void
 buffer::unbind(render_context& ren_ctx, buffer_binding target) const
 {
-    const opengl::gl3_core& glapi = ren_ctx.opengl_api();
+    const opengl::gl_core& glapi = ren_ctx.opengl_api();
 
     gl_assert(glapi, entering buffer::unbind());
 
@@ -84,7 +84,7 @@ buffer::bind_range(render_context&   in_context,
                    const scm::size_t in_offset,
                    const scm::size_t in_size)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     gl_assert(glapi, entering buffer::bind_range());
 
@@ -115,7 +115,7 @@ buffer::unbind_range(render_context&   in_context,
                      buffer_binding    in_target,
                      const unsigned    in_index)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     gl_assert(glapi, entering buffer::unbind_range());
 
@@ -140,7 +140,7 @@ buffer::map_range(const render_context& in_context,
                   scm::size_t           in_size,
                   const access_mode   in_access)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     gl_assert(glapi, entering buffer::map_range());
 
@@ -188,7 +188,7 @@ buffer::map_range(const render_context& in_context,
 bool
 buffer::unmap(const render_context& in_context)
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     gl_assert(glapi, entering buffer::unmap());
 
@@ -226,7 +226,7 @@ buffer::buffer_data(const render_device& ren_dev,
                     const buffer_desc&   in_desc,
                     const void*          initial_data)
 {
-    const opengl::gl3_core& glcore = ren_dev.opengl3_api();
+    const opengl::gl_core& glcore = ren_dev.opengl_api();
 
     gl_assert(glcore, entering buffer::buffer_data());
 
@@ -270,7 +270,7 @@ buffer::buffer_sub_data(const render_device& ren_dev,
                         scm::size_t          size,
                         const void*          data)
 {
-    const opengl::gl3_core& glcore = ren_dev.opengl3_api();
+    const opengl::gl_core& glcore = ren_dev.opengl_api();
 
     gl_assert(glcore, entering buffer::buffer_sub_data());
 

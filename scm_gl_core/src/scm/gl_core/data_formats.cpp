@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <boost/static_assert.hpp>
+
 namespace  {
 
 const char* format_strings[] = {
@@ -28,6 +30,14 @@ const char* format_strings[] = {
     "R_32F", "RG_32F", "RGB_32F", "RGBA_32F",
     // special packed formats
     "RGB9_E5", "R11B11G10F",
+    // compressed formats
+    "BC1_RGBA", "BC1_SRGBA",
+    "BC2_RGBA", "BC2_SRGBA",
+    "BC3_RGBA", "BC3_SRGBA",
+    "BC4_R", "BC4_R_S",
+    "BC5_RG", "BC5_RG_S",
+    "BC6H_RGB_F", "BC6H_RGB_UF",
+    "BC7_RGBA", "BC7_SRGBA",
     // depth stencil formats
     "D16", "D24", "D32", "D32F", "D24_S8", "D32F_S8"
 };
@@ -39,8 +49,9 @@ namespace gl {
 
 const char* format_string(data_format d)
 {
+    BOOST_STATIC_ASSERT((sizeof(format_strings) / sizeof(const char*)) == FORMAT_COUNT);
     assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
-    return (format_strings[d]);
+    return format_strings[d];
 }
 
 } // namespace gl

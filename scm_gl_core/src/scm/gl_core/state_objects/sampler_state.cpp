@@ -6,7 +6,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
@@ -45,7 +45,7 @@ sampler_state::sampler_state(render_device&            in_device,
   , _descriptor(in_desc)
   , _gl_sampler_id(0)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
 
     glapi.glGenSamplers(1, &_gl_sampler_id);
     if (0 == _gl_sampler_id) {
@@ -76,7 +76,7 @@ sampler_state::sampler_state(render_device&            in_device,
 
 sampler_state::~sampler_state()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != _gl_sampler_id);
     glapi.glDeleteSamplers(1, &_gl_sampler_id);
@@ -100,7 +100,7 @@ void
 sampler_state::bind(const render_context&     in_context,
                     const int                 in_unit) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != sampler_id());
 
     glapi.glBindSampler(in_unit, sampler_id());
@@ -112,7 +112,7 @@ void
 sampler_state::unbind(const render_context& in_context,
                       const int             in_unit) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
 
     glapi.glBindSampler(in_unit, 0);
 

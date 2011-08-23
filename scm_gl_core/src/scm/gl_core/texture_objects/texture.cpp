@@ -5,7 +5,7 @@
 
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
@@ -22,7 +22,7 @@ texture::texture(render_device& in_device)
   : context_bindable_object()
   , render_device_resource(in_device)
 {
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
 
     glapi.glGenTextures(1, &(context_bindable_object::_gl_object_id));
     if (0 == _gl_object_id) {
@@ -34,7 +34,7 @@ texture::texture(render_device& in_device)
 
 texture::~texture()
 {
-    const opengl::gl3_core& glapi = parent_device().opengl3_api();
+    const opengl::gl_core& glapi = parent_device().opengl_api();
 
     assert(0 != _gl_object_id);
     glapi.glDeleteTextures(1, &(context_bindable_object::_gl_object_id));
@@ -45,7 +45,7 @@ texture::~texture()
 void
 texture::bind(const render_context& in_context, int in_unit) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
@@ -82,7 +82,7 @@ texture::bind(const render_context& in_context, int in_unit) const
 void
 texture::unbind(const render_context& in_context, int in_unit) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
@@ -109,13 +109,13 @@ texture::bind_image(const render_context& in_context,
                           int             in_level,
                           int             in_layer) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
     
     // TODO runtime checks for level and layer, maybe format compatibility
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {
         glapi.glBindImageTexture(in_unit, object_id(),
                                  in_level, (in_layer >= 0), in_layer >= 0 ? in_layer : 0,
                                  util::gl_image_access_mode(in_access),
@@ -136,12 +136,12 @@ texture::bind_image(const render_context& in_context,
 void
 texture::unbind_image(const render_context& in_context, int in_unit) const
 {
-    const opengl::gl3_core& glapi = in_context.opengl_api();
+    const opengl::gl_core& glapi = in_context.opengl_api();
     assert(0 != object_id());
     assert(0 != object_target());
     assert(0 != object_binding());
 
-    if (SCM_GL_CORE_BASE_OPENGL_VERSION >= SCM_GL_CORE_OPENGL_VERSION_420) {
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {
         glapi.glBindImageTexture(in_unit, 0,
                                  0, false, 0,
                                  GL_READ_WRITE,

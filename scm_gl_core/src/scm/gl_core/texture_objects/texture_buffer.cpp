@@ -5,7 +5,7 @@
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/buffer_objects.h>
 #include <scm/gl_core/render_device.h>
-#include <scm/gl_core/render_device/opengl/gl3_core.h>
+#include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
 #include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
@@ -45,7 +45,7 @@ texture_buffer::texture_buffer(render_device&             in_device,
 
     assert(state().ok());
 
-    const opengl::gl3_core& glapi = in_device.opengl3_api();
+    const opengl::gl_core& glapi = in_device.opengl_api();
     util::gl_error          glerror(glapi);
 
     if (SCM_GL_DEBUG) {
