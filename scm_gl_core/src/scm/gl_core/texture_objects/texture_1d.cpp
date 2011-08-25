@@ -118,7 +118,7 @@ texture_1d::allocate_storage(const render_device&      in_device,
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
 
         if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) { // false) { //BUG r280 
-            glerr() << "storage" << log::end;
+            //glerr() << "storage" << log::end;
             if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
                 glapi.glTextureStorage1DEXT(object_id(), object_target(), init_mip_levels, gl_internal_format, in_desc._size);
             }
@@ -154,7 +154,7 @@ texture_1d::allocate_storage(const render_device&      in_device,
         glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
         if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {//false) { // BUG r280 
-            glerr() << "storage" << log::end;
+            //glerr() << "storage" << log::end;
             if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
                 glapi.glTextureStorage2DEXT(object_id(), object_target(), init_mip_levels, gl_internal_format, in_desc._size, in_desc._array_layers);
             }

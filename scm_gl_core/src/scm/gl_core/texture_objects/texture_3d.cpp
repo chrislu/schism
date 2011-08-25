@@ -118,7 +118,7 @@ texture_3d::allocate_storage(const render_device&      in_device,
     glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
     if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {//false) { //BUG r280 
-        glerr() << "storage" << log::end;
+        //glerr() << "storage" << log::end;
         if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
             glapi.glTextureStorage3DEXT(object_id(), object_target(), init_mip_levels, gl_internal_format, in_desc._size.x, in_desc._size.y, in_desc._size.z); 
         }

@@ -975,7 +975,6 @@ render_context::apply_texture_units()
             }
             ati = cti;
         }
-
         sampler_state_ptr&  css = _current_state._texture_units[u]._sampler_state;
         sampler_state_ptr&  ass = _applied_state._texture_units[u]._sampler_state;
         if (css != ass) {
