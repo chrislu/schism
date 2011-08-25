@@ -359,8 +359,9 @@ file_core_win32::close()
 }
 
 file_core_win32::size_type
-file_core_win32::read(void*     output_buffer,
-                      size_type num_bytes_to_read)
+file_core_win32::read(void*         output_buffer,
+                      offset_type   start_position,
+                      size_type     num_bytes_to_read)
 {
     assert(_file_handle);
     assert(_file_handle.get() != INVALID_HANDLE_VALUE);
@@ -374,10 +375,11 @@ file_core_win32::read(void*     output_buffer,
     // non system buffered read operation
     //if (_rw_buffer_size > 0) {
     if (async_io_mode()) {
-        bytes_read = read_async(output_buffer, num_bytes_to_read);
+        bytes_read = read_async(output_buffer, start_position, num_bytes_to_read);
     }
     // normal system buffered operation
     else {
+        _position = start_position;
         if (!set_file_pointer(_position)) {
             scm::err() << log::error
                        << "file_win::read(): "
@@ -420,6 +422,7 @@ file_core_win32::read(void*     output_buffer,
 
 file_core_win32::size_type
 file_core_win32::write(const void* input_buffer,
+                       offset_type start_position,
                        size_type   num_bytes_to_write)
 {
     assert(_file_handle);
@@ -441,10 +444,11 @@ file_core_win32::write(const void* input_buffer,
         //           << "file_win::write(): "
         //           << "file was opened for async read operations (async write not supported)" << log::end;
         //return (0);
-        bytes_written = write_async(input_buffer, num_bytes_to_write);
+        bytes_written = write_async(input_buffer, start_position, num_bytes_to_write);
     }
     // normal system buffered operation
     else {
+        _position = start_position;
         if (!set_file_pointer(_position)) {
             return (0);
         }
@@ -566,8 +570,9 @@ file_core_win32::set_end_of_file()
 
 
 file_core_win32::size_type
-file_core_win32::read_async(void*     output_buffer,
-                            size_type num_bytes_to_read)
+file_core_win32::read_async(void*       output_buffer,
+                            offset_type start_position,
+                            size_type   num_bytes_to_read)
 {
     assert(async_io_mode());
 
@@ -580,6 +585,8 @@ file_core_win32::read_async(void*     output_buffer,
     request_ptr_map         running_requests;
 
     char* output_byte_buffer   = reinterpret_cast<char*>(output_buffer);
+
+    _position   = start_position;
 
     size_type   position_vss            = vss_align_floor(_position);
     size_type   file_size_vss           = vss_align_ceil(_file_size);
@@ -736,6 +743,7 @@ file_core_win32::read_async_request(const detail::request_ptr& req) const
 
 file_core_win32::size_type
 file_core_win32::write_async(const void* input_buffer,
+                             offset_type start_position,
                              size_type   num_bytes_to_write)
 {
     assert(async_io_mode());
@@ -749,6 +757,8 @@ file_core_win32::write_async(const void* input_buffer,
     request_ptr_map         running_requests;
 
     const char* input_byte_buffer  = reinterpret_cast<const char*>(input_buffer);
+
+    _position = start_position;
 
     size_type   position_vss            = vss_align_floor(_position);
     size_type   position_end_vss        = vss_align_ceil(_position + num_bytes_to_write);

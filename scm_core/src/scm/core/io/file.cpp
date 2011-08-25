@@ -66,19 +66,21 @@ file::close()
 }
 
 file::size_type
-file::read(void*     output_buffer,
-           size_type num_bytes_to_read)
+file::read(void*        output_buffer,
+           offset_type  start_position,
+           size_type    num_bytes_to_read)
 {
     assert(_file_core);
-    return _file_core->read(output_buffer, num_bytes_to_read);
+    return _file_core->read(output_buffer, start_position, num_bytes_to_read);
 }
 
 file::size_type
 file::write(const void* input_buffer,
+            offset_type start_position,
             size_type   num_bytes_to_write)
 {
     assert(_file_core);
-    return _file_core->write(input_buffer, num_bytes_to_write);
+    return _file_core->write(input_buffer, start_position, num_bytes_to_write);
 }
 
 bool

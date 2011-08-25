@@ -29,8 +29,10 @@ public:
     virtual void                close() = 0;
 
     virtual size_type           read(void*           output_buffer,
+                                     offset_type     start_position,
                                      size_type       num_bytes_to_read) = 0;
     virtual size_type           write(const void*    input_buffer,
+                                      offset_type    start_position,
                                       size_type      num_bytes_to_write) = 0;
 
     virtual bool                flush_buffers() const = 0;

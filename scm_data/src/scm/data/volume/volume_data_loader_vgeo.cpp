@@ -36,7 +36,7 @@ bool volume_data_loader_vgeo::open_file(const std::string& filename)
 
     vgeo_vol_hdr.reset(new VV_volume);
 
-    if (_file.read((char*)(vgeo_vol_hdr.get()), sizeof(VV_volume)) != sizeof(VV_volume)) {
+    if (_file.read((char*)(vgeo_vol_hdr.get()), 0, sizeof(VV_volume)) != sizeof(VV_volume)) {
         // error reading the header
         vgeo_vol_hdr.reset(0);
         this->close_file();

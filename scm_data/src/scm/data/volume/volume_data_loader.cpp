@@ -38,7 +38,7 @@ bool volume_data_loader::read_volume_data(unsigned char*const buffer)
         return (false);
     }
 
-    _file.seek(_data_start_offset, std::ios_base::beg);
+    //_file.seek(_data_start_offset, std::ios_base::beg);
 
     scm::int64 read_size =    static_cast<scm::int64>(_vol_desc._data_dimensions.x)
                             * static_cast<scm::int64>(_vol_desc._data_dimensions.y)
@@ -46,7 +46,7 @@ bool volume_data_loader::read_volume_data(unsigned char*const buffer)
                             * static_cast<scm::int64>(_vol_desc._data_byte_per_channel)
                             * static_cast<scm::int64>(_vol_desc._data_num_channels);
 
-    if (_file.read((char*)buffer, read_size) != read_size) {
+    if (_file.read((char*)buffer, _data_start_offset, read_size) != read_size) {
         return (false);
     }
     else {
@@ -90,10 +90,11 @@ bool volume_data_loader::read_sub_volume_data(const scm::math::vec<unsigned, 3>&
                         + buf_dimensions64.x * buf_dimensions64.y * slice;
             offset_dst *= data_value_size;
 
-            _file.seek(static_cast<scm::int64>(_data_start_offset) + offset_src, std::ios_base::beg);
+            //_file.seek(static_cast<scm::int64>(_data_start_offset) + offset_src, std::ios_base::beg);
+            scm::int64 read_off  = _data_start_offset + offset_src;
             scm::int64 read_size = data_value_size * read_dimensions.x;
 
-            if (_file.read((char*)&buffer[offset_dst], read_size) != read_size) {
+            if (_file.read((char*)&buffer[offset_dst], read_off, read_size) != read_size) {
                 success_reading = false;
             }
         }

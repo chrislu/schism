@@ -30,7 +30,7 @@ read_text_file(const std::string& in_file_path, std::string& out_file_string)
 
         assert(out_file_string.capacity() >= f->size());
 
-        if (f->read(&out_file_string[0], f->size()) != f->size()) {
+        if (f->read(&out_file_string[0], 0, f->size()) != f->size()) {
             scm::out() << log::error
                        << "read_text_file(): error reading from file "
                        << in_file_path 

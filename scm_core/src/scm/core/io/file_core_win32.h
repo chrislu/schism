@@ -42,8 +42,10 @@ public:
     void                        close();
 
     size_type                   read(void*          output_buffer,
+                                     offset_type    start_position,
                                      size_type      num_bytes_to_read);
     size_type                   write(const void*   input_buffer,
+                                      offset_type   start_position,
                                       size_type     num_bytes_to_write);
 
     bool                        flush_buffers() const;
@@ -53,10 +55,12 @@ public:
 
 private:
     size_type                   read_async(void*        output_buffer,
+                                           offset_type  start_position,
                                            size_type    num_bytes_to_read);
     bool                        read_async_request(const detail::request_ptr& req) const;
 
     size_type                   write_async(const void* input_buffer,
+                                            offset_type start_position,
                                             size_type   num_bytes_to_write);
     bool                        write_async_request(const detail::request_ptr& req) const;
 

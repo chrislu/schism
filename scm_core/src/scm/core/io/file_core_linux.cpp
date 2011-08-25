@@ -228,8 +228,9 @@ file_core_linux::close()
 }
 
 file_core_linux::size_type
-file_core_linux::read(void*     output_buffer,
-                      size_type num_bytes_to_read)
+file_core_linux::read(void*       output_buffer,
+                      offset_type start_position,
+                      size_type   num_bytes_to_read)
 {
     assert(is_open());
     assert(_position >= 0);
@@ -238,6 +239,8 @@ file_core_linux::read(void*     output_buffer,
 
     uint8*      output_byte_buffer  = reinterpret_cast<uint8*>(output_buffer);
     offset_type bytes_read          = 0;
+
+    _position = start_position;
 
     if (num_bytes_to_read <= 0) {
         return (0);
@@ -284,6 +287,7 @@ file_core_linux::read(void*     output_buffer,
 
 file_core_linux::size_type
 file_core_linux::write(const void* input_buffer,
+                       offset_type start_position,
                        size_type   num_bytes_to_write)
 {
     assert(is_open());
@@ -297,6 +301,7 @@ file_core_linux::write(const void* input_buffer,
     const uint8*    input_byte_buffer   = reinterpret_cast<const uint8*>(input_buffer);
     offset_type     bytes_written       = 0;
 
+    _position = start_position;
 //    // non system buffered read operation
 //    if (async_io_mode()) {
 //        //scm::err() << log::error
