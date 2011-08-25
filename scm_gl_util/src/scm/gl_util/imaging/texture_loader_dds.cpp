@@ -241,41 +241,19 @@ public:
             return;
         }
 
-        if (_file->size() < sizeof(DDS_HEADER) + sizeof(unsigned int)) {
-            glerr() << log::error
-                    << "dds_file::dds_file(): error file to small to hold header data: "
-                    << in_file_name << log::end;
-            cleanup();
-            return;
-        }
-
-        shared_array<scm::uint8> raw_data;
-#if 0
-        try {
-            raw_data.reset(new scm::uint8[_file->size()]);
-        }
-        catch(const std::bad_alloc& e) {
-            glerr() << log::error
-                    << "dds_file::dds_file(): error allocating image data store "
-                    << "(" << e.what() << "): "
-                    << in_file_name << log::end;
-            cleanup();
-            return;
-        }
-
-        // read file contents
-        if (f->read(raw_data.get(), f->size()) != f->size()) {
-            glerr() << log::error
-                    << "dds_file::dds_file(): error reading from file: "
-                    << in_file_name 
-                    << " (number of bytes attempted to read: " << f->size() << ")" << log::end;
-            cleanup();
-            return;
-        }
+        scm::size_t       dds_header_off        = sizeof(unsigned int);
+        scm::size_t       dds_header_dxt10_off  = dds_header_off + sizeof(DDS_HEADER);
 
         // check  magic number ("DDS ")
         unsigned int magic_number = 0;
-        _file->read(&magic_number, sizeof(unsigned int));
+        if (_file->read(&magic_number, 0, sizeof(unsigned int)) != sizeof(unsigned int)) {
+            glerr() << log::error
+                    << "dds_file::dds_file(): error reading from file: " << in_file_name 
+                    << " (number of bytes attempted to read: " << sizeof(unsigned int) << ", at position : " << 0 << ")" << log::end;
+            cleanup();
+            return;
+        }
+
         if (magic_number != DDS_MAGIC) {
             glerr() << log::error
                     << "dds_file::dds_file(): error file not starting with magic \"dds \" number: "
@@ -284,14 +262,16 @@ public:
             return;
         }
 
-        scm::size_t       dds_header_off        = sizeof(unsigned int);
-        scm::size_t       dds_header_dxt10_off  = dds_header_off + sizeof(DDS_HEADER);
-        DDS_HEADER*       dds_header       = 0;
-        DDS_HEADER_DXT10* dds_header_dxt10 = 0;
-
-        dds_header = reinterpret_cast<DDS_HEADER*>(raw_data.get() + dds_header_off);
-        if (   dds_header->dwSize       != sizeof(DDS_HEADER)
-            || dds_header->ddspf.dwSize != sizeof(DDS_PIXELFORMAT)) {
+        _dds_header.reset(new DDS_HEADER);
+        if (_file->read(_dds_header.get(), dds_header_off, sizeof(DDS_HEADER)) != sizeof(DDS_HEADER)) {
+            glerr() << log::error
+                    << "dds_file::dds_file(): error reading from file: " << in_file_name 
+                    << " (number of bytes attempted to read: " << sizeof(DDS_HEADER) << ", at position : " << dds_header_off << ")" << log::end;
+            cleanup();
+            return;
+        }
+        if (   _dds_header->dwSize       != sizeof(DDS_HEADER)
+            || _dds_header->ddspf.dwSize != sizeof(DDS_PIXELFORMAT)) {
             glerr() << log::error
                     << "dds_file::dds_file(): error validating header size information: "
                     << in_file_name << log::end;
@@ -300,50 +280,30 @@ public:
         }
 
         // check for DX10 extension
-        //if (   (dds_header->ddspf.dwFlags & DDPF_FOURCC)
-        //    && (dds_header->ddspf.dwFourCC == SCM_MAKEFOURCC('D', 'X' ,'1' ,'0'))) {
-        if (dds_header->ddspf.dwFourCC == SCM_MAKEFOURCC('D', 'X' ,'1' ,'0')) {
+        //if (   (_dds_header->ddspf.dwFlags & DDPF_FOURCC)
+        //    && (_dds_header->ddspf.dwFourCC == SCM_MAKEFOURCC('D', 'X' ,'1' ,'0'))) {
+        if (_dds_header->ddspf.dwFourCC == SCM_MAKEFOURCC('D', 'X' ,'1' ,'0')) {
             // Must be long enough for both headers and magic value
-            if(f->size() < sizeof(DDS_HEADER) + sizeof(unsigned int) + sizeof(DDS_HEADER_DXT10)) {
-                glerr() << log::error
-                        << "dds_file::dds_file(): error file to small to hold dxt10 header data as indicated by FOURCC \"DX10\": "
-                        << in_file_name << log::end;
-            cleanup();
-            return;
-            }
+            _dds_header_dxt10.reset(new DDS_HEADER_DXT10);
 
-            dds_header_dxt10 = reinterpret_cast<DDS_HEADER_DXT10*>(raw_data.get() + dds_header_dxt10_off);
+            if (_file->read(_dds_header_dxt10.get(), dds_header_dxt10_off, sizeof(DDS_HEADER_DXT10)) != sizeof(DDS_HEADER_DXT10)) {
+                glerr() << log::error
+                        << "dds_file::dds_file(): error reading from file: " << in_file_name 
+                        << " (number of bytes attempted to read: " << sizeof(DDS_HEADER_DXT10) << ", at position : " << dds_header_dxt10_off << ")" << log::end;
+                cleanup();
+                return;
+            }
         }
 
-        scm::size_t image_data_off  = 0;
-
-        if (dds_header_dxt10) {
-            image_data_off = dds_header_dxt10_off + sizeof(DDS_HEADER_DXT10);
+        if (_dds_header_dxt10) {
+            _image_data_offset = dds_header_dxt10_off + sizeof(DDS_HEADER_DXT10);
         }
         else {
-            image_data_off = dds_header_off + sizeof(DDS_HEADER);
+            _image_data_offset = dds_header_off + sizeof(DDS_HEADER);
         }
 
-        scm::uint8* image_data      = raw_data.get() + image_data_off;
-        scm::size_t image_data_size = f->size() - image_data_off;
-
-        out_dds_data = dds_data(raw_data, dds_header, dds_header_dxt10, image_data, image_data_size);
-
-
-#endif
-
+        _image_data_size = _file->size() - _image_data_offset;
     }
-    //dds_file(const scm::shared_array<scm::uint8>&   rd,
-    //         const DDS_HEADER*const                 ddsh,
-    //         const DDS_HEADER_DXT10*const           ddsh10,
-    //         const scm::uint8*const                 id,
-    //         const scm::size_t                      ids)
-    //: _raw_data(rd)
-    //, _dds_header(ddsh)
-    //, _dds_header_dxt10(ddsh10)
-    //, _image_data(id)
-    //, _image_data_size(ids)
-    //{}
 
     const scm::shared_ptr<const scm::io::file>      file() const              { assert(_file);                  return _file; }
     const scm::shared_ptr<const DDS_HEADER>         dds_header() const        { assert(_dds_header);            return _dds_header; }
@@ -370,6 +330,7 @@ private:
     }
 };
 
+#if 0
 class dds_data
 {
 public:
@@ -505,7 +466,7 @@ read_dds_data_file(const std::string&   in_file_name,
     return true;
 }
                     
-
+#endif
 } // namespace
 
 namespace scm {
@@ -514,13 +475,19 @@ namespace gl {
 texture_image_data_ptr
 texture_loader_dds::load_image_data(const std::string&  in_image_path)
 {
-    ::dds_data    raw_dds;
+    ::dds_file   raw_dds = ::dds_file(in_image_path);
 
-    if (!read_dds_data_file(in_image_path, raw_dds)) {
+    if (!raw_dds) {
         glerr() << log::error
                 << "texture_loader_dds::load_image_data(): error reading dds image data." << log::end;
         return texture_image_data_ptr();
     }
+
+    //if (!read_dds_data_file(in_image_path, raw_dds)) {
+    //    glerr() << log::error
+    //            << "texture_loader_dds::load_image_data(): error reading dds image data." << log::end;
+    //    return texture_image_data_ptr();
+    //}
 
     return texture_image_data_ptr();
 }
