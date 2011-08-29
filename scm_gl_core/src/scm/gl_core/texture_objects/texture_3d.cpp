@@ -117,7 +117,7 @@ texture_3d::allocate_storage(const render_device&      in_device,
     util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
     glapi.glBindTexture(object_target(), object_id());
 #endif // !SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
-    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {//false) { //BUG r280 
+    if (false) { //BUG r280 SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {//
         //glerr() << "storage" << log::end;
         if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
             glapi.glTextureStorage3DEXT(object_id(), object_target(), init_mip_levels, gl_internal_format, in_desc._size.x, in_desc._size.y, in_desc._size.z); 
@@ -338,37 +338,71 @@ texture_3d::image_sub_data(const render_context& in_context,
     const opengl::gl_core& glapi = in_context.opengl_api();
     util::gl_error         glerror(glapi);
     
-    unsigned gl_base_format = util::gl_base_format(in_data_format);
-    unsigned gl_base_type   = util::gl_base_type(in_data_format);
+    unsigned gl_internal_format = util::gl_internal_format(in_data_format);
+    unsigned gl_base_format     = util::gl_base_format(in_data_format);
+    unsigned gl_base_type       = util::gl_base_type(in_data_format);
 
     if (is_compressed_format(in_data_format)) {
-        glerr() << log::error
-                << "texture_3d::image_sub_data(): currently not supporting incoming compressed data formats" << log::end;
-        return false;
-    }
 
-    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-        glapi.glTextureSubImage3DEXT(object_id(), object_target(),
-                                        in_level,
-                                        in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
-                                        in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
-                                        gl_base_format,
-                                        gl_base_type,
-                                        in_data);
+        // currently no compressed format supports 3d textures...
+        glerr() << log::error
+                << "texture_3d::image_sub_data(): currently not supporting compressed data formats" << log::end;
+        return false;
+
+#if 0
+        scm::size_t w          = (in_region._dimensions.x + 3) / 4;
+        scm::size_t h          = (in_region._dimensions.y + 3) / 4;
+        scm::size_t d          =  in_region._dimensions.z;
+        scm::size_t image_size = w * h * d * compressed_block_size(in_data_format);
+
+        if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+            glapi.glCompressedTextureSubImage3DEXT(object_id(), object_target(),
+                                            in_level,
+                                            in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                            in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                            gl_internal_format,
+                                            static_cast<int>(image_size),
+                                            in_data);
+        }
+        else {
+            util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
+            glapi.glBindTexture(object_target(), object_id());
+
+            glapi.glCompressedTexSubImage3D(object_target(),
+                                    in_level,
+                                    in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                    in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                    gl_internal_format,
+                                    static_cast<int>(image_size),
+                                    in_data);
+        }
+        gl_assert(glapi, texture_2d::image_sub_data() after glCompressedTexSubImage3D());
+#endif
     }
     else {
-        util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
-        glapi.glBindTexture(object_target(), object_id());
+        if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+            glapi.glTextureSubImage3DEXT(object_id(), object_target(),
+                                            in_level,
+                                            in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                            in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                            gl_base_format,
+                                            gl_base_type,
+                                            in_data);
+        }
+        else {
+            util::texture_binding_guard save_guard(glapi, object_target(), object_binding());
+            glapi.glBindTexture(object_target(), object_id());
 
-        glapi.glTexSubImage3D(object_target(),
-                                in_level,
-                                in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
-                                in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
-                                gl_base_format,
-                                gl_base_type,
-                                in_data);
+            glapi.glTexSubImage3D(object_target(),
+                                    in_level,
+                                    in_region._origin.x,     in_region._origin.y,     in_region._origin.z,
+                                    in_region._dimensions.x, in_region._dimensions.y, in_region._dimensions.z,
+                                    gl_base_format,
+                                    gl_base_type,
+                                    in_data);
+        }
+        gl_assert(glapi, texture_2d::image_sub_data() after glTexSubImage3D());
     }
-    gl_assert(glapi, texture_2d::image_sub_data() after glTexSubImage3D());
 
     return true;
 }

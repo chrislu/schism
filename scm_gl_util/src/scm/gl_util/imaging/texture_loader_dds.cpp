@@ -819,5 +819,39 @@ texture_loader_dds::load_texture_2d(render_device&       in_device,
     return new_tex;
 }
 
+texture_3d_ptr
+texture_loader_dds::load_texture_3d(render_device&       in_device,
+                                    const std::string&   in_image_path)
+{
+    texture_image_data_ptr img_data = load_image_data(in_image_path);
+    if (!img_data) {
+        glerr() << log::error
+                << "texture_loader_dds::load_texture_3d(): error opening dds file: " << in_image_path << log::end;
+        return texture_3d_ptr();
+    }
+
+
+    std::vector<void*>  image_mip_data_raw;
+
+    for (int i = 0; i < img_data->mip_level_count(); ++i) {
+        image_mip_data_raw.push_back(img_data->mip_level(i).data().get());
+    }
+
+    texture_3d_ptr new_tex = in_device.create_texture_3d(img_data->mip_level(0).size(), img_data->format(),
+                                                         img_data->mip_level_count(),
+                                                         img_data->format(), image_mip_data_raw);
+
+    if (!new_tex) {
+        glerr() << log::error << "texture_loader_dds::load_texture_3d(): "
+                << "unable to create texture object (file: " << in_image_path << ")" << log::end;
+        return texture_3d_ptr();
+    }
+
+    image_mip_data_raw.clear();
+    img_data.reset();
+
+    return new_tex;
+}
+
 } // namespace gl
 } // namespace scm

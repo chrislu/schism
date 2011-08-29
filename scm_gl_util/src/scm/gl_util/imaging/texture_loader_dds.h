@@ -24,8 +24,8 @@ class __scm_export(gl_util) texture_loader_dds
 
 public:
 
-    texture_2d_ptr              load_texture_2d(render_device&       in_device,
-                                                const std::string&   in_image_path);
+    texture_2d_ptr              load_texture_2d(render_device& in_device, const std::string& in_image_path);
+    texture_3d_ptr              load_texture_3d(render_device& in_device, const std::string& in_image_path);
 
     texture_image_data_ptr      load_image_data(const std::string&  in_image_path);
 
