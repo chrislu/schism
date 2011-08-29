@@ -1055,6 +1055,9 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLTEXTURESUBIMAGE1DEXTPROC, glTextureSubImage1DEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLTEXTURESUBIMAGE2DEXTPROC, glTextureSubImage2DEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLTEXTURESUBIMAGE3DEXTPROC, glTextureSubImage3DEXT, "EXT_direct_state_access", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCOMPRESSEDTEXTURESUBIMAGE1DEXTPROC, glCompressedTextureSubImage1DEXT, "EXT_direct_state_access", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCOMPRESSEDTEXTURESUBIMAGE2DEXTPROC, glCompressedTextureSubImage2DEXT, "EXT_direct_state_access", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCOMPRESSEDTEXTURESUBIMAGE3DEXTPROC, glCompressedTextureSubImage3DEXT, "EXT_direct_state_access", init_success);
     
     SCM_INIT_GL_ENTRY(PFNGLTEXTUREBUFFEREXTPROC, glTextureBufferEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLMULTITEXBUFFEREXTPROC, glMultiTexBufferEXT, "EXT_direct_state_access", init_success);

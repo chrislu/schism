@@ -799,7 +799,10 @@ public:
     PFNGLTEXTURESUBIMAGE1DEXTPROC                   glTextureSubImage1DEXT;
     PFNGLTEXTURESUBIMAGE2DEXTPROC                   glTextureSubImage2DEXT;
     PFNGLTEXTURESUBIMAGE3DEXTPROC                   glTextureSubImage3DEXT;
-    
+    PFNGLCOMPRESSEDTEXTURESUBIMAGE1DEXTPROC         glCompressedTextureSubImage1DEXT;
+    PFNGLCOMPRESSEDTEXTURESUBIMAGE2DEXTPROC         glCompressedTextureSubImage2DEXT;
+    PFNGLCOMPRESSEDTEXTURESUBIMAGE3DEXTPROC         glCompressedTextureSubImage3DEXT;
+
     PFNGLTEXTUREBUFFEREXTPROC                       glTextureBufferEXT;
     PFNGLMULTITEXBUFFEREXTPROC                      glMultiTexBufferEXT;
     PFNGLBINDMULTITEXTUREEXTPROC                    glBindMultiTextureEXT;

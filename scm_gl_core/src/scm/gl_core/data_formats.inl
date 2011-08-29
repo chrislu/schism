@@ -243,6 +243,110 @@ int size_of_format(data_format d)
 }
 
 inline
+int bit_per_pixel(data_format d)
+{
+    static int bpp[] = {
+        0,
+        // normalized integer formats (NORM)
+         8, 16, 24, 32,   // FORMAT_RGBA_8
+        16, 32, 48, 64,   // FORMAT_RGBA_16
+         8, 16, 24, 32,   // FORMAT_RGBA_8S
+        16, 32, 48, 64,   // FORMAT_RGBA_16S
+        // swizzled integer formats
+        24, 32,           // FORMAT_BGRA_8
+        // srgb integer formats
+        24, 32,           // FORMAT_SRGB_8
+        // unnormalized integer formats (UNORM)
+         8, 16, 24, 32,   // FORMAT_RGBA_8I
+        16, 32, 48, 64,   // FORMAT_RGBA_16I
+        32, 64, 96, 128,  // FORMAT_RGBA_32I
+         8, 16, 24, 32,   // FORMAT_RGBA_8UI
+        16, 32, 48, 64,   // FORMAT_RGBA_16UI
+        32, 64, 96, 128,  // FORMAT_RGBA_32UI
+        // floating point formats
+        16, 32, 48, 64,   // FORMAT_RGBA_16F
+        32, 64, 96, 128,  // FORMAT_RGBA_32F
+        // special packed formats
+        32, 32,
+        // compressed formats
+        4, // FORMAT_BC1_RGBA,        // DXT1
+        4, // FORMAT_BC1_SRGBA,       // DXT1
+        8, // FORMAT_BC2_RGBA,        // DXT3
+        8, // FORMAT_BC2_SRGBA,       // DXT3
+        8, // FORMAT_BC3_RGBA,        // DXT5
+        8, // FORMAT_BC3_SRGBA,       // DXT5
+        4, // FORMAT_BC4_R,           // RGTC1
+        4, // FORMAT_BC4_R_S,         // RGTC1
+        8, // FORMAT_BC5_RG,          // RGTC2
+        8, // FORMAT_BC5_RG_S,        // RGTC2
+        8, // FORMAT_BC6H_RGB_F,      // BPTC
+        8, // FORMAT_BC6H_RGB_UF,     // BPTC
+        8, // FORMAT_BC7_RGBA,        // BPTC
+        8, // FORMAT_BC7_SRGBA,       // BPTC
+        // depth stencil formats
+        16, 24, 32, 32, 32, 64
+    };
+
+    BOOST_STATIC_ASSERT((sizeof(bpp) / sizeof(int)) == FORMAT_COUNT);
+
+    assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
+    return bpp[d];
+}
+
+inline
+int compressed_block_size(data_format d)
+{
+    static int cbs[] = {
+        0,
+        // normalized integer formats (NORM)
+        0, 0, 0, 0,   // FORMAT_RGBA_8
+        0, 0, 0, 0,   // FORMAT_RGBA_16
+        0, 0, 0, 0,   // FORMAT_RGBA_8S
+        0, 0, 0, 0,   // FORMAT_RGBA_16S
+        // swizzled integer formats
+        0, 0,           // FORMAT_BGRA_8
+        // srgb integer formats
+        0, 0,           // FORMAT_SRGB_8
+        // unnormalized integer formats (UNORM)
+        0, 0, 0, 0,  // FORMAT_RGBA_8I
+        0, 0, 0, 0,  // FORMAT_RGBA_16I
+        0, 0, 0, 0,  // FORMAT_RGBA_32I
+        0, 0, 0, 0,  // FORMAT_RGBA_8UI
+        0, 0, 0, 0,  // FORMAT_RGBA_16UI
+        0, 0, 0, 0,  // FORMAT_RGBA_32UI
+        // floating point formats
+        0, 0, 0, 0,  // FORMAT_RGBA_16F
+        0, 0, 0, 0,  // FORMAT_RGBA_32F
+        // special packed formats
+        0, 0,
+        // compressed formats
+        8, // FORMAT_BC1_RGBA,        // DXT1
+        8, // FORMAT_BC1_SRGBA,       // DXT1
+        16, // FORMAT_BC2_RGBA,        // DXT3
+        16, // FORMAT_BC2_SRGBA,       // DXT3
+        16, // FORMAT_BC3_RGBA,        // DXT5
+        16, // FORMAT_BC3_SRGBA,       // DXT5
+        8, // FORMAT_BC4_R,           // RGTC1
+        8, // FORMAT_BC4_R_S,         // RGTC1
+        16, // FORMAT_BC5_RG,          // RGTC2
+        16, // FORMAT_BC5_RG_S,        // RGTC2
+        16, // FORMAT_BC6H_RGB_F,      // BPTC
+        16, // FORMAT_BC6H_RGB_UF,     // BPTC
+        16, // FORMAT_BC7_RGBA,        // BPTC
+        16, // FORMAT_BC7_SRGBA,       // BPTC
+        // depth stencil formats
+        0, 0, 0, 0, 0, 0
+    };
+
+    BOOST_STATIC_ASSERT((sizeof(cbs) / sizeof(int)) == FORMAT_COUNT);
+
+    assert(is_compressed_format(d));
+    assert(FORMAT_NULL <= d && d < FORMAT_COUNT);
+
+    return cbs[d];
+}
+
+inline
 int
 size_of_depth_component(data_format d)
 {

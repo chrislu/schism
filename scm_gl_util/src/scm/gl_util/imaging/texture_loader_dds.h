@@ -24,11 +24,8 @@ class __scm_export(gl_util) texture_loader_dds
 
 public:
 
-    //texture_2d_ptr              load_texture_2d(render_device&       in_device,
-    //                                            const std::string&   in_image_path,
-    //                                            bool                 in_create_mips,
-    //                                            bool                 in_color_mips  = false,
-    //                                            const data_format    in_force_internal_format = FORMAT_NULL);
+    texture_2d_ptr              load_texture_2d(render_device&       in_device,
+                                                const std::string&   in_image_path);
 
     texture_image_data_ptr      load_image_data(const std::string&  in_image_path);
 

@@ -132,6 +132,8 @@ bool is_compressed_format(data_format d);
 int channel_count(data_format d);
 int size_of_channel(data_format d);
 int size_of_format(data_format d);
+int bit_per_pixel(data_format d);
+int compressed_block_size(data_format d);
 
 int size_of_depth_component(data_format d);
 int size_of_stencil_component(data_format d);
