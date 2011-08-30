@@ -122,7 +122,12 @@ if (WIN32)
 endif (WIN32)
 
 # add/create library
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+if (SCHISM_STATIC_BUILD)
+    add_definitions(-DSCM_STATIC_BUILD)
+	add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+else (SCHISM_STATIC_BUILD)
+	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+endif (SCHISM_STATIC_BUILD)
 
 # link libraries
 target_link_libraries(${PROJECT_NAME}

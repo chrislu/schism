@@ -58,6 +58,7 @@
 #define warn_message(msg)           message(__FILE__ "(" TO_STR(__LINE__) "): " "warning: " #msg)
 
 // windows related
+#ifndef SCM_STATIC_BUILD
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 
 #   if SCM_COMPILER == SCM_COMPILER_MSVC
@@ -95,5 +96,10 @@
 #       define SCM_DEBUG   0
 #   endif
 #endif
+
+#else // SCM_STATIC_BUILD
+#   define __scm_export(lib)
+#   define __scm_private(lib)
+#endif //SCM_STATIC_BUILD
 
 #endif // namespace PLATFORM_H_INCLUDED

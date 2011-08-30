@@ -76,10 +76,15 @@ scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
 if (WIN32)
     # add preprocessor defines
     add_definitions(-DSCM_BUILD_LIBRARY_core=\(\))
-ENDIF (WIN32)
+endif (WIN32)
 
 # add/create library
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+if (SCHISM_STATIC_BUILD)
+    add_definitions(-DSCM_STATIC_BUILD)
+	add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+else (SCHISM_STATIC_BUILD)
+	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+endif (SCHISM_STATIC_BUILD)
 
 # link libraries
 if (WIN32)

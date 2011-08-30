@@ -5,8 +5,10 @@ project(schism)
 include(schism_platform)
 include(schism)
 
+option(SCHISM_STATIC_BUILD	"Build schism libraries as static libraries" OFF)
+
 #-----------------------------------------------------------------------------
-# Setup schism_VR version strings
+# Setup schism version strings
 set(SCHISM_MAJOR_VERSION 0)
 set(SCHISM_MINOR_VERSION 0)
 set(SCHISM_BUILD_VERSION 1)
