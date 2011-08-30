@@ -18,6 +18,7 @@
 #include <scm/gl_core/texture_objects.h>
 
 #include <scm/gl_util/imaging/texture_image_data.h>
+#include <scm/gl_util/imaging/texture_data_util.h>
 
 #define SCM_MAKEFOURCC(ch0, ch1, ch2, ch3)                          \
     (scm::uint32)(                                                  \
@@ -776,6 +777,16 @@ texture_loader_dds::load_image_data(const std::string& in_image_path)
                 }
 
                 roff += lmip_img_size;
+            }
+        }
+    }
+
+    { // dds files use upper-left origin, we flip!
+        for (unsigned l = 0; l < img_mip_count; ++l) {
+            if (!util::image_flip_vertical(img_lev_data[l].data(), img_format, img_lev_data[l].size().x, img_lev_data[l].size().y)) {
+                glerr() << log::error
+                        << "texture_loader_dds::load_image_data(): error flipping image: " << in_image_path << log::end;
+                return texture_image_data_ptr();
             }
         }
     }
