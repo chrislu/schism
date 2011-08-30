@@ -959,6 +959,22 @@ render_context::update_sub_texture(const texture_image_ptr& in_texture,
     return (true);
 }
 
+bool
+render_context::retrieve_texture_data(const texture_image_ptr& in_texture,
+                                      const unsigned           in_level,
+                                            void*              in_data)
+{
+    //assert(!_pack_buffer);
+    if (!in_texture->retrieve_image_data(*this, in_level, in_data)) {
+        glerr() << log::error
+                << "render_context::retrieve_texture_data(): "
+                << "error during texture data retrival (check valid level or if multisampled texture)."
+                << log::end;
+        return false;
+    }
+    return true;
+}
+
 void
 render_context::apply_texture_units()
 {

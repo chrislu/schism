@@ -803,6 +803,10 @@ public:
     PFNGLCOMPRESSEDTEXTURESUBIMAGE2DEXTPROC         glCompressedTextureSubImage2DEXT;
     PFNGLCOMPRESSEDTEXTURESUBIMAGE3DEXTPROC         glCompressedTextureSubImage3DEXT;
 
+    PFNGLGETTEXTUREIMAGEEXTPROC                     glGetTextureImageEXT;
+    PFNGLGETTEXTUREPARAMETERFVEXTPROC               glGetTextureParameterfvEXT;
+    PFNGLGETTEXTUREPARAMETERIVEXTPROC               glGetTextureParameterivEXT;
+
     PFNGLTEXTUREBUFFEREXTPROC                       glTextureBufferEXT;
     PFNGLMULTITEXBUFFEREXTPROC                      glMultiTexBufferEXT;
     PFNGLBINDMULTITEXTUREEXTPROC                    glBindMultiTextureEXT;

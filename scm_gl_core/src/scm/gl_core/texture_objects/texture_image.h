@@ -45,11 +45,13 @@ protected:
                                    const unsigned        in_level,
                                    const data_format     in_data_format,
                                    const void*const      in_data) = 0;
-
+    bool            retrieve_image_data(const render_context& in_context,
+                                        const unsigned        in_level,
+                                              void*           in_data);
 private:
-
     friend class render_device;
     friend class render_context;
+
 }; // class texture_image
 
 } // namespace gl

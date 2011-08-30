@@ -216,6 +216,9 @@ public:
                                                    const unsigned           in_level,
                                                    const data_format        in_data_format,
                                                    const void*const         in_data);
+    bool                        retrieve_texture_data(const texture_image_ptr& in_texture,
+                                                      const unsigned           in_level,
+                                                            void*              in_data);
 
 protected:
     void                        apply_texture_units();

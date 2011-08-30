@@ -102,6 +102,8 @@ public:
     void                            clear_depth_stencil() const;
 
     void                            swap_buffers(int interval = 0);
+
+    bool                            take_screenshot(const std::string& f) const;
     
     // callbacks
     void                            render_update_func(const update_func& f);

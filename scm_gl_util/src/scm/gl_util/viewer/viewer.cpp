@@ -10,8 +10,11 @@
 
 #include <boost/assign/list_of.hpp>
 
+#include <FreeImagePlus.h>
+
 #include <scm/log.h>
 #include <scm/core/math.h>
+#include <scm/core/io/file.h>
 
 #include <scm/input/devices/space_navigator_device.h>
 
@@ -273,6 +276,50 @@ viewer::swap_buffers(int interval)
     _window->swap_buffers(interval);
 }
 
+bool
+viewer::take_screenshot(const std::string& f) const
+{
+    if (!_render_target) {
+        glerr() << log::error 
+                << "viewer::take_screenshot(): only working if using anti aliasing and therefore a texture render target."
+                << log::end;
+        return false;
+    }
+
+    size_t img_size =  _render_target->_color_buffer_resolved->descriptor()._size.x
+                     * _render_target->_color_buffer_resolved->descriptor()._size.y
+                     * size_of_format(_render_target->_color_buffer_resolved->format());
+    shared_ptr<uint8>   data(new uint8[img_size]);
+
+    if (!context()->retrieve_texture_data(_render_target->_color_buffer_resolved, 0, data.get())) {
+        glerr() << log::error 
+                << "viewer::take_screenshot(): unable to read back texture data." << log::end;
+        return false;
+    }
+
+#if 0
+    io::file_ptr of(new io::file());
+
+    if (!of->open(f, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, false)) {
+        glerr() << log::error 
+                << "viewer::take_screenshot(): error opening output file : " << f << log::end;
+        return false;
+    }
+    if (of->write(data.get(), 0, img_size) != img_size) {
+        glerr() << log::error 
+                << "viewer::take_screenshot(): unable to write out texture data." << log::end;
+        return false;
+    }
+#else
+    fipImage of(FIT_BITMAP,
+                _render_target->_color_buffer_resolved->descriptor()._size.x,
+                _render_target->_color_buffer_resolved->descriptor()._size.y,
+                bit_per_pixel(_render_target->_color_buffer_resolved->format()));
+    memcpy(of.accessPixels(), data.get(), img_size);
+    of.save(f.c_str());
+#endif
+    return true;
+}
 
 void
 viewer::render_update_func(const update_func& f)
