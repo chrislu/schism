@@ -326,6 +326,8 @@ public:
 
         _file.reset(new io::file());
 
+        // TODO check if file exists...
+
         if (!_file->open(in_file_name, std::ios_base::in, false)) {
             glerr() << log::error
                     << "dds_file::dds_file(): error opening file: "
@@ -783,7 +785,7 @@ texture_loader_dds::load_image_data(const std::string& in_image_path)
 
     { // dds files use upper-left origin, we flip!
         for (unsigned l = 0; l < img_mip_count; ++l) {
-            if (!util::image_flip_vertical(img_lev_data[l].data(), img_format, img_lev_data[l].size().x, img_lev_data[l].size().y)) {
+            if (!util::volume_flip_vertical(img_lev_data[l].data(), img_format, img_lev_data[l].size().x, img_lev_data[l].size().y, img_lev_data[l].size().z)) {
                 glerr() << log::error
                         << "texture_loader_dds::load_image_data(): error flipping image: " << in_image_path << log::end;
                 return texture_image_data_ptr();

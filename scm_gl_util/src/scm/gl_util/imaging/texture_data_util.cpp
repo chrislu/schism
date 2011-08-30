@@ -175,10 +175,10 @@ flipBC5Blocks(DXTColorBlock_t *Block, int NumBlocks)
 } // namespace nv
 
 bool
-image_flip_vertical(const shared_array<uint8>& data,
-                          data_format          fmt,
-                          unsigned             w,
-                          unsigned             h)
+image_layer_vert_flip_raw(scm::uint8*const data,
+                          data_format      fmt,
+                          unsigned         w,
+                          unsigned         h)
 {
     if (is_compressed_format(fmt)) {
         using namespace scm::gl::util::nv;
@@ -192,7 +192,7 @@ image_flip_vertical(const shared_array<uint8>& data,
             return true;
         }
         else if (1 < h && h < 4) {
-            DXTColorBlock_t *line = reinterpret_cast<DXTColorBlock_t*>(data.get());
+            DXTColorBlock_t *line = reinterpret_cast<DXTColorBlock_t*>(data);
             switch (fmt) {
                 case FORMAT_BC1_RGBA:
                 case FORMAT_BC1_SRGBA:
@@ -227,8 +227,8 @@ image_flip_vertical(const shared_array<uint8>& data,
                 case FORMAT_BC1_RGBA:
                 case FORMAT_BC1_SRGBA:
                     for(int bl = 0; bl < (bh / 2); ++bl) {
-                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data.get() + bl * bls);
-                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data.get() + (bh - (bl + 1)) * bls);
+                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data + bl * bls);
+                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data + (bh - (bl + 1)) * bls);
                         flipDXT1Blocks(top_line,    bw);
                         flipDXT1Blocks(bottom_line, bw);
                         SwapMem(bottom_line, top_line, bls);
@@ -237,8 +237,8 @@ image_flip_vertical(const shared_array<uint8>& data,
                 case FORMAT_BC2_RGBA:
                 case FORMAT_BC2_SRGBA:
                     for(int bl = 0; bl < (bh / 2); ++bl) {
-                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data.get() + bl * bls);
-                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data.get() + (bh - (bl + 1)) * bls);
+                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data + bl * bls);
+                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data + (bh - (bl + 1)) * bls);
                         flipDXT3Blocks(top_line,    bw);
                         flipDXT3Blocks(bottom_line, bw);
                         SwapMem(bottom_line, top_line, bls);
@@ -247,8 +247,8 @@ image_flip_vertical(const shared_array<uint8>& data,
                 case FORMAT_BC3_RGBA:
                 case FORMAT_BC3_SRGBA:
                     for(int bl = 0; bl < (bh / 2); ++bl) {
-                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data.get() + bl * bls);
-                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data.get() + (bh - (bl + 1)) * bls);
+                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data + bl * bls);
+                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data + (bh - (bl + 1)) * bls);
                         flipDXT5Blocks(top_line,    bw);
                         flipDXT5Blocks(bottom_line, bw);
                         SwapMem(bottom_line, top_line, bls);
@@ -257,8 +257,8 @@ image_flip_vertical(const shared_array<uint8>& data,
                 case FORMAT_BC4_R:
                 case FORMAT_BC4_R_S:
                     for(int bl = 0; bl < (bh / 2); ++bl) {
-                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data.get() + bl * bls);
-                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data.get() + (bh - (bl + 1)) * bls);
+                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data + bl * bls);
+                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data + (bh - (bl + 1)) * bls);
                         flipBC4Blocks(top_line,    bw);
                         flipBC4Blocks(bottom_line, bw);
                         SwapMem(bottom_line, top_line, bls);
@@ -267,8 +267,8 @@ image_flip_vertical(const shared_array<uint8>& data,
                 case FORMAT_BC5_RG:
                 case FORMAT_BC5_RG_S:
                     for(int bl = 0; bl < (bh / 2); ++bl) {
-                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data.get() + bl * bls);
-                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data.get() + (bh - (bl + 1)) * bls);
+                        top_line    = reinterpret_cast<DXTColorBlock_t*>(data + bl * bls);
+                        bottom_line = reinterpret_cast<DXTColorBlock_t*>(data + (bh - (bl + 1)) * bls);
                         flipBC5Blocks(top_line,    bw);
                         flipBC5Blocks(bottom_line, bw);
                         SwapMem(bottom_line, top_line, bls);
@@ -291,12 +291,39 @@ image_flip_vertical(const shared_array<uint8>& data,
             size_t r = lsize * l;
             size_t w = lsize * (h - (l + 1));
 
-            memcpy(tmp_line.get(), data.get() + r, lsize);
-            memcpy(data.get() + r, data.get() + w, lsize);
-            memcpy(data.get() + w, tmp_line.get(), lsize);
+            memcpy(tmp_line.get(), data + r,       lsize);
+            memcpy(data + r,       data + w,       lsize);
+            memcpy(data + w,       tmp_line.get(), lsize);
         }
         return true;
     }
+}
+
+bool
+image_flip_vertical(const shared_array<uint8>& data,
+                          data_format          fmt,
+                          unsigned             w,
+                          unsigned             h)
+{
+    return image_layer_vert_flip_raw(data.get(), fmt, w, h);
+}
+
+bool
+volume_flip_vertical(const shared_array<uint8>& data,
+                           data_format          fmt,
+                           unsigned             w,
+                           unsigned             h,
+                           unsigned             d)
+{
+    size_t ssize = (static_cast<size_t>(w) * h * bit_per_pixel(fmt)) / 8;
+
+    for (unsigned s = 0; s < d; ++s) {
+        if (!image_layer_vert_flip_raw(data.get() + ssize * s, fmt, w, h)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace util

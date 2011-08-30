@@ -14,6 +14,9 @@ namespace util {
 bool
 image_flip_vertical(const shared_array<uint8>& data, data_format fmt, unsigned w, unsigned h);
 
+bool
+volume_flip_vertical(const shared_array<uint8>& data, data_format fmt, unsigned w, unsigned h, unsigned d);
+
 } // namespace util
 } // namespace gl
 } // namespace scm
