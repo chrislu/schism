@@ -7,7 +7,9 @@ include(schism_boost)
 set(SRC_DIR                         "${scm_core_SOURCE_DIR}/../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})
 
-SET(LIBRARY_OUTPUT_PATH             ${SCHISM_LIBRARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
@@ -87,21 +89,35 @@ else (SCHISM_STATIC_BUILD)
 endif (SCHISM_STATIC_BUILD)
 
 # link libraries
-if (WIN32)
-    target_link_libraries(${PROJECT_NAME}
-        optimized libboost_date_time-${SCM_BOOST_MT_REL}        debug libboost_date_time-${SCM_BOOST_MT_DBG}
-        optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
-        optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
-        optimized libboost_system-${SCM_BOOST_MT_REL}           debug libboost_system-${SCM_BOOST_MT_DBG}
-    )
-endif (WIN32)
+scm_link_libraries(WIN32
+    optimized libboost_date_time-${SCM_BOOST_MT_REL}        debug libboost_date_time-${SCM_BOOST_MT_DBG}
+    optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+    optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
+    optimized libboost_system-${SCM_BOOST_MT_REL}           debug libboost_system-${SCM_BOOST_MT_DBG}
+)
+scm_link_libraries(UNIX
+    rt
+    boost_date_time${SCM_BOOST_MT_REL}
+    boost_filesystem${SCM_BOOST_MT_REL}
+    boost_program_options${SCM_BOOST_MT_REL}
+    boost_system${SCM_BOOST_MT_REL}
+)
 
-if (UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        rt
-        boost_date_time${SCM_BOOST_MT_REL}
-        boost_filesystem${SCM_BOOST_MT_REL}
-        boost_program_options${SCM_BOOST_MT_REL}
-        boost_system${SCM_BOOST_MT_REL}
-    )
-endif (UNIX)
+#if (WIN32)
+#    target_link_libraries(${PROJECT_NAME}
+#       optimized libboost_date_time-${SCM_BOOST_MT_REL}        debug libboost_date_time-${SCM_BOOST_MT_DBG}
+#        optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+#        optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
+#        optimized libboost_system-${SCM_BOOST_MT_REL}           debug libboost_system-${SCM_BOOST_MT_DBG}
+#    )
+#endif (WIN32)
+
+#if (UNIX)
+#    target_link_libraries(${PROJECT_NAME}
+#        rt
+#        boost_date_time${SCM_BOOST_MT_REL}
+#        boost_filesystem${SCM_BOOST_MT_REL}
+#        boost_program_options${SCM_BOOST_MT_REL}
+#        boost_system${SCM_BOOST_MT_REL}
+#    )
+#endif (UNIX)

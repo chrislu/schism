@@ -8,7 +8,9 @@ include(schism_boost)
 set(SRC_DIR                         "${scm_date_SOURCE_DIR}../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})
 
-set(LIBRARY_OUTPUT_PATH             ${SCHISM_LIBRARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
 
 # source files
 scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)
@@ -74,21 +76,33 @@ else (SCHISM_STATIC_BUILD)
 endif (SCHISM_STATIC_BUILD)
 
 # link libraries
-target_link_libraries(${PROJECT_NAME}
+scm_link_libraries(ALL
     scm_core
 )
-if (WIN32)
-    target_link_libraries(${PROJECT_NAME}
-        optimized libboost_filesystem-${SCM_BOOST_MT_REL}   debug libboost_filesystem-${SCM_BOOST_MT_DBG}
-        optimized libboost_system-${SCM_BOOST_MT_REL}       debug libboost_system-${SCM_BOOST_MT_DBG}
-    )
-endif (WIN32)
-if (UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        boost_filesystem${SCM_BOOST_MT_REL}
-        boost_system${SCM_BOOST_MT_REL}
-    )
-endif (UNIX)
+scm_link_libraries(WIN32
+    optimized libboost_filesystem-${SCM_BOOST_MT_REL}   debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+    optimized libboost_system-${SCM_BOOST_MT_REL}       debug libboost_system-${SCM_BOOST_MT_DBG}
+)
+scm_link_libraries(UNIX
+    boost_filesystem${SCM_BOOST_MT_REL}
+    boost_system${SCM_BOOST_MT_REL}
+)
+
+#target_link_libraries(${PROJECT_NAME}
+#    scm_core
+#)
+#if (WIN32)
+#    target_link_libraries(${PROJECT_NAME}
+#        optimized libboost_filesystem-${SCM_BOOST_MT_REL}   debug libboost_filesystem-${SCM_BOOST_MT_DBG}
+#        optimized libboost_system-${SCM_BOOST_MT_REL}       debug libboost_system-${SCM_BOOST_MT_DBG}
+#    )
+#endif (WIN32)
+#if (UNIX)
+#    target_link_libraries(${PROJECT_NAME}
+#        boost_filesystem${SCM_BOOST_MT_REL}
+#        boost_system${SCM_BOOST_MT_REL}
+#    )
+#endif (UNIX)
 
 add_dependencies(${PROJECT_NAME}
     scm_core

@@ -3,14 +3,15 @@ project(scm_gl_core)
 
 option(OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     ON)
 
-
 include(schism_macros)
 include(schism_boost)
 
 set(SRC_DIR                         "${scm_gl_core_SOURCE_DIR}/../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})
 
-set(LIBRARY_OUTPUT_PATH             ${SCHISM_LIBRARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
 
 # source files
 scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)
@@ -130,30 +131,49 @@ else (SCHISM_STATIC_BUILD)
 endif (SCHISM_STATIC_BUILD)
 
 # link libraries
-target_link_libraries(${PROJECT_NAME}
-    scm_core
+scm_link_libraries(ALL
+	scm_core
 )
-if (WIN32)
-    target_link_libraries(${PROJECT_NAME}
-        opengl32
-    )
-    if (OPT_BUILD_deprecated_classic_scm_gl)
-        target_link_libraries(${PROJECT_NAME}
-            glew32
-        )
-    endif (OPT_BUILD_deprecated_classic_scm_gl)
-endif (WIN32)
+scm_link_libraries(WIN32
+    opengl32
+)
+scm_link_libraries(UNIX
+    GL
+)
 
-if (UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        GL
-    )
-    if (OPT_BUILD_deprecated_classic_scm_gl)
-        target_link_libraries(${PROJECT_NAME}
-            GLEW
-        )
-    endif (OPT_BUILD_deprecated_classic_scm_gl)
-endif (UNIX)
+if (OPT_BUILD_deprecated_classic_scm_gl)
+	scm_link_libraries(WIN32
+	    glew32
+	)
+	scm_link_libraries(UNIX
+	    GLEW
+	)
+endif (OPT_BUILD_deprecated_classic_scm_gl)
+
+#target_link_libraries(${PROJECT_NAME}
+#    scm_core
+#)
+#if (WIN32)
+#    target_link_libraries(${PROJECT_NAME}
+#        opengl32
+#    )
+#    if (OPT_BUILD_deprecated_classic_scm_gl)
+#        target_link_libraries(${PROJECT_NAME}
+#            glew32
+#        )
+#    endif (OPT_BUILD_deprecated_classic_scm_gl)
+#endif (WIN32)
+#
+#if (UNIX)
+#    target_link_libraries(${PROJECT_NAME}
+#        GL
+#    )
+#    if (OPT_BUILD_deprecated_classic_scm_gl)
+#        target_link_libraries(${PROJECT_NAME}
+#            GLEW
+#        )
+#    endif (OPT_BUILD_deprecated_classic_scm_gl)
+#endif (UNIX)
 
 add_dependencies(${PROJECT_NAME}
     scm_core
