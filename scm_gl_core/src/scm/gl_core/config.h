@@ -12,7 +12,7 @@
 #   define SCM_GL_DEBUG 0
 #endif
 
-#define SCM_GL_CORE_OPENGL_PROFILE          SCM_GL_CORE_OPENGL_330_PROFILE
+#define SCM_GL_CORE_OPENGL_PROFILE          SCM_GL_CORE_OPENGL_420_PROFILE
 
 // to use the direct state access extension define this token
 //  - currently used in:
@@ -21,7 +21,7 @@
 //    - buffer objects
 //    - vertex array objects
 #define SCM_GL_CORE_USE_DIRECT_STATE_ACCESS 1
-#undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
+//#undef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
 
 #define SCM_GL_CORE_WORKAROUND_AMD 1
 #undef SCM_GL_CORE_WORKAROUND_AMD

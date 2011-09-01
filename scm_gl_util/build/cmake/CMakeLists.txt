@@ -84,12 +84,12 @@ if (WIN32)
 endif (WIN32)
 
 # add/create library
-if (SCHISM_STATIC_BUILD)
+if (SCHISM_BUILD_STATIC)
     add_definitions(-DSCM_STATIC_BUILD)
 	add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
-else (SCHISM_STATIC_BUILD)
+else (SCHISM_BUILD_STATIC)
 	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-endif (SCHISM_STATIC_BUILD)
+endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(ALL
@@ -105,24 +105,6 @@ scm_link_libraries(UNIX
     freeimageplus
     freetype
 )
-
-#target_link_libraries(${PROJECT_NAME}
-#    scm_core
-#    scm_gl_core
-#    scm_input
-#)
-#if (WIN32)
-#    target_link_libraries(${PROJECT_NAME}
-#        FreeImagePlus
-#        freetype2
-#    )
-#endif (WIN32)
-#if (UNIX)
-#    target_link_libraries(${PROJECT_NAME}
-#        freeimageplus
-#        freetype
-#    )
-#endif (UNIX)
 
 add_dependencies(${PROJECT_NAME}
     scm_core

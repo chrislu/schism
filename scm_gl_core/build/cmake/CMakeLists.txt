@@ -1,7 +1,7 @@
 
 project(scm_gl_core)
 
-option(OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     ON)
+option(SCHISM_OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     ON)
 
 include(schism_macros)
 include(schism_boost)
@@ -57,7 +57,7 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/state_objects *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/texture_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/texture_objects *.h *.inl)
 
-if (OPT_BUILD_deprecated_classic_scm_gl)
+if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 ## gl_classic #####################################################################################
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic *.h *.inl)
@@ -94,7 +94,7 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/utilities *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic/vertexbuffer_object *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_classic/vertexbuffer_object *.h *.inl)
 ## gl_classic #####################################################################################
-endif (OPT_BUILD_deprecated_classic_scm_gl)
+endif (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 
 # include header and inline files in source files for visual studio projects
 if (WIN32)
@@ -123,12 +123,12 @@ if (WIN32)
 endif (WIN32)
 
 # add/create library
-if (SCHISM_STATIC_BUILD)
+if (SCHISM_BUILD_STATIC)
     add_definitions(-DSCM_STATIC_BUILD)
 	add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
-else (SCHISM_STATIC_BUILD)
+else (SCHISM_BUILD_STATIC)
 	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-endif (SCHISM_STATIC_BUILD)
+endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(ALL
@@ -141,39 +141,14 @@ scm_link_libraries(UNIX
     GL
 )
 
-if (OPT_BUILD_deprecated_classic_scm_gl)
+if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 	scm_link_libraries(WIN32
 	    glew32
 	)
 	scm_link_libraries(UNIX
 	    GLEW
 	)
-endif (OPT_BUILD_deprecated_classic_scm_gl)
-
-#target_link_libraries(${PROJECT_NAME}
-#    scm_core
-#)
-#if (WIN32)
-#    target_link_libraries(${PROJECT_NAME}
-#        opengl32
-#    )
-#    if (OPT_BUILD_deprecated_classic_scm_gl)
-#        target_link_libraries(${PROJECT_NAME}
-#            glew32
-#        )
-#    endif (OPT_BUILD_deprecated_classic_scm_gl)
-#endif (WIN32)
-#
-#if (UNIX)
-#    target_link_libraries(${PROJECT_NAME}
-#        GL
-#    )
-#    if (OPT_BUILD_deprecated_classic_scm_gl)
-#        target_link_libraries(${PROJECT_NAME}
-#            GLEW
-#        )
-#    endif (OPT_BUILD_deprecated_classic_scm_gl)
-#endif (UNIX)
+endif (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 
 add_dependencies(${PROJECT_NAME}
     scm_core

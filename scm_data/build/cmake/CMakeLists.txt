@@ -68,12 +68,12 @@ if (WIN32)
 endif (WIN32)
 
 # add/create library
-if (SCHISM_STATIC_BUILD)
+if (SCHISM_BUILD_STATIC)
     add_definitions(-DSCM_STATIC_BUILD)
 	add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
-else (SCHISM_STATIC_BUILD)
+else (SCHISM_BUILD_STATIC)
 	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-endif (SCHISM_STATIC_BUILD)
+endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(ALL
@@ -87,22 +87,6 @@ scm_link_libraries(UNIX
     boost_filesystem${SCM_BOOST_MT_REL}
     boost_system${SCM_BOOST_MT_REL}
 )
-
-#target_link_libraries(${PROJECT_NAME}
-#    scm_core
-#)
-#if (WIN32)
-#    target_link_libraries(${PROJECT_NAME}
-#        optimized libboost_filesystem-${SCM_BOOST_MT_REL}   debug libboost_filesystem-${SCM_BOOST_MT_DBG}
-#        optimized libboost_system-${SCM_BOOST_MT_REL}       debug libboost_system-${SCM_BOOST_MT_DBG}
-#    )
-#endif (WIN32)
-#if (UNIX)
-#    target_link_libraries(${PROJECT_NAME}
-#        boost_filesystem${SCM_BOOST_MT_REL}
-#        boost_system${SCM_BOOST_MT_REL}
-#    )
-#endif (UNIX)
 
 add_dependencies(${PROJECT_NAME}
     scm_core
