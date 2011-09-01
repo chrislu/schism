@@ -181,7 +181,7 @@ program::bind_uniforms(render_context& ren_ctx) const
             //std::cout << u->first << std::endl;
             if (u->second->update_required()) {
                 u->second->apply_value(ren_ctx, *this);
-                u->second->_update_required = false;
+                u->second->_status._update_required = false;
             }
             //if (u->second._update_required) {
                 //std::cout << u->second._name << std::endl;

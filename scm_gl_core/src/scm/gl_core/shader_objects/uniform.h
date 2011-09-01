@@ -38,7 +38,10 @@ protected:
     unsigned                _elements;
     data_type               _type;
 
-    bool                    _update_required;
+    struct {
+        bool                _update_required : 1;
+        bool                _initialized     : 1;
+    }                       _status;
 
 private:
     // declared, never defined

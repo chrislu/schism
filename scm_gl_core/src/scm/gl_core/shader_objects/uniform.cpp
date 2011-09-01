@@ -55,9 +55,10 @@ void
 uniform<T, D>::value(int i, value_param_type v)
 {
     assert(i < static_cast<int>(_elements));
-    if (v != _value[i]) {
+    if (!_status._initialized || v != _value[i]) {
         _value[i] = v;
-        _update_required = true;
+        _status._update_required = true;
+        _status._initialized     = true;
     }
 }
 
@@ -113,9 +114,10 @@ uniform_base::uniform_base(const std::string& n, const int l, const unsigned e, 
   : _name(n)
   , _location(l)
   , _elements(e)
-  , _update_required(true)
   , _type(t)
 {
+    _status._initialized     = false;
+    _status._update_required = false;
 }
 
 uniform_base::~uniform_base()
@@ -149,7 +151,7 @@ uniform_base::type() const
 bool
 uniform_base::update_required() const
 {
-    return _update_required;
+    return _status._update_required;
 }
 
 // float types ////////////////////////////////////////////////////////////////////////////////////
