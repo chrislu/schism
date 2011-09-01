@@ -1,7 +1,7 @@
 
 project(scm_gl_core)
 
-option(SCHISM_OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     ON)
+option(SCHISM_OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     OFF)
 
 include(schism_macros)
 include(schism_boost)
