@@ -102,4 +102,27 @@
 #   define __scm_private(lib)
 #endif //SCM_STATIC_BUILD
 
+
+#if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
+
+#   ifndef NDEBUG
+#       define SCM_DEBUG   1
+#   else
+#       define SCM_DEBUG   0
+#   endif
+
+#endif
+
+// Linux, Apple
+#if    SCM_PLATFORM == SCM_PLATFORM_LINUX \
+    || SCM_PLATFORM == SCM_PLATFORM_APPLE
+
+#   ifndef NDEBUG
+#       define SCM_DEBUG   1
+#   else
+#       define SCM_DEBUG   0
+#endif
+
+#endif
+
 #endif // namespace PLATFORM_H_INCLUDED

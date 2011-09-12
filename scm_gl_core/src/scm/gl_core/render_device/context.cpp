@@ -906,6 +906,7 @@ render_context::bind_image(const texture_ptr&       in_texture_image,
 void
 render_context::set_image_unit_state(const image_unit_array& in_imageunits)
 {
+    assert(in_imageunits.size() == _current_state._image_units.size());
     _current_state._image_units = in_imageunits;
 }
 
