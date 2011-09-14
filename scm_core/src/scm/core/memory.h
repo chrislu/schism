@@ -4,6 +4,7 @@
 
 #if 1
 
+#include <boost/array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -14,6 +15,8 @@
 #include <boost/enable_shared_from_this.hpp>
 
 namespace scm {
+
+using boost::array;
 
 using boost::scoped_ptr;
 using boost::scoped_array;
@@ -35,6 +38,7 @@ using boost::enable_shared_from_this;
 
 #else
 
+#include <array>
 #include <memory>
 
 #include <boost/scoped_ptr.hpp>
@@ -48,6 +52,8 @@ using boost::scoped_ptr;
 using boost::scoped_array;
 using boost::shared_array;
 using boost::intrusive_ptr;
+
+using std::array;
 
 using std::shared_ptr;
 using std::weak_ptr;

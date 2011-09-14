@@ -8,6 +8,7 @@
 #include <scm/core/math/common.h>
 
 #include <scm/core/math/vec.h>
+#include <scm/core/math/vec1.h>
 #include <scm/core/math/vec2.h>
 #include <scm/core/math/vec3.h>
 #include <scm/core/math/vec4.h>
