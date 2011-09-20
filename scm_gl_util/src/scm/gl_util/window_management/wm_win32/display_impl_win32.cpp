@@ -58,26 +58,28 @@ enum_display_infos(display_info_map& display_infos, std::ostream& os)
         if (0 == ::EnumDisplaySettings(disp_device.DeviceName, ENUM_CURRENT_SETTINGS, &disp_mode)) {
             os << "display::display_impl::enum_display_infos() <win32>: " 
                << "EnumDisplaySettings failed for device num " + boost::lexical_cast<std::string>(i);
-            return (false);
+            //return (false);
             
         }
+        else {
         //std::cout << "dev_name = " << dev_mode.dmDeviceName << ",\tdev_mode._width = " << dev_mode.dmPelsWidth << ",\t dev_mode._height = " << dev_mode.dmPelsHeight
         //          << ",\t dev_mode._refresh_rate = " << dev_mode.dmDisplayFrequency << ",\t dev_mode._bpp = " << dev_mode.dmBitsPerPel << ",\t dev_pos.x = " << dev_mode.dmPosition.x 
         //          << ",\t dev_pos.y = " << dev_mode.dmPosition.y << std::endl;
 
-        shared_ptr<display_info>    di(new display_info());
+            shared_ptr<display_info>    di(new display_info());
 
-        di->_dev_name               = disp_device.DeviceName;
-        di->_dev_string             = disp_device.DeviceString;
-        di->_screen_origin          = math::vec2i(disp_mode.dmPosition.x, disp_mode.dmPosition.y);
-        di->_screen_size            = math::vec2i(disp_mode.dmPelsWidth, disp_mode.dmPelsHeight);
-        di->_screen_refresh_rate    = disp_mode.dmDisplayFrequency;
-        di->_screen_bpp             = disp_mode.dmBitsPerPel;
+            di->_dev_name               = disp_device.DeviceName;
+            di->_dev_string             = disp_device.DeviceString;
+            di->_screen_origin          = math::vec2i(disp_mode.dmPosition.x, disp_mode.dmPosition.y);
+            di->_screen_size            = math::vec2i(disp_mode.dmPelsWidth, disp_mode.dmPelsHeight);
+            di->_screen_refresh_rate    = disp_mode.dmDisplayFrequency;
+            di->_screen_bpp             = disp_mode.dmBitsPerPel;
 
-        display_infos.insert(std::make_pair(di->_dev_name, di));
+            display_infos.insert(std::make_pair(di->_dev_name, di));
+        }
     }
 
-    return (true);
+    return !display_infos.empty();
 }
 
 std::string
