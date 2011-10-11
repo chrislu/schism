@@ -20,13 +20,12 @@ inline void swap_endian(T& val)
 {
     unsigned int Tsize = sizeof(T);
     
-    for (unsigned i = 0; i < Tsize/2; i++)
-    {
+    for (unsigned i = 0; i < Tsize/2; ++i) {
         unsigned char* r = (unsigned char*)(&val);
         unsigned char t;
 
-        t = r[i];
-        r[i] = r[Tsize - 1 - i];
+        t                = r[i];
+        r[i]             = r[Tsize - 1 - i];
         r[Tsize - 1 - i] = t;
     }
 }
