@@ -83,6 +83,7 @@ render_device::render_device()
     // setup main rendering context
     try {
         _main_context.reset(new render_context(*this));
+        _main_context->apply();
     }
     catch (const std::exception& e) {
         std::ostringstream s;
