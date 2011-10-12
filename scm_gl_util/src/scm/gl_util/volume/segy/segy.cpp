@@ -305,9 +305,6 @@ segy_data::segy_data(const io::file_ptr& segy_file)
         scm::size_t     trace_size = static_cast<scm::size_t>(_binary_header->_samples_per_trace) * size_of_format(trace_fmt) + sizeof(segy_trace_header);
         scm::size_t     num_traces = (segy_file->size() - traces_start_offset) / trace_size;
 
-
-        vec3ui          vdim = vec3ui(0u);
-
         vdim.x = _binary_header->_samples_per_trace;
         vdim.y = max<int16>(1, _binary_header->_traces_per_ensemble);
         vdim.z = static_cast<uint32>(num_traces / vdim.y);

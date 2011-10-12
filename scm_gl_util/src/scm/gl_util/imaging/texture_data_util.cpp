@@ -3,6 +3,10 @@
 
 #include <memory.h>
 
+#include <scm/gl_core/log.h>
+#include <scm/gl_core/texture_objects/texture_image.h>
+#include <scm/gl_util/imaging/mip_map_generation.h>
+
 namespace scm {
 namespace gl {
 namespace util {
@@ -321,6 +325,35 @@ volume_flip_vertical(const shared_array<uint8>& data,
         if (!image_layer_vert_flip_raw(data.get() + ssize * s, fmt, w, h)) {
             return false;
         }
+    }
+
+    return true;
+}
+
+
+bool
+generate_mipmaps(const math::vec3ui&        src_dim,
+                       gl::data_format      src_fmt,
+                       uint8*               src_data,
+                       std::vector<uint8*>& dst_data)
+{
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    switch (src_fmt) {
+    case FORMAT_R_32F:
+        typed_generate_mipmaps<float, 1, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_R_8:
+        typed_generate_mipmaps<uint8, 1, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGBA_8:
+        typed_generate_mipmaps<uint8, 4, 2>(src_dim, src_data, dst_data);
+        break;
+    default:
+        glerr() << log::error
+                << "generate_mipmaps(): error unsupported source data format (" << format_string(src_fmt) << ")." << log::end;
+        return false;
     }
 
     return true;
