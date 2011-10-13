@@ -137,6 +137,9 @@ volume_reader_vgeo::volume_reader_vgeo(const std::string& file_path,
         return;
     }
 
+    size_t slice_size = static_cast<size_t>(_dimensions.x) * _dimensions.y * size_of_format(_format);
+    _slice_buffer.reset(new uint8[slice_size]);
+
     //_vol_desc._volume_origin.x = vgeo_vol_hdr->xoffset;
     //_vol_desc._volume_origin.y = vgeo_vol_hdr->yoffset;
     //_vol_desc._volume_origin.z = vgeo_vol_hdr->zoffset;

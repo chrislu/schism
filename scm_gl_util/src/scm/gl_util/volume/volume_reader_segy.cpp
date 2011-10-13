@@ -130,7 +130,7 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
         //    return false;
         //}
 #if 1
-        if (o.x == 0 && s.x == _dimensions.x) {
+        if (o.x == 0 && s.x >= _dimensions.x) {
             // we can read complete sets of lines/traces
             scm::int64 offset_src;
             scm::int64 offset_dst;
@@ -145,7 +145,7 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
 
             for (unsigned int s = 0; s < read_dim.z; ++s) {
                 offset_src =   o64.x
-                            +  o64.x      * d64.y
+                            +  o64.y      * d64.x
                             + (o64.z + s) * d64.x * d64.y;
                 offset_src *= data_value_size;
                 offset_src += thsize * (o64.y + d64.y * (o64.z + s)); // consider the trace headers
@@ -153,7 +153,7 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
                 scm::int64 read_off      = dstart + offset_src;
                 scm::int64 line_size_raw = data_value_size * read_dim.x;
                 scm::int64 line_size_sgy = line_size_raw + thsize;
-                scm::int64 read_size     = read_dim.y * line_size_sgy;
+                scm::int64 read_size     = line_size_sgy * read_dim.y;
 
                 if (_file->read(_segy_slice_buffer.get(), read_off, read_size) != read_size) {
                     return false;

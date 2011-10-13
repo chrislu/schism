@@ -150,10 +150,14 @@ volume_reader_raw::volume_reader_raw(const std::string& file_path,
                 << "file size does not match data dimensions and data format." << scm::log::end;
         return;
     }
+
+    size_t slice_size = static_cast<size_t>(_dimensions.x) * _dimensions.y * size_of_format(_format);
+    _slice_buffer.reset(new uint8[slice_size]);
 }
 
 volume_reader_raw::~volume_reader_raw()
 {
+    _slice_buffer.reset();
     _file->close();
     _file.reset();
 }

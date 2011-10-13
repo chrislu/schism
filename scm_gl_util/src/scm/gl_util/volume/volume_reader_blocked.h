@@ -2,6 +2,9 @@
 #ifndef SCM_GL_UTIL_VOLUME_READER_BLOCKED_H_INCLUDED
 #define SCM_GL_UTIL_VOLUME_READER_BLOCKED_H_INCLUDED
 
+#include <scm/core/memory.h>
+#include <scm/core/numeric_types.h>
+
 #include <scm/gl_util/volume/volume_reader.h>
 
 #include <scm/core/platform/platform.h>
@@ -25,6 +28,7 @@ public:
 
 protected:
     int64               _data_start_offset;
+    shared_array<uint8> _slice_buffer;
 
 }; // struct volume_reader_blocked
 

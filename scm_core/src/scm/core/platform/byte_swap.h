@@ -99,7 +99,7 @@ template<typename T, size_t st>
 struct do_swap_bytes
 {
     inline void operator()(T*) {
-        throw std::out_of_range("there be dragons...");
+        throw std::out_of_range("do_swap_bytes(): there be dragons...");
     }
 };
 
