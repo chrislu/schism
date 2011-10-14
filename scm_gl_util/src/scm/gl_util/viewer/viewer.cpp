@@ -80,6 +80,7 @@ viewer::viewer_settings::viewer_settings()
   , _clear_depth(1.0f)
   , _clear_stencil(0)
   , _show_frame_times(false)
+  , _full_screen(false)
 {
 }
 
@@ -516,10 +517,10 @@ viewer::send_render_reshape(int width, int height)
 }
 
 void
-viewer::send_keyboard_input(int key, bool state)
+viewer::send_keyboard_input(int key, bool state, scm::uint32 mod)
 {
     if (_keyboard_func) {
-        _keyboard_func(key, state);
+        _keyboard_func(key, state, mod);
     }
 }
 

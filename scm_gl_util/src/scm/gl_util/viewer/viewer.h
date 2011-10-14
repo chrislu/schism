@@ -39,6 +39,14 @@ public:
         right_button
     }; // enum mouse_button
 
+    enum key_modifier {
+        km_no_modifier          = 0x0000,
+        km_shift_modifier       = 0x0002,
+        km_control_modifier     = 0x0004,
+        km_alt_modifier         = 0x0008,
+        km_meta_modifer         = 0x0010
+    }; // key_modifier
+
     struct __scm_export(gl_util) viewer_attributes {
         viewer_attributes();
 
@@ -56,6 +64,7 @@ public:
         float       _clear_depth;
         unsigned    _clear_stencil;
         bool        _show_frame_times;
+        bool        _full_screen;
     }; // struct viewer_settings
 
     typedef scm::time::accumulate_timer<scm::time::high_res_timer>  accum_timer_type;
@@ -67,7 +76,7 @@ public:
                                   int, int)>                    resize_func;
     typedef boost::function<void (const render_context_ptr&)>   display_func;
 
-    typedef boost::function<void (int, bool)>                   keyboard_func;
+    typedef boost::function<void (int, bool, scm::uint32)>      keyboard_func;
     typedef boost::function<void (mouse_button, int, int)>      mouse_func;
 
 public:
@@ -121,7 +130,7 @@ public:
     void                            send_render_display();
     void                            send_render_reshape(int width, int height);
 
-    void                            send_keyboard_input(int key, bool state);
+    void                            send_keyboard_input(int key, bool state, scm::uint32 mod);
     void                            send_mouse_double_click(mouse_button button, int x, int y);
     void                            send_mouse_press(mouse_button button, int x, int y);
     void                            send_mouse_release(mouse_button button, int x, int y);
