@@ -22,6 +22,11 @@ namespace gl {
 class __scm_export(gl_util) texture_image_data
 {
 public:
+    enum data_origin {
+        ORIGIN_LOWER_LEFT   = 0x01,
+        ORIGIN_UPPER_LEFT
+    }; // enum data_origin
+
     class level {
         math::vec3ui            _size;
         shared_array<uint8>     _data;
@@ -36,19 +41,25 @@ public:
     typedef std::vector<level>  level_vector;
 
 public:
-    texture_image_data(const data_format   img_format,
+    texture_image_data(const data_origin   img_origin,
+                       const data_format   img_format,
                        const level_vector& img_mip_data);
-    texture_image_data(const data_format   img_format,
+    texture_image_data(const data_origin   img_origin,
+                       const data_format   img_format,
                        const int           layers,
                        const level_vector& img_mip_data);
     /*virtual*/ ~texture_image_data();
 
+    const data_origin           origin() const;
     const data_format           format() const;
     const level&                mip_level(const int i) const;
     int                         mip_level_count() const;
     int                         array_layers() const;
 
+    bool                        flip_vertical();
+
 protected:
+    data_origin                 _origin;
     data_format                 _format;
     int                         _layers;
     level_vector                _mip_levels;

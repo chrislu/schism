@@ -578,6 +578,7 @@ match_format(const dds_file& dds)
         switch (dds.dds_header()->ddspf.dwRGBBitCount) {
             case 16:break;
             case 24:
+                if(SCM_ISBITMASK(0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000))   return FORMAT_RGB_8;
                 if(SCM_ISBITMASK(0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000))   return FORMAT_BGR_8;
                 break;
             case 32:
@@ -622,6 +623,95 @@ match_format(const dds_file& dds)
 }
 
 #undef SCM_ISBITMASK
+
+unsigned
+dds_fourcc(scm::gl::data_format f)
+{
+    using namespace scm::gl;
+#if 1
+    switch (f) {
+        //case FORMAT_BGR_8       : return D3DFMT_R8G8B8;
+        //case FORMAT_BGRA_8      : return D3DFMT_A8R8G8B8;
+        //case FORMAT_R_8         : return D3DFMT_A8;
+        //case FORMAT_RGBA_8      : return D3DFMT_A8B8G8R8;
+        //case FORMAT_RG_16       : return D3DFMT_G16R16;
+        //case FORMAT_RGBA_16     : return D3DFMT_A16B16G16R16;
+        //case FORMAT_RG_8        : return D3DFMT_A8L8;
+        case FORMAT_BC1_RGBA    : return D3DFMT_DXT1;
+        case FORMAT_BC2_RGBA    : return D3DFMT_DXT3;
+        case FORMAT_BC3_RGBA    : return D3DFMT_DXT5;
+        //case FORMAT_R_16        : return D3DFMT_L16;
+        case FORMAT_R_16F       : return D3DFMT_R16F;
+        case FORMAT_RG_16F      : return D3DFMT_G16R16F;
+        case FORMAT_RGBA_16F    : return D3DFMT_A16B16G16R16F;
+        case FORMAT_R_32F       : return D3DFMT_R32F;
+        case FORMAT_RG_32F      : return D3DFMT_G32R32F;
+        case FORMAT_RGBA_32F    : return D3DFMT_A32B32G32R32F;
+        default                 : return 0;
+    }
+#else
+    return 0;
+#endif
+}
+
+bool
+dds_bitmask(scm::gl::data_format f, unsigned& rm, unsigned& gm, unsigned& bm, unsigned& am)
+{
+    using namespace scm::gl;
+
+    if (dds_fourcc(f) != 0) {
+        rm = gm = bm = am = 0u;
+        return true;
+    }
+
+    switch (f) {
+        case FORMAT_R_8:    rm = 0x000000ffu; gm = 0x00000000u; bm = 0x00000000u; am = 0x00000000u; break;
+        case FORMAT_R_16:   rm = 0x0000ffffu; gm = 0x00000000u; bm = 0x00000000u; am = 0x00000000u; break;
+        case FORMAT_R_32F:  rm = 0xffffffffu; gm = 0x00000000u; bm = 0x00000000u; am = 0x00000000u; break;
+
+        case FORMAT_RGB_8:  rm = 0x000000ffu; gm = 0x0000ff00u; bm = 0x00ff0000u; am = 0x00000000u; break;
+        case FORMAT_BGR_8:  rm = 0x00ff0000u; gm = 0x0000ff00u; bm = 0x000000ffu; am = 0x00000000u; break;
+
+        case FORMAT_RGBA_8: rm = 0x000000ffu; gm = 0x0000ff00u; bm = 0x00ff0000u; am = 0xff000000u; break;
+        case FORMAT_BGRA_8: rm = 0x00ff0000u; gm = 0x0000ff00u; bm = 0x000000ffu; am = 0xff000000u; break;
+
+        case FORMAT_RG_16:  rm = 0x0000ffffu; gm = 0xffff0000u; bm = 0x00000000u; am = 0x00000000u; break;
+
+        default:            return false;
+    };
+
+    return true;
+}
+
+unsigned
+dds_flags(scm::gl::data_format f)
+{
+    using namespace scm::gl;
+
+    unsigned r = 0;
+    if (dds_fourcc(f) != 0) {
+        r |= DDPF_FOURCC;
+    }
+    else {
+        switch (f) {
+            case FORMAT_RG_16:
+            case FORMAT_R_32F:
+            case FORMAT_RGB_8:
+            case FORMAT_BGR_8:
+                r |= DDPF_RGB;
+                break;
+            case FORMAT_RGBA_8:
+            case FORMAT_BGRA_8:
+                r |= DDPF_RGBA;
+                break;
+            case FORMAT_R_8:
+            case FORMAT_R_16:
+                r |= DDPF_LUMINANCE;
+            break;
+        };
+    }
+    return r;
+}
 
 scm::math::vec3ui
 retrieve_dimensions(const dds_file& dds)
@@ -700,7 +790,7 @@ namespace scm {
 namespace gl {
 
 texture_image_data_ptr
-texture_loader_dds::load_image_data(const std::string& in_image_path)
+texture_loader_dds::load_image_data(const std::string& in_image_path) const
 {
     using namespace scm::math;
 
@@ -783,24 +873,137 @@ texture_loader_dds::load_image_data(const std::string& in_image_path)
         }
     }
 
-    { // dds files use upper-left origin, we flip!
-        for (unsigned l = 0; l < img_mip_count; ++l) {
-            if (!util::volume_flip_vertical(img_lev_data[l].data(), img_format, img_lev_data[l].size().x, img_lev_data[l].size().y, img_lev_data[l].size().z)) {
-                glerr() << log::error
-                        << "texture_loader_dds::load_image_data(): error flipping image: " << in_image_path << log::end;
-                return texture_image_data_ptr();
-            }
-        }
-    }
-
-    texture_image_data_ptr ret_img(new texture_image_data(img_format, img_layer_count, img_lev_data));
+    texture_image_data_ptr ret_img(new texture_image_data(texture_image_data::ORIGIN_UPPER_LEFT, img_format, img_layer_count, img_lev_data));
+    
+    // dds files use upper-left origin, we flip!
+    ret_img->flip_vertical();
 
     return ret_img;
 }
 
+bool
+texture_loader_dds::save_image_data_dx9(const std::string&           in_image_path,
+                                        const texture_image_data_ptr in_img_data) const
+{
+    using namespace scm;
+    using namespace scm::gl;
+    using namespace scm::io;
+    using namespace scm::math;
+
+    if (in_img_data->origin() == texture_image_data::ORIGIN_LOWER_LEFT) {
+        if (!in_img_data->flip_vertical()) {
+            glerr() << log::error
+                    << "texture_loader_dds::save_image_data_dx9(): error flipping image data before save operation." << log::end;
+            return false;
+        }
+    }
+
+
+    scoped_ptr<io::file> out_file(new io::file());
+
+    // TODO check if file exists...
+
+    if (!out_file->open(in_image_path, std::ios_base::out, false)) {
+        glerr() << log::error
+                << "texture_loader_dds::save_image_data_dx9(): error opening output file: "
+                << in_image_path << log::end;
+        return false;
+    }
+
+    scm::size_t       dds_header_off = sizeof(unsigned int);
+    scm::size_t       dds_data_off   = dds_header_off + sizeof(DDS_HEADER);
+
+    // check  magic number ("DDS ")
+    unsigned int magic_number = DDS_MAGIC;
+    if (out_file->write(&magic_number, 0, sizeof(unsigned int)) != sizeof(unsigned int)) {
+        glerr() << log::error
+                << "texture_loader_dds::save_image_data_dx9(): error writing to output file: " << in_image_path 
+                << " (number of bytes attempted to write: " << sizeof(unsigned int) << ", at position : " << 0 << ")" << log::end;
+        return false;
+    }
+
+    scoped_ptr<DDS_HEADER> dds9_header(new DDS_HEADER);
+    memset(dds9_header.get(), 0, sizeof(DDS_HEADER));
+
+    // setup dds header
+    dds9_header->dwSize              = sizeof(DDS_HEADER);
+    dds9_header->dwHeaderFlags       =   DDSD_CAPS
+                                       | DDSD_WIDTH
+                                       | DDSD_HEIGHT
+                                       | (in_img_data->mip_level(0).size().z > 1 ? DDSD_DEPTH : 0)
+                                       | DDSD_PIXELFORMAT
+                                       | (in_img_data->mip_level_count() > 1 ? DDSD_MIPMAPCOUNT : 0)
+                                       | (is_compressed_format(in_img_data->format()) ? DDSD_LINEARSIZE : DDSD_PITCH);
+    dds9_header->dwHeight            = in_img_data->mip_level(0).size().y;
+    dds9_header->dwWidth             = in_img_data->mip_level(0).size().x;
+    dds9_header->dwPitchOrLinearSize = (is_compressed_format(in_img_data->format())
+                                         ? max(1u, (in_img_data->mip_level(0).size().x * 3u) / 4u) * compressed_block_size(in_img_data->format())
+                                         : (in_img_data->mip_level(0).size().x * bit_per_pixel(in_img_data->format()) + 7) / 8
+                                       );
+    dds9_header->dwDepth             = (in_img_data->mip_level(0).size().z > 1 ? in_img_data->mip_level(0).size().z : 0);
+    dds9_header->dwMipMapCount       = (in_img_data->mip_level_count() > 1 ? in_img_data->mip_level_count() : 0);
+    dds9_header->ddspf.dwSize        = sizeof(DDS_PIXELFORMAT);
+    dds9_header->ddspf.dwFlags       = dds_flags(in_img_data->format());
+    dds9_header->ddspf.dwFourCC      = dds_fourcc(in_img_data->format());
+    dds9_header->ddspf.dwRGBBitCount = (dds9_header->ddspf.dwFourCC & DDPF_FOURCC ? 0 : bit_per_pixel(in_img_data->format()));
+    unsigned rm = 0;
+    unsigned gm = 0;
+    unsigned bm = 0;
+    unsigned am = 0;
+    if (!dds_bitmask(in_img_data->format(), rm, gm, bm, am)) {
+        glerr() << log::error
+                << "texture_loader_dds::save_image_data_dx9(): error generating dds header bitmask info." << log::end;
+        return false;
+    }
+    dds9_header->ddspf.dwRBitMask   = rm;
+    dds9_header->ddspf.dwGBitMask   = gm;
+    dds9_header->ddspf.dwBBitMask   = bm;
+    dds9_header->ddspf.dwABitMask   = am;
+    dds9_header->dwSurfaceFlags     =   DDSCAPS_TEXTURE
+                                      | (in_img_data->mip_level_count() > 1 ? DDSCAPS_MIPMAP : 0)
+                                      | (in_img_data->mip_level_count() > 1 ? DDSCAPS_COMPLEX : 0);
+    dds9_header->dwSurfaceFlags2    = (in_img_data->mip_level(0).size().z > 1 ? DDSCAPS2_VOLUME : 0);
+
+    if (out_file->write(dds9_header.get(), dds_header_off, sizeof(DDS_HEADER)) != sizeof(DDS_HEADER)) {
+        glerr() << log::error
+                << "texture_loader_dds::save_image_data_dx9(): error writing to output file: " << in_image_path 
+                << " (number of bytes attempted to write: " << sizeof(DDS_HEADER) << ", at position : " << dds_header_off << ")" << log::end;
+        return false;
+    }
+
+    { // write image data
+        io::file::offset_type woff = dds_data_off;
+        for (unsigned l = 0; l < static_cast<unsigned>(in_img_data->mip_level_count()); ++l) {
+            const scm::size_t         lmip_img_size = mip_level_size(in_img_data->mip_level(l).size(), in_img_data->format());
+
+            if (out_file->write(in_img_data->mip_level(l).data().get(), woff, lmip_img_size) != lmip_img_size) {
+                glerr() << log::error
+                        << "texture_loader_dds::save_image_data_dx9(): error writing to output file: " << in_image_path 
+                        << " (number of bytes attempted to write: " << lmip_img_size << ", at position : " << woff << ")" << log::end;
+                return false;
+            }
+
+            woff += lmip_img_size;
+        }
+    }
+
+    out_file->close();
+
+    if (in_img_data->origin() == texture_image_data::ORIGIN_UPPER_LEFT) {
+        if (!in_img_data->flip_vertical()) {
+            glerr() << log::error
+                    << "texture_loader_dds::save_image_data_dx9(): error flipping image data after save operation." << log::end;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 texture_2d_ptr
 texture_loader_dds::load_texture_2d(render_device&       in_device,
-                                    const std::string&   in_image_path)
+                                    const std::string&   in_image_path) const
 {
     texture_image_data_ptr img_data = load_image_data(in_image_path);
     if (!img_data) {
@@ -834,7 +1037,7 @@ texture_loader_dds::load_texture_2d(render_device&       in_device,
 
 texture_3d_ptr
 texture_loader_dds::load_texture_3d(render_device&       in_device,
-                                    const std::string&   in_image_path)
+                                    const std::string&   in_image_path) const
 {
     texture_image_data_ptr img_data = load_image_data(in_image_path);
     if (!img_data) {

@@ -21,13 +21,15 @@ namespace gl {
 
 class __scm_export(gl_util) texture_loader_dds
 {
-
 public:
 
-    texture_2d_ptr              load_texture_2d(render_device& in_device, const std::string& in_image_path);
-    texture_3d_ptr              load_texture_3d(render_device& in_device, const std::string& in_image_path);
+    texture_2d_ptr              load_texture_2d(render_device& in_device, const std::string& in_image_path) const;
+    texture_3d_ptr              load_texture_3d(render_device& in_device, const std::string& in_image_path) const;
 
-    texture_image_data_ptr      load_image_data(const std::string&  in_image_path);
+    texture_image_data_ptr      load_image_data(const std::string&  in_image_path) const;
+
+    bool                        save_image_data_dx9(const std::string&           in_image_path,
+                                                    const texture_image_data_ptr in_img_data) const;
 
 }; // class texture_loader_dds
 
