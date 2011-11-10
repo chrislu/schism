@@ -11,6 +11,8 @@
 //#include <istream>
 //#include <iterator>
 
+#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
+
 namespace scm {
 namespace data {
 
