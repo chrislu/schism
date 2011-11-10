@@ -347,6 +347,9 @@ generate_mipmaps(const math::vec3ui&        src_dim,
     case FORMAT_R_8:
         typed_generate_mipmaps<uint8, 1, 2>(src_dim, src_data, dst_data);
         break;
+    case FORMAT_R_16:
+        typed_generate_mipmaps<uint16, 1, 2>(src_dim, src_data, dst_data);
+        break;
     case FORMAT_RGBA_8:
         typed_generate_mipmaps<uint8, 4, 2>(src_dim, src_data, dst_data);
         break;
