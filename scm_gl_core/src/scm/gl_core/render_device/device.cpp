@@ -42,7 +42,7 @@ render_device::render_device()
         std::ostringstream s;
         s << "render_device::render_device(): error initializing gl core.";
         glerr() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
+        throw std::runtime_error(s.str());
     }
     unsigned req_version_major = SCM_GL_CORE_OPENGL_CORE_VERSION / 100;
     unsigned req_version_minor = (SCM_GL_CORE_OPENGL_CORE_VERSION - req_version_major * 100) / 10;
@@ -56,7 +56,7 @@ render_device::render_device()
           << _opengl_api_core->context_information()._version_major << "."
           << _opengl_api_core->context_information()._version_minor << ").";
         glerr() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
+        throw std::runtime_error(s.str());
     }
     else {
         glout() << log::info << "render_device::render_device(): "
@@ -74,11 +74,18 @@ render_device::render_device()
         s << "render_device::render_device(): error initializing gl core "
           << "(missing requiered extension GL_EXT_direct_state_access).";
         glerr() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
+        throw std::runtime_error(s.str());
     }
 #endif
 
     init_capabilities();
+
+    if (!init_opencl()) {
+        std::ostringstream s;
+        s << "render_device::render_device(): error initializing OpenCL.";
+        glerr() << log::fatal << s.str() << log::end;
+        throw std::runtime_error(s.str());
+    }
 
     // setup main rendering context
     try {
@@ -91,7 +98,7 @@ render_device::render_device()
           << e.what()
           << ").";
         glerr() << log::fatal << s.str() << log::end;
-        throw(std::runtime_error(s.str()));
+        throw std::runtime_error(s.str());
     }
 }
 
@@ -525,8 +532,8 @@ render_device::create_shader(shader_stage                    in_stage,
     // combine shader include paths
     shader_include_path_list   include_paths(in_inc_paths);
 
-    shader_include_path_set::const_iterator ipb = _default_include_paths.begin();
-    shader_include_path_set::const_iterator ipe = _default_include_paths.end();
+    string_set::const_iterator ipb = _default_include_paths.begin();
+    string_set::const_iterator ipe = _default_include_paths.end();
 
     for(; ipb != ipe; ++ipb) {
         include_paths.push_back(*ipb);

@@ -25,6 +25,8 @@
 #include <scm/gl_core/state_objects/depth_stencil_state.h>
 #include <scm/gl_core/state_objects/rasterizer_state.h>
 
+#include <scm/gl_core/opencl_interop/opencl_interop_fwd.h>
+
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
@@ -68,13 +70,13 @@ public:
 
 protected:
     typedef boost::unordered_set<render_device_resource*>   resource_ptr_set;
-    //typedef std::map<std::string, shader_macro>             shader_macro_map;
+
     typedef boost::unordered_map<std::string, shader_macro> shader_macro_map;
-    typedef std::set<std::string>                           shader_include_path_set;
+    typedef std::set<std::string>                           string_set;
 
     typedef std::list<shader_ptr>                           shader_list;
 
-    typedef std::vector<buffer_ptr>             buffer_array;
+    typedef std::vector<buffer_ptr>                         buffer_array;
 
 ////// methods ////////////////////////////////////////////////////////////////////////////////////
 public:
@@ -278,15 +280,43 @@ public:
     timer_query_ptr                 create_timer_query();
     transform_feedback_statistics_query_ptr create_transform_feedback_statistics_query(int stream = 0);
 
+    // opencl interop /////////////////////////////////////////////////////////////////////////////
+public:
+    const cl::platform_ptr&         cl_platform() const;
+    const cl::context_ptr&          cl_context() const;
+    const cl::device_ptr&           cl_device() const;
+
+    void                            add_cl_include_path(const std::string& in_path);
+
+    cl::program_ptr                 create_cl_program(const std::string& in_source,
+                                                      const std::string& in_options,
+                                                      const std::string& in_source_name = "");
+    cl::program_ptr                 create_cl_program_from_file(const std::string& in_file_name,
+                                                                const std::string& in_options);
+
+    cl::kernel_ptr                  create_cl_kernel(const cl::program_ptr& in_program,
+                                                     const std::string&     in_entry_point);
+
+protected:
+    bool                            init_opencl();
+
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:
     // device /////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr<opengl::gl_core>    _opengl_api_core;
+    shared_ptr<opengl::gl_core>     _opengl_api_core;
     render_context_ptr              _main_context;
+
+    // opencl interop /////////////////////////////////////////////////////////////////////////////
+    cl::platform_ptr                _cl_platform;
+    cl::context_ptr                 _cl_context;
+    cl::device_ptr                  _cl_device;
+
+    std::string                     _default_options;
+    string_set                      _default_cl_include_paths;
 
     // shader api /////////////////////////////////////////////////////////////////////////////////
     shader_macro_map                _default_macro_defines;
-    shader_include_path_set         _default_include_paths;
+    string_set                      _default_include_paths;
 
     device_capabilities             _capabilities;
     resource_ptr_set                _registered_resources;

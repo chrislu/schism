@@ -1,6 +1,8 @@
 
 #include "context.h"
 
+#include <sstream>
+
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/object_state.h>
 #include <scm/gl_core/buffer_objects.h>
@@ -139,6 +141,12 @@ render_context::render_context(render_device& in_device)
     _debug_synchronous_reporting = true;
 
     _active_transform_feedback_topology_mode = PRIMITIVE_POINTS;
+
+    if (!init_opencl(in_device)) {
+        std::ostringstream s;
+        s << "render_context::render_context(): error initializing OpenCL command queue.";
+        throw std::runtime_error(s.str());
+    }
 
     gl_assert(glapi, leaving render_context::render_context());
 }

@@ -42,6 +42,9 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/render_device/opengl/util
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/math *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/math *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/opencl_interop *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/opencl_interop *.h *.inl)
+
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/primitives *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/primitives *.h *.inl)
 
@@ -135,18 +138,19 @@ scm_link_libraries(ALL
 	scm_core
 )
 scm_link_libraries(WIN32
-    opengl32
+    general OpenCL
+    general opengl32
 )
 scm_link_libraries(UNIX
-    GL
+    genral GL
 )
 
 if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 	scm_link_libraries(WIN32
-	    glew32
+	    general glew32
 	)
 	scm_link_libraries(UNIX
-	    GLEW
+	    general GLEW
 	)
 endif (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 

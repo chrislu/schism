@@ -17,6 +17,7 @@
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 #include <scm/gl_core/render_device/device_child.h>
+#include <scm/gl_core/opencl_interop/opencl_interop_fwd.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
@@ -300,6 +301,13 @@ public:
     void                            end_query(const query_ptr& in_query);
     void                            collect_query_results(const query_ptr& in_query);
 
+    // opencl interop /////////////////////////////////////////////////////////////////////////////
+public:
+    const cl::command_queue_ptr&    cl_command_queue() const;
+
+protected:
+    bool                            init_opencl(render_device& in_device);
+
 protected:
     render_context(render_device& in_device);
 
@@ -326,6 +334,10 @@ private:
     depth_stencil_state_ptr     _default_depth_stencil_state;
     rasterizer_state_ptr        _default_rasterizer_state;
     blend_state_ptr             _default_blend_state;
+
+    // opencl interop /////////////////////////////////////////////////////////////////////////////
+    cl::command_queue_ptr       _cl_command_queue;
+
 
     friend class render_device;    
 }; // class render_context
