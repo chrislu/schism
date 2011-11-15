@@ -47,6 +47,22 @@ public:
         km_meta_modifer         = 0x0010
     }; // key_modifier
 
+    enum tablet_device {
+        no_device       = 0x00,
+        puck            = 0x01,
+        stylus,
+        airbrush,
+        mouse_4d,
+        rotation_stylus
+    }; // enum tablet_device
+
+    enum tablet_pointer_type {
+        unknown_pointer = 0x00,
+        pen             = 0x01,
+        cursor,
+        eraser
+    }; // enum tablet_device
+
     struct __scm_export(gl_util) viewer_attributes {
         viewer_attributes();
 
@@ -78,6 +94,16 @@ public:
 
     typedef boost::function<void (int, bool, scm::uint32)>      keyboard_func;
     typedef boost::function<void (mouse_button, int, int)>      mouse_func;
+
+    typedef boost::function<void (tablet_device,
+                                  tablet_pointer_type,                                  
+                                  math::vec3i const&,   
+                                  math::vec2d const&,
+                                  math::vec2i const&,
+                                  double, 
+                                  double, 
+                                  //double,
+                                  scm::int64)>                  tablet_func;
 
 public:
     viewer(const math::vec2ui&                  vp_dim,
@@ -125,6 +151,8 @@ public:
     void                            mouse_release_func(const mouse_func& f);
     void                            mouse_move_func(const mouse_func& f);
 
+    void                            tablet_input_func(const tablet_func& f);
+
     // callback invoke (to be hidden somewhere else)
     void                            send_render_update();
     void                            send_render_display();
@@ -135,6 +163,16 @@ public:
     void                            send_mouse_press(mouse_button button, int x, int y);
     void                            send_mouse_release(mouse_button button, int x, int y);
     void                            send_mouse_move(mouse_button button, int x, int y);
+
+    void                            send_tablet_input(tablet_device       device,
+                                                      tablet_pointer_type pointer_type,  
+                                                      math::vec3i const&  pos,
+                                                      math::vec2d const&  x_y_hi_res_glob, 
+                                                      math::vec2i const&  x_y_tilt,
+                                                      double              pressure, 
+                                                      double              rotation, 
+                                                      //double               tangential_pressure,
+                                                      scm::int64          unique_id);
 
 protected:
     bool                            initialize_render_target();
@@ -208,7 +246,9 @@ protected:
     mouse_func                      _mouse_press_func;
     mouse_func                      _mouse_release_func;
     mouse_func                      _mouse_move_func;
-    
+
+    tablet_func                     _tablet_func;
+
 }; // class viewer
 
 } // namespace gl

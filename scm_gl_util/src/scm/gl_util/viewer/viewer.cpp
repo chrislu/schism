@@ -371,6 +371,12 @@ viewer::mouse_move_func(const mouse_func& f)
 }
 
 void
+viewer::tablet_input_func(const tablet_func& f)
+{
+    _tablet_func = f;
+}
+
+void
 viewer::send_render_update()
 {
     using namespace scm::math;
@@ -582,6 +588,30 @@ viewer::send_mouse_move(mouse_button button, int x, int y)
 
     if (_mouse_move_func) {
         _mouse_move_func(button, x, y);
+    }
+}
+
+void
+viewer::send_tablet_input(tablet_device       device,
+                          tablet_pointer_type pointer_type,  
+                          math::vec3i const&  pos,
+                          math::vec2d const&  x_y_hi_res_glob, 
+                          math::vec2i const&  x_y_tilt,
+                          double              pressure, 
+                          double              rotation, 
+                          //double              tangential_pressure,
+                          scm::int64          unique_id)
+{
+    if (_tablet_func) {
+        _tablet_func(device,
+                     pointer_type,
+                     pos,
+                     x_y_hi_res_glob,
+                     x_y_tilt,
+                     pressure, 
+                     rotation, 
+                     //tangential_pressure,
+                     unique_id);
     }
 }
 
