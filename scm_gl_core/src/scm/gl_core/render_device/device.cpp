@@ -1075,6 +1075,47 @@ render_device::create_transform_feedback_statistics_query(int stream)
     }
 }
 
+// debug //////////////////////////////////////////////////////////////////////////////////////////
+void
+render_device::dump_memory_info(std::ostream& os) const
+{
+    const opengl::gl_core& glcore = opengl_api();
+    util::gl_error         glerror(glcore);
+
+    if (!glcore.extension_NVX_gpu_memory_info) {
+        glout() << log::warning << "render_device::dump_memory_info(): "
+                << "shader includes not supported (GL_NVX_gpu_memory_info unsupported), ignoring call." << log::end;
+    }
+    else {
+        static const unsigned int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX           = 0x9047u;
+        static const unsigned int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX     = 0x9048u;
+        static const unsigned int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX   = 0x9049u;
+        static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
+        static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
+
+        int dedicated_vidmem         = 0;    
+        int total_available_memory   = 0;
+        int current_available_vidmem = 0;
+        int eviction_count           = 0;
+        int evicted_memory           = 0;
+
+        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX        , &dedicated_vidmem        );
+        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX  , &total_available_memory  );
+        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &current_available_vidmem);
+        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX          , &eviction_count          );
+        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX          , &evicted_memory          );
+        
+        os << std::fixed << std::setprecision(3)
+           << "dedicated_vidmem        : " << static_cast<float>(dedicated_vidmem        ) / 1024.0f << "MiB" << std::endl
+           << "total_available_memory  : " << static_cast<float>(total_available_memory  ) / 1024.0f << "MiB" << std::endl
+           << "current_available_vidmem: " << static_cast<float>(current_available_vidmem) / 1024.0f << "MiB" << std::endl
+           << "eviction_count          : " << eviction_count           << std::endl
+           << "evicted_memory          : " << evicted_memory           << std::endl;
+    }
+
+    gl_assert(glcore, leaving render_device::dump_memory_info());
+}
+
 void
 render_device::print_device_informations(std::ostream& os) const
 {

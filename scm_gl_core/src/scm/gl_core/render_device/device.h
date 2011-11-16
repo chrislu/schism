@@ -280,6 +280,10 @@ public:
     timer_query_ptr                 create_timer_query();
     transform_feedback_statistics_query_ptr create_transform_feedback_statistics_query(int stream = 0);
 
+    // debug //////////////////////////////////////////////////////////////////////////////////////
+public:
+    void                            dump_memory_info(std::ostream& os) const;
+
     // opencl interop /////////////////////////////////////////////////////////////////////////////
 public:
     const cl::platform_ptr&         cl_platform() const;

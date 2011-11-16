@@ -119,6 +119,7 @@ gl_core::gl_core()
     extension_EXT_direct_state_access_available = false;
     extension_EXT_texture_compression_s3tc      = false;
     extension_ARB_texture_compression_bptc      = false;
+    extension_NVX_gpu_memory_info               = false;
 }
 
 bool
@@ -252,6 +253,7 @@ gl_core::initialize()
 
     extension_EXT_texture_compression_s3tc = is_supported("GL_EXT_texture_compression_s3tc");
     extension_ARB_texture_compression_bptc = is_supported("GL_ARB_texture_compression_bptc");
+    extension_NVX_gpu_memory_info          = is_supported("GL_NVX_gpu_memory_info");
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
