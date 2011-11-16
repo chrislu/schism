@@ -13,6 +13,13 @@
 
 #include <CL/cl.hpp>
 
+#if SCM_PLATFORM == SCM_PLATFORM_LINUX
+
+#include <X11/Xlib.h>
+#include <GL/glx.h>
+
+#endif // SCM_PLATFORM == SCM_PLATFORM_LINUX
+
 #include <scm/core/io/tools.h>
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/foreach.h>

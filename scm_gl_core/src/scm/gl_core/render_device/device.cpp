@@ -1093,7 +1093,7 @@ render_device::dump_memory_info(std::ostream& os) const
         static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
         static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
 
-        int dedicated_vidmem         = 0;    
+        int dedicated_vidmem         = 0;
         int total_available_memory   = 0;
         int current_available_vidmem = 0;
         int eviction_count           = 0;
