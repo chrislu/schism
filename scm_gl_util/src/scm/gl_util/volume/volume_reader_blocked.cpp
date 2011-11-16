@@ -1,6 +1,8 @@
 
 #include "volume_reader_blocked.h"
 
+#include <memory.h>
+
 #include <scm/core/io/file.h>
 
 namespace {

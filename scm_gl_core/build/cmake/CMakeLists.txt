@@ -112,7 +112,7 @@ scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_BOOST_INC_DIR})
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
-#scm_project_include_directories(UNIX )
+scm_project_include_directories(UNIX /opt/OpenCL/include)
 
 # set library directories
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
@@ -142,7 +142,8 @@ scm_link_libraries(WIN32
     general opengl32
 )
 scm_link_libraries(UNIX
-    genral GL
+    general GL
+    general OpenCL
 )
 
 if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)

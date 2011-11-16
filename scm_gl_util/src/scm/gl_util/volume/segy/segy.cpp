@@ -1,6 +1,8 @@
 
 #include "segy.h"
 
+#include <string.h>
+
 #include <exception>
 #include <stdexcept>
 
