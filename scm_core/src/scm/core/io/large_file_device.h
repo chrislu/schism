@@ -53,6 +53,7 @@ public:
 
 private:
     boost::shared_ptr<file>     _impl;
+    file::offset_type           _position;
 
 }; // class large_file
 
