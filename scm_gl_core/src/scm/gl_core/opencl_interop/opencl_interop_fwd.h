@@ -30,8 +30,11 @@ class NDRange;
 
 namespace scm {
 namespace cl {
+namespace util {
 
 class accumulate_timer;
+
+} // namespace util
 
 using ::cl::Platform;
 using ::cl::Device;

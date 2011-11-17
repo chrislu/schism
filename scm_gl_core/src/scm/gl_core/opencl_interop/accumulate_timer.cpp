@@ -2,6 +2,9 @@
 #include "accumulate_timer.h"
 
 #include <CL/cl.hpp>
+#include <scm/gl_core/opencl_interop.h>
+
+#include <scm/gl_core/log.h>
 
 namespace scm {
 namespace cl {
@@ -27,13 +30,24 @@ void
 accumulate_timer::collect()
 {
     assert(_cl_event);
+    cl_int      cl_error00 = CL_SUCCESS;
+    cl_int      cl_error01 = CL_SUCCESS;
 
-    cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>();
-    cl_ulong end   = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_END>();
-    cl_ulong diff  = ((end > start) ? (end - start) : (~start + 1 + end));
+    cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>(&cl_error00);
+    cl_ulong end   = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_END>(&cl_error01);
 
-    _accumulated_duration += time::nanosec(diff);
-    ++_accumulation_count;
+    if (   CL_SUCCESS != cl_error00
+        || CL_SUCCESS != cl_error01) {
+        gl::glerr() << log::error
+                    << "accumulate_timer::collect(): "
+                    << "unable retrieve timer data "
+                    << "(" << util::cl_error_string(cl_error00) << ", " << util::cl_error_string(cl_error01) << ")." << log::end;
+    }
+    else {
+        cl_ulong diff  = ((end > start) ? (end - start) : (~start + 1 + end));
+        _accumulated_duration += time::nanosec(diff);
+        ++_accumulation_count;
+    }
 }
 
 void
