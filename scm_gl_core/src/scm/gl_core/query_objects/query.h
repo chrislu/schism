@@ -19,8 +19,10 @@ public:
 protected:
     query(render_device& in_device);
 
-    virtual void    begin(const render_context& in_context) const;
-    virtual void    end(const render_context& in_context) const;
+    void            begin(const render_context& in_context) const;
+    void            end(const render_context& in_context) const;
+
+    bool            available(const render_context& in_context) const;
 
     virtual void    collect(const render_context& in_context) = 0;
 

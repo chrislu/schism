@@ -299,7 +299,8 @@ protected:
 public:
     void                            begin_query(const query_ptr& in_query);
     void                            end_query(const query_ptr& in_query);
-    void                            collect_query_results(const query_ptr& in_query);
+    bool                            query_result_available(const query_ptr& in_query) const;
+    void                            collect_query_results(const query_ptr& in_query) const;
 
     // opencl interop /////////////////////////////////////////////////////////////////////////////
 public:

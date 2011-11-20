@@ -61,6 +61,22 @@ query::end(const render_context& in_context) const
     gl_assert(glapi, leaving query::end());
 }
 
+bool
+query::available(const render_context& in_context) const
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+    assert(0 != query_id());
+    assert(0 != query_type());
+
+    int query_available = GL_FALSE;
+
+    glapi.glGetQueryObjectiv(query_id(), GL_QUERY_RESULT_AVAILABLE, &query_available);
+    
+    gl_assert(glapi, leaving query::available());
+
+    return query_available != GL_FALSE;
+}
+
 int
 query::index() const
 {

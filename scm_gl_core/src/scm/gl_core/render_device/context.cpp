@@ -1697,18 +1697,44 @@ render_context::end_query(const query_ptr& in_query)
     gl_assert(opengl_api(), leaving render_context::end_query());
 }
 
-void
-render_context::collect_query_results(const query_ptr& in_query)
+bool
+render_context::query_result_available(const query_ptr& in_query) const
 {
-    indexed_query_id cur_query = std::make_pair(in_query->query_type(), in_query->index());
+    indexed_query_id cur_query_id = std::make_pair(in_query->query_type(), in_query->index());
 
-    if (_active_queries[cur_query] == in_query) {
+    auto cur_query = _active_queries.find(cur_query_id);
+    if (   cur_query         != _active_queries.end()
+        && cur_query->second == in_query) {
+    //if (_active_queries[cur_query_id] == in_query) {
+        glerr() << log::warning
+                << "render_context::query_result_available(): this query of type and index ("
+                << std::hex << in_query->query_type() << ", " << std::dec << in_query->index() << ") "
+                << "is currently active, the collected results may be undefined." << log::end;
+        return false;
+    }
+    else {
+        return in_query->available(*this);
+    }
+}
+
+void
+render_context::collect_query_results(const query_ptr& in_query) const
+{
+    indexed_query_id cur_query_id = std::make_pair(in_query->query_type(), in_query->index());
+
+    auto cur_query = _active_queries.find(cur_query_id);
+    if (   cur_query != _active_queries.end()
+        && cur_query->second == in_query) {
+    //if (_active_queries[cur_query_id] == in_query) {
         glerr() << log::warning
                 << "render_context::collect_query_results(): this query of type and index ("
                 << std::hex << in_query->query_type() << ", " << std::dec << in_query->index() << ") "
-                << "is currently active, the collected results may be undefined." << log::end;
+                << "is currently active, unable to collect results." << log::end;
     }
-    in_query->collect(*this);
+    else {
+        in_query->collect(*this);
+    }
+
     gl_assert(opengl_api(), leaving render_context::collect_query_results());
 }
 
