@@ -129,6 +129,10 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
   , _render_target(new render_target())
   , _attributes(view_attrib)
 {
+
+    _attributes._multi_samples = math::max(1u, _attributes._multi_samples);
+    _attributes._super_samples = math::max(1u, _attributes._super_samples);
+
     try {
         using namespace scm::gl;
         using namespace scm::math;
@@ -689,7 +693,7 @@ viewer::initialize_render_target()
 
         if (   !_render_target->_color_buffer_aa
             || !_render_target->_depth_buffer_aa) {
-            err() << "viewer::initialize_render_target(): error creating textures" << log::end;
+            err() << "viewer::initialize_render_target(): error creating texturesof size: " << vec2ui(_viewport._dimensions) * _render_target->_viewport_scale << log::end;
             return false;
         }
 
@@ -708,7 +712,7 @@ viewer::initialize_render_target()
     if (    _attributes._post_process_aa
         || (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
 
-        _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8);
+        _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, _render_target->_viewport_color_mip_level + 1);
 
         if (!_render_target->_color_buffer_resolved) {
             err() << "viewer::initialize_render_target(): error creating resolve color texture" << log::end;
