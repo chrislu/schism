@@ -36,7 +36,7 @@ sync::delete_sync()
 {
     if (_gl_sync_object) {
         const opengl::gl_core& glapi = parent_device().opengl_api();
-        glapi.glDeleteSync(reinterpret_cast<::GLsync>(_gl_sync_object));
+        glapi.glDeleteSync(_gl_sync_object);
         _gl_sync_object = nullptr;
     }
     

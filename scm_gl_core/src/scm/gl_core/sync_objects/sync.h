@@ -11,6 +11,8 @@
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
+struct __GLsync;
+
 namespace scm {
 namespace gl {
 
@@ -24,6 +26,9 @@ public:
 
 protected:
     sync(render_device& in_device);
+
+    //client|server_wait(in_context);
+    //sync_state()
 
     GLsync                      gl_object() const;
     void                        delete_sync();
