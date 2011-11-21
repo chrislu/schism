@@ -57,6 +57,9 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/shader_objects *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/state_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/state_objects *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/sync_objects *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/sync_objects *.h *.inl)
+
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/texture_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/texture_objects *.h *.inl)
 

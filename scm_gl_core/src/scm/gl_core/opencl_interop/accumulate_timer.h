@@ -40,6 +40,7 @@ protected:
     unsigned                _accumulation_count;
 
     event_ptr               _cl_event;
+    bool                    _cl_event_finished;
 
 }; // class accumulate_timer
 

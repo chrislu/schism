@@ -15,6 +15,7 @@
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/shader_objects.h>
 #include <scm/gl_core/state_objects.h>
+#include <scm/gl_core/sync_objects.h>
 #include <scm/gl_core/texture_objects.h>
 
 namespace scm {

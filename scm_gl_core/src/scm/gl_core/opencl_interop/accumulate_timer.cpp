@@ -12,6 +12,7 @@ namespace util {
 
 accumulate_timer::accumulate_timer()
   : _cl_event(new ::cl::Event())
+  , _cl_event_finished(true)
 {
 }
 
@@ -23,7 +24,12 @@ accumulate_timer::~accumulate_timer()
 ::cl::Event*const
 accumulate_timer::event() const
 {
-    return _cl_event.get();
+    if (_cl_event_finished) {
+        return _cl_event.get();
+    }
+    else {
+        return nullptr;
+    }
 }
 
 void
@@ -31,19 +37,21 @@ accumulate_timer::collect()
 {
     assert(_cl_event);
     cl_int      cl_error00 = CL_SUCCESS;
-    cl_int      cl_error01 = CL_SUCCESS;
 
-    cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>(&cl_error00);
-    cl_ulong end   = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_END>(&cl_error01);
+    cl_ulong end   = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_END>(&cl_error00);
 
-    if (   CL_SUCCESS != cl_error00
-        || CL_SUCCESS != cl_error01) {
-        gl::glerr() << log::error
-                    << "accumulate_timer::collect(): "
-                    << "unable retrieve timer data "
-                    << "(" << util::cl_error_string(cl_error00) << ", " << util::cl_error_string(cl_error01) << ")." << log::end;
+    if (CL_PROFILING_INFO_NOT_AVAILABLE == cl_error00) {
+        _cl_event_finished = false;
+        //gl::glerr() << "not finished";
+        //gl::glerr() << log::error
+        //            << "accumulate_timer::collect(): "
+        //            << "unable retrieve timer data "
+        //            << "(" << util::cl_error_string(cl_error00) << ", " << util::cl_error_string(cl_error01) << ")." << log::end;
     }
-    else {
+    else if (CL_SUCCESS == cl_error00)  {
+        //gl::glerr() << "finished";
+        _cl_event_finished = true;
+        cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>(&cl_error00);
         cl_ulong diff  = ((end > start) ? (end - start) : (~start + 1 + end));
         _accumulated_duration += time::nanosec(diff);
         ++_accumulation_count;
@@ -53,8 +61,9 @@ accumulate_timer::collect()
 void
 accumulate_timer::reset()
 {
-    _accumulated_duration   = duration_type();
-    _accumulation_count     = 0u;
+    _accumulated_duration = duration_type();
+    _accumulation_count   = 0u;
+    _cl_event_finished    = false;
 }
 
 const accumulate_timer::duration_type&

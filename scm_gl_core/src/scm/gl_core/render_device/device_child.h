@@ -21,14 +21,14 @@ public:
 
     const render_device&    parent_device() const;
 
-    object_state&           state()                 { return (_state); }
-    const object_state&     state() const           { return (_state); }
+    object_state&           state()                 { return _state; }
+    const object_state&     state() const           { return _state; }
 
-                            operator bool() const   { return (_state.ok()); }
-    bool                    operator!() const       { return (_state.fail()); }
-    bool                    ok() const              { return (_state.ok()); }
-    bool                    bad() const             { return (_state.bad()); }
-    bool                    fail() const            { return (_state.fail()); }
+                            operator bool() const   { return _state.ok(); }
+    bool                    operator!() const       { return _state.fail(); }
+    bool                    ok() const              { return _state.ok(); }
+    bool                    bad() const             { return _state.bad(); }
+    bool                    fail() const            { return _state.fail(); }
 
 private:
     render_device&          _parent_device;

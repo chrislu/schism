@@ -302,6 +302,9 @@ public:
     bool                            query_result_available(const query_ptr& in_query) const;
     void                            collect_query_results(const query_ptr& in_query) const;
 
+    // sync api ///////////////////////////////////////////////////////////////////////////////////
+public:
+
     // opencl interop /////////////////////////////////////////////////////////////////////////////
 public:
     const cl::command_queue_ptr&    cl_command_queue() const;
