@@ -14,13 +14,28 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_core) sync
+class __scm_export(gl_core) sync : public render_device_child
 {
+protected:
+    typedef struct __GLsync* GLsync;
+
+public:
+    virtual ~sync();
+
+protected:
+    sync(render_device& in_device);
+
+    GLsync                      gl_object() const;
+    void                        delete_sync();
+
+protected:
+    GLsync                      _gl_sync_object;
+
 private:
-    //friend class render_device;
+    friend class render_device;
     friend class render_context;
 
-}; // class texture
+}; // class sync
 
 } // namespace gl
 } // namespace scm
