@@ -36,6 +36,7 @@ private:
 
 protected:
     render_device_child(render_device& dev);
+
 }; // class render_device_child
 
 } // namespace gl

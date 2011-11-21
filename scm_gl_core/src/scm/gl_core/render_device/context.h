@@ -102,7 +102,7 @@ private:
 public:
     virtual ~render_context();
 
-    const opengl::gl_core&     opengl_api() const;
+    const opengl::gl_core&      opengl_api() const;
     void                        apply();
 
     void                        reset();
