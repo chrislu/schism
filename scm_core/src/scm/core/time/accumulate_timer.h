@@ -23,6 +23,7 @@ public:
     unsigned                accumulation_count() const;
 
     duration_type           average_duration() const;
+    duration_type           last_time() const;
 
 protected:
     duration_type           _accumulated_duration;

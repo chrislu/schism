@@ -136,6 +136,8 @@ public:
     void                            clear_color() const;
     void                            clear_depth_stencil() const;
 
+    float                           frame_time_us() const;
+
     void                            swap_buffers(int interval = 0);
 
     bool                            take_screenshot(const std::string& f) const;
@@ -225,7 +227,9 @@ protected:
     };
     shared_ptr<render_target>       _render_target;
 
-    accum_timer_type                _frame_time;
+    accum_timer_type                _frame_timer;
+    float                           _frame_time_us;
+
     gl::text_renderer_ptr           _text_renderer;
     gl::text_ptr                    _frame_counter_text;
 

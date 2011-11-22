@@ -62,5 +62,12 @@ accumulate_timer<timer_t>::average_duration() const
     }
 }
 
+template<class timer_t>
+typename accumulate_timer<timer_t>::duration_type
+accumulate_timer<timer_t>::last_time() const
+{
+    return _timer.get_time();
+}
+
 } // namespace time
 } // namespace scm

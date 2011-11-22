@@ -275,6 +275,12 @@ viewer::clear_depth_stencil() const
     }
 }
 
+float
+viewer::frame_time_us() const
+{
+    return _frame_time_us;
+}
+
 void
 viewer::swap_buffers(int interval)
 {
@@ -404,8 +410,13 @@ viewer::send_render_display()
     using namespace scm::gl;
     using namespace scm::math;
 
+    _frame_timer.stop();
+    _frame_timer.start();
+
+    _frame_time_us = static_cast<float>(scm::time::to_microseconds(_frame_timer.last_time()));
+
     if (_display_func) {
-        
+
         // clear
         clear_color();
         clear_depth_stencil();
@@ -478,15 +489,12 @@ viewer::send_render_display()
         swap_buffers(_settings._vsync ? 1 : 0);
     }
 
-    _frame_time.stop();
-    _frame_time.start();
-
     if (_settings._show_frame_times) {
-        if (scm::time::to_milliseconds(_frame_time.accumulated_duration()) > 100.0) {
+        if (scm::time::to_milliseconds(_frame_timer.accumulated_duration()) > 100.0) {
             std::stringstream   output;
             output.precision(2);
-            double frame_time = scm::time::to_milliseconds(_frame_time.average_duration());
-            double frame_fps  = 1.0 / scm::time::to_seconds(_frame_time.average_duration());
+            double frame_time = scm::time::to_milliseconds(_frame_timer.average_duration());
+            double frame_fps  = 1.0 / scm::time::to_seconds(_frame_timer.average_duration());
             output << std::fixed << "frame_time: " << frame_time << "ms "
                                  << "fps: " << frame_fps;
 
@@ -497,7 +505,7 @@ viewer::send_render_display()
             else {
                 _frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
             }
-            _frame_time.reset();
+            _frame_timer.reset();
         }
     }
 
