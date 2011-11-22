@@ -19,6 +19,7 @@ class __scm_export(gl_core) render_device_child : boost::noncopyable
 public:
     virtual ~render_device_child();
 
+    render_device&          parent_device();
     const render_device&    parent_device() const;
 
     object_state&           state()                 { return _state; }

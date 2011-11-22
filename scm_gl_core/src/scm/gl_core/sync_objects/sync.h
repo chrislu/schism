@@ -2,6 +2,8 @@
 #ifndef SCM_GL_CORE_SYNC_H_INCLUDED
 #define SCM_GL_CORE_SYNC_H_INCLUDED
 
+#include <scm/core/numeric_types.h>
+
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/data_types.h>
 #include <scm/gl_core/render_device/render_device_fwd.h>
@@ -27,10 +29,14 @@ public:
 protected:
     sync(render_device& in_device);
 
-    //client|server_wait(in_context);
-    //sync_state()
+    sync_wait_result            client_wait(const render_context& in_context,
+                                                  scm::uint64     in_timeout = sync_timeout_ignored,
+                                                  bool            in_flush   = true) const;
+    void                        server_wait(const render_context& in_context,
+                                                  scm::uint64     in_timeout = sync_timeout_ignored) const;
+    sync_status                 status(const render_context& in_context) const;
 
-    GLsync                      gl_object() const;
+    GLsync                      object() const;
     void                        delete_sync();
 
 protected:

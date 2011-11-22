@@ -10,6 +10,7 @@
 #include <scm/gl_core/query_objects.h>
 #include <scm/gl_core/shader_objects.h>
 #include <scm/gl_core/state_objects.h>
+#include <scm/gl_core/sync_objects.h>
 #include <scm/gl_core/texture_objects.h>
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/opengl/gl_core.h>
@@ -1662,7 +1663,7 @@ render_context::apply_state_objects()
     gl_assert(opengl_api(), leaving render_context::apply_state_objects());
 }
 
-// active queries /////////////////////////////////////////////////////////////////////////
+// active queries /////////////////////////////////////////////////////////////////////////////////
 void
 render_context::begin_query(const query_ptr& in_query)
 {
@@ -1736,6 +1737,46 @@ render_context::collect_query_results(const query_ptr& in_query) const
     }
 
     gl_assert(opengl_api(), leaving render_context::collect_query_results());
+}
+
+// sync api ///////////////////////////////////////////////////////////////////////////////////////
+fence_sync_ptr
+render_context::insert_fence_sync()
+{
+    const fence_sync_ptr new_fence(new fence_sync(parent_device()));
+
+    if (new_fence->fail()) {
+        glerr() << log::error << "render_context::insert_fence_sync(): unable to create fence sync object ("
+                << new_fence->state().state_string() << ")." << log::end;
+        return fence_sync_ptr();
+    }
+
+    return new_fence;
+}
+
+sync_wait_result
+render_context::sync_client_wait(const sync_ptr& in_sync,
+                                 scm::uint64     in_timeout,
+                                 bool            in_flush)
+{
+    return in_sync->client_wait(*this, in_timeout, in_flush);
+}
+
+void
+render_context::sync_server_wait(const sync_ptr& in_sync,
+                                 scm::uint64     in_timeout,
+                                 bool            in_flush)
+{
+    if (in_flush) {
+        flush();
+    }
+    return in_sync->server_wait(*this, in_timeout);
+}
+
+sync_status
+render_context::sync_signal_status(const sync_ptr& in_sync) const
+{
+    return in_sync->status(*this);
 }
 
 } // namespace gl

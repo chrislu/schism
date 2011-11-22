@@ -2,6 +2,7 @@
 #ifndef SCM_GL_CORE_CONSTANTS_H_INCLUDED
 #define SCM_GL_CORE_CONSTANTS_H_INCLUDED
 
+#include <scm/core/numeric_types.h>
 #include <scm/core/platform/platform.h>
 
 #include <scm/gl_core/config.h>
@@ -342,6 +343,24 @@ enum frame_buffer_target {
     
     FRAMEBUFFER_TARGET_COUNT
 }; // enum frame_buffer_target
+
+enum sync_status {
+    SYNC_UNSIGNALED = 0x00,
+    SYNC_SIGNALED,
+
+    SYNC_STATUS_COUNT
+}; // enum sync_status
+
+enum sync_wait_result {
+    SYNC_WAIT_FAILED = 0x00,
+    SYNC_WAIT_CONDITION_SATISFIED,
+    SYNC_WAIT_ALREADY_SIGNALED,
+    SYNC_WAIT_TIMEOUT_EXPIRED,
+
+    SYNC_WAIT_RESULT_COUNT
+}; // enum sync_wait_result
+
+const scm::uint64 sync_timeout_ignored = 0xffffffffffffffffull;
 
 } // namespace gl
 } // namespace scm

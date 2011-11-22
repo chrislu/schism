@@ -295,7 +295,7 @@ public:
 protected:
     void                            apply_state_objects();
      
-    // active queries /////////////////////////////////////////////////////////////////////////
+    // active queries /////////////////////////////////////////////////////////////////////////////
 public:
     void                            begin_query(const query_ptr& in_query);
     void                            end_query(const query_ptr& in_query);
@@ -304,6 +304,15 @@ public:
 
     // sync api ///////////////////////////////////////////////////////////////////////////////////
 public:
+    fence_sync_ptr                  insert_fence_sync();
+    sync_wait_result                sync_client_wait(const sync_ptr& in_sync,
+                                                     scm::uint64     in_timeout = sync_timeout_ignored,
+                                                     bool            in_flush   = true);
+    void                            sync_server_wait(const sync_ptr& in_sync,
+                                                     scm::uint64     in_timeout = sync_timeout_ignored,
+                                                     bool            in_flush   = true);
+    sync_status                     sync_signal_status(const sync_ptr& in_sync) const;
+
 
     // opencl interop /////////////////////////////////////////////////////////////////////////////
 public:
