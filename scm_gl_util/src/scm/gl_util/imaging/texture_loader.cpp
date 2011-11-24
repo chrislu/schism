@@ -318,7 +318,7 @@ texture_loader::load_image_data(const std::string&  in_image_path)
     texture_image_data::level_vector    mip_vec;
     mip_vec.push_back(texture_image_data::level(math::vec3ui(image_size, 1), image_data));
 
-    texture_image_data_ptr ret_data(new texture_image_data(texture_image_data::ORIGIN_UPPER_LEFT, image_format, mip_vec));
+    texture_image_data_ptr ret_data(new texture_image_data(texture_image_data::ORIGIN_LOWER_LEFT, image_format, mip_vec));
     
     return (ret_data);
 }
