@@ -26,6 +26,7 @@ public:
     void                    start(const render_context_ptr& context);
     void                    stop(const render_context_ptr& context);
     void                    collect(const render_context_ptr& context);
+    void                    force_collect(const render_context_ptr& context);
     void                    reset();
 
     const duration_type&    accumulated_duration() const;
@@ -38,6 +39,7 @@ protected:
     unsigned                _accumulation_count;
 
     timer_query_ptr         _timer_query;
+    bool                    _timer_query_finished;
 
 }; // class accumulate_timer_query
 
