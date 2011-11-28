@@ -32,9 +32,9 @@
 #include <scm/gl_util/font/text.h>
 #include <scm/gl_util/font/text_renderer.h>
 #include <scm/gl_util/primitives/quad.h>
-#include <scm/gl_util/window_management/context.h>
-#include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/window.h>
+#include <scm/gl_core/window_management/context.h>
+#include <scm/gl_core/window_management/display.h>
+#include <scm/gl_core/window_management/window.h>
 
 
 namespace {

@@ -63,6 +63,17 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/sync_objects *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/texture_objects *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/texture_objects *.h *.inl)
 
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/window_management *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/window_management *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/window_management/wm_win32 *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/window_management/wm_win32 *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/window_management/wm_win32/util *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/window_management/wm_win32/util *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/window_management/wm_x *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/window_management/wm_x *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/window_management/wm_x/util *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/window_management/wm_x/util *.h *.inl)
+
 if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 ## gl_classic #####################################################################################
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_classic *.cpp)

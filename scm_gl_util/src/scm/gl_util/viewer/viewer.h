@@ -18,10 +18,10 @@
 #include <scm/gl_util/font/font_fwd.h>
 #include <scm/gl_util/primitives/primitives_fwd.h>
 #include <scm/gl_util/viewer/camera.h>
-#include <scm/gl_util/window_management/wm_fwd.h>
-#include <scm/gl_util/window_management/surface.h>
-#include <scm/gl_util/window_management/window.h>
-#include <scm/gl_util/window_management/context.h>
+#include <scm/gl_core/window_management/wm_fwd.h>
+#include <scm/gl_core/window_management/surface.h>
+#include <scm/gl_core/window_management/window.h>
+#include <scm/gl_core/window_management/context.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>

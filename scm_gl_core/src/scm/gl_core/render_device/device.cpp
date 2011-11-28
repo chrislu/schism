@@ -10,6 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <scm/core/io/tools.h>
 #include <scm/core/utilities/foreach.h>
@@ -34,7 +35,13 @@
 namespace scm {
 namespace gl {
 
+struct render_device::mutex_impl
+{
+    boost::mutex    _mutex;
+};
+
 render_device::render_device()
+  : _mutex_impl(new mutex_impl)
 {
     _opengl_api_core.reset(new opengl::gl_core());
 
@@ -112,25 +119,25 @@ render_device::~render_device()
 const opengl::gl_core&
 render_device::opengl_api() const
 {
-    return (*_opengl_api_core);
+    return *_opengl_api_core;
 }
 
 render_context_ptr
 render_device::main_context() const
 {
-    return (_main_context);
+    return _main_context;
 }
 
 render_context_ptr
 render_device::create_context()
 {
-    return (render_context_ptr(new render_context(*this)));
+    return render_context_ptr(new render_context(*this));
 }
 
 const render_device::device_capabilities&
 render_device::capabilities() const
 {
-    return (_capabilities);
+    return _capabilities;
 }
 
 void
@@ -232,11 +239,11 @@ render_device::create_buffer(const buffer_desc& in_buffer_desc,
             glerr() << log::error << "render_device::create_buffer(): unable to allocate buffer ("
                     << new_buffer->state().state_string() << ")." << log::end;
         }
-        return (buffer_ptr());
+        return buffer_ptr();
     }
     else {
         register_resource(new_buffer.get());
-        return (new_buffer);
+        return new_buffer;
     }
 }
 
@@ -246,7 +253,7 @@ render_device::create_buffer(buffer_binding in_binding,
                              scm::size_t    in_size,
                              const void*    in_initial_data)
 {
-    return (create_buffer(buffer_desc(in_binding, in_usage, in_size), in_initial_data));
+    return create_buffer(buffer_desc(in_binding, in_usage, in_size), in_initial_data);
 }
 
 bool
@@ -257,10 +264,10 @@ render_device::resize_buffer(const buffer_ptr& in_buffer, scm::size_t in_size)
     if (!in_buffer->buffer_data(*this, desc, 0)) {
         glerr() << log::error << "render_device::resize_buffer(): unable to reallocate buffer ("
                 << in_buffer->state().state_string() << ")." << log::end;
-        return (false);
+        return false;
     }
     else {
-        return (true);
+        return true;
     }
 }
 
@@ -279,9 +286,9 @@ render_device::create_vertex_array(const vertex_format& in_vert_fmt,
             glerr() << log::error << "render_device::create_vertex_array(): unable to initialize vertex array object ("
                     << new_array->state().state_string() << ")." << log::end;
         }
-        return (vertex_array_ptr());
+        return vertex_array_ptr();
     }
-    return (new_array);
+    return new_array;
 }
 
 transform_feedback_ptr
@@ -297,9 +304,9 @@ render_device::create_transform_feedback(const stream_output_setup& in_setup)
             glerr() << log::error << "render_device::create_transform_feedback(): unable to initialize transform feedback object ("
                     << new_feedback->state().state_string() << ")." << log::end;
         }
-        return (transform_feedback_ptr());
+        return transform_feedback_ptr();
     }
-    return (new_feedback);
+    return new_feedback;
 }
 
 // shader api /////////////////////////////////////////////////////////////////////////////////////
@@ -309,104 +316,107 @@ render_device::add_include_files(const std::string& in_path,
                                  const std::string& in_file_extensions,
                                  bool               in_scan_subdirectories)
 {
-    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-    boost::char_separator<char> space_separator(" ");
-    tokenizer                   file_extensions(in_file_extensions, space_separator);
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-    namespace bfs = boost::filesystem;
-    
+        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> space_separator(" ");
+        tokenizer                   file_extensions(in_file_extensions, space_separator);
 
-    std::string         output_root_path
-        = boost::trim_left_copy_if(
-              boost::trim_right_copy_if(
-                in_glsl_root_path,
-                boost::is_any_of("/")),
-              boost::is_any_of("/"));
+        namespace bfs = boost::filesystem;
 
-    if (!output_root_path.empty()) {
-        output_root_path = std::string("/") + output_root_path + std::string("/");
-    }
-    else {
-        output_root_path = std::string("/");
-    }
+        std::string         output_root_path
+            = boost::trim_left_copy_if(
+                  boost::trim_right_copy_if(
+                    in_glsl_root_path,
+                    boost::is_any_of("/")),
+                  boost::is_any_of("/"));
 
-    bfs::path           input_path = bfs::path(in_path);
-    bfs::path           input_root;
+        if (!output_root_path.empty()) {
+            output_root_path = std::string("/") + output_root_path + std::string("/");
+        }
+        else {
+            output_root_path = std::string("/");
+        }
 
-    //if (input_path.is_relative()) {
-    //    input_path = bfs::absolute(input_path);
-    //}
+        bfs::path           input_path = bfs::path(in_path);
+        bfs::path           input_root;
 
-    if (!bfs::exists(input_path)) {
-        glerr() << log::error << "render_device::add_include_files(): "
-                << "<error> input path does not exist (" << input_path << ")." << log::end;
-        return false;
-    }
+        //if (input_path.is_relative()) {
+        //    input_path = bfs::absolute(input_path);
+        //}
 
-    if (bfs::is_directory(input_path)) {
-        input_root = input_path;
-    }
-    else {
-        glerr() << log::error << "render_device::add_include_files(): "
-                << "<error> input path is a file (" << input_path << ")." << log::end;
-        return false;
-    }
+        if (!bfs::exists(input_path)) {
+            glerr() << log::error << "render_device::add_include_files(): "
+                    << "<error> input path does not exist (" << input_path << ")." << log::end;
+            return false;
+        }
 
-    if (in_scan_subdirectories) {
-        bfs::recursive_directory_iterator  file_iter(input_path);
-        bfs::recursive_directory_iterator  e = bfs::recursive_directory_iterator();
-        for (; file_iter != e; ++file_iter) {
-            bfs::path current_file = file_iter->path();
-            if (!bfs::is_directory(current_file)) {
-                if (    std::find(file_extensions.begin(),
-                                  file_extensions.end(),
-                                  current_file.extension().string())
-                    != file_extensions.end())
-                {
-                    std::string     source_string;
-                    if (io::read_text_file(current_file.string(), source_string)) {
-                        // me not likey... but does the trick in a portable manner
-                        bfs::path::const_iterator first_mis
-                            = std::mismatch(input_root.begin(), input_root.end(),
-                                            current_file.begin()).second;
-                        bfs::path input_rel_path;
-                        for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
+        if (bfs::is_directory(input_path)) {
+            input_root = input_path;
+        }
+        else {
+            glerr() << log::error << "render_device::add_include_files(): "
+                    << "<error> input path is a file (" << input_path << ")." << log::end;
+            return false;
+        }
 
-                        assert(input_path / input_rel_path == current_file);
-                        add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
-                    }
-                    else {
-                        glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+        if (in_scan_subdirectories) {
+            bfs::recursive_directory_iterator  file_iter(input_path);
+            bfs::recursive_directory_iterator  e = bfs::recursive_directory_iterator();
+            for (; file_iter != e; ++file_iter) {
+                bfs::path current_file = file_iter->path();
+                if (!bfs::is_directory(current_file)) {
+                    if (    std::find(file_extensions.begin(),
+                                      file_extensions.end(),
+                                      current_file.extension().string())
+                        != file_extensions.end())
+                    {
+                        std::string     source_string;
+                        if (io::read_text_file(current_file.string(), source_string)) {
+                            // me not likey... but does the trick in a portable manner
+                            bfs::path::const_iterator first_mis
+                                = std::mismatch(input_root.begin(), input_root.end(),
+                                                current_file.begin()).second;
+                            bfs::path input_rel_path;
+                            for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
+
+                            assert(input_path / input_rel_path == current_file);
+                            add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
+                        }
+                        else {
+                            glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+                        }
                     }
                 }
             }
         }
-    }
-    else {
-        bfs::directory_iterator  file_iter(input_path);
-        bfs::directory_iterator  e = bfs::directory_iterator();
-        for (; file_iter != e; ++file_iter) {
-            bfs::path current_file = file_iter->path();
-            if (!bfs::is_directory(current_file)) {
-                if (    std::find(file_extensions.begin(),
-                                  file_extensions.end(),
-                                  current_file.extension().string())
-                    != file_extensions.end())
-                {
-                    std::string     source_string;
-                    if (io::read_text_file(current_file.string(), source_string)) {
-                        // me not likey... but does the trick in a portable manner
-                        bfs::path::const_iterator first_mis
-                            = std::mismatch(input_root.begin(), input_root.end(),
-                                            current_file.begin()).second;
-                        bfs::path input_rel_path;
-                        for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
+        else {
+            bfs::directory_iterator  file_iter(input_path);
+            bfs::directory_iterator  e = bfs::directory_iterator();
+            for (; file_iter != e; ++file_iter) {
+                bfs::path current_file = file_iter->path();
+                if (!bfs::is_directory(current_file)) {
+                    if (    std::find(file_extensions.begin(),
+                                      file_extensions.end(),
+                                      current_file.extension().string())
+                        != file_extensions.end())
+                    {
+                        std::string     source_string;
+                        if (io::read_text_file(current_file.string(), source_string)) {
+                            // me not likey... but does the trick in a portable manner
+                            bfs::path::const_iterator first_mis
+                                = std::mismatch(input_root.begin(), input_root.end(),
+                                                current_file.begin()).second;
+                            bfs::path input_rel_path;
+                            for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
 
-                        assert(input_path / input_rel_path == current_file);
-                        add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
-                    }
-                    else {
-                        glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+                            assert(input_path / input_rel_path == current_file);
+                            add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
+                        }
+                        else {
+                            glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
+                        }
                     }
                 }
             }
@@ -420,47 +430,51 @@ bool
 render_device::add_include_string(const std::string& in_path,
                                   const std::string& in_source_string)
 {
-    const opengl::gl_core& glcore = opengl_api();
-    util::gl_error          glerror(glcore);
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-    if (!glcore.extension_ARB_shading_language_include) {
-        glout() << log::warning << "render_device::add_include_string(): "
-                << "shader includes not supported (GL_ARB_shading_language_include unsupported), ignoring include string." << log::end;
-        return false;
-    }
+        const opengl::gl_core& glcore = opengl_api();
+        util::gl_error          glerror(glcore);
 
-    if (in_path[0] != '/') {
-        glerr() << log::error << "render_device::add_include_string(): "
-                << "<error> path not starting with '/'." << log::end;
-        return false;
-    }
-
-    glcore.glNamedStringARB(GL_SHADER_INCLUDE_ARB,
-                            static_cast<int>(in_path.length()),          in_path.c_str(),
-                            static_cast<int>(in_source_string.length()), in_source_string.c_str());
-
-    if (glerror) {
-        switch (glerror.to_object_state()) {
-        case object_state::OS_ERROR_INVALID_VALUE:
-            glerr() << log::error << "render_device::add_include_string(): "
-                    << "error creating named include string (path or source string empty or path not starting with '/'." << log::end;
-            return false;
-            break;
-        default:
-            glerr() << log::error << "render_device::add_include_string(): "
-                    << "error creating named include string (an unknown error occured)" << log::end;
+        if (!glcore.extension_ARB_shading_language_include) {
+            glout() << log::warning << "render_device::add_include_string(): "
+                    << "shader includes not supported (GL_ARB_shading_language_include unsupported), ignoring include string." << log::end;
             return false;
         }
+
+        if (in_path[0] != '/') {
+            glerr() << log::error << "render_device::add_include_string(): "
+                    << "<error> path not starting with '/'." << log::end;
+            return false;
+        }
+
+        glcore.glNamedStringARB(GL_SHADER_INCLUDE_ARB,
+                                static_cast<int>(in_path.length()),          in_path.c_str(),
+                                static_cast<int>(in_source_string.length()), in_source_string.c_str());
+
+        if (glerror) {
+            switch (glerror.to_object_state()) {
+            case object_state::OS_ERROR_INVALID_VALUE:
+                glerr() << log::error << "render_device::add_include_string(): "
+                        << "error creating named include string (path or source string empty or path not starting with '/'." << log::end;
+                return false;
+                break;
+            default:
+                glerr() << log::error << "render_device::add_include_string(): "
+                        << "error creating named include string (an unknown error occured)" << log::end;
+                return false;
+            }
+        }
+
+        size_t      parent_path_end = in_path.find_last_of('/');
+        std::string parent_path     = in_path.substr(0, parent_path_end);
+
+        //if (!parent_path.empty()) {
+        //    _default_include_paths.insert(parent_path);
+        //}
+
+        gl_assert(glcore, leaving render_device::add_include_string());
     }
-
-    size_t      parent_path_end = in_path.find_last_of('/');
-    std::string parent_path     = in_path.substr(0, parent_path_end);
-
-    //if (!parent_path.empty()) {
-    //    _default_include_paths.insert(parent_path);
-    //}
-
-    gl_assert(glcore, leaving render_device::add_include_string());
 
     return true;
 }
@@ -469,20 +483,32 @@ void
 render_device::add_macro_define(const std::string& in_name,
                                 const std::string& in_value)
 {
-    _default_macro_defines[in_name] = shader_macro(in_name, in_value);
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+
+        _default_macro_defines[in_name] = shader_macro(in_name, in_value);
+    }
 }
 
 void
 render_device::add_macro_define(const shader_macro& in_macro)
 {
-    _default_macro_defines[in_macro._name] = in_macro;
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+
+        _default_macro_defines[in_macro._name] = in_macro;
+    }
 }
 
 void
 render_device::add_macro_defines(const shader_macro_array& in_macros)
 {
-    foreach(const shader_macro& m, in_macros.macros()) {
-        add_macro_define(m);
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+
+        foreach(const shader_macro& m, in_macros.macros()) {
+            add_macro_define(m);
+        }
     }
 }
 
@@ -522,21 +548,29 @@ render_device::create_shader(shader_stage                    in_stage,
     // combine macro definitions
     shader_macro_array  macro_array(in_macros);
 
-    shader_macro_map::const_iterator mb = _default_macro_defines.begin();
-    shader_macro_map::const_iterator me = _default_macro_defines.end();
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-    for(; mb != me; ++mb) {
-        macro_array(mb->second._name, mb->second._value);
+        shader_macro_map::const_iterator mb = _default_macro_defines.begin();
+        shader_macro_map::const_iterator me = _default_macro_defines.end();
+
+        for(; mb != me; ++mb) {
+            macro_array(mb->second._name, mb->second._value);
+        }
     }
 
     // combine shader include paths
     shader_include_path_list   include_paths(in_inc_paths);
 
-    string_set::const_iterator ipb = _default_include_paths.begin();
-    string_set::const_iterator ipe = _default_include_paths.end();
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-    for(; ipb != ipe; ++ipb) {
-        include_paths.push_back(*ipb);
+        string_set::const_iterator ipb = _default_include_paths.begin();
+        string_set::const_iterator ipe = _default_include_paths.end();
+
+        for(; ipb != ipe; ++ipb) {
+            include_paths.push_back(*ipb);
+        }
     }
 
     shader_ptr new_shader(new shader(*this,
@@ -559,7 +593,7 @@ render_device::create_shader(shader_stage                    in_stage,
                     << new_shader->state().state_string() << "):" << log::nline
                     << new_shader->info_log() << log::end;
         }
-        return (shader_ptr());
+        return shader_ptr();
     }
     else {
         if (!new_shader->info_log().empty()) {
@@ -569,7 +603,7 @@ render_device::create_shader(shader_stage                    in_stage,
                     << ")" << log::nline
                     << new_shader->info_log() << log::end;
         }
-        return (new_shader);
+        return new_shader;
     }
 }
 
@@ -640,7 +674,7 @@ render_device::create_program(const shader_list&          in_shaders,
                     << new_program->state().state_string() << "):" << log::nline
                     << new_program->info_log() << log::end;
         }
-        return (program_ptr());
+        return program_ptr();
     }
     else {
         if (!new_program->info_log().empty()) {
@@ -648,7 +682,7 @@ render_device::create_program(const shader_list&          in_shaders,
                     << "name: " << in_program_name << ")" << log::nline
                     << new_program->info_log() << log::end;
         }
-        return (new_program);
+        return new_program;
     }
 }
 
@@ -666,10 +700,10 @@ render_device::create_texture_1d(const texture_1d_desc&   in_desc)
             glerr() << log::error << "render_device::create_texture_1d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_1d_ptr());
+        return texture_1d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -688,10 +722,10 @@ render_device::create_texture_1d(const texture_1d_desc&    in_desc,
             glerr() << log::error << "render_device::create_texture_1d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_1d_ptr());
+        return texture_1d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -701,7 +735,7 @@ render_device::create_texture_1d(const unsigned      in_size,
                                  const unsigned      in_mip_levels,
                                  const unsigned      in_array_layers)
 {
-    return (create_texture_1d(texture_1d_desc(in_size, in_format, in_mip_levels, in_array_layers)));
+    return create_texture_1d(texture_1d_desc(in_size, in_format, in_mip_levels, in_array_layers));
 }
 
 texture_1d_ptr
@@ -712,9 +746,9 @@ render_device::create_texture_1d(const unsigned            in_size,
                                  const data_format         in_initial_data_format,
                                  const std::vector<void*>& in_initial_mip_level_data)
 {
-    return (create_texture_1d(texture_1d_desc(in_size, in_format, in_mip_levels, in_array_layers),
-                              in_initial_data_format,
-                              in_initial_mip_level_data));
+    return create_texture_1d(texture_1d_desc(in_size, in_format, in_mip_levels, in_array_layers),
+                             in_initial_data_format,
+                             in_initial_mip_level_data);
 }
 
 texture_2d_ptr
@@ -730,10 +764,10 @@ render_device::create_texture_2d(const texture_2d_desc&   in_desc)
             glerr() << log::error << "render_device::create_texture_2d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_2d_ptr());
+        return texture_2d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -752,10 +786,10 @@ render_device::create_texture_2d(const texture_2d_desc&    in_desc,
             glerr() << log::error << "render_device::create_texture_2d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_2d_ptr());
+        return texture_2d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -766,7 +800,7 @@ render_device::create_texture_2d(const math::vec2ui& in_size,
                                  const unsigned      in_array_layers,
                                  const unsigned      in_samples)
 {
-    return (create_texture_2d(texture_2d_desc(in_size, in_format, in_mip_levels, in_array_layers, in_samples)));
+    return create_texture_2d(texture_2d_desc(in_size, in_format, in_mip_levels, in_array_layers, in_samples));
 }
 
 texture_2d_ptr
@@ -778,9 +812,9 @@ render_device::create_texture_2d(const math::vec2ui&       in_size,
                                  const data_format         in_initial_data_format,
                                  const std::vector<void*>& in_initial_mip_level_data)
 {
-    return (create_texture_2d(texture_2d_desc(in_size, in_format, in_mip_levels, in_array_layers, in_samples),
-                              in_initial_data_format,
-                              in_initial_mip_level_data));
+    return create_texture_2d(texture_2d_desc(in_size, in_format, in_mip_levels, in_array_layers, in_samples),
+                             in_initial_data_format,
+                             in_initial_mip_level_data);
 }
 
 texture_3d_ptr
@@ -796,10 +830,10 @@ render_device::create_texture_3d(const texture_3d_desc&   in_desc)
             glerr() << log::error << "render_device::create_texture_3d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_3d_ptr());
+        return texture_3d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -818,10 +852,10 @@ render_device::create_texture_3d(const texture_3d_desc&    in_desc,
             glerr() << log::error << "render_device::create_texture_3d(): unable to allocate texture image data ("
                     << new_tex->state().state_string() << ")." << log::end;
         }
-        return (texture_3d_ptr());
+        return texture_3d_ptr();
     }
     else {
-        return (new_tex);
+        return new_tex;
     }
 }
 
@@ -830,7 +864,7 @@ render_device::create_texture_3d(const math::vec3ui& in_size,
                                  const data_format   in_format,
                                  const unsigned      in_mip_levels)
 {
-    return (create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels)));
+    return create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels));
 }
 
 texture_3d_ptr
@@ -840,9 +874,9 @@ render_device::create_texture_3d(const math::vec3ui&       in_size,
                                  const data_format         in_initial_data_format,
                                  const std::vector<void*>& in_initial_mip_level_data)
 {
-    return (create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels),
-                              in_initial_data_format,
-                              in_initial_mip_level_data));
+    return create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels),
+                             in_initial_data_format,
+                             in_initial_mip_level_data);
 }
 
 texture_buffer_ptr
@@ -895,10 +929,10 @@ render_device::create_sampler_state(const sampler_state_desc& in_desc)
             glerr() << log::error << "render_device::create_sampler_state(): unable to create sampler state object ("
                     << new_sstate->state().state_string() << ")." << log::end;
         }
-        return (sampler_state_ptr());
+        return sampler_state_ptr();
     }
     else {
-        return (new_sstate);
+        return new_sstate;
     }
 }
 
@@ -912,8 +946,8 @@ render_device::create_sampler_state(texture_filter_mode  in_filter,
                                     compare_func         in_compare_func,
                                     texture_compare_mode in_compare_mode)
 {
-    return (create_sampler_state(sampler_state_desc(in_filter, in_wrap, in_wrap, in_wrap,
-        in_max_anisotropy, in_min_lod, in_max_lod, in_lod_bias, in_compare_func, in_compare_mode)));
+    return create_sampler_state(sampler_state_desc(in_filter, in_wrap, in_wrap, in_wrap,
+        in_max_anisotropy, in_min_lod, in_max_lod, in_lod_bias, in_compare_func, in_compare_mode));
 }
 
 sampler_state_ptr
@@ -928,8 +962,8 @@ render_device::create_sampler_state(texture_filter_mode  in_filter,
                                     compare_func         in_compare_func,
                                     texture_compare_mode in_compare_mode)
 {
-    return (create_sampler_state(sampler_state_desc(in_filter, in_wrap_s, in_wrap_t, in_wrap_r,
-        in_max_anisotropy, in_min_lod, in_max_lod, in_lod_bias, in_compare_func, in_compare_mode)));
+    return create_sampler_state(sampler_state_desc(in_filter, in_wrap_s, in_wrap_t, in_wrap_r,
+        in_max_anisotropy, in_min_lod, in_max_lod, in_lod_bias, in_compare_func, in_compare_mode));
 }
 
 // frame buffer api ///////////////////////////////////////////////////////////////////////////////
@@ -942,10 +976,10 @@ render_device::create_render_buffer(const render_buffer_desc& in_desc)
             glerr() << log::error << "render_device::create_render_buffer(): unable to create render buffer object ("
                     << new_rb->state().state_string() << ")." << log::end;
         }
-        return (render_buffer_ptr());
+        return render_buffer_ptr();
     }
     else {
-        return (new_rb);
+        return new_rb;
     }
 }
 
@@ -966,10 +1000,10 @@ render_device::create_frame_buffer()
             glerr() << log::error << "render_device::create_render_buffer(): unable to create frame buffer object ("
                     << new_rb->state().state_string() << ")." << log::end;
         }
-        return (frame_buffer_ptr());
+        return frame_buffer_ptr();
     }
     else {
-        return (new_rb);
+        return new_rb;
     }
 }
 
@@ -977,7 +1011,7 @@ depth_stencil_state_ptr
 render_device::create_depth_stencil_state(const depth_stencil_state_desc& in_desc)
 {
     depth_stencil_state_ptr new_ds_state(new depth_stencil_state(*this, in_desc));
-    return (new_ds_state);
+    return new_ds_state;
 }
 
 depth_stencil_state_ptr
@@ -985,9 +1019,9 @@ render_device::create_depth_stencil_state(bool in_depth_test, bool in_depth_mask
                                           bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
                                           stencil_ops in_stencil_ops)
 {
-    return (create_depth_stencil_state(depth_stencil_state_desc(in_depth_test, in_depth_mask, in_depth_func,
-                                                                in_stencil_test, in_stencil_rmask, in_stencil_wmask,
-                                                                in_stencil_ops)));
+    return create_depth_stencil_state(depth_stencil_state_desc(in_depth_test, in_depth_mask, in_depth_func,
+                                                               in_stencil_test, in_stencil_rmask, in_stencil_wmask,
+                                                               in_stencil_ops));
 }
 
 depth_stencil_state_ptr
@@ -995,31 +1029,31 @@ render_device::create_depth_stencil_state(bool in_depth_test, bool in_depth_mask
                                           bool in_stencil_test, unsigned in_stencil_rmask, unsigned in_stencil_wmask,
                                           stencil_ops in_stencil_front_ops, stencil_ops in_stencil_back_ops)
 {
-    return (create_depth_stencil_state(depth_stencil_state_desc(in_depth_test, in_depth_mask, in_depth_func,
-                                                                in_stencil_test, in_stencil_rmask, in_stencil_wmask,
-                                                                in_stencil_front_ops, in_stencil_front_ops)));
+    return create_depth_stencil_state(depth_stencil_state_desc(in_depth_test, in_depth_mask, in_depth_func,
+                                                               in_stencil_test, in_stencil_rmask, in_stencil_wmask,
+                                                               in_stencil_front_ops, in_stencil_front_ops));
 }
 
 rasterizer_state_ptr
 render_device::create_rasterizer_state(const rasterizer_state_desc& in_desc)
 {
     rasterizer_state_ptr new_r_state(new rasterizer_state(*this, in_desc));
-    return (new_r_state);
+    return new_r_state;
 }
 
 rasterizer_state_ptr
 render_device::create_rasterizer_state(fill_mode in_fmode, cull_mode in_cmode, polygon_orientation in_fface,
                                        bool in_msample, bool in_sctest, bool in_smlines, const point_raster_state& in_point_state)
 {
-    return (create_rasterizer_state(rasterizer_state_desc(in_fmode, in_cmode, in_fface,
-                                                          in_msample, in_sctest, in_smlines, in_point_state)));
+    return create_rasterizer_state(rasterizer_state_desc(in_fmode, in_cmode, in_fface,
+                                                         in_msample, in_sctest, in_smlines, in_point_state));
 }
 
 blend_state_ptr
 render_device::create_blend_state(const blend_state_desc& in_desc)
 {
     blend_state_ptr new_bl_state(new blend_state(*this, in_desc));
-    return (new_bl_state);
+    return new_bl_state;
 }
 
 blend_state_ptr
@@ -1029,17 +1063,17 @@ render_device::create_blend_state(bool in_enabled,
                                   blend_equation  in_rgb_equation, blend_equation in_alpha_equation,
                                   unsigned in_write_mask, bool in_alpha_to_coverage)
 {
-    return (create_blend_state(blend_state_desc(blend_ops(in_enabled,
-                                                          in_src_rgb_func,   in_dst_rgb_func,
-                                                          in_src_alpha_func, in_dst_alpha_func,
-                                                          in_rgb_equation,   in_alpha_equation, in_write_mask),
-                                                in_alpha_to_coverage)));
+    return create_blend_state(blend_state_desc(blend_ops(in_enabled,
+                                                         in_src_rgb_func,   in_dst_rgb_func,
+                                                         in_src_alpha_func, in_dst_alpha_func,
+                                                         in_rgb_equation,   in_alpha_equation, in_write_mask),
+                                               in_alpha_to_coverage));
 }
 
 blend_state_ptr
 render_device::create_blend_state(const blend_ops_array& in_blend_ops, bool in_alpha_to_coverage)
 {
-    return (create_blend_state(blend_state_desc(in_blend_ops, in_alpha_to_coverage)));
+    return create_blend_state(blend_state_desc(in_blend_ops, in_alpha_to_coverage));
 }
 
 // query api //////////////////////////////////////////////////////////////////////////////////////
@@ -1087,30 +1121,34 @@ render_device::dump_memory_info(std::ostream& os) const
                 << "shader includes not supported (GL_NVX_gpu_memory_info unsupported), ignoring call." << log::end;
     }
     else {
-        static const unsigned int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX           = 0x9047u;
-        static const unsigned int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX     = 0x9048u;
-        static const unsigned int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX   = 0x9049u;
-        static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
-        static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
+        { // protect this function from multiple thread access
+            boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-        int dedicated_vidmem         = 0;
-        int total_available_memory   = 0;
-        int current_available_vidmem = 0;
-        int eviction_count           = 0;
-        int evicted_memory           = 0;
+            static const unsigned int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX           = 0x9047u;
+            static const unsigned int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX     = 0x9048u;
+            static const unsigned int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX   = 0x9049u;
+            static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
+            static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
 
-        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX        , &dedicated_vidmem        );
-        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX  , &total_available_memory  );
-        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &current_available_vidmem);
-        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX          , &eviction_count          );
-        glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX          , &evicted_memory          );
+            int dedicated_vidmem         = 0;
+            int total_available_memory   = 0;
+            int current_available_vidmem = 0;
+            int eviction_count           = 0;
+            int evicted_memory           = 0;
+
+            glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX        , &dedicated_vidmem        );
+            glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX  , &total_available_memory  );
+            glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &current_available_vidmem);
+            glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX          , &eviction_count          );
+            glcore.glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX          , &evicted_memory          );
         
-        os << std::fixed << std::setprecision(3)
-           << "dedicated_vidmem        : " << static_cast<float>(dedicated_vidmem        ) / 1024.0f << "MiB" << std::endl
-           << "total_available_memory  : " << static_cast<float>(total_available_memory  ) / 1024.0f << "MiB" << std::endl
-           << "current_available_vidmem: " << static_cast<float>(current_available_vidmem) / 1024.0f << "MiB" << std::endl
-           << "eviction_count          : " << eviction_count           << std::endl
-           << "evicted_memory          : " << evicted_memory           << std::endl;
+            os << std::fixed << std::setprecision(3)
+               << "dedicated_vidmem        : " << static_cast<float>(dedicated_vidmem        ) / 1024.0f << "MiB" << std::endl
+               << "total_available_memory  : " << static_cast<float>(total_available_memory  ) / 1024.0f << "MiB" << std::endl
+               << "current_available_vidmem: " << static_cast<float>(current_available_vidmem) / 1024.0f << "MiB" << std::endl
+               << "eviction_count          : " << eviction_count           << std::endl
+               << "evicted_memory          : " << evicted_memory           << std::endl;
+        }
     }
 
     gl_assert(glcore, leaving render_device::dump_memory_info());
@@ -1119,8 +1157,12 @@ render_device::dump_memory_info(std::ostream& os) const
 void
 render_device::print_device_informations(std::ostream& os) const
 {
-    os << "OpenGL render device" << std::endl;
-    os << *_opengl_api_core;
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+
+        os << "OpenGL render device" << std::endl;
+        os << *_opengl_api_core;
+    }
 }
 const std::string
 render_device::device_vendor() const
@@ -1158,24 +1200,32 @@ render_device::device_context_version() const
 void
 render_device::register_resource(render_device_resource* res_ptr)
 {
-    _registered_resources.insert(res_ptr);
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+
+        _registered_resources.insert(res_ptr);
+    }
 }
 
 void
 render_device::release_resource(render_device_resource* res_ptr)
 {
-    resource_ptr_set::iterator res_iter = _registered_resources.find(res_ptr);
-    if (res_iter != _registered_resources.end()) {
-        _registered_resources.erase(res_iter);
-    }
+    { // protect this function from multiple thread access
+        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-    delete res_ptr;
+        resource_ptr_set::iterator res_iter = _registered_resources.find(res_ptr);
+        if (res_iter != _registered_resources.end()) {
+            _registered_resources.erase(res_iter);
+        }
+
+        delete res_ptr;
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const render_device& ren_dev)
 {
     ren_dev.print_device_informations(os);
-    return (os);
+    return os;
 }
 
 } // namespace gl

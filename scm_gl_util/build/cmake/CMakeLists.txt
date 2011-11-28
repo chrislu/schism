@@ -47,17 +47,6 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/volume/voxel_geo *.h *.in
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/volume/segy *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/volume/segy *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32 *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32 *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32/util *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_win32/util *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_x *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/window_management/wm_x/util *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/window_management/wm_x/util *.h *.inl)
-
 # include header and inline files in source files for visual studio projects
 if (WIN32)
     if (MSVC)

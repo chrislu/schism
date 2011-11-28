@@ -14,6 +14,7 @@
 #include <scm/gl_core/state_objects/state_objects_fwd.h>
 #include <scm/gl_core/sync_objects/sync_objects_fwd.h>
 #include <scm/gl_core/texture_objects/texture_objects_fwd.h>
+#include <scm/gl_core/window_management/wm_fwd.h>
 
 namespace scm {
 namespace gl {

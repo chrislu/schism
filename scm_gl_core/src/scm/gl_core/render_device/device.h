@@ -84,7 +84,7 @@ public:
     virtual ~render_device();
 
     // device /////////////////////////////////////////////////////////////////////////////////////
-    const opengl::gl_core&         opengl_api() const;
+    const opengl::gl_core&          opengl_api() const;
     render_context_ptr              main_context() const;
     render_context_ptr              create_context();
     const device_capabilities&      capabilities() const;
@@ -306,6 +306,10 @@ protected:
 
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:
+    // device /////////////////////////////////////////////////////////////////////////////////////
+    struct mutex_impl;
+    shared_ptr<mutex_impl>          _mutex_impl;
+
     // device /////////////////////////////////////////////////////////////////////////////////////
     shared_ptr<opengl::gl_core>     _opengl_api_core;
     render_context_ptr              _main_context;

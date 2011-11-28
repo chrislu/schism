@@ -299,6 +299,7 @@ frame_buffer::capture_color_buffer(      render_context& in_context,
     assert(0 != object_id());
     
     {
+        apply_attachments(in_context);
         assert(check_completeness(in_context));
 
         util::framebuffer_binding_guard fbo_guard(glapi, util::gl_framebuffer_binding(FRAMEBUFFER_READ),
