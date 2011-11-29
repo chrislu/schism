@@ -382,7 +382,7 @@ render_device::add_include_files(const std::string& in_path,
                             for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
 
                             assert(input_path / input_rel_path == current_file);
-                            add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
+                            add_include_string_internal(output_root_path + input_rel_path.generic_string(), source_string, false);
                         }
                         else {
                             glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
@@ -412,7 +412,7 @@ render_device::add_include_files(const std::string& in_path,
                             for (; first_mis != current_file.end(); ++first_mis) input_rel_path /= *first_mis;
 
                             assert(input_path / input_rel_path == current_file);
-                            add_include_string(output_root_path + input_rel_path.generic_string(), source_string);
+                            add_include_string_internal(output_root_path + input_rel_path.generic_string(), source_string, false);
                         }
                         else {
                             glout() << log::warning << "render_device::add_include_files(): error reading shader file " << current_file << log::end;
@@ -430,8 +430,19 @@ bool
 render_device::add_include_string(const std::string& in_path,
                                   const std::string& in_source_string)
 {
+    return add_include_string_internal(in_path, in_source_string, true);
+}
+
+bool
+render_device::add_include_string_internal(const std::string& in_path,
+                                           const std::string& in_source_string,
+                                                 bool         lock_thread)
+{
     { // protect this function from multiple thread access
-        boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
+        scoped_ptr<boost::mutex::scoped_lock> lock;
+        if (lock_thread) {
+            lock.reset(new boost::mutex::scoped_lock(_mutex_impl->_mutex));
+        }
 
         const opengl::gl_core& glcore = opengl_api();
         util::gl_error          glerror(glcore);
@@ -507,7 +518,7 @@ render_device::add_macro_defines(const shader_macro_array& in_macros)
         boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
         foreach(const shader_macro& m, in_macros.macros()) {
-            add_macro_define(m);
+            _default_macro_defines[m._name] = m;
         }
     }
 }

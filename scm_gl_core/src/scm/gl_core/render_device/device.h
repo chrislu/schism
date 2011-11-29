@@ -168,6 +168,9 @@ public:
                                                    const std::string&          in_program_name = "");
 
 protected:
+    bool                            add_include_string_internal(const std::string& in_path,
+                                                                const std::string& in_source_string,
+                                                                      bool         lock_thread);
 
     // texture api ////////////////////////////////////////////////////////////////////////////////
 public:
