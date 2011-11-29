@@ -228,6 +228,9 @@ protected:
     // frame buffer api ///////////////////////////////////////////////////////////////////////////
 public:
     void                        set_frame_buffer(const frame_buffer_ptr& in_frame_buffer);
+    void                        clear_frame_buffer_color_attachments(const frame_buffer_ptr& in_frame_buffer);
+    void                        clear_frame_buffer_depth_stencil_attachment(const frame_buffer_ptr& in_frame_buffer);
+    void                        clear_frame_buffer_attachments(const frame_buffer_ptr& in_frame_buffer);
     void                        set_default_frame_buffer(const frame_buffer_target in_target = FRAMEBUFFER_BACK);
     const frame_buffer_ptr&     current_frame_buffer() const;
     const frame_buffer_target   current_default_frame_buffer_target() const;

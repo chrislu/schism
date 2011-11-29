@@ -545,5 +545,45 @@ frame_buffer::clear_attachment(const render_context& in_context, unsigned in_att
     gl_assert(glapi, frame_buffer::clear_attachment() after glFramebufferRenderbuffer());
 }
 
+void
+frame_buffer::clear_color_attachments(const render_context& in_context)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+
+    std::fill(_selected_color_attachments.begin(), _selected_color_attachments.end(), attachment());
+    _attachments_dirty = true;
+
+    apply_attachments(in_context);
+
+    gl_assert(glapi, frame_buffer::clear_attachments() after glFramebufferRenderbuffer());
+}
+
+void
+frame_buffer::clear_depth_stencil_attachment(const render_context& in_context)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+
+    _selected_depth_stencil_attachment = attachment();
+    _attachments_dirty = true;
+    
+    apply_attachments(in_context);
+
+    gl_assert(glapi, frame_buffer::clear_attachments() after glFramebufferRenderbuffer());
+}
+
+void
+frame_buffer::clear_attachments(const render_context& in_context)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+
+    std::fill(_selected_color_attachments.begin(), _selected_color_attachments.end(), attachment());
+    _selected_depth_stencil_attachment = attachment();
+    _attachments_dirty = true;
+    
+    apply_attachments(in_context);
+
+    gl_assert(glapi, frame_buffer::clear_attachments() after glFramebufferRenderbuffer());
+}
+
 } // namespace gl
 } // namespace scm

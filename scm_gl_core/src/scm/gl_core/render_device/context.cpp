@@ -1045,6 +1045,24 @@ render_context::set_frame_buffer(const frame_buffer_ptr& in_frame_buffer)
 }
 
 void
+render_context::clear_frame_buffer_color_attachments(const frame_buffer_ptr& in_frame_buffer)
+{
+    in_frame_buffer->clear_color_attachments(*this);
+}
+
+void
+render_context::clear_frame_buffer_depth_stencil_attachment(const frame_buffer_ptr& in_frame_buffer)
+{
+    in_frame_buffer->clear_depth_stencil_attachment(*this);
+}
+
+void
+render_context::clear_frame_buffer_attachments(const frame_buffer_ptr& in_frame_buffer)
+{
+    in_frame_buffer->clear_attachments(*this);
+}
+
+void
 render_context::set_default_frame_buffer(const frame_buffer_target in_target)
 {
     _current_state._draw_framebuffer           = frame_buffer_ptr();

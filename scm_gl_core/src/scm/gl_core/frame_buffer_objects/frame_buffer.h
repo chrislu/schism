@@ -82,6 +82,11 @@ protected:
     void                            apply_attachment(const render_context& in_context, unsigned in_attach_point, const attachment& in_attachment);
     void                            clear_attachment(const render_context& in_context, unsigned in_attach_point);
 
+    void                            clear_color_attachments(const render_context& in_context);
+    void                            clear_depth_stencil_attachment(const render_context& in_context);
+    void                            clear_attachments(const render_context& in_context);
+
+
 protected:
     attachment_array                _selected_color_attachments;
     attachment                      _selected_depth_stencil_attachment;
