@@ -146,7 +146,7 @@ render_context::render_context(render_device& in_device)
     if (!init_opencl(in_device)) {
         std::ostringstream s;
         s << "render_context::render_context(): error initializing OpenCL command queue.";
-        throw std::runtime_error(s.str());
+        //throw std::runtime_error(s.str());
     }
 
     gl_assert(glapi, leaving render_context::render_context());

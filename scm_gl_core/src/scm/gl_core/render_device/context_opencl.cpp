@@ -26,7 +26,7 @@ render_context::init_opencl(render_device& in_device)
 
     cl_int          cl_error = CL_SUCCESS;
 
-    { // create command queue
+    if (in_device.cl_context()) { // create command queue
         cl_command_queue_properties cmd_prop = 0;
 #if SCM_GL_CORE_OPENCL_ENABLE_PROFILING
         cmd_prop = CL_QUEUE_PROFILING_ENABLE;
@@ -39,6 +39,9 @@ render_context::init_opencl(render_device& in_device)
                   << "(" << cl_error_string(cl_error) << ")." << log::end;
             return false;              
         }
+    }
+    else {
+        return false;
     }
 #endif // SCM_GL_CORE_OPENCL_ENABLE_INTEROP
 

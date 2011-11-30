@@ -91,7 +91,7 @@ render_device::render_device()
         std::ostringstream s;
         s << "render_device::render_device(): error initializing OpenCL.";
         glerr() << log::fatal << s.str() << log::end;
-        throw std::runtime_error(s.str());
+        //throw std::runtime_error(s.str());
     }
 
     // setup main rendering context
