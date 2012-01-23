@@ -1222,6 +1222,14 @@ render_device::enable_cuda_interop()
         return false;
     }
 
+    if (!main_context()->enable_cuda_interop(cuda_interop_device())) {
+        std::stringstream msg;
+        msg << "render_device::enable_cuda_interop(): unable to initialize CUDA system ("
+            << "unable to create CUDA command stream for main context" << ").";
+        glerr() << msg.str() << log::end;
+        return false;
+    }
+
     return true;
 }
 
