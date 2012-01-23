@@ -1,5 +1,5 @@
 
-#include "cl_util.h"
+#include "util.h"
 
 #include <CL/cl.h>
 #include <CL/cl_gl.h>

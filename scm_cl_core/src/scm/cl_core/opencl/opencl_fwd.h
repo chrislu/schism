@@ -1,6 +1,6 @@
 
-#ifndef SCM_GL_CORE_OPENCL_INTEROP_FWD_H_INCLUDED
-#define SCM_GL_CORE_OPENCL_INTEROP_FWD_H_INCLUDED
+#ifndef SCM_CL_CORE_OPENCL_FWD_H_INCLUDED
+#define SCM_CL_CORE_OPENCL_FWD_H_INCLUDED
 
 #include <scm/core/memory.h>
 
@@ -32,9 +32,14 @@ namespace scm {
 namespace cl {
 namespace util {
 
-class accumulate_timer;
+class accum_timer;
 
 } // namespace util
+
+class opencl_device;
+
+typedef scm::shared_ptr<opencl_device>        opencl_device_ptr;
+typedef scm::shared_ptr<opencl_device const>  opencl_device_cptr;
 
 using ::cl::Platform;
 using ::cl::Device;
@@ -116,4 +121,4 @@ typedef scm::shared_ptr<NDRange const>  nd_range_cptr;
 } // namespace cl
 } // namespace scm
 
-#endif // SCM_GL_CORE_OPENCL_INTEROP_FWD_H_INCLUDED
+#endif // SCM_CL_CORE_OPENCL_FWD_H_INCLUDED

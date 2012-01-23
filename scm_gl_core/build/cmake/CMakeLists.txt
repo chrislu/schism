@@ -42,9 +42,6 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/render_device/opengl/util
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/math *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/math *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/opencl_interop *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/opencl_interop *.h *.inl)
-
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_core/primitives *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_core/primitives *.h *.inl)
 
@@ -123,10 +120,10 @@ endif (WIN32)
 
 # set include and lib directories
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
+                                      ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_BOOST_INC_DIR})
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
-scm_project_include_directories(UNIX /opt/OpenCL/include)
 
 # set library directories
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
@@ -149,15 +146,14 @@ endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(ALL
-	scm_core
+	general scm_core
+	general scm_cl_core
 )
 scm_link_libraries(WIN32
-    general OpenCL
     general opengl32
 )
 scm_link_libraries(UNIX
     general GL
-    general OpenCL
 )
 
 if (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
@@ -171,5 +167,6 @@ endif (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 
 add_dependencies(${PROJECT_NAME}
     scm_core
+    scm_cl_core
 )
 

@@ -1,28 +1,26 @@
 
-#include "accumulate_timer.h"
+#include "accum_timer.h"
 
 #include <CL/cl.hpp>
-#include <scm/gl_core/opencl_interop.h>
-
-#include <scm/gl_core/log.h>
+#include <scm/cl_core/opencl.h>
 
 namespace scm {
 namespace cl {
 namespace util {
 
-accumulate_timer::accumulate_timer()
+accum_timer::accum_timer()
   : _cl_event(new ::cl::Event())
   , _cl_event_finished(true)
 {
 }
 
-accumulate_timer::~accumulate_timer()
+accum_timer::~accum_timer()
 {
     _cl_event.reset();
 }
 
 ::cl::Event*const
-accumulate_timer::event() const
+accum_timer::event() const
 {
     if (_cl_event_finished) {
         return _cl_event.get();
@@ -33,7 +31,7 @@ accumulate_timer::event() const
 }
 
 void
-accumulate_timer::collect()
+accum_timer::collect()
 {
     assert(_cl_event);
     cl_int      cl_error00 = CL_SUCCESS;
@@ -44,7 +42,7 @@ accumulate_timer::collect()
         _cl_event_finished = false;
         //gl::glerr() << "not finished";
         //gl::glerr() << log::error
-        //            << "accumulate_timer::collect(): "
+        //            << "accum_timer::collect(): "
         //            << "unable retrieve timer data "
         //            << "(" << util::cl_error_string(cl_error00) << ", " << util::cl_error_string(cl_error01) << ")." << log::end;
     }
@@ -59,27 +57,27 @@ accumulate_timer::collect()
 }
 
 void
-accumulate_timer::reset()
+accum_timer::reset()
 {
     _accumulated_duration = duration_type();
     _accumulation_count   = 0u;
     _cl_event_finished    = false;
 }
 
-const accumulate_timer::duration_type&
-accumulate_timer::accumulated_duration() const
+const accum_timer::duration_type&
+accum_timer::accumulated_duration() const
 {
     return _accumulated_duration;
 }
 
 unsigned
-accumulate_timer::accumulation_count() const
+accum_timer::accumulation_count() const
 {
     return _accumulation_count;
 }
 
-accumulate_timer::duration_type
-accumulate_timer::average_duration() const
+accum_timer::duration_type
+accum_timer::average_duration() const
 {
     if (_accumulation_count > 0) {
         return _accumulated_duration / _accumulation_count;

@@ -1,11 +1,11 @@
 
-#ifndef SCM_GL_CORE_ACCUMULATE_TIMER_H_INCLUDED
-#define SCM_GL_CORE_ACCUMULATE_TIMER_H_INCLUDED
+#ifndef SCM_CL_CORE_OPENCL_ACCUMU_TIMER_H_INCLUDED
+#define SCM_CL_CORE_OPENCL_ACCUMU_TIMER_H_INCLUDED
 
 #include <scm/core/memory.h>
 #include <scm/core/time/time_types.h>
 
-#include <scm/gl_core/opencl_interop/opencl_interop_fwd.h>
+#include <scm/cl_core/opencl/opencl_fwd.h>
 
 #include <CL/cl_fwd.hpp>
 
@@ -16,14 +16,14 @@ namespace scm {
 namespace cl {
 namespace util {
 
-class __scm_export(gl_core) accumulate_timer
+class __scm_export(cl_core) accum_timer
 {
 public:
     typedef time::time_duration      duration_type;
 
 public:
-    accumulate_timer();
-    /*virtual*/ ~accumulate_timer();
+    accum_timer();
+    /*virtual*/ ~accum_timer();
 
     ::cl::Event*const       event() const;
 
@@ -42,7 +42,7 @@ protected:
     event_ptr               _cl_event;
     bool                    _cl_event_finished;
 
-}; // class accumulate_timer
+}; // class accum_timer
 
 } // namespace util
 } // namespace cl
@@ -50,4 +50,4 @@ protected:
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
-#endif // SCM_GL_CORE_ACCUMULATE_TIMER_H_INCLUDED
+#endif // SCM_CL_CORE_OPENCL_ACCUMU_TIMER_H_INCLUDED

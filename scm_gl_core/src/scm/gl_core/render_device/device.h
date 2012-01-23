@@ -25,12 +25,36 @@
 #include <scm/gl_core/state_objects/depth_stencil_state.h>
 #include <scm/gl_core/state_objects/rasterizer_state.h>
 
-#include <scm/gl_core/opencl_interop/opencl_interop_fwd.h>
-
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
+//#include <scm/cl_core/cl_core_fwd.h>
+
+
 namespace scm {
+namespace cu {
+
+class cuda_device;
+
+typedef scm::shared_ptr<cuda_device>        cuda_device_ptr;
+typedef scm::shared_ptr<cuda_device const>  cuda_device_cptr;
+
+class cuda_command_stream;
+
+typedef scm::shared_ptr<cuda_command_stream>        cuda_command_stream_ptr;
+typedef scm::shared_ptr<cuda_command_stream const>  cuda_command_stream_cptr;
+
+} // namespace cu
+
+namespace cl {
+
+class opencl_device;
+
+typedef scm::shared_ptr<opencl_device>        opencl_device_ptr;
+typedef scm::shared_ptr<opencl_device const>  opencl_device_cptr;
+
+} // namespace cl
+
 namespace gl {
 
 namespace opengl {
@@ -287,25 +311,14 @@ public:
 public:
     void                            dump_memory_info(std::ostream& os) const;
 
-    // opencl interop /////////////////////////////////////////////////////////////////////////////
+    // compute interop ////////////////////////////////////////////////////////////////////////////
 public:
-    const cl::platform_ptr&         cl_platform() const;
-    const cl::context_ptr&          cl_context() const;
-    const cl::device_ptr&           cl_device() const;
+    bool                            enable_cuda_interop();
+    bool                            enable_opencl_interop();
 
-    void                            add_cl_include_path(const std::string& in_path);
+    const cl::opencl_device_ptr     opencl_interop_device() const;
+    const cu::cuda_device_ptr       cuda_interop_device() const;
 
-    cl::program_ptr                 create_cl_program(const std::string& in_source,
-                                                      const std::string& in_options,
-                                                      const std::string& in_source_name = "");
-    cl::program_ptr                 create_cl_program_from_file(const std::string& in_file_name,
-                                                                const std::string& in_options);
-
-    cl::kernel_ptr                  create_cl_kernel(const cl::program_ptr& in_program,
-                                                     const std::string&     in_entry_point);
-
-protected:
-    bool                            init_opencl();
 
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:
@@ -317,20 +330,16 @@ protected:
     shared_ptr<opengl::gl_core>     _opengl_api_core;
     render_context_ptr              _main_context;
 
-    // opencl interop /////////////////////////////////////////////////////////////////////////////
-    cl::platform_ptr                _cl_platform;
-    cl::context_ptr                 _cl_context;
-    cl::device_ptr                  _cl_device;
-
-    std::string                     _default_options;
-    string_set                      _default_cl_include_paths;
-
     // shader api /////////////////////////////////////////////////////////////////////////////////
     shader_macro_map                _default_macro_defines;
     string_set                      _default_include_paths;
 
     device_capabilities             _capabilities;
     resource_ptr_set                _registered_resources;
+
+    // compute interop ////////////////////////////////////////////////////////////////////////////
+    cl::opencl_device_ptr           _opencl_device;
+    cu::cuda_device_ptr             _cuda_device;
 
 }; // class render_device
 

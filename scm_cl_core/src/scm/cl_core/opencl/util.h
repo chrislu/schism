@@ -1,6 +1,6 @@
 
-#ifndef SCM_GL_CORE_CL_UTIL_H_INCLUDED
-#define SCM_GL_CORE_CL_UTIL_H_INCLUDED
+#ifndef SCM_CL_CORE_OPENCL_UTIL_H_INCLUDED
+#define SCM_CL_CORE_OPENCL_UTIL_H_INCLUDED
 
 #include <string>
 
@@ -12,7 +12,7 @@ namespace cl {
 namespace util {
 
 std::string
-__scm_export(gl_core) cl_error_string(int error_code);
+__scm_export(cl_core) cl_error_string(int error_code);
 
 } // namespace util
 } // namespace cl
@@ -20,4 +20,4 @@ __scm_export(gl_core) cl_error_string(int error_code);
 
 #include <scm/core/utilities/platform_warning_enable.h>
 
-#endif // SCM_GL_CORE_CL_UTIL_H_INCLUDED
+#endif // SCM_CL_CORE_OPENCL_UTIL_H_INCLUDED

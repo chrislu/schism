@@ -21,6 +21,9 @@
 
 #include <scm/gl_core/log.h>
 
+#include <scm/cl_core/cuda/device.h>
+#include <scm/cl_core/opencl/device.h>
+
 namespace scm {
 namespace gl {
 namespace detail {
@@ -142,12 +145,6 @@ render_context::render_context(render_device& in_device)
     _debug_synchronous_reporting = true;
 
     _active_transform_feedback_topology_mode = PRIMITIVE_POINTS;
-
-    if (!init_opencl(in_device)) {
-        std::ostringstream s;
-        s << "render_context::render_context(): error initializing OpenCL command queue.";
-        //throw std::runtime_error(s.str());
-    }
 
     gl_assert(glapi, leaving render_context::render_context());
 }
@@ -1795,6 +1792,40 @@ sync_status
 render_context::sync_signal_status(const sync_ptr& in_sync) const
 {
     return in_sync->status(*this);
+}
+
+bool
+render_context::enable_cuda_interop(const cu::cuda_device_ptr& cudev)
+{
+    _cu_command_stream = cudev->create_command_stream();
+    if (!_cu_command_stream) {
+        glerr() << log::error << "render_context::enable_cuda_interop(): unable to create cuda command stream." << log::end;
+        return false;
+    }
+    return true;
+}
+
+bool
+render_context::enable_opencl_interop(const cl::opencl_device_ptr& cldev)
+{
+    _cl_command_queue = cldev->create_command_queue();
+    if (!_cl_command_queue) {
+        glerr() << log::error << "render_context::enable_opencl_interop(): unable to create opencl command queue." << log::end;
+        return false;
+    }
+    return true;
+}
+
+const cu::cuda_command_stream_ptr&
+render_context::cuda_command_stream() const
+{
+    return _cu_command_stream;
+}
+
+const cl::command_queue_ptr&
+render_context::opencl_command_queue() const
+{
+    return _cl_command_queue;
 }
 
 } // namespace gl

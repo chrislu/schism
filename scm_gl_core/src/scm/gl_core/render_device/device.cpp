@@ -32,6 +32,9 @@
 #include <scm/gl_core/state_objects/sampler_state.h>
 #include <scm/gl_core/texture_objects.h>
 
+#include <scm/cl_core/cuda/device.h>
+#include <scm/cl_core/opencl/device.h>
+
 namespace scm {
 namespace gl {
 
@@ -86,13 +89,6 @@ render_device::render_device()
 #endif
 
     init_capabilities();
-
-    if (!init_opencl()) {
-        std::ostringstream s;
-        s << "render_device::render_device(): error initializing OpenCL.";
-        glerr() << log::fatal << s.str() << log::end;
-        //throw std::runtime_error(s.str());
-    }
 
     // setup main rendering context
     try {
@@ -1206,6 +1202,69 @@ render_device::device_context_version() const
          s << " " << _opengl_api_core->context_information()._profile_string;
 
     return s.str();
+}
+
+bool
+render_device::enable_cuda_interop()
+{
+    try {
+        _cuda_device.reset(new cu::cuda_device());
+        glout() << *_cuda_device << log::end;
+    }
+    catch (std::exception& e) {
+        std::stringstream msg;
+        msg << "render_device::enable_cuda_interop(): unable to initialize CUDA system ("
+            << "evoking error: " << e.what() << ").";
+        glerr() << msg.str() << log::end;
+
+        _cuda_device.reset();
+
+        return false;
+    }
+
+    return true;
+}
+
+bool
+render_device::enable_opencl_interop()
+{
+    try {
+        _opencl_device.reset(new cl::opencl_device());
+        glout() << *_opencl_device << log::end;
+    }
+    catch (std::exception& e) {
+        std::stringstream msg;
+        msg << "render_device::enable_opencl_interop(): unable to initialize OpenCL system ("
+            << "evoking error: " << e.what() << ").";
+        glerr() << msg.str() << log::end;
+
+        _opencl_device.reset();
+
+        return false;
+    }
+
+    if (!main_context()->enable_opencl_interop(opencl_interop_device())) {
+        std::stringstream msg;
+        msg << "render_device::enable_opencl_interop(): unable to initialize OpenCL system ("
+            << "unable to create OpenCL command queue for main context" << ").";
+        glerr() << msg.str() << log::end;
+        return false;
+    }
+
+    return true;
+}
+
+
+const cl::opencl_device_ptr
+render_device::opencl_interop_device() const
+{
+    return _opencl_device;
+}
+
+const cu::cuda_device_ptr
+render_device::cuda_interop_device() const
+{
+    return _cuda_device;
 }
 
 void

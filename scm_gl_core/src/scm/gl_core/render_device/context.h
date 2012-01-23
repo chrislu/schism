@@ -17,12 +17,35 @@
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/frame_buffer_objects/viewport.h>
 #include <scm/gl_core/render_device/device_child.h>
-#include <scm/gl_core/opencl_interop/opencl_interop_fwd.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
+namespace cl {
+class CommandQueue;
+} // namespace cl
+
 namespace scm {
+namespace cu {
+
+class cuda_device;
+class cuda_command_stream;
+
+typedef scm::shared_ptr<cuda_device>            cuda_device_ptr;
+typedef scm::shared_ptr<cuda_command_stream>    cuda_command_stream_ptr;
+
+} // namespace cu
+
+namespace cl {
+
+class opencl_device;
+using ::cl::CommandQueue;
+
+typedef scm::shared_ptr<opencl_device>       opencl_device_ptr;
+typedef scm::shared_ptr<CommandQueue>        command_queue_ptr;
+
+} // namespace cl    
+    
 namespace gl {
 
 namespace opengl {
@@ -316,13 +339,13 @@ public:
                                                      bool            in_flush   = true);
     sync_status                     sync_signal_status(const sync_ptr& in_sync) const;
 
-
-    // opencl interop /////////////////////////////////////////////////////////////////////////////
+    // compute interop ////////////////////////////////////////////////////////////////////////////
 public:
-    const cl::command_queue_ptr&    cl_command_queue() const;
+    bool                                enable_cuda_interop(const cu::cuda_device_ptr& cudev);
+    bool                                enable_opencl_interop(const cl::opencl_device_ptr& cldev);
 
-protected:
-    bool                            init_opencl(render_device& in_device);
+    const cu::cuda_command_stream_ptr&  cuda_command_stream() const;
+    const cl::command_queue_ptr&        opencl_command_queue() const;
 
 protected:
     render_context(render_device& in_device);
@@ -351,9 +374,9 @@ private:
     rasterizer_state_ptr        _default_rasterizer_state;
     blend_state_ptr             _default_blend_state;
 
-    // opencl interop /////////////////////////////////////////////////////////////////////////////
-    cl::command_queue_ptr       _cl_command_queue;
-
+    // compute interop ////////////////////////////////////////////////////////////////////////////
+    cu::cuda_command_stream_ptr     _cu_command_stream;
+    cl::command_queue_ptr           _cl_command_queue;
 
     friend class render_device;    
 }; // class render_context
