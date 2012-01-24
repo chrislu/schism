@@ -4,7 +4,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include <cuda_runtime.h>
+#include <cuda/cuda_runtime.h>
 
 #include <scm/core/memory.h>
 
