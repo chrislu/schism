@@ -156,6 +156,10 @@ public:
     void*                       map_buffer(const buffer_ptr& in_buffer, const access_mode in_access) const;
     void*                       map_buffer_range(const buffer_ptr& in_buffer, scm::size_t in_offset, scm::size_t in_size, const access_mode in_access) const;
     bool                        unmap_buffer(const buffer_ptr& in_buffer) const;
+    bool                        get_buffer_sub_data(const buffer_ptr& in_buffer,
+                                                    scm::size_t          offset,
+                                                    scm::size_t          size,
+                                                    void*const           data) const;
     bool                        orphane_buffer(const buffer_ptr& in_buffer) const;
 
     void                        bind_uniform_buffer(const buffer_ptr& in_buffer,

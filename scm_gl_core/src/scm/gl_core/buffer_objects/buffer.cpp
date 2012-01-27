@@ -131,7 +131,7 @@ void*
 buffer::map(const render_context& in_context,
             const access_mode   in_access)
 {
-    return (map_range(in_context, 0, _descriptor._size, in_access));
+    return map_range(in_context, 0, _descriptor._size, in_access);
 }
 
 void*
@@ -155,14 +155,14 @@ buffer::map_range(const render_context& in_context,
         || (_descriptor._size < (in_offset + in_size))
         || (0 == access_flags)) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
-        return (0);
+        return 0;
     }
 
     if (   (0 != _mapped_interval_offset)
         || (0 != _mapped_interval_length)) {
         // buffer allready mapped
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
-        return (0);
+        return 0;
     }
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
@@ -182,7 +182,7 @@ buffer::map_range(const render_context& in_context,
 
     gl_assert(glapi, leaving buffer::map_range());
 
-    return (return_value);
+    return return_value;
 }
 
 bool
@@ -198,7 +198,7 @@ buffer::unmap(const render_context& in_context)
     if (   0 == _mapped_interval_offset
         && 0 == _mapped_interval_length) {
         // buffer not mapped
-        return (true);
+        return true;
     }
 
     bool return_value = true;
@@ -218,7 +218,7 @@ buffer::unmap(const render_context& in_context)
 
     gl_assert(glapi, leaving buffer::unmap());
 
-    return (return_value);
+    return return_value;
 }
 
 bool
@@ -234,7 +234,7 @@ buffer::buffer_data(const render_device& ren_dev,
 
     if (0 == object_id()) {
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
-        return (false);
+        return false;
     }
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
@@ -256,11 +256,11 @@ buffer::buffer_data(const render_device& ren_dev,
     if (glerror) {
         _descriptor = buffer_desc();
         state().set(glerror.to_object_state());
-        return (false);
+        return false;
     }
     else {
         _descriptor = in_desc;
-        return (true);
+        return true;
     }
 }
 
@@ -278,23 +278,23 @@ buffer::buffer_sub_data(const render_device& ren_dev,
 
     if (0 == object_id()) {
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
-        return (false);
+        return false;
     }
 
     if (0 > offset || 0 > size) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
-        return (false);
+        return false;
     }
 
     if ((offset + size) > _descriptor._size) {
         state().set(object_state::OS_ERROR_INVALID_VALUE);
-        return (false);
+        return false;
     }
 
     if (   offset < (_mapped_interval_offset + _mapped_interval_length)
         && (offset + size) > _mapped_interval_offset) {
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
-        return (false);
+        return false;
     }
 
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
@@ -309,13 +309,62 @@ buffer::buffer_sub_data(const render_device& ren_dev,
 
     gl_assert(glcore, leaving buffer::buffer_sub_data());
 
-    return (true);
+    return true;
+}
+
+bool
+buffer::get_buffer_sub_data(const render_context& in_context,
+                            scm::size_t           offset,
+                            scm::size_t           size,
+                            void*const            data)
+{
+    const opengl::gl_core& glcore = in_context.opengl_api();
+
+    gl_assert(glcore, entering buffer::get_buffer_sub_data());
+
+    util::gl_error          glerror(glcore);
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (0 > offset || 0 > size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if ((offset + size) > _descriptor._size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if (   offset < (_mapped_interval_offset + _mapped_interval_length)
+        && (offset + size) > _mapped_interval_offset) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glGetNamedBufferSubDataEXT(object_id(), offset, size, data);
+    }
+    else {
+        util::buffer_binding_guard save_guard(glcore, util::gl_buffer_targets(BIND_PIXEL_PACK_BUFFER),
+                                                      util::gl_buffer_bindings(BIND_PIXEL_PACK_BUFFER));
+
+        glcore.glBindBuffer(GL_PIXEL_PACK_BUFFER, object_id());
+        glcore.glBufferSubData(GL_PIXEL_PACK_BUFFER, offset, size, data);
+    }
+
+    gl_assert(glcore, leaving buffer::get_buffer_sub_data());
+
+    return true;
 }
 
 const buffer_desc&
 buffer::descriptor() const
 {
-    return (_descriptor);
+    return _descriptor;
 }
 
 void

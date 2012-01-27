@@ -70,6 +70,11 @@ protected:
                                                 scm::size_t          size,
                                                 const void*          data);
 
+    bool                        get_buffer_sub_data(const render_context& in_context,
+                                                    scm::size_t           offset,
+                                                    scm::size_t           size,
+                                                    void*const            data);
+
 protected:
     buffer_desc                 _descriptor;
 

@@ -157,7 +157,7 @@ render_context::~render_context()
 const opengl::gl_core&
 render_context::opengl_api() const
 {
-    return (_opengl_api_core);
+    return _opengl_api_core;
 }
 
 void
@@ -323,7 +323,7 @@ render_context::retrieve_debug_log() const
     if (!glapi.extension_ARB_debug_output) {
         glout() << log::warning << "render_context::retrieve_debug_log(): "
                 << "no debug context present (GL_ARB_debug_output unsupported), ignoring debug output." << log::end;
-        return (std::string(""));
+        return std::string("");
     }
 
     //glapi.glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_ERROR_ARB, 0, GL_DEBUG_SEVERITY_HIGH_ARB, 5, "test");
@@ -356,7 +356,7 @@ render_context::retrieve_debug_log() const
         message_pos += lengths[i];
     }
 
-    return (output.str());
+    return output.str();
 }
 
 void
@@ -380,7 +380,7 @@ render_context::synchronous_reporting(bool e)
 bool
 render_context::synchronous_reporting() const
 {
-    return (_debug_synchronous_reporting);
+    return _debug_synchronous_reporting;
 }
 
 /*static*/
@@ -422,7 +422,7 @@ render_context::map_buffer(const buffer_ptr&  in_buffer,
         SCM_GL_DGB("render_context::map_buffer(): error mapping buffer ('" << in_buffer->state().state_string() << "')");
     }
 
-    return (return_value);
+    return return_value;
 }
 
 void*
@@ -438,7 +438,7 @@ render_context::map_buffer_range(const buffer_ptr&   in_buffer,
         SCM_GL_DGB("render_context::map_buffer_range(): error mapping buffer range ('" << in_buffer->state().state_string() << "')");
     }
 
-    return (return_value);
+    return return_value;
 }
 
 bool
@@ -451,7 +451,23 @@ render_context::unmap_buffer(const buffer_ptr& in_buffer) const
         SCM_GL_DGB("render_context::unmap_buffer(): error unmapping buffer ('" << in_buffer->state().state_string() << "')");
     }
 
-    return (return_value);
+    return return_value;
+}
+
+bool
+render_context::get_buffer_sub_data(const buffer_ptr& in_buffer,
+                                    scm::size_t          offset,
+                                    scm::size_t          size,
+                                    void*const           data) const
+{
+    bool return_value = in_buffer->get_buffer_sub_data(*this, offset, size, data);
+
+    if (   (false == return_value)
+        || (!in_buffer->ok())) {
+        SCM_GL_DGB("render_context::get_buffer_sub_data(): error retrieving buffer data ('" << in_buffer->state().state_string() << "')");
+    }
+
+    return return_value;
 }
 
 bool
@@ -488,7 +504,7 @@ render_context::set_uniform_buffers(const buffer_binding_array& in_buffers)
 const render_context::buffer_binding_array&
 render_context::current_uniform_buffers() const
 {
-    return (_current_state._active_uniform_buffers);
+    return _current_state._active_uniform_buffers;
 }
 
 void
@@ -516,7 +532,7 @@ render_context::bind_unpack_buffer(const buffer_ptr& in_buffer)
 const buffer_ptr&
 render_context::current_unpack_buffer() const
 {
-    return (_unpack_buffer);
+    return _unpack_buffer;
 }
 
 void
@@ -528,7 +544,7 @@ render_context::bind_vertex_array(const vertex_array_ptr& in_vertex_array)
 const vertex_array_ptr&
 render_context::current_vertex_array() const
 {
-    return (_current_state._vertex_array);
+    return _current_state._vertex_array;
 }
 
 void
@@ -558,7 +574,7 @@ render_context::set_index_buffer_binding(const index_buffer_binding& in_index_bu
 const render_context::index_buffer_binding&
 render_context::current_index_buffer_binding() const
 {
-    return (_current_state._index_buffer_binding);
+    return _current_state._index_buffer_binding;
 }
 
 void
@@ -810,7 +826,7 @@ render_context::bind_program(const program_ptr& in_program)
 const program_ptr&
 render_context::current_program() const
 {
-    return (_current_state._program);
+    return _current_state._program;
 }
 
 void
@@ -869,7 +885,7 @@ render_context::set_texture_unit_state(const texture_unit_array& in_texture_unit
 const render_context::texture_unit_array&
 render_context::current_texture_unit_state() const
 {
-    return (_current_state._texture_units);
+    return _current_state._texture_units;
 }
 
 void
@@ -943,9 +959,9 @@ render_context::update_sub_texture(const texture_image_ptr& in_texture,
                 << "render_context::update_sub_texture(): "
                 << "error during sub texture update (check update region)."
                 << log::end;
-        return (false);
+        return false;
     }
-    return (true);
+    return true;
 }
 
 bool
@@ -961,9 +977,9 @@ render_context::update_sub_texture(const texture_image_ptr& in_texture,
                 << "render_context::update_sub_texture(): "
                 << "error during sub texture update (check update region)."
                 << log::end;
-        return (false);
+        return false;
     }
-    return (true);
+    return true;
 }
 
 bool
@@ -1069,13 +1085,13 @@ render_context::set_default_frame_buffer(const frame_buffer_target in_target)
 const frame_buffer_ptr&
 render_context::current_frame_buffer() const
 {
-    return (_current_state._draw_framebuffer);
+    return _current_state._draw_framebuffer;
 }
 
 const frame_buffer_target
 render_context::current_default_frame_buffer_target() const
 {
-    return (_current_state._default_framebuffer_target);
+    return _current_state._default_framebuffer_target;
 }
 
 void
@@ -1098,7 +1114,7 @@ render_context::set_viewports(const viewport_array& in_vp)
 const viewport_array&
 render_context::current_viewports() const
 {
-    return (_current_state._viewports);
+    return _current_state._viewports;
 }
 
 void
@@ -1586,13 +1602,13 @@ render_context::set_depth_stencil_state(const depth_stencil_state_ptr& in_ds_sta
 const depth_stencil_state_ptr&
 render_context::current_depth_stencil_state() const
 {
-    return (_current_state._depth_stencil_state);
+    return _current_state._depth_stencil_state;
 }
 
 unsigned
 render_context::current_stencil_ref_value() const
 {
-    return (_current_state._stencil_ref_value);
+    return _current_state._stencil_ref_value;
 }
 
 void
@@ -1606,19 +1622,19 @@ render_context::set_rasterizer_state(const rasterizer_state_ptr& in_rs_state, fl
 const rasterizer_state_ptr&
 render_context::current_rasterizer_state() const
 {
-    return (_current_state._rasterizer_state);
+    return _current_state._rasterizer_state;
 }
 
 float
 render_context::current_line_width() const
 {
-    return (_current_state._line_width);
+    return _current_state._line_width;
 }
 
 float
 render_context::current_point_size() const
 {
-    return (_current_state._point_size);
+    return _current_state._point_size;
 }
 
 void
@@ -1631,13 +1647,13 @@ render_context::set_blend_state(const blend_state_ptr& in_bl_state, const math::
 const blend_state_ptr&
 render_context::current_blend_state() const
 {
-    return (_current_state._blend_state);
+    return _current_state._blend_state;
 }
 
 const math::vec4f&
 render_context::current_blend_color() const
 {
-    return (_current_state._blend_color);
+    return _current_state._blend_color;
 }
 
 void
