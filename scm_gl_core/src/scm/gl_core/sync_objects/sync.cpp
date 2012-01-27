@@ -1,4 +1,3 @@
-
 #include "sync.h"
 
 #include <cassert>
@@ -17,7 +16,7 @@ namespace gl {
 
 sync::sync(render_device& in_device)
   : render_device_child(in_device)
-  , _gl_sync_object(nullptr)
+  , _gl_sync_object(0)//nullptr)
 {
 }
 
@@ -90,7 +89,7 @@ sync::delete_sync()
     if (_gl_sync_object) {
         const opengl::gl_core& glapi = parent_device().opengl_api();
         glapi.glDeleteSync(_gl_sync_object);
-        _gl_sync_object = nullptr;
+        _gl_sync_object = 0;//nullptr;
 
         gl_assert(glapi, leaving sync::~delete_sync());
     }

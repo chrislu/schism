@@ -26,7 +26,7 @@ accum_timer::event() const
         return _cl_event.get();
     }
     else {
-        return nullptr;
+        return 0;//nullptr;
     }
 }
 

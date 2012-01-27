@@ -7,7 +7,7 @@
 
 #include <scm/cl_core/cuda/cuda_fwd.h>
 
-#include <cuda/cuda_runtime_api.h>
+#include <cuda_runtime_api.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
