@@ -22,6 +22,7 @@ gl_buffer_targets(const buffer_binding b)
         case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER;
         case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BUFFER;
         case BIND_TRANSFORM_FEEDBACK_BUFFER:    return GL_TRANSFORM_FEEDBACK_BUFFER;
+        case BIND_ATOMIC_COUNTER_BUFFER:        return GL_ATOMIC_COUNTER_BUFFER;
         default:                                return 0;
     }
 }
@@ -39,6 +40,7 @@ gl_buffer_bindings(const buffer_binding b)
         case BIND_UNIFORM_BUFFER:               return GL_UNIFORM_BUFFER_BINDING;
         case BIND_TEXTURE_BUFFER:               return GL_TEXTURE_BINDING_BUFFER;
         case BIND_TRANSFORM_FEEDBACK_BUFFER:    return GL_TRANSFORM_FEEDBACK_BUFFER_BINDING;
+        case BIND_ATOMIC_COUNTER_BUFFER:        return GL_ATOMIC_COUNTER_BUFFER_BINDING;
         default:                                return 0;
     }
 }

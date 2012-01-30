@@ -537,6 +537,9 @@ program::retrieve_uniform_information(render_device& in_device)
                         case GL_UNSIGNED_INT_VEC2:      current_uniform.reset(new scm::gl::uniform_vec2ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_UNSIGNED_INT_VEC3:      current_uniform.reset(new scm::gl::uniform_vec3ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
                         case GL_UNSIGNED_INT_VEC4:      current_uniform.reset(new scm::gl::uniform_vec4ui(actual_uniform_name, actual_uniform_location, actual_uniform_size, util::from_gl_data_type(actual_uniform_type)));break;
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420
+                        case GL_UNSIGNED_INT_ATOMIC_COUNTER:break; // uniform atomic counters are just discovered here... nothing to save
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420
                         default:
                             glerr() << log::error << "program::retrieve_uniform_information(): "
                                     << "unsupported uniform type for uniform '" << actual_uniform_name << "'." << log::end;

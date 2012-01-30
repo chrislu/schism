@@ -22,7 +22,8 @@ enum buffer_binding
     BIND_PIXEL_BUFFER                = BIND_PIXEL_PACK_BUFFER,
     BIND_UNIFORM_BUFFER              = 0x10,
     BIND_TEXTURE_BUFFER              = 0x20,
-    BIND_TRANSFORM_FEEDBACK_BUFFER   = 0x40
+    BIND_TRANSFORM_FEEDBACK_BUFFER   = 0x40,
+    BIND_ATOMIC_COUNTER_BUFFER       = 0x80
 }; // enum buffer_binding
 
 enum buffer_usage

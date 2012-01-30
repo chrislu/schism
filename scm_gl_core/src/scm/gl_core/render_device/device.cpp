@@ -216,6 +216,27 @@ render_device::init_capabilities()
         _capabilities._max_image_units = 0;
     }
 
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420) {
+        glcore.glGetIntegerv(GL_MAX_VERTEX_ATOMIC_COUNTERS,         &_capabilities._max_vertex_atomic_counters);
+        glcore.glGetIntegerv(GL_MAX_FRAGMENT_ATOMIC_COUNTERS,       &_capabilities._max_geometry_atomic_counters);
+        glcore.glGetIntegerv(GL_MAX_GEOMETRY_ATOMIC_COUNTERS,       &_capabilities._max_fragment_atomic_counters);
+        glcore.glGetIntegerv(GL_MAX_COMBINED_ATOMIC_COUNTERS,       &_capabilities._max_combined_atomic_counters);
+        glcore.glGetIntegerv(GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS, &_capabilities._max_atomic_counter_buffer_bindings);
+
+        assert(_capabilities._max_vertex_atomic_counters        >= 0);
+        assert(_capabilities._max_geometry_atomic_counters      >= 0);
+        assert(_capabilities._max_fragment_atomic_counters       > 0);
+        assert(_capabilities._max_combined_atomic_counters       > 0);
+        assert(_capabilities._max_atomic_counter_buffer_bindings > 0);
+    }
+    else {
+        _capabilities._max_vertex_atomic_counters         = 0;
+        _capabilities._max_geometry_atomic_counters       = 0;
+        _capabilities._max_fragment_atomic_counters       = 0;
+        _capabilities._max_combined_atomic_counters       = 0;
+        _capabilities._max_atomic_counter_buffer_bindings = 0;
+    }
+
     //std::cout << "GL_MAX_IMAGE_UNITS_EXT " << _capabilities._max_image_units << std::endl;
 }
 

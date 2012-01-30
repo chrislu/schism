@@ -90,6 +90,11 @@ public:
         int             _max_transform_feedback_buffers;
         int             _max_vertex_streams;
         int             _max_image_units;
+        int             _max_vertex_atomic_counters;
+        int             _max_geometry_atomic_counters;
+        int             _max_fragment_atomic_counters;
+        int             _max_combined_atomic_counters;
+        int             _max_atomic_counter_buffer_bindings;
     }; // struct device_capabilities
 
 protected:

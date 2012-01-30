@@ -139,6 +139,9 @@ render_context::render_context(render_device& in_device)
     _current_state._active_uniform_buffers.resize(in_device.capabilities()._max_uniform_buffer_bindings);
     _applied_state._active_uniform_buffers.resize(in_device.capabilities()._max_uniform_buffer_bindings);
 
+    _current_state._active_atomic_counter_buffers.resize(in_device.capabilities()._max_atomic_counter_buffer_bindings);
+    _applied_state._active_atomic_counter_buffers.resize(in_device.capabilities()._max_atomic_counter_buffer_bindings);
+
     glapi.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glapi.glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -173,6 +176,7 @@ render_context::apply()
     apply_vertex_input();
     apply_state_objects();
     apply_uniform_buffer_bindings();
+    apply_atomic_counter_bindings();
     apply_program();
 
     assert(state().ok());
@@ -187,6 +191,7 @@ render_context::reset()
     reset_vertex_input();
     reset_state_objects();
     reset_uniform_buffers();
+    reset_atomic_counter_buffers();
     reset_program();
 }
 
@@ -489,10 +494,19 @@ render_context::bind_uniform_buffer(const buffer_ptr& in_buffer,
                                     const scm::size_t in_offset,
                                     const scm::size_t in_size)
 {
-     assert(in_bind_point < _current_state._active_uniform_buffers.size());
-    _current_state._active_uniform_buffers[in_bind_point]._buffer = in_buffer;
-    _current_state._active_uniform_buffers[in_bind_point]._offset = in_offset;
-    _current_state._active_uniform_buffers[in_bind_point]._size   = in_size;
+    if (in_bind_point < _current_state._active_uniform_buffers.size()) {
+        _current_state._active_uniform_buffers[in_bind_point]._buffer = in_buffer;
+        _current_state._active_uniform_buffers[in_bind_point]._offset = in_offset;
+        _current_state._active_uniform_buffers[in_bind_point]._size   = in_size;
+    }
+    else {
+        glerr() << log::error
+                << "render_context::bind_uniform_buffer() "
+                << "uniform binding point out of range "
+                << "(binding point: " << in_bind_point
+                << ", max binding point" << _current_state._active_uniform_buffers.size()
+                << ")." << log::end;
+    }
 }
 
 void
@@ -512,6 +526,47 @@ render_context::reset_uniform_buffers()
 {
     std::fill(_current_state._active_uniform_buffers.begin(),
               _current_state._active_uniform_buffers.end(),
+              buffer_binding());
+}
+
+void
+render_context::bind_atomic_counter_buffer(const buffer_ptr& in_buffer,
+                                    const unsigned           in_bind_point,
+                                    const scm::size_t        in_offset,
+                                    const scm::size_t        in_size)
+{
+    if (in_bind_point < _current_state._active_atomic_counter_buffers.size()) {
+        _current_state._active_atomic_counter_buffers[in_bind_point]._buffer = in_buffer;
+        _current_state._active_atomic_counter_buffers[in_bind_point]._offset = in_offset;
+        _current_state._active_atomic_counter_buffers[in_bind_point]._size   = in_size;
+    }
+    else {
+        glerr() << log::error
+                << "render_context::bind_atomic_counter_buffer() "
+                << "uniform binding point out of range "
+                << "(binding point: " << in_bind_point
+                << ", max binding point" << _current_state._active_atomic_counter_buffers.size()
+                << ")." << log::end;
+    }
+}
+
+void
+render_context::set_atomic_counter_buffers(const buffer_binding_array& in_buffers)
+{
+    _current_state._active_atomic_counter_buffers = in_buffers;
+}
+
+const render_context::buffer_binding_array&
+render_context::current_atomic_counter_buffers() const
+{
+    return _current_state._active_atomic_counter_buffers;
+}
+
+void
+render_context::reset_atomic_counter_buffers()
+{
+    std::fill(_current_state._active_atomic_counter_buffers.begin(),
+              _current_state._active_atomic_counter_buffers.end(),
               buffer_binding());
 }
 
@@ -810,6 +865,26 @@ render_context::apply_uniform_buffer_bindings()
             }
             else {
                 aubb._buffer->unbind_range(*this, BIND_UNIFORM_BUFFER, i);
+            }
+            aubb = cubb;
+        }
+    }
+}
+
+void
+render_context::apply_atomic_counter_bindings()
+{
+    for (int i = 0; i < _current_state._active_atomic_counter_buffers.size(); ++i) {
+        const buffer_binding&   cubb = _current_state._active_atomic_counter_buffers[i];
+        buffer_binding&         aubb = _applied_state._active_atomic_counter_buffers[i];
+
+        if (cubb != aubb) {
+            if (cubb._buffer) {
+                cubb._buffer->bind_range(*this, BIND_ATOMIC_COUNTER_BUFFER, i, cubb._offset, cubb._size);
+                assert(cubb._buffer->ok());
+            }
+            else {
+                aubb._buffer->unbind_range(*this, BIND_ATOMIC_COUNTER_BUFFER, i);
             }
             aubb = cubb;
         }

@@ -78,6 +78,27 @@ private:
     const render_context::buffer_binding_array  _save_uniform_buffers;
 }; // class context_uniform_buffer_guard
 
+class context_atomic_counter_buffer_guard : boost::noncopyable
+{
+public:
+    context_atomic_counter_buffer_guard(const render_context_ptr& in_context)
+        : _guarded_context(in_context)
+        , _save_atomic_counter_buffers(in_context->current_atomic_counter_buffers())
+    {
+    }
+    ~context_atomic_counter_buffer_guard()
+    {
+        restore();
+    }
+    void restore()
+    {
+        _guarded_context->set_atomic_counter_buffers(_save_atomic_counter_buffers);
+    }
+private:
+    const render_context_ptr&                   _guarded_context;
+    const render_context::buffer_binding_array  _save_atomic_counter_buffers;
+}; // class context_atomic_counter_buffer_guard
+
 class context_unpack_buffer_guard : boost::noncopyable
 {
 public:
@@ -217,6 +238,7 @@ public:
       : _p_guard(in_context)
       , _v_guard(in_context)
       , _u_guard(in_context)
+      , _ac_guard(in_context)
       , _up_guard(in_context)
       , _s_guard(in_context)
       , _t_guard(in_context)
@@ -228,14 +250,15 @@ public:
     {
     }
 private:
-    context_program_guard           _p_guard;
-    context_vertex_input_guard      _v_guard;
-    context_uniform_buffer_guard    _u_guard;
-    context_unpack_buffer_guard     _up_guard;
-    context_state_objects_guard     _s_guard;
-    context_texture_units_guard     _t_guard;
-    context_image_units_guard       _i_guard;
-    context_framebuffer_guard       _f_guard;
+    context_program_guard               _p_guard;
+    context_vertex_input_guard          _v_guard;
+    context_uniform_buffer_guard        _u_guard;
+    context_atomic_counter_buffer_guard _ac_guard;
+    context_unpack_buffer_guard         _up_guard;
+    context_state_objects_guard         _s_guard;
+    context_texture_units_guard         _t_guard;
+    context_image_units_guard           _i_guard;
+    context_framebuffer_guard           _f_guard;
 }; // class context_all_guard
 
 } // namespace gl
