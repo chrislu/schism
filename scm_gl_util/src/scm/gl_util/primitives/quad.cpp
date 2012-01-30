@@ -40,7 +40,7 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
     scoped_array<unsigned short>    ind_s(new unsigned short[4]);
     scoped_array<unsigned short>    ind_w(new unsigned short[4]);
 
-    _vertices = in_device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STREAM_DRAW, num_vertices * sizeof(vertex), 0);
+    _vertices = in_device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STATIC_DRAW, num_vertices * sizeof(vertex), 0);
 
     render_context_ptr ctx = in_device->main_context();
     vertex* data = static_cast<vertex*>(ctx->map_buffer(_vertices, ACCESS_WRITE_INVALIDATE_BUFFER));

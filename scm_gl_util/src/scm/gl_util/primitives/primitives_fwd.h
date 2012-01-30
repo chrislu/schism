@@ -17,6 +17,7 @@ class geometry_highlight;
 class box_geometry;
 class box_volume_geometry;
 class quad_geometry;
+class fullscreen_triangle;
 class wavefront_obj_geometry;
 
 typedef shared_ptr<geometry>                        geometry_ptr;
@@ -29,6 +30,8 @@ typedef shared_ptr<box_volume_geometry>             box_volume_geometry_ptr;
 typedef shared_ptr<box_volume_geometry const>       box_volume_geometry_cptr;
 typedef shared_ptr<quad_geometry>                   quad_geometry_ptr;
 typedef shared_ptr<quad_geometry const>             quad_geometry_cptr;
+typedef shared_ptr<fullscreen_triangle>             fullscreen_triangle_ptr;
+typedef shared_ptr<fullscreen_triangle const>       fullscreen_triangle_cptr;
 typedef shared_ptr<wavefront_obj_geometry>          wavefront_obj_geometry_ptr;
 typedef shared_ptr<wavefront_obj_geometry const>    wavefront_obj_geometry_cptr;
 
