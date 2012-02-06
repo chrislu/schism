@@ -361,6 +361,63 @@ buffer::get_buffer_sub_data(const render_context& in_context,
     return true;
 }
 
+bool
+buffer::copy_buffer_data(const render_context& in_context,
+                         const buffer&         in_src_buffer,
+                               scm::size_t     in_dst_offset,
+                               scm::size_t     in_src_offset,
+                               scm::size_t     in_size)
+{
+    const opengl::gl_core& glcore = in_context.opengl_api();
+
+    gl_assert(glcore, entering buffer::copy_buffer_data());
+
+    util::gl_error          glerror(glcore);
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (0 > in_src_offset || 0 > in_size || 0 > in_dst_offset) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if ((in_src_offset + in_size) > in_src_buffer.descriptor()._size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+    if ((in_dst_offset + in_size) > _descriptor._size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if (   in_dst_offset < (_mapped_interval_offset + _mapped_interval_length)
+        && (in_dst_offset + in_size) > _mapped_interval_offset) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glNamedCopyBufferSubDataEXT(in_src_buffer.object_id(), object_id(), in_src_offset, in_dst_offset, in_size);
+    }
+    else {
+        glcore.glBindBuffer(GL_COPY_READ_BUFFER,  in_src_buffer.object_id());
+        glcore.glBindBuffer(GL_COPY_WRITE_BUFFER, object_id());
+
+        glcore.glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, in_src_offset, in_dst_offset, in_size);
+
+        glcore.glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+        glcore.glBindBuffer(GL_COPY_READ_BUFFER,  0);
+    }
+
+    gl_assert(glcore, leaving buffer::copy_buffer_data());
+
+    return true;
+}
+
+
 const buffer_desc&
 buffer::descriptor() const
 {

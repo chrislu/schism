@@ -161,6 +161,12 @@ public:
                                                     scm::size_t          offset,
                                                     scm::size_t          size,
                                                     void*const           data) const;
+    bool                        copy_buffer_data(const buffer_ptr& in_dst_buffer,
+                                                 const buffer_ptr& in_src_buffer,
+                                                       scm::size_t in_dst_offset,
+                                                       scm::size_t in_src_offset,
+                                                       scm::size_t in_size) const;
+
     bool                        orphane_buffer(const buffer_ptr& in_buffer) const;
 
     void                        bind_uniform_buffer(const buffer_ptr& in_buffer,

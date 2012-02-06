@@ -476,6 +476,26 @@ render_context::get_buffer_sub_data(const buffer_ptr& in_buffer,
 }
 
 bool
+render_context::copy_buffer_data(const buffer_ptr& in_dst_buffer,
+                                 const buffer_ptr& in_src_buffer,
+                                       scm::size_t in_dst_offset,
+                                       scm::size_t in_src_offset,
+                                       scm::size_t in_size) const
+{
+    assert(in_dst_buffer);
+    assert(in_src_buffer);
+
+    bool return_value = in_dst_buffer->copy_buffer_data(*this, *in_src_buffer, in_dst_offset, in_src_offset, in_size);
+
+    if (   (false == return_value)
+        || (!in_dst_buffer->ok())) {
+        SCM_GL_DGB("render_context::copy_buffer_data(): error copying buffer data ('" << in_dst_buffer->state().state_string() << "')");
+    }
+
+    return return_value;
+}
+
+bool
 render_context::orphane_buffer(const buffer_ptr& in_buffer) const
 {
     bool return_value = in_buffer->buffer_data(parent_device(), in_buffer->descriptor(), 0);

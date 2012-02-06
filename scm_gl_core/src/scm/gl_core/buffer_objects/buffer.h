@@ -75,6 +75,11 @@ protected:
                                                     scm::size_t           size,
                                                     void*const            data);
 
+    bool                        copy_buffer_data(const render_context& in_context,
+                                                 const buffer&         in_src_buffer,
+                                                       scm::size_t     in_dst_offset,
+                                                       scm::size_t     in_src_offset,
+                                                       scm::size_t     in_size);
 protected:
     buffer_desc                 _descriptor;
 

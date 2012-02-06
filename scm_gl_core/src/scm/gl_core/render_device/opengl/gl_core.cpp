@@ -1003,6 +1003,8 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLMAPNAMEDBUFFERRANGEEXTPROC, glMapNamedBufferRangeEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEEXTPROC, glFlushMappedNamedBufferRangeEXT, "EXT_direct_state_access", init_success);
 
+    SCM_INIT_GL_ENTRY(PFNGLNAMEDCOPYBUFFERSUBDATAEXTPROC, glNamedCopyBufferSubDataEXT, "EXT_direct_state_access", init_success);
+
     SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBOFFSETEXTPROC, glVertexArrayVertexAttribOffsetEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBIOFFSETEXTPROC, glVertexArrayVertexAttribIOffsetEXT, "EXT_direct_state_access", init_success);
     SCM_INIT_GL_ENTRY(PFNGLENABLEVERTEXARRAYATTRIBEXTPROC, glEnableVertexArrayAttribEXT, "EXT_direct_state_access", init_success);
