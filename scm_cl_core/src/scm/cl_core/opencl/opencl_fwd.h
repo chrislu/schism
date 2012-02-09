@@ -34,6 +34,9 @@ namespace util {
 
 class accum_timer;
 
+typedef scm::shared_ptr<accum_timer>        accum_timer_ptr;
+typedef scm::shared_ptr<accum_timer const>  accum_timer_cptr;
+
 } // namespace util
 
 class opencl_device;
