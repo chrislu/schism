@@ -57,6 +57,7 @@ endif (WIN32)
 
 # set include and lib directories
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
+                                      ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_ROOT_DIR}/scm_input/src
@@ -90,6 +91,7 @@ endif (SCHISM_BUILD_STATIC)
 # link libraries
 scm_link_libraries(ALL
     scm_core
+    scm_cl_core
     scm_gl_core
     scm_input
 )
@@ -104,6 +106,7 @@ scm_link_libraries(UNIX
 
 add_dependencies(${PROJECT_NAME}
     scm_core
+    scm_cl_core
     scm_gl_core
     scm_input
 )
