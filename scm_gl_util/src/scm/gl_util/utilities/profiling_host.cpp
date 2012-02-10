@@ -290,10 +290,10 @@ profiling_host::timer_prefix_string(timer_type ttype) const
     std::string r;
 
     switch (ttype) {
-        case CPU_TIMER: r.assign("cpu."); break;
-        case GL_TIMER:  r.assign("gl."); break;
-        case CU_TIMER:  r.assign("cuda."); break;
-        case CL_TIMER:  r.assign("cl."); break;
+        case CPU_TIMER: r.assign("cpu"); break;
+        case GL_TIMER:  r.assign("gl"); break;
+        case CU_TIMER:  r.assign("cuda"); break;
+        case CL_TIMER:  r.assign("cl"); break;
         default:        r.assign("unknown.");
     }
 
@@ -408,12 +408,19 @@ std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
         boost::io::ios_all_saver saved_state(os);
         os << std::fixed << std::setprecision(3);
 
-        os << pres._phost->timer_prefix_string(pres._tname) << pres._tname
-           << ": " << pres.time() << pres.unit_string();
-
-        if (0 < pres._dsize) {
-            os << ", " << pres.throughput() << pres.throughput_string();
+        if (profiling_host::duration_type() == pres._phost->time(pres._tname)) {
+            os << "unused timer";
         }
+        else {
+            os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname) << ""
+               << std::setw(6) << std::right << pres.time() << pres.unit_string();
+
+            if (0 < pres._dsize) {
+                os << ", "
+                   << std::setw(9) << std::right << pres.throughput() << pres.throughput_string();
+            }
+        }
+
     }
     else {
         os.setstate(std::ios_base::failbit);

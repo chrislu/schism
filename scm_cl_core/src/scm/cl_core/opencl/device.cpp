@@ -249,8 +249,8 @@ opencl_device::create_command_queue()
     cl::command_queue_ptr  new_cl_cmd_queue;
 
     cl_command_queue_properties cmd_prop = 0;
-#if SCM_CL_CORE_OPENCL_ENABLE_PROFILING
     cmd_prop = CL_QUEUE_PROFILING_ENABLE;
+#if SCM_CL_CORE_OPENCL_ENABLE_PROFILING
 #endif // SCM_CL_CORE_OPENCL_ENABLE_PROFILING
     new_cl_cmd_queue.reset(new cl::CommandQueue(*cl_context(), *cl_device(), cmd_prop, &cl_error));
     if (CL_SUCCESS != cl_error) {
