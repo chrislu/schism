@@ -7,19 +7,30 @@
 namespace scm {
 namespace gl {
 
-class accumulate_timer_query;
-class coordinate_cross;
-class geometry_highlight;
-class texture_output;
+class accum_timer_query;
+typedef shared_ptr<accum_timer_query>          accum_timer_query_ptr;
+typedef shared_ptr<accum_timer_query const>    accum_timer_query_cptr;
 
-typedef shared_ptr<accumulate_timer_query>          accumulate_timer_query_ptr;
-typedef shared_ptr<accumulate_timer_query const>    accumulate_timer_query_cptr;
+class coordinate_cross;
 typedef shared_ptr<coordinate_cross>                coordinate_cross_ptr;
 typedef shared_ptr<coordinate_cross const>          coordinate_cross_cptr;
+
+class geometry_highlight;
 typedef shared_ptr<geometry_highlight>              geometry_highlight_ptr;
 typedef shared_ptr<geometry_highlight const>        geometry_highlight_cptr;
+
+class texture_output;
 typedef shared_ptr<texture_output>                  texture_output_ptr;
 typedef shared_ptr<texture_output const>            texture_output_cptr;
+
+namespace util {
+
+class  profiling_host;
+struct profiling_result;
+typedef shared_ptr<profiling_host>                  profiling_host_ptr;
+typedef shared_ptr<profiling_host const>            profiling_host_cptr;
+
+} // namespace util
 
 } // namespace gl
 } // namespace scm

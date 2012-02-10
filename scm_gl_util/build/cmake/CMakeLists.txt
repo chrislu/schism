@@ -65,15 +65,18 @@ scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
                                       ${GLOBAL_EXT_DIR}/inc/freeimage
-                                      ${GLOBAL_EXT_DIR}/inc/freetype)
+                                      ${GLOBAL_EXT_DIR}/inc/freetype
+									  ${GLOBAL_EXT_DIR}/inc/cuda)
 
-scm_project_include_directories(UNIX  /usr/include/freetype2)
+scm_project_include_directories(UNIX  /usr/include/freetype2
+									  /opt/OpenCL/include
+									  /opt/cuda/current/cuda/include)
 
 # set library directories
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                    ${SCM_BOOST_LIB_DIR})
 scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
-#scm_project_link_directories(UNIX  )
+scm_project_link_directories(UNIX  /opt/cuda/current/cuda/lib64)
 
 if (WIN32)
     # add preprocessor defines
@@ -94,6 +97,10 @@ scm_link_libraries(ALL
     scm_cl_core
     scm_gl_core
     scm_input
+
+	general cuda
+	general cudart
+    general OpenCL
 )
 scm_link_libraries(WIN32
     FreeImagePlus

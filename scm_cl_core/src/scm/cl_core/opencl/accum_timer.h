@@ -3,7 +3,7 @@
 #define SCM_CL_CORE_OPENCL_ACCUMU_TIMER_H_INCLUDED
 
 #include <scm/core/memory.h>
-#include <scm/core/time/time_types.h>
+#include <scm/core/time/accum_timer.h>
 
 #include <scm/cl_core/opencl/opencl_fwd.h>
 
@@ -16,29 +16,20 @@ namespace scm {
 namespace cl {
 namespace util {
 
-class __scm_export(cl_core) accum_timer
+class __scm_export(cl_core) accum_timer : public time::accum_timer_base
 {
 public:
-    typedef time::time_duration      duration_type;
-
-public:
     accum_timer();
-    /*virtual*/ ~accum_timer();
+    virtual ~accum_timer();
 
     ::cl::Event*const       event() const;
 
+    void                    stop();
     void                    collect();
+    void                    force_collect();
     void                    reset();
 
-    const duration_type&    accumulated_duration() const;
-    unsigned                accumulation_count() const;
-
-    duration_type           average_duration() const;
-
 protected:
-    duration_type           _accumulated_duration;
-    unsigned                _accumulation_count;
-
     event_ptr               _cl_event;
     bool                    _cl_event_finished;
 

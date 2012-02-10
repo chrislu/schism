@@ -18,7 +18,8 @@ namespace cu {
 namespace util {
 
 accum_timer::accum_timer()
-  : _cu_event_finished(true)
+  : time::accum_timer_base()
+  , _cu_event_finished(true)
   , _cu_event_stream(0)
 {
     cudaError b = cudaEventCreate(&_cu_event_start);
@@ -66,7 +67,6 @@ accum_timer::collect()
         _cu_event_finished = false;
     }
     else if (cudaSuccess == f) {
-        _cu_event_finished = true;
         cudaError e = cudaStreamSynchronize(_cu_event_stream);
         assert(cudaSuccess == e);
 
@@ -75,8 +75,10 @@ accum_timer::collect()
         assert(cudaSuccess == e);
 
         int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
-        _accumulated_duration += time::nanosec(ns);
+        _last_duration         = time::nanosec(ns);
+        _accumulated_duration += _last_duration;
         ++_accumulation_count;
+        _cu_event_finished = true;
     }
     else {
         err() << "accum_timer::collect() "
@@ -85,34 +87,26 @@ accum_timer::collect()
 }
 
 void
+accum_timer::force_collect()
+{
+    cudaError e = cudaStreamSynchronize(_cu_event_stream);
+    assert(cudaSuccess == e);
+
+    float cu_copy_time = 0.0f;
+    e = cudaEventElapsedTime(&cu_copy_time, _cu_event_start, _cu_event_stop);
+    assert(cudaSuccess == e);
+
+    int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
+    _accumulated_duration += time::nanosec(ns);
+    ++_accumulation_count;
+    _cu_event_finished = true;
+}
+
+void
 accum_timer::reset()
 {
-    _accumulated_duration = duration_type();
-    _accumulation_count   = 0u;
+    time::accum_timer_base::reset();
     _cu_event_finished    = false;
-}
-
-const accum_timer::duration_type&
-accum_timer::accumulated_duration() const
-{
-    return _accumulated_duration;
-}
-
-unsigned
-accum_timer::accumulation_count() const
-{
-    return _accumulation_count;
-}
-
-accum_timer::duration_type
-accum_timer::average_duration() const
-{
-    if (_accumulation_count > 0) {
-        return _accumulated_duration / _accumulation_count;
-    }
-    else {
-        return duration_type();
-    }
 }
 
 } // namespace util

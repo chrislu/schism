@@ -19,7 +19,7 @@
 
 #include <scm/log.h>
 #include <scm/core/math/math.h>
-#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/accum_timer.h>
 #include <scm/core/time/high_res_timer.h>
 #include <scm/core/utilities/foreach.h>
 
@@ -607,7 +607,7 @@ file_core_win32::read_async(void*       output_buffer,
         free_requests.push(new_request);
     }
 
-    scm::time::accumulate_timer<scm::time::high_res_timer>  request_processing_timer;
+    scm::time::accum_timer<scm::time::high_res_timer>  request_processing_timer;
 
     do {
         // fill up request queue

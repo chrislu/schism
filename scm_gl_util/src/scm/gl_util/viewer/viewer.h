@@ -5,7 +5,7 @@
 #include <boost/function.hpp>
 
 #include <scm/core/math.h>
-#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/accum_timer.h>
 #include <scm/core/time/high_res_timer.h>
 
 #include <scm/input/devices/devices_fwd.h>
@@ -83,7 +83,7 @@ public:
         bool        _full_screen;
     }; // struct viewer_settings
 
-    typedef scm::time::accumulate_timer<scm::time::high_res_timer>  accum_timer_type;
+    typedef scm::time::accum_timer<scm::time::high_res_timer>  accum_timer_type;
 
     typedef boost::function<void (const render_device_ptr&,
                                   const render_context_ptr&)>   update_func;

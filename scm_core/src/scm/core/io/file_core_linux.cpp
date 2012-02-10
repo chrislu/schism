@@ -15,7 +15,7 @@
 
 #include <scm/log.h>
 #include <scm/core/math/math.h>
-#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/accum_timer.h>
 #include <scm/core/time/high_res_timer.h>
 #include <scm/core/utilities/foreach.h>
 

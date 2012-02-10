@@ -5,7 +5,7 @@
 #include <scm/core/time/time_types.h>
 #include <scm/core/time/time_system.h>
 #include <scm/core/time/high_res_timer.h>
-#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/accum_timer.h>
 
 namespace scm {
 namespace time {

@@ -9,7 +9,8 @@ namespace cl {
 namespace util {
 
 accum_timer::accum_timer()
-  : _cl_event(new ::cl::Event())
+  : time::accum_timer_base()
+  , _cl_event(new ::cl::Event())
   , _cl_event_finished(true)
 {
 }
@@ -31,6 +32,11 @@ accum_timer::event() const
 }
 
 void
+accum_timer::stop()
+{
+}
+
+void
 accum_timer::collect()
 {
     assert(_cl_event);
@@ -48,43 +54,38 @@ accum_timer::collect()
     }
     else if (CL_SUCCESS == cl_error00)  {
         //gl::glerr() << "finished";
-        _cl_event_finished = true;
         cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>(&cl_error00);
         cl_ulong diff  = ((end > start) ? (end - start) : (~start + 1 + end));
-        _accumulated_duration += time::nanosec(diff);
+        
+        _last_duration         = time::nanosec(diff);
+        _accumulated_duration += _last_duration;
         ++_accumulation_count;
+        _cl_event_finished = true;
     }
+}
+
+void
+accum_timer::force_collect()
+{
+    assert(_cl_event);
+    cl_int      cl_error00 = CL_SUCCESS;
+
+    cl_ulong end   = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_END>(&cl_error00);
+    cl_ulong start = _cl_event->getProfilingInfo<CL_PROFILING_COMMAND_START>(&cl_error00);
+
+    cl_ulong diff  = ((end > start) ? (end - start) : (~start + 1 + end));
+        
+    _last_duration         = time::nanosec(diff);
+    _accumulated_duration += _last_duration;
+    ++_accumulation_count;
+    _cl_event_finished = true;
 }
 
 void
 accum_timer::reset()
 {
-    _accumulated_duration = duration_type();
-    _accumulation_count   = 0u;
+    time::accum_timer_base::reset();
     _cl_event_finished    = false;
-}
-
-const accum_timer::duration_type&
-accum_timer::accumulated_duration() const
-{
-    return _accumulated_duration;
-}
-
-unsigned
-accum_timer::accumulation_count() const
-{
-    return _accumulation_count;
-}
-
-accum_timer::duration_type
-accum_timer::average_duration() const
-{
-    if (_accumulation_count > 0) {
-        return _accumulated_duration / _accumulation_count;
-    }
-    else {
-        return duration_type();
-    }
 }
 
 } // namespace util
