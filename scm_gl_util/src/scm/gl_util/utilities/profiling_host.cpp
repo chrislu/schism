@@ -37,7 +37,8 @@ namespace gl {
 namespace util {
 
 profiling_host::profiling_host()
-  : _update_interval(0)
+  : _enabled(false)
+  , _update_interval(0)
 {
 }
 
@@ -46,114 +47,139 @@ profiling_host::~profiling_host()
     _timers.clear();
 }
 
+bool
+profiling_host::enabled() const
+{
+    return _enabled;
+}
+
+void
+profiling_host::enabled(bool e)
+{
+    _enabled = e;
+}
+
 void
 profiling_host::cpu_start(const std::string& tname)
 {
-    cpu_accum_timer* t  = 0;
-    auto             ti = _timers.find(tname);
-    if (ti == _timers.end()) {
-        t  = new cpu_accum_timer();
-        _timers.insert(timer_map::value_type(tname, timer_instance(CPU_TIMER, t)));
-    }
-    else {
-        if (CPU_TIMER != ti->second._type) {
-            std::stringstream os;
-            os << "profiling_host::cpu_start() "
-               << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
-            throw std::runtime_error(os.str());
+    if (_enabled) {
+        cpu_accum_timer* t  = 0;
+        auto             ti = _timers.find(tname);
+        if (ti == _timers.end()) {
+            t  = new cpu_accum_timer();
+            _timers.insert(timer_map::value_type(tname, timer_instance(CPU_TIMER, t)));
+        }
+        else {
+            if (CPU_TIMER != ti->second._type) {
+                std::stringstream os;
+                os << "profiling_host::cpu_start() "
+                   << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
+                throw std::runtime_error(os.str());
+            }
+
+            t = dynamic_cast<cpu_accum_timer*>(ti->second._timer.get());
         }
 
-        t = dynamic_cast<cpu_accum_timer*>(ti->second._timer.get());
+        assert(0 != t);
+
+        t->start();
     }
-
-    assert(0 != t);
-
-    t->start();
 }
 
 void
 profiling_host::gl_start(const std::string& tname, const render_context_ptr& context)
 {
-    gl_accum_timer*  t  = 0;
-    auto             ti = _timers.find(tname);
-    if (ti == _timers.end()) {
-        // EVIL!!!111einseinself
-        render_device_ptr d(&(context->parent_device()), null_deleter());
-        t = new gl_accum_timer(d);
-        _timers.insert(timer_map::value_type(tname, timer_instance(GL_TIMER, t)));
-    }
-    else {
-        if (GL_TIMER != ti->second._type) {
-            std::stringstream os;
-            os << "profiling_host::gl_start() "
-               << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
-            throw std::runtime_error(os.str());
+    if (_enabled) {
+        gl_accum_timer*  t  = 0;
+        auto             ti = _timers.find(tname);
+        if (ti == _timers.end()) {
+            // EVIL!!!111einseinself
+            render_device_ptr d(&(context->parent_device()), null_deleter());
+            t = new gl_accum_timer(d);
+            _timers.insert(timer_map::value_type(tname, timer_instance(GL_TIMER, t)));
+        }
+        else {
+            if (GL_TIMER != ti->second._type) {
+                std::stringstream os;
+                os << "profiling_host::gl_start() "
+                   << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
+                throw std::runtime_error(os.str());
+            }
+
+            t = dynamic_cast<gl_accum_timer*>(ti->second._timer.get());
         }
 
-        t = dynamic_cast<gl_accum_timer*>(ti->second._timer.get());
+        assert(0 != t);
+
+        t->start(context);
     }
-
-    assert(0 != t);
-
-    t->start(context);
 }
 
 void
 profiling_host::cu_start(const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream)
 {
-    cu_accum_timer* t  = 0;
-    auto            ti = _timers.find(tname);
-    if (ti == _timers.end()) {
-        t  = new cu_accum_timer();
-        _timers.insert(timer_map::value_type(tname, timer_instance(CU_TIMER, t)));
-    }
-    else {
-        if (CU_TIMER != ti->second._type) {
-            std::stringstream os;
-            os << "profiling_host::cu_start() "
-               << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
-            throw std::runtime_error(os.str());
+    if (_enabled) {
+        cu_accum_timer* t  = 0;
+        auto            ti = _timers.find(tname);
+        if (ti == _timers.end()) {
+            t  = new cu_accum_timer();
+            _timers.insert(timer_map::value_type(tname, timer_instance(CU_TIMER, t)));
+        }
+        else {
+            if (CU_TIMER != ti->second._type) {
+                std::stringstream os;
+                os << "profiling_host::cu_start() "
+                   << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
+                throw std::runtime_error(os.str());
+            }
+
+            t = dynamic_cast<cu_accum_timer*>(ti->second._timer.get());
         }
 
-        t = dynamic_cast<cu_accum_timer*>(ti->second._timer.get());
+        assert(0 != t);
+
+        t->start(cu_stream->stream());
     }
-
-    assert(0 != t);
-
-    t->start(cu_stream->stream());
 }
 
 ::cl::Event*const
 profiling_host::cl_start(const std::string& tname)
 {
-    cl_accum_timer* t  = 0;
-    auto            ti = _timers.find(tname);
-    if (ti == _timers.end()) {
-        t  = new cl_accum_timer();
-        _timers.insert(timer_map::value_type(tname, timer_instance(CL_TIMER, t)));
-    }
-    else {
-        if (CL_TIMER != ti->second._type) {
-            std::stringstream os;
-            os << "profiling_host::cl_start() "
-               << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
-            throw std::runtime_error(os.str());
+    if (_enabled) {
+        cl_accum_timer* t  = 0;
+        auto            ti = _timers.find(tname);
+        if (ti == _timers.end()) {
+            t  = new cl_accum_timer();
+            _timers.insert(timer_map::value_type(tname, timer_instance(CL_TIMER, t)));
+        }
+        else {
+            if (CL_TIMER != ti->second._type) {
+                std::stringstream os;
+                os << "profiling_host::cl_start() "
+                   << "timer with name '" << tname << "' already exists with different type [" << timer_type_string(ti->second._type) << "].";
+                throw std::runtime_error(os.str());
+            }
+
+            t = dynamic_cast<cl_accum_timer*>(ti->second._timer.get());
         }
 
-        t = dynamic_cast<cl_accum_timer*>(ti->second._timer.get());
+        assert(0 != t);
+
+        return t->event();
     }
-
-    assert(0 != t);
-
-    return t->event();
+    else {
+        return 0;
+    }
 }
 
 void
-profiling_host::stop(const std::string& tname)
+profiling_host::stop(const std::string& tname) const
 {
-    timer_ptr t = find_timer(tname);
-    if (t) {
-        t->stop();
+    if (_enabled) {
+        timer_ptr t = find_timer(tname);
+        if (t) {
+            t->stop();
+        }
     }
 }
 
@@ -171,19 +197,22 @@ profiling_host::time(const std::string& tname) const
 void
 profiling_host::update(int interval)
 {
-    using namespace std;
 
-    collect_all();
-    ++_update_interval;
+    if (_enabled) {
+        using namespace std;
 
-    if (_update_interval >= interval) {
-        _update_interval = 0;
+        collect_all();
+        ++_update_interval;
 
-        for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
-            t.second._time = t.second._timer->average_duration();
-        });
+        if (_update_interval >= interval) {
+            _update_interval = 0;
 
-        reset_all();
+            for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
+                t.second._time = t.second._timer->average_duration();
+            });
+
+            reset_all();
+        }
     }
 }
 
@@ -312,6 +341,32 @@ profiling_host::find_timer(const std::string& tname) const
     }
 }
 
+scoped_timer::scoped_timer(profiling_host& phost, const std::string& tname)
+  : _phost(phost)
+  , _tname(tname)
+{
+    phost.cpu_start(_tname);
+}
+
+scoped_timer::scoped_timer(profiling_host& phost, const std::string& tname, const render_context_ptr& context)
+  : _phost(phost)
+  , _tname(tname)
+{
+    phost.gl_start(_tname, context);
+}
+
+scoped_timer::scoped_timer(profiling_host& phost, const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream)
+  : _phost(phost)
+  , _tname(tname)
+{
+    phost.cu_start(_tname, cu_stream);
+}
+
+scoped_timer::~scoped_timer()
+{
+    _phost.stop(_tname);
+}
+
 profiling_result::profiling_result(const profiling_host_cptr& host,
                                    const std::string&         tname,
                                          time_unit            tunit)
@@ -408,19 +463,23 @@ std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
         boost::io::ios_all_saver saved_state(os);
         os << std::fixed << std::setprecision(3);
 
-        if (profiling_host::duration_type() == pres._phost->time(pres._tname)) {
-            os << "unused timer";
-        }
-        else {
-            os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname) << ""
-               << std::setw(6) << std::right << pres.time() << pres.unit_string();
+        if (pres._phost->enabled()) {
+            if (profiling_host::duration_type() == pres._phost->time(pres._tname)) {
+                os << "unused timer";
+            }
+            else {
+                os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname) << ""
+                   << std::setw(6) << std::right << pres.time() << pres.unit_string();
 
-            if (0 < pres._dsize) {
-                os << ", "
-                   << std::setw(9) << std::right << pres.throughput() << pres.throughput_string();
+                if (0 < pres._dsize) {
+                    os << ", "
+                       << std::setw(9) << std::right << pres.throughput() << pres.throughput_string();
+                }
             }
         }
-
+        else {
+            os << "profiling disabled";
+        }
     }
     else {
         os.setstate(std::ios_base::failbit);

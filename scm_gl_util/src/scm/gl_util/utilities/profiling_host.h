@@ -63,12 +63,15 @@ public:
     profiling_host();
     virtual ~profiling_host();
 
+    bool                    enabled() const;
+    void                    enabled(bool e);
+
     void                    cpu_start(const std::string& tname);
     void                    gl_start(const std::string& tname, const render_context_ptr& context);
     void                    cu_start(const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream);
     ::cl::Event*const       cl_start(const std::string& tname);
 
-    void                    stop(const std::string& tname);
+    void                    stop(const std::string& tname) const;
     duration_type           time(const std::string& tname) const;
 
     void                    update(int interval = 100);
@@ -92,10 +95,28 @@ protected:
     timer_ptr               find_timer(const std::string& tname) const;
 
 protected:
+    bool                    _enabled;
     timer_map               _timers;
     int                     _update_interval;
 
 }; // profiling_host
+
+class __scm_export(gl_util) scoped_timer
+{
+public:
+    scoped_timer(profiling_host& phost, const std::string& tname);
+    scoped_timer(profiling_host& phost, const std::string& tname, const render_context_ptr& context);
+    scoped_timer(profiling_host& phost, const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream);
+    ~scoped_timer();
+
+private:
+    const profiling_host& _phost;
+    const std::string     _tname;
+
+private: // declared, never defined
+    scoped_timer(const scoped_timer&);
+    const scoped_timer& operator=(const scoped_timer&);
+};
 
 struct __scm_export(gl_util) profiling_result
 {
