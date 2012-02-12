@@ -27,12 +27,17 @@ public:
     void            draw_shadowed(const render_context_ptr& context,
                                   const math::vec2i&        pos,
                                   const text_ptr&           txt) const;
+    void            draw_outlined(const render_context_ptr& context,
+                                  const math::vec2i&        pos,
+                                  const text_ptr&           txt) const;
 
     void            projection_matrix(const math::mat4f& m);
 
 protected:
     program_ptr                 _font_program_gray;
     program_ptr                 _font_program_lcd;
+    program_ptr                 _font_program_outline_gray;
+    program_ptr                 _font_program_outline_lcd;
     sampler_state_ptr           _font_sampler_state;
     depth_stencil_state_ptr     _font_dstate;
     rasterizer_state_ptr        _font_raster_state;

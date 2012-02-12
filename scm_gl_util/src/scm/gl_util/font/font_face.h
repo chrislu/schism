@@ -43,8 +43,19 @@ public:
         math::vec2f    _texture_box_size;
 
         math::vec2i    _box_size;
+        math::vec2i    _border_bearing;
         unsigned       _advance;
         math::vec2i    _bearing;
+
+        glyph_info()
+          : _texture_origin(math::vec2f::zero())
+          , _texture_box_size(math::vec2f::zero())
+          , _box_size(math::vec2i::zero())
+          , _border_bearing(math::vec2i::zero())
+          , _advance(0)
+          , _bearing(math::vec2i::zero())
+        {
+        }
     }; // struct glyph_info
 
     static const unsigned       default_point_size   = 12;
@@ -88,14 +99,18 @@ public:
     int                             underline_thickness(style_type s = style_regular) const;
 
     const texture_2d_ptr&           styles_texture_array() const;
+    const texture_2d_ptr&           styles_border_texture_array() const;
 
 protected:
+    void                            render_glyphs();
+
     void                            cleanup();
 
 protected:
     style_container                 _font_styles;
     std::vector<bool>               _font_styles_available;
     texture_2d_ptr                  _font_styles_texture_array;
+    texture_2d_ptr                  _font_styles_border_texture_array;
     smooth_type                     _font_smooth_style;
 
     std::string                     _name;

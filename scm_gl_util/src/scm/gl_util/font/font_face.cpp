@@ -284,117 +284,266 @@ font_face::font_face(const render_device_ptr& device,
                 s << "font_face::font_face(): unsupported smoothing style.";
                 throw(std::runtime_error(s.str()));
         }
+
+
+        for (int i = 0; i < style_count; ++i) {
+            _font_styles[i]._glyphs.resize(256);
+        }
+
         //typedef vec<unsigned char, 2> glyph_texel; // 2 components (core, border... TO BE DONE!, currently only first used)
+        max_glyph_size += math::vec2ui(1u) + 2 * _border_size; // space of at least one texel around all glyphs
+
         vec3ui                        glyph_texture_dim  = vec3ui(max_glyph_size * 16, style_count); // a 16x16 grid of 256 glyphs in 4 layers
         size_t                        glyph_texture_size = static_cast<size_t>(glyph_texture_dim.x) * glyph_texture_dim.y * glyph_texture_dim.z;
         scoped_array<unsigned char>   glyph_texture(new unsigned char[glyph_texture_size * glyph_components]);
-        memset(glyph_texture.get(), 0u, glyph_texture_size * glyph_components); // clear to black
 
-        for (int i = 0; i < style_count; ++i) {
-            std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
-            _font_styles[i]._glyphs.resize(256);
+        if (_border_size > 0) { // border
+            memset(glyph_texture.get(), 0u, glyph_texture_size * glyph_components); // clear to black
 
-            detail::ft_face     ft_font(ft_lib, cur_font_file);
-            ft_font.set_size(font_size, display_dpi);
+            for (int i = 0; i < style_count; ++i) {
+                std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
 
-            for (unsigned c = 0; c < 256; ++c) {
-                glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
+                detail::ft_face     ft_font(ft_lib, cur_font_file);
+                ft_font.set_size(font_size, display_dpi);
+                FT_Bitmap           bitmap;
 
-                ft_font.load_glyph(c, glyph_load_flags);
-                if (FT_Render_Glyph(ft_font.get_glyph(), glyph_render_mode)) {
-                    continue;
-                }
-                FT_Bitmap& bitmap = ft_font.get_face()->glyph->bitmap;
+                for (unsigned c = 0; c < 256; ++c) {
+                    glyph_info& cur_glyph = _font_styles[i]._glyphs[c];
+                    FT_Glyph    ft_glyph;
 
-                // calculate the glyphs grid position in the font texture array
-                vec3ui tex_array_dst;
-                tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
-                tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
-                tex_array_dst.z = i;
-                
-                cur_glyph._box_size         = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
-                cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
-                                                    static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
-                cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
-                                                    static_cast<float>(cur_glyph._box_size.y) / glyph_texture_dim.y);
+                    ft_font.load_glyph(c, glyph_load_flags);
+                    {
+                        detail::ft_stroker stroker(ft_lib, _border_size << 6);
+                        FT_Error ft_err;
 
-                if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
-                    // linearHoriAdvance contains the 16.16 representation of the horizontal advance
-                    // horiAdvance contains only the rounded advance which can be off by 1 and
-                    // lead to sub styles beeing rendered to narrow
-                    cur_glyph._advance          =  FT_CeilFix(ft_font.get_face()->glyph->linearHoriAdvance) >> 16;
-                }
-                else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
-                    cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
-                }
-                cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
-                                                      (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
-                                                    - (ft_font.get_face()->glyph->metrics.height >> 6));
-                // fill texture
-                switch (bitmap.pixel_mode) {
-                    case FT_PIXEL_MODE_GRAY:
-                        for (int dy = 0; dy < bitmap.rows; ++dy) {
-                            unsigned src_off = dy * bitmap.pitch;
-                            unsigned dst_off =    tex_array_dst.x
-                                               + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
-                                               + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                            for (int dx = 0; dx < bitmap.width; ++dx) {
-                                glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
-                            }
+                        ft_err = FT_Get_Glyph(ft_font.get_glyph(), &ft_glyph);
+                        if (ft_err) {
+                            throw std::runtime_error("font_face::font_face(): error during FT_Get_Glyph");
                         }
-                        break;
-                    case FT_PIXEL_MODE_LCD:
-                        for (int dy = 0; dy < bitmap.rows; ++dy) {
-                            unsigned src_off = dy * bitmap.pitch;
-                            unsigned dst_off =    tex_array_dst.x
-                                               + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
-                                               + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                            for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
-                                glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
-                                glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
-                                glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
-                            }
+                        ft_err = FT_Glyph_Stroke(&ft_glyph, stroker.get_stroker(), true);
+                        if (ft_err) {
+                            throw std::runtime_error("font_face::font_face(): error during FT_Glyph_Stroke");
                         }
-                        break;
-                    case FT_PIXEL_MODE_MONO:
-                        for (int dy = 0; dy < bitmap.rows; ++dy) {
-                            for (int dx = 0; dx < bitmap.pitch; ++dx) {
-                                unsigned        src_off     = dx + dy * bitmap.pitch;
-                                unsigned char   src_byte    = bitmap.buffer[src_off];
-                                for (int bx = 0; bx < 8; ++bx) {
-                                    unsigned        dst_off =   (tex_array_dst.x + dx * 8 + bx)
-                                                              + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
-                                                              + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                                    unsigned char   src_set = src_byte & (0x80 >> bx);
-                                    unsigned char*  plah    = &src_byte;
-                                    for (int l = 0; l < glyph_components; ++l) {
-                                        glyph_texture[dst_off * glyph_components + l] = src_set ? 255u : 0u;
+                        ft_err = FT_Glyph_To_Bitmap(&ft_glyph, glyph_render_mode, 0, true);
+                        if (ft_err) {
+                            throw std::runtime_error("font_face::font_face(): error during FT_Glyph_To_Bitmap");
+                        }
+                        FT_BitmapGlyph ft_bitmap_glyph = (FT_BitmapGlyph)ft_glyph;
+                        bitmap = ft_bitmap_glyph->bitmap;
+                    }
+
+                    // calculate the glyphs grid position in the font texture array
+                    vec3ui tex_array_dst;
+                    tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
+                    tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
+                    tex_array_dst.z = i;
+
+                    FT_BitmapGlyph ft_bitmap_glyph = (FT_BitmapGlyph)ft_glyph;
+                    cur_glyph._box_size         = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
+                    cur_glyph._border_bearing   = vec2i(ft_bitmap_glyph->left, ft_bitmap_glyph->bitmap.rows - ft_bitmap_glyph->top);
+                    cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
+                                                        static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
+                    cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
+                                                        static_cast<float>(cur_glyph._box_size.y) / glyph_texture_dim.y);
+
+                    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
+                        // linearHoriAdvance contains the 16.16 representation of the horizontal advance
+                        // horiAdvance contains only the rounded advance which can be off by 1 and
+                        // lead to sub styles beeing rendered to narrow
+                        cur_glyph._advance          =  FT_CeilFix(ft_font.get_face()->glyph->linearHoriAdvance) >> 16;
+                    }
+                    else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+                        cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
+                    }
+                    cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
+                                                          (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
+                                                        - (ft_font.get_face()->glyph->metrics.height >> 6));
+
+                    // fill texture
+                    switch (bitmap.pixel_mode) {
+                        case FT_PIXEL_MODE_GRAY:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                unsigned src_off = dy * bitmap.pitch;
+                                unsigned dst_off =    tex_array_dst.x
+                                                   + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                   + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                for (int dx = 0; dx < bitmap.width; ++dx) {
+                                    glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
+                                }
+                            }
+                            break;
+                        case FT_PIXEL_MODE_LCD:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                unsigned src_off = dy * bitmap.pitch;
+                                unsigned dst_off =    tex_array_dst.x
+                                                   + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                   + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
+                                    glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
+                                    glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
+                                    glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
+                                }
+                            }
+                            break;
+                        case FT_PIXEL_MODE_MONO:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                for (int dx = 0; dx < bitmap.pitch; ++dx) {
+                                    unsigned        src_off     = dx + dy * bitmap.pitch;
+                                    unsigned char   src_byte    = bitmap.buffer[src_off];
+                                    for (int bx = 0; bx < 8; ++bx) {
+                                        unsigned        dst_off =   (tex_array_dst.x + dx * 8 + bx)
+                                                                  + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                                  + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                        unsigned char   src_set = src_byte & (0x80 >> bx);
+                                        unsigned char*  plah    = &src_byte;
+                                        for (int l = 0; l < glyph_components; ++l) {
+                                            glyph_texture[dst_off * glyph_components + l] = src_set ? 255u : 0u;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        break;
-                    default:
-                        continue;
+                            break;
+                        default:
+                            continue;
+                    }
+                    FT_Done_Glyph(ft_glyph);
                 }
             }
+            // end generate texture image
+            std::vector<void*> image_array_data_raw;
+            image_array_data_raw.push_back(glyph_texture.get());
+
+            _font_styles_border_texture_array = device->create_texture_2d(vec2ui(glyph_texture_dim.x, glyph_texture_dim.y),
+                                                                   glyph_texture_format, 1, glyph_texture_dim.z, 1,
+                                                                   glyph_texture_format, image_array_data_raw);
+
+            if (!_font_styles_border_texture_array) {
+                std::ostringstream s;
+                s << "font_face::font_face(): unable to create texture object (border).";
+                throw(std::runtime_error(s.str()));
+            }
+
+            image_array_data_raw.clear();
         }
-        // end generate texture image
-        std::vector<void*> image_array_data_raw;
-        image_array_data_raw.push_back(glyph_texture.get());
+        // TODO the bearing and box is not wrong!!! FIXME
+        { // core
+            memset(glyph_texture.get(), 0u, glyph_texture_size * glyph_components); // clear to black
 
-        _font_styles_texture_array = device->create_texture_2d(vec2ui(glyph_texture_dim.x, glyph_texture_dim.y),
-                                                               glyph_texture_format, 1, glyph_texture_dim.z, 1,
-                                                               glyph_texture_format, image_array_data_raw);
+            for (int i = 0; i < style_count; ++i) {
+                std::string cur_font_file = _font_styles_available[i] ? font_style_files[i] : font_style_files[0];
 
-        if (!_font_styles_texture_array) {
-            std::ostringstream s;
-            s << "font_face::font_face(): unable to create texture object.";
-            throw(std::runtime_error(s.str()));
+                detail::ft_face     ft_font(ft_lib, cur_font_file);
+                ft_font.set_size(font_size, display_dpi);
+                FT_Bitmap           bitmap;
+
+                for (unsigned c = 0; c < 256; ++c) {
+                    glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
+
+                    ft_font.load_glyph(c, glyph_load_flags);
+                    if (FT_Render_Glyph(ft_font.get_glyph(), glyph_render_mode)) {
+                        continue;
+                    }
+                    bitmap = ft_font.get_face()->glyph->bitmap;
+
+                    // calculate the glyphs grid position in the font texture array
+                    vec3ui tex_array_dst;
+                    tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
+                    tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
+                    tex_array_dst.z = i;
+
+                    vec2i cur_core_box = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
+                    vec2i cur_bm_bearing = vec2i(ft_font.get_face()->glyph->bitmap_left, ft_font.get_face()->glyph->bitmap.rows - ft_font.get_face()->glyph->bitmap_top);
+                    vec2i box_diff;
+                    box_diff.x = max(0, cur_bm_bearing.x - cur_glyph._border_bearing.x);
+                    box_diff.y = max(0, cur_glyph._border_bearing.y - cur_bm_bearing.y);
+                    cur_glyph._box_size.x = max(cur_glyph._box_size.x, cur_core_box.x);
+                    cur_glyph._box_size.y = max(cur_glyph._box_size.y, cur_core_box.y);
+
+                    cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
+                                                        static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
+                    cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
+                                                        static_cast<float>(cur_glyph._box_size.y) / glyph_texture_dim.y);
+
+                    if (ft_font.get_face()->face_flags & FT_FACE_FLAG_SCALABLE) {
+                        // linearHoriAdvance contains the 16.16 representation of the horizontal advance
+                        // horiAdvance contains only the rounded advance which can be off by 1 and
+                        // lead to sub styles beeing rendered to narrow
+                        cur_glyph._advance          =  FT_CeilFix(ft_font.get_face()->glyph->linearHoriAdvance) >> 16;
+                    }
+                    else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
+                        cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
+                    }
+                    cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
+                                                          (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
+                                                        - (ft_font.get_face()->glyph->metrics.height >> 6));
+                    // fill texture
+                    switch (bitmap.pixel_mode) {
+                        case FT_PIXEL_MODE_GRAY:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                unsigned src_off = dy * bitmap.pitch;
+                                unsigned dst_off =    tex_array_dst.x + box_diff.x
+                                                   + (tex_array_dst.y + box_diff.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                   + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                for (int dx = 0; dx < bitmap.width; ++dx) {
+                                    glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
+                                }
+                            }
+                            break;
+                        case FT_PIXEL_MODE_LCD:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                unsigned src_off = dy * bitmap.pitch;
+                                unsigned dst_off =    tex_array_dst.x + box_diff.x
+                                                   + (tex_array_dst.y + box_diff.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                   + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
+                                    glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
+                                    glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
+                                    glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
+                                }
+                            }
+                            break;
+                        case FT_PIXEL_MODE_MONO:
+                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                                for (int dx = 0; dx < bitmap.pitch; ++dx) {
+                                    unsigned        src_off     = dx + dy * bitmap.pitch;
+                                    unsigned char   src_byte    = bitmap.buffer[src_off];
+                                    for (int bx = 0; bx < 8; ++bx) {
+                                        unsigned        dst_off =   (tex_array_dst.x + box_diff.x + dx * 8 + bx)
+                                                                  + (tex_array_dst.y + box_diff.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
+                                                                  + i * (glyph_texture_dim.x * glyph_texture_dim.y);
+                                        unsigned char   src_set = src_byte & (0x80 >> bx);
+                                        unsigned char*  plah    = &src_byte;
+                                        for (int l = 0; l < glyph_components; ++l) {
+                                            glyph_texture[dst_off * glyph_components + l] = src_set ? 255u : 0u;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            continue;
+                    }
+                }
+            }
+            // end generate texture image
+            std::vector<void*> image_array_data_raw;
+            image_array_data_raw.push_back(glyph_texture.get());
+
+            _font_styles_texture_array = device->create_texture_2d(vec2ui(glyph_texture_dim.x, glyph_texture_dim.y),
+                                                                   glyph_texture_format, 1, glyph_texture_dim.z, 1,
+                                                                   glyph_texture_format, image_array_data_raw);
+
+            if (!_font_styles_texture_array) {
+                std::ostringstream s;
+                s << "font_face::font_face(): unable to create texture object.";
+                throw(std::runtime_error(s.str()));
+            }
+
+            image_array_data_raw.clear();
         }
 
-        image_array_data_raw.clear();
         glyph_texture.reset();
+
 
         using namespace boost::filesystem;
 
@@ -491,6 +640,12 @@ const texture_2d_ptr&
 font_face::styles_texture_array() const
 {
     return (_font_styles_texture_array);
+}
+
+const texture_2d_ptr&
+font_face::styles_border_texture_array() const
+{
+    return (_font_styles_border_texture_array);
 }
 
 } // namespace gl
