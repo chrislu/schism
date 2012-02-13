@@ -59,7 +59,7 @@ public:
     }; // struct glyph_info
 
     static const unsigned       default_point_size   = 12;
-    static const unsigned       default_border_size  = 0;
+    //static const float          default_border_size  = 0.0f;
     static const unsigned       default_display_dpi  = 72;
     static const smooth_type    default_smooth_style = smooth_normal;
 
@@ -79,7 +79,7 @@ public:
     font_face(const render_device_ptr& device,                  
               const std::string&       font_file,
               unsigned                 point_size  = default_point_size,
-              unsigned                 border_size = default_border_size,
+              float                    border_size = 0.0f,//default_border_size,
               smooth_type              smooth_type = default_smooth_style,
               unsigned                 display_dpi = default_display_dpi);
     virtual ~font_face();

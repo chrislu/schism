@@ -21,8 +21,8 @@
 
 namespace {
 struct vertex {
-    scm::math::vec3f pos;
-    scm::math::vec3f tex;
+    scm::math::vec2f pos;
+    scm::math::vec2f tex;
 };
 } // namespace
 
@@ -37,7 +37,8 @@ text::text(const render_device_ptr&     device,
   , _text_style(stl)
   , _text_string(str)
   , _text_kerning(true)
-  , _text_color(math::vec4f(1.0f))
+  , _text_color(math::vec4f::one())
+  , _text_outline_color(math::vec4f(0.0f, 0.0f, 0.0f, 1.0f))
   , _text_shadow_color(math::vec4f(0.0f, 0.0f, 0.0f, 1.0f))
   , _text_shadow_offset(math::vec2i(1, -1))
   , _text_bounding_box(math::vec2i(0, 0))
@@ -54,9 +55,26 @@ text::text(const render_device_ptr&     device,
 
     _vertex_buffer = device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STREAM_DRAW, num_vertices * sizeof(vertex), 0);
     _index_buffer  = device->create_buffer(BIND_INDEX_BUFFER, USAGE_STREAM_DRAW,  num_indices  * sizeof(unsigned short), 0);
-    _vertex_array  = device->create_vertex_array(vertex_format(0, 0, TYPE_VEC3F, sizeof(vertex))
-                                                              (0, 2, TYPE_VEC3F, sizeof(vertex)),
+    _vertex_array  = device->create_vertex_array(vertex_format(0, 0, TYPE_VEC2F, sizeof(vertex))
+                                                              (0, 2, TYPE_VEC2F, sizeof(vertex)),
                                                  list_of(_vertex_buffer));
+
+    // fill index data
+    unsigned short* index_data  = static_cast<unsigned short*>(device->main_context()->map_buffer(_index_buffer, ACCESS_WRITE_INVALIDATE_BUFFER));
+
+    if (0 == index_data) {
+        throw std::runtime_error("text::update(): unable to map index buffer for initialization.");
+    }
+
+    for (int i = 0; i < _glyph_capacity; ++i) {
+        index_data[i * 6    ] = static_cast<unsigned short>(i * 4);
+        index_data[i * 6 + 1] = static_cast<unsigned short>(i * 4 + 1);
+        index_data[i * 6 + 2] = static_cast<unsigned short>(i * 4 + 2);
+        index_data[i * 6 + 3] = static_cast<unsigned short>(i * 4);
+        index_data[i * 6 + 4] = static_cast<unsigned short>(i * 4 + 2);
+        index_data[i * 6 + 5] = static_cast<unsigned short>(i * 4 + 3);
+    }
+    device->main_context()->unmap_buffer(_index_buffer);
     update();
 }
 
@@ -70,19 +88,19 @@ text::~text()
 const font_face_cptr&
 text::font() const
 {
-    return (_font);
+    return _font;
 }
 
 const font_face::style_type
 text::text_style() const
 {
-    return (_text_style);
+    return _text_style;
 }
 
 const std::string&
 text::text_string() const
 {
-    return (_text_string);
+    return _text_string;
 }
 
 void
@@ -103,7 +121,7 @@ text::text_string(const std::string& str,
 bool
 text::text_kerning() const
 {
-    return (_text_kerning);
+    return _text_kerning;
 }
 
 void
@@ -115,7 +133,7 @@ text::text_kerning(bool k)
 const math::vec4f&
 text::text_color() const
 {
-    return (_text_color);
+    return _text_color;
 }
 
 void
@@ -125,9 +143,21 @@ text::text_color(const math::vec4f& c)
 }
 
 const math::vec4f&
+text::text_outline_color() const
+{
+    return _text_outline_color;
+}
+
+void
+text::text_outline_color(const math::vec4f& c)
+{
+    _text_outline_color = c;
+}
+
+const math::vec4f&
 text::text_shadow_color() const
 {
-    return (_text_shadow_color);
+    return _text_shadow_color;
 }
 
 void
@@ -139,7 +169,7 @@ text::text_shadow_color(const math::vec4f& c)
 const math::vec2i&
 text::text_shadow_offset() const
 {
-    return (_text_shadow_offset);
+    return _text_shadow_offset;
 }
 
 void
@@ -151,7 +181,7 @@ text::text_shadow_offset(const math::vec2i& o)
 const math::vec2i&
 text::text_bounding_box() const
 {
-    return (_text_bounding_box);
+    return _text_bounding_box;
 }
 
 void
@@ -175,6 +205,25 @@ text::update()
                       << "text::update(): unable to resize index buffer (size : " << num_indices * sizeof(unsigned short) << ")." << log::end;
                 return;
             }
+            // fill index data
+            unsigned short* index_data  = static_cast<unsigned short*>(device->main_context()->map_buffer(_index_buffer, ACCESS_WRITE_INVALIDATE_BUFFER));
+
+            if (0 == index_data) {
+                err() << log::error
+                      << "text::update(): unable to map index buffer for initialization (size : " << num_indices * sizeof(unsigned short) << ")." << log::end;
+                return;
+            }
+
+            for (int i = 0; i < _glyph_capacity; ++i) {
+                index_data[i * 6    ] = static_cast<unsigned short>(i * 4);
+                index_data[i * 6 + 1] = static_cast<unsigned short>(i * 4 + 1);
+                index_data[i * 6 + 2] = static_cast<unsigned short>(i * 4 + 2);
+                index_data[i * 6 + 3] = static_cast<unsigned short>(i * 4);
+                index_data[i * 6 + 4] = static_cast<unsigned short>(i * 4 + 2);
+                index_data[i * 6 + 5] = static_cast<unsigned short>(i * 4 + 3);
+            }
+            device->main_context()->unmap_buffer(_index_buffer);
+
         }
         else  {
             err() << log::error
@@ -189,9 +238,8 @@ text::update()
         vec2i           current_pos = vec2i(0, 0);
         char            prev_char   = 0;
         vertex*         vertex_data = static_cast<vertex*>(context->map_buffer_range(_vertex_buffer, 0, 4 * _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER));
-        unsigned short* index_data  = static_cast<unsigned short*>(context->map_buffer_range(_index_buffer, 0, 6 * _text_string.size() * sizeof(unsigned short), ACCESS_WRITE_INVALIDATE_BUFFER));
 
-        if ((vertex_data == 0) || (index_data == 0)) {
+        if (0 == vertex_data) {
             err() << log::error
                   << "text::update(): unable to map vertex element or index buffer." << log::end;
             return;
@@ -236,17 +284,10 @@ text::update()
                 vertex_data[i * 4 + 2].tex = cur_glyph._texture_origin + cur_glyph._texture_box_size;                // 11
                 vertex_data[i * 4 + 3].tex = cur_glyph._texture_origin + vec2f(0.0f, cur_glyph._texture_box_size.y); // 01
 
-                vertex_data[i * 4    ].tex.z = static_cast<float>(_text_style);
-                vertex_data[i * 4 + 1].tex.z = static_cast<float>(_text_style);
-                vertex_data[i * 4 + 2].tex.z = static_cast<float>(_text_style);
-                vertex_data[i * 4 + 3].tex.z = static_cast<float>(_text_style);
-
-                index_data[i * 6    ] = i * 4;
-                index_data[i * 6 + 1] = i * 4 + 1;
-                index_data[i * 6 + 2] = i * 4 + 2;
-                index_data[i * 6 + 3] = i * 4;
-                index_data[i * 6 + 4] = i * 4 + 2;
-                index_data[i * 6 + 5] = i * 4 + 3;
+                //vertex_data[i * 4    ].tex.z = static_cast<float>(_text_style);
+                //vertex_data[i * 4 + 1].tex.z = static_cast<float>(_text_style);
+                //vertex_data[i * 4 + 2].tex.z = static_cast<float>(_text_style);
+                //vertex_data[i * 4 + 3].tex.z = static_cast<float>(_text_style);
 
                 _indices_count += 6;
                 ++i;
@@ -260,7 +301,6 @@ text::update()
         });
         
         context->unmap_buffer(_vertex_buffer);
-        context->unmap_buffer(_index_buffer);
     }
     else {
         err() << log::error

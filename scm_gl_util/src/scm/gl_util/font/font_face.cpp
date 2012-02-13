@@ -11,6 +11,7 @@
 #include <boost/filesystem.hpp>
 //#include <boost/tuple/tuple.hpp>
 
+#include <scm/gl_core/log.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/texture_objects.h>
 
@@ -157,14 +158,14 @@ available_72dpi_size(const std::string& file_name,
 font_face::font_face(const render_device_ptr& device,
                      const std::string&       font_file,
                      unsigned                 point_size,
-                     unsigned                 border_size,
+                     float                    border_size,
                      smooth_type              smooth_type,
                      unsigned                 display_dpi)
   : _font_styles(style_count)
   , _font_styles_available(style_count)
   , _font_smooth_style(smooth_type)
   , _point_size(point_size)
-  , _border_size(border_size)
+  , _border_size(static_cast<unsigned>(math::floor(border_size * 64.0f)))
   , _dpi(display_dpi)
 {
     using namespace scm::gl;
@@ -291,7 +292,7 @@ font_face::font_face(const render_device_ptr& device,
         }
 
         //typedef vec<unsigned char, 2> glyph_texel; // 2 components (core, border... TO BE DONE!, currently only first used)
-        max_glyph_size += math::vec2ui(1u) + 2 * _border_size; // space of at least one texel around all glyphs
+        max_glyph_size += math::vec2ui(1u) + 2 * (_border_size >> 6); // space of at least one texel around all glyphs
 
         vec3ui                        glyph_texture_dim  = vec3ui(max_glyph_size * 16, style_count); // a 16x16 grid of 256 glyphs in 4 layers
         size_t                        glyph_texture_size = static_cast<size_t>(glyph_texture_dim.x) * glyph_texture_dim.y * glyph_texture_dim.z;
@@ -313,7 +314,7 @@ font_face::font_face(const render_device_ptr& device,
 
                     ft_font.load_glyph(c, glyph_load_flags);
                     {
-                        detail::ft_stroker stroker(ft_lib, _border_size << 6);
+                        detail::ft_stroker stroker(ft_lib, _border_size);
                         FT_Error ft_err;
 
                         ft_err = FT_Get_Glyph(ft_font.get_glyph(), &ft_glyph);
@@ -544,6 +545,23 @@ font_face::font_face(const render_device_ptr& device,
 
         glyph_texture.reset();
 
+        std::stringstream os;
+        os << std::fixed << std::setprecision(2)
+           << "font_face::font_face(): " << std::endl
+           << " - created font textures for font '" << font_file << "' "
+           << "(point size: " << point_size << ", border size: " << border_size << ")" << std::endl
+           << "   - style texture:  format " << gl::format_string(glyph_texture_format)
+                << ", size " <<      glyph_texture_dim
+                << ", glyph box " << max_glyph_size
+                << ", memory " <<      static_cast<double>(glyph_texture_dim.x * glyph_texture_dim.y * glyph_texture_dim.z * size_of_format(glyph_texture_format)) / 1024.0 << "KiB";
+        if (_border_size > 0) {
+            os << std::endl
+               << "   - border texture: format " << gl::format_string(glyph_texture_format)
+               << ", size " <<      glyph_texture_dim
+               << ", glyph box " << max_glyph_size
+               << ", memory " <<      static_cast<double>(glyph_texture_dim.x * glyph_texture_dim.y * glyph_texture_dim.z * size_of_format(glyph_texture_format)) / 1024.0 << "KiB";
+        }
+        glout() << log::info << os.str();
 
         using namespace boost::filesystem;
 

@@ -37,6 +37,8 @@ public:
 
     const math::vec4f&          text_color() const;
     void                        text_color(const math::vec4f& c) ;
+    const math::vec4f&          text_outline_color() const;
+    void                        text_outline_color(const math::vec4f& c) ;
     const math::vec4f&          text_shadow_color() const;
     void                        text_shadow_color(const math::vec4f& c);
     const math::vec2i&          text_shadow_offset() const;
@@ -54,6 +56,7 @@ protected:
     bool                        _text_kerning;
 
     math::vec4f                 _text_color;
+    math::vec4f                 _text_outline_color;
     math::vec4f                 _text_shadow_color;
     math::vec2i                 _text_shadow_offset;
 
