@@ -262,7 +262,8 @@ text_renderer::draw_outlined(const render_context_ptr& context,
             _font_program_gray->uniform("in_font_array", 0);
             context->set_blend_state(_font_blend_gray);
             context->bind_program(_font_program_gray);
-            { // outline
+            
+            if (txt->font()->styles_border_texture_array()) { // outline
                 mat4f  v  = make_translation(vec3f(vec2f(pos), 0.0f));
                 mat4f mvp = _projection_matrix * v;
 
@@ -296,7 +297,7 @@ text_renderer::draw_outlined(const render_context_ptr& context,
         case font_face::smooth_lcd:
             _font_program_lcd->uniform("in_font_array", 0);
             context->bind_program(_font_program_lcd);
-            { // shadow
+            if (txt->font()->styles_border_texture_array()) { // outline
                 mat4f v   = make_translation(vec3f(vec2f(pos), 0.0f));
                 mat4f mvp = _projection_matrix * v;
 
