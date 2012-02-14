@@ -341,7 +341,7 @@ font_face::font_face(const render_device_ptr& device,
 
                     FT_BitmapGlyph ft_bitmap_glyph = (FT_BitmapGlyph)ft_glyph;
                     cur_glyph._box_size         = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
-                    cur_glyph._border_bearing   = vec2i(ft_bitmap_glyph->left, ft_bitmap_glyph->bitmap.rows - ft_bitmap_glyph->top);
+                    cur_glyph._border_bearing   = vec2i(ft_bitmap_glyph->left, ft_bitmap_glyph->top - ft_bitmap_glyph->bitmap.rows);
                     cur_glyph._texture_origin   = vec2f(static_cast<float>(tex_array_dst.x) / glyph_texture_dim.x,
                                                         static_cast<float>(tex_array_dst.y) / glyph_texture_dim.y);
                     cur_glyph._texture_box_size = vec2f(static_cast<float>(cur_glyph._box_size.x) / glyph_texture_dim.x,
@@ -453,10 +453,10 @@ font_face::font_face(const render_device_ptr& device,
                     tex_array_dst.z = i;
 
                     vec2i cur_core_box = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
-                    vec2i cur_bm_bearing = vec2i(ft_font.get_face()->glyph->bitmap_left, ft_font.get_face()->glyph->bitmap.rows - ft_font.get_face()->glyph->bitmap_top);
+                    vec2i cur_bm_bearing = vec2i(ft_font.get_face()->glyph->bitmap_left, ft_font.get_face()->glyph->bitmap_top - ft_font.get_face()->glyph->bitmap.rows);
                     vec2i box_diff;
                     box_diff.x = max(0, cur_bm_bearing.x - cur_glyph._border_bearing.x);
-                    box_diff.y = max(0, cur_glyph._border_bearing.y - cur_bm_bearing.y);
+                    box_diff.y = max(0, cur_bm_bearing.y - cur_glyph._border_bearing.y);
                     cur_glyph._box_size.x = max(cur_glyph._box_size.x, cur_core_box.x);
                     cur_glyph._box_size.y = max(cur_glyph._box_size.y, cur_core_box.y);
 
