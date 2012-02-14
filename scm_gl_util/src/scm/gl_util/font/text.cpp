@@ -16,13 +16,21 @@
 #include <scm/gl_core/math.h>
 #include <scm/gl_core/buffer_objects.h>
 #include <scm/gl_core/render_device.h>
+#include <scm/gl_core/buffer_objects/scoped_buffer_map.h>
 
 #include <scm/gl_util/font/font_face.h>
 
+#define GEOM_SHADER_FONT 1
+
 namespace {
 struct vertex {
+#if GEOM_SHADER_FONT == 1
+    scm::math::vec4f pos_bbox;
+    scm::math::vec4f tex_bbox;
+#else
     scm::math::vec2f pos;
     scm::math::vec2f tex;
+#endif
 };
 } // namespace
 
@@ -50,9 +58,15 @@ text::text(const render_device_ptr&     device,
 {
     using boost::assign::list_of;
 
+#if GEOM_SHADER_FONT == 1
+    int num_vertices = _glyph_capacity; // one point per glyph 
+    _vertex_buffer = device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STREAM_DRAW, num_vertices * sizeof(vertex), 0);
+    _vertex_array  = device->create_vertex_array(vertex_format(0, 0, TYPE_VEC4F, sizeof(vertex))
+                                                              (0, 2, TYPE_VEC4F, sizeof(vertex)),
+                                                 list_of(_vertex_buffer));
+#else
     int num_vertices = _glyph_capacity * 4; // one quad per glyph 
     int num_indices  = _glyph_capacity * 6; // two triangles per glyph
-
     _vertex_buffer = device->create_buffer(BIND_VERTEX_BUFFER, USAGE_STREAM_DRAW, num_vertices * sizeof(vertex), 0);
     _index_buffer  = device->create_buffer(BIND_INDEX_BUFFER, USAGE_STREAM_DRAW,  num_indices  * sizeof(unsigned short), 0);
     _vertex_array  = device->create_vertex_array(vertex_format(0, 0, TYPE_VEC2F, sizeof(vertex))
@@ -75,6 +89,7 @@ text::text(const render_device_ptr&     device,
         index_data[i * 6 + 5] = static_cast<unsigned short>(i * 4 + 3);
     }
     device->main_context()->unmap_buffer(_index_buffer);
+#endif
     update();
 }
 
@@ -190,6 +205,16 @@ text::update()
     if (_glyph_capacity < _text_string.size()) {
         // resize the buffers
         if (render_device_ptr device = _render_device.lock()) {
+#if GEOM_SHADER_FONT == 1
+            _glyph_capacity  = static_cast<int>(_text_string.size() + _text_string.size() / 2); // make it 50% bigger as required currently
+
+            int num_vertices = _glyph_capacity; 
+            if (!device->resize_buffer(_vertex_buffer, num_vertices * sizeof(vertex))) {
+                err() << log::error
+                      << "text::update(): unable to resize vertex buffer (size : " << num_vertices * sizeof(vertex) << ")." << log::end;
+                return;
+            }
+#else
             _indices_count   = 0;
             _glyph_capacity  = static_cast<int>(_text_string.size() + _text_string.size() / 2); // make it 50% bigger as required currently
 
@@ -223,7 +248,7 @@ text::update()
                 index_data[i * 6 + 5] = static_cast<unsigned short>(i * 4 + 3);
             }
             device->main_context()->unmap_buffer(_index_buffer);
-
+#endif
         }
         else  {
             err() << log::error
@@ -235,6 +260,56 @@ text::update()
     if (render_context_ptr context = _render_context.lock()) {
         using namespace scm::math;
 
+#if GEOM_SHADER_FONT == 1
+        scoped_buffer_map vb_map(context, _vertex_buffer, 0, _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER);
+
+        if (!vb_map) {
+            err() << log::error
+                  << "text::update(): unable to map vertex element or index buffer." << log::end;
+            return;
+        }
+        vertex*const    vertex_data = reinterpret_cast<vertex*const>(vb_map.data_ptr());
+        vec2i           current_pos = vec2i(0, 0);
+        char            prev_char   = 0;
+
+        _indices_count     = 0;
+        _text_bounding_box = vec2i(0, _font->line_advance(_text_style));
+        assert(_text_string.size() < (6 * (std::numeric_limits<unsigned short>::max)()));
+
+        std::for_each(_text_string.begin(), _text_string.end(), [&](char cur_char) -> void {
+            using namespace scm::gl;
+            using namespace scm::math;
+
+            if (cur_char == '\n') {
+                current_pos.x         = 0;
+                current_pos.y        -= _font->line_advance(_text_style);
+                prev_char             = 0;
+                _text_bounding_box.y += _font->line_advance(_text_style);
+            }
+            else {
+                const font_face::glyph_info& cur_glyph = _font->glyph(cur_char, _text_style);
+                // kerning
+                if (_text_kerning && prev_char) {
+                    current_pos.x += _font->kerning(prev_char, cur_char, _text_style);
+                }
+
+                vec2f pos  = vec2f(current_pos + cur_glyph._bearing);   
+                vec2f bbox = vec2f(cur_glyph._box_size);   
+                vertex_data[_indices_count].pos_bbox = vec4f(pos, bbox.x, bbox.y);
+                vertex_data[_indices_count].tex_bbox = vec4f(cur_glyph._texture_origin, cur_glyph._texture_box_size.x, cur_glyph._texture_box_size.y);
+
+                _indices_count += 1;
+                // advance the position
+                current_pos.x        += cur_glyph._advance;
+                _text_bounding_box.x += cur_glyph._advance;
+
+                // remember just drawn glyph for kerning
+                prev_char = cur_char;
+            }
+        });
+        
+        context->unmap_buffer(_vertex_buffer);
+#else
         vec2i           current_pos = vec2i(0, 0);
         char            prev_char   = 0;
         vertex*         vertex_data = static_cast<vertex*>(context->map_buffer_range(_vertex_buffer, 0, 4 * _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER));
@@ -301,6 +376,7 @@ text::update()
         });
         
         context->unmap_buffer(_vertex_buffer);
+#endif
     }
     else {
         err() << log::error
