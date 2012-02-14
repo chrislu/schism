@@ -208,9 +208,9 @@ font_face::font_face(const render_device_ptr& device,
             ft_font.set_size(font_size, display_dpi);
 
             // calculate kerning information
-            _font_styles[i]._kerning_table.resize(boost::extents[256][256]);
-            for (unsigned l = 0; l < 256; ++l) {
-                for (unsigned r = 0; r < 256; ++r) {
+            _font_styles[i]._kerning_table.resize(boost::extents[max_char][max_char]);
+            for (unsigned l = min_char; l < max_char; ++l) {
+                for (unsigned r = min_char; r < max_char; ++r) {
                     //if (l == 'T' && r == 'e')
                     //    std::cout << "kerning: " << int(ft_font.get_kerning(l, r)) << std::endl;
                     _font_styles[i]._kerning_table[l][r] = ft_font.get_kerning(l, r);
@@ -288,13 +288,14 @@ font_face::font_face(const render_device_ptr& device,
 
 
         for (int i = 0; i < style_count; ++i) {
-            _font_styles[i]._glyphs.resize(256);
+            _font_styles[i]._glyphs.resize(max_char);
         }
 
         //typedef vec<unsigned char, 2> glyph_texel; // 2 components (core, border... TO BE DONE!, currently only first used)
         max_glyph_size += math::vec2ui(1u) + 2 * (_border_size >> 6); // space of at least one texel around all glyphs
 
-        vec3ui                        glyph_texture_dim  = vec3ui(max_glyph_size * 16, style_count); // a 16x16 grid of 256 glyphs in 4 layers
+        int                           grid_size = static_cast<int>(ceil(math::sqrt(static_cast<double>(max_char - min_char))));
+        vec3ui                        glyph_texture_dim  = vec3ui(max_glyph_size * grid_size, style_count); // a 16x16 grid of 256 glyphs in 4 layers
         size_t                        glyph_texture_size = static_cast<size_t>(glyph_texture_dim.x) * glyph_texture_dim.y * glyph_texture_dim.z;
         scoped_array<unsigned char>   glyph_texture(new unsigned char[glyph_texture_size * glyph_components]);
 
@@ -308,7 +309,7 @@ font_face::font_face(const render_device_ptr& device,
                 ft_font.set_size(font_size, display_dpi);
                 FT_Bitmap           bitmap;
 
-                for (unsigned c = 0; c < 256; ++c) {
+                for (unsigned c = min_char; c < max_char; ++c) {
                     glyph_info& cur_glyph = _font_styles[i]._glyphs[c];
                     FT_Glyph    ft_glyph;
 
@@ -335,8 +336,10 @@ font_face::font_face(const render_device_ptr& device,
 
                     // calculate the glyphs grid position in the font texture array
                     vec3ui tex_array_dst;
-                    tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
-                    tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
+                    tex_array_dst.x = ((c - min_char) % grid_size) * max_glyph_size.x;
+                    tex_array_dst.y = glyph_texture_dim.y - (((c - min_char) / grid_size) + 1) * max_glyph_size.y;
+                    //tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
+                    //tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
                     tex_array_dst.z = i;
 
                     FT_BitmapGlyph ft_bitmap_glyph = (FT_BitmapGlyph)ft_glyph;
@@ -440,7 +443,7 @@ font_face::font_face(const render_device_ptr& device,
                 ft_font.set_size(font_size, display_dpi);
                 FT_Bitmap           bitmap;
 
-                for (unsigned c = 0; c < 256; ++c) {
+                for (unsigned c = min_char; c < max_char; ++c) {
                     glyph_info&      cur_glyph = _font_styles[i]._glyphs[c];
 
                     ft_font.load_glyph(c, glyph_load_flags);
@@ -452,8 +455,10 @@ font_face::font_face(const render_device_ptr& device,
 
                     // calculate the glyphs grid position in the font texture array
                     vec3ui tex_array_dst;
-                    tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
-                    tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
+                    tex_array_dst.x = ((c - min_char) % grid_size) * max_glyph_size.x;
+                    tex_array_dst.y = glyph_texture_dim.y - (((c - min_char) / grid_size) + 1) * max_glyph_size.y;
+                    //tex_array_dst.x = (c & 0x0F) * max_glyph_size.x;
+                    //tex_array_dst.y = glyph_texture_dim.y - ((c >> 4) + 1) * max_glyph_size.y;
                     tex_array_dst.z = i;
 
                     vec2i cur_core_box = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);

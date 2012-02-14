@@ -286,7 +286,7 @@ text::update()
                 prev_char             = 0;
                 _text_bounding_box.y += _font->line_advance(_text_style);
             }
-            else {
+            else if (font_face::min_char <= cur_char && cur_char < font_face::max_char) {
                 const font_face::glyph_info& cur_glyph = _font->glyph(cur_char, _text_style);
                 // kerning
                 if (_text_kerning && prev_char) {
@@ -305,6 +305,8 @@ text::update()
 
                 // remember just drawn glyph for kerning
                 prev_char = cur_char;
+            }
+            else {
             }
         });
         

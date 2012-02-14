@@ -58,6 +58,9 @@ public:
         }
     }; // struct glyph_info
 
+    static const unsigned       min_char = 32u;
+    static const unsigned       max_char = 128u;
+
     static const unsigned       default_point_size   = 12;
     //static const float          default_border_size  = 0.0f;
     static const unsigned       default_display_dpi  = 72;
