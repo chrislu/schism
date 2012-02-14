@@ -359,6 +359,9 @@ font_face::font_face(const render_device_ptr& device,
                     cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
                                                           (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
                                                         - (ft_font.get_face()->glyph->metrics.height >> 6));
+                    FT_Face ff = ft_font.get_face();
+                    int ksks = ft_font.get_face()->glyph->lsb_delta;
+                    int ksds = ft_font.get_face()->glyph->rsb_delta;
 
                     // fill texture
                     switch (bitmap.pixel_mode) {
@@ -442,6 +445,7 @@ font_face::font_face(const render_device_ptr& device,
 
                     ft_font.load_glyph(c, glyph_load_flags);
                     if (FT_Render_Glyph(ft_font.get_glyph(), glyph_render_mode)) {
+                        //glout() << static_cast<char>(c) << " afafaf";
                         continue;
                     }
                     bitmap = ft_font.get_face()->glyph->bitmap;
@@ -454,9 +458,11 @@ font_face::font_face(const render_device_ptr& device,
 
                     vec2i cur_core_box = vec2i(bitmap.width / glyph_bitmap_ycomp, bitmap.rows);
                     vec2i cur_bm_bearing = vec2i(ft_font.get_face()->glyph->bitmap_left, ft_font.get_face()->glyph->bitmap_top - ft_font.get_face()->glyph->bitmap.rows);
-                    vec2i box_diff;
-                    box_diff.x = max(0, cur_bm_bearing.x - cur_glyph._border_bearing.x);
-                    box_diff.y = max(0, cur_bm_bearing.y - cur_glyph._border_bearing.y);
+                    vec2i box_diff = vec2i::zero();
+                    if (_border_size > 0) {
+                        box_diff.x = max(0, cur_bm_bearing.x - cur_glyph._border_bearing.x);
+                        box_diff.y = max(0, cur_bm_bearing.y - cur_glyph._border_bearing.y);
+                    }
                     cur_glyph._box_size.x = max(cur_glyph._box_size.x, cur_core_box.x);
                     cur_glyph._box_size.y = max(cur_glyph._box_size.y, cur_core_box.y);
 
@@ -474,9 +480,12 @@ font_face::font_face(const render_device_ptr& device,
                     else if (ft_font.get_face()->face_flags & FT_FACE_FLAG_FIXED_SIZES) {
                         cur_glyph._advance          = ft_font.get_face()->glyph->metrics.horiAdvance >> 6;
                     }
-                    cur_glyph._bearing          = vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
-                                                          (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
-                                                        - (ft_font.get_face()->glyph->metrics.height >> 6));
+                    cur_glyph._bearing          = //vec2i(   ft_font.get_face()->glyph->metrics.horiBearingX >> 6,
+                                                  //        (ft_font.get_face()->glyph->metrics.horiBearingY >> 6)
+                                                  //      - (ft_font.get_face()->glyph->metrics.height >> 6))
+                                                    cur_bm_bearing
+                                                  - box_diff;
+                                                  //+ cur_glyph._border_bearing;
                     // fill texture
                     switch (bitmap.pixel_mode) {
                         case FT_PIXEL_MODE_GRAY:

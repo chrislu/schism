@@ -154,6 +154,7 @@ viewer::viewer(const math::vec2ui&                  vp_dim,
         _text_renderer.reset(new text_renderer(_device));
         _frame_counter_text.reset(new text(_device, counter_font, font_face::style_regular, "sick, sad world..."));
         _frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
+        _frame_counter_text->text_outline_color(math::vec4f(0.0f, 0.0f, 0.0f, 1.0f));
         _frame_counter_text->text_kerning(true);
 
         _device_space_navigator = make_shared<inp::space_navigator>();
@@ -501,10 +502,12 @@ viewer::send_render_display()
 
             _frame_counter_text->text_string(output.str());
             if (frame_time > 1000.0 / 50.0) {
-                _frame_counter_text->text_color(math::vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+                //_frame_counter_text->text_color(math::vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+                _frame_counter_text->text_outline_color(math::vec4f(1.0f, 0.0f, 0.0f, 1.0f));
             }
             else {
-                _frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
+                //_frame_counter_text->text_color(math::vec4f(1.0f, 1.0f, 0.0f, 1.0f));
+                _frame_counter_text->text_outline_color(math::vec4f(0.0f, 0.0f, 0.0f, 1.0f));
             }
             _frame_timer.reset();
         }
