@@ -33,7 +33,9 @@ accum_timer_query::~accum_timer_query()
 void
 accum_timer_query::start(const render_context_ptr& context)
 {
-    assert(_timer_query);
+    assert(_timer_query_begin);
+    assert(_timer_query_end);
+
     if (_timer_query_finished) {
         context->query_time_stamp(_timer_query_begin);
         _timer_context = context;
@@ -43,7 +45,9 @@ accum_timer_query::start(const render_context_ptr& context)
 void
 accum_timer_query::stop()
 {
-    assert(_timer_query);
+    assert(_timer_query_begin);
+    assert(_timer_query_end);
+
     if (_timer_query_finished && _timer_context) {
         _timer_context->query_time_stamp(_timer_query_end);
     }
@@ -52,7 +56,8 @@ accum_timer_query::stop()
 void
 accum_timer_query::collect()
 {
-    assert(_timer_query);
+    assert(_timer_query_begin);
+    assert(_timer_query_end);
 
     if (_timer_context) {
         if (_timer_context->query_result_available(_timer_query_end)) {
@@ -77,7 +82,8 @@ accum_timer_query::collect()
 void
 accum_timer_query::force_collect()
 {
-    assert(_timer_query);
+    assert(_timer_query_begin);
+    assert(_timer_query_end);
 
     if (_timer_context) {
         _timer_context->collect_query_results(_timer_query_begin);
