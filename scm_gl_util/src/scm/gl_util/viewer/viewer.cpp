@@ -482,7 +482,7 @@ viewer::send_render_display()
                                                       0.0f, _viewport._dimensions.y, -1.0f, 1.0f);
             _text_renderer->projection_matrix(fs_projection);
 
-            vec2i text_ur = vec2i(_viewport._dimensions) - _frame_counter_text->text_bounding_box();
+            vec2i text_ur = vec2i(_viewport._dimensions) - _frame_counter_text->text_bounding_box() - vec2i(5, 0);
             _text_renderer->draw_outlined(context(), text_ur, _frame_counter_text);
             //_text_renderer->draw_shadowed(context(), text_ur, _frame_counter_text);
         }
