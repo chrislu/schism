@@ -348,6 +348,7 @@ public:
     void                            end_query(const query_ptr& in_query);
     bool                            query_result_available(const query_ptr& in_query) const;
     void                            collect_query_results(const query_ptr& in_query) const;
+    void                            query_time_stamp(const timer_query_ptr& in_timer) const;
 
     // sync api ///////////////////////////////////////////////////////////////////////////////////
 public:

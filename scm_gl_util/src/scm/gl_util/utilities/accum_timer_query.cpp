@@ -15,16 +15,19 @@ accum_timer_query::accum_timer_query(const render_device_ptr& device)
   : time::accum_timer_base()
   , _timer_query_finished(true)
 {
-    _timer_query = device->create_timer_query();
+    _timer_query_begin = device->create_timer_query();
+    _timer_query_end = device->create_timer_query();
 
-    if (!_timer_query) {
+    if (   !_timer_query_begin
+        || !_timer_query_end) {
         throw std::runtime_error("accum_timer_query::accum_timer_query(): error creating query object.");
     }
 }
 
 accum_timer_query::~accum_timer_query()
 {
-    _timer_query.reset();
+    _timer_query_begin.reset();
+    _timer_query_end.reset();
 }
 
 void
@@ -32,7 +35,7 @@ accum_timer_query::start(const render_context_ptr& context)
 {
     assert(_timer_query);
     if (_timer_query_finished) {
-        context->begin_query(_timer_query);
+        context->query_time_stamp(_timer_query_begin);
         _timer_context = context;
     }
 }
@@ -42,7 +45,7 @@ accum_timer_query::stop()
 {
     assert(_timer_query);
     if (_timer_query_finished && _timer_context) {
-        _timer_context->end_query(_timer_query);
+        _timer_context->query_time_stamp(_timer_query_end);
     }
 }
 
@@ -52,10 +55,15 @@ accum_timer_query::collect()
     assert(_timer_query);
 
     if (_timer_context) {
-        if (_timer_context->query_result_available(_timer_query)) {
-            _timer_context->collect_query_results(_timer_query);
+        if (_timer_context->query_result_available(_timer_query_end)) {
+            _timer_context->collect_query_results(_timer_query_begin);
+            _timer_context->collect_query_results(_timer_query_end);
 
-            _last_duration         = time::nanosec(_timer_query->result());
+            scm::uint64 start = _timer_query_begin->result();
+            scm::uint64 end   = _timer_query_end->result();
+            scm::uint64 diff  = ((end > start) ? (end - start) : (~start + 1 + end));
+
+            _last_duration         = time::nanosec(diff);
             _accumulated_duration += _last_duration;
             ++_accumulation_count;
             _timer_query_finished = true;
@@ -72,9 +80,14 @@ accum_timer_query::force_collect()
     assert(_timer_query);
 
     if (_timer_context) {
-        _timer_context->collect_query_results(_timer_query);
+        _timer_context->collect_query_results(_timer_query_begin);
+        _timer_context->collect_query_results(_timer_query_end);
 
-        _last_duration         = time::nanosec(_timer_query->result());
+        scm::uint64 start = _timer_query_begin->result();
+        scm::uint64 end   = _timer_query_end->result();
+        scm::uint64 diff  = ((end > start) ? (end - start) : (~start + 1 + end));
+
+        _last_duration         = time::nanosec(diff);
         _accumulated_duration += _last_duration;
         ++_accumulation_count;
         _timer_query_finished = true;

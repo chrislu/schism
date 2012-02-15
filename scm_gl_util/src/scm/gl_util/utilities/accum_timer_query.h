@@ -27,7 +27,8 @@ public:
     void                    reset();
 
 protected:
-    timer_query_ptr         _timer_query;
+    timer_query_ptr         _timer_query_begin;
+    timer_query_ptr         _timer_query_end;
     bool                    _timer_query_finished;
 
     render_context_ptr      _timer_context;

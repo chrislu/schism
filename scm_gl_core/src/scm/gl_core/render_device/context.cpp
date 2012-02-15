@@ -1865,6 +1865,15 @@ render_context::collect_query_results(const query_ptr& in_query) const
     gl_assert(opengl_api(), leaving render_context::collect_query_results());
 }
 
+void
+render_context::query_time_stamp(const timer_query_ptr& in_timer) const
+{
+    assert(in_timer);
+    in_timer->query_counter(*this);
+
+    gl_assert(opengl_api(), leaving render_context::query_time_stamp());
+}
+
 // sync api ///////////////////////////////////////////////////////////////////////////////////////
 fence_sync_ptr
 render_context::insert_fence_sync()

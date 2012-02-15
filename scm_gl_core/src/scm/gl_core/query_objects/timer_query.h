@@ -22,6 +22,7 @@ public:
 protected:
     timer_query(render_device& in_device);
 
+    void            query_counter(const render_context& in_context);
     void            collect(const render_context& in_context);
 
 protected:

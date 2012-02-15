@@ -26,6 +26,18 @@ timer_query::~timer_query()
 }
 
 void
+timer_query::query_counter(const render_context& in_context)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+    assert(0 != query_id());
+    assert(0 != query_type());
+
+    glapi.glQueryCounter(query_id(), GL_TIMESTAMP);
+
+    gl_assert(glapi, leaving timer_query::collect());
+}
+
+void
 timer_query::collect(const render_context& in_context)
 {
     const opengl::gl_core& glapi = in_context.opengl_api();
@@ -40,7 +52,7 @@ timer_query::collect(const render_context& in_context)
 scm::uint64
 timer_query::result() const
 {
-    return (_result);
+    return _result;
 }
 
 } // namespace gl
