@@ -81,4 +81,25 @@ template<class T> T * get_pointer(std::shared_ptr<T> const & p) {
 
 #endif
 
+namespace scm {
+
+inline
+uintptr_t
+align_address(const void*const p, const uintptr_t a) {
+    const uintptr_t p8 = reinterpret_cast<const uintptr_t>(p);
+    const uintptr_t r  = p8 % a;
+    //return ((p8 + a - 1) / a) * a;
+    return p8 + (r == 0 ? 0 : a - r);
+}
+
+inline
+uintptr_t
+align_address(const uintptr_t p, const uintptr_t a) {
+    const uintptr_t r  = p % a;
+    //return ((p8 + a - 1) / a) * a;
+    return p + (r == 0 ? 0 : a - r);
+}
+
+} // namespace scm
+
 #endif // SCM_CORE_MEMORY_H_INCLUDED
