@@ -252,10 +252,7 @@ buffer_ptr
 render_device::create_buffer(const buffer_desc& in_buffer_desc,
                              const void*        in_initial_data)
 {
-    buffer_desc bd(in_buffer_desc);
-    bd._size = round_to_multiple(bd._size, _capabilities._min_buffer_alignment);
-
-    buffer_ptr new_buffer(new buffer(*this, bd, in_initial_data),
+    buffer_ptr new_buffer(new buffer(*this, in_buffer_desc, in_initial_data),
                           boost::bind(&render_device::release_resource, this, _1));
     if (new_buffer->fail()) {
         if (new_buffer->bad()) {
