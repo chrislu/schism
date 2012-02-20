@@ -21,10 +21,11 @@ namespace {
 buffer::buffer(render_device&     ren_dev,
                const buffer_desc& in_desc,
                const void*        initial_data)
-  : render_device_resource(ren_dev),
-    _descriptor(),
-    _mapped_interval_offset(0),
-    _mapped_interval_length(0)
+  : render_device_resource(ren_dev)
+  , _descriptor()
+  , _mapped(false)
+  , _mapped_interval_offset(0)
+  , _mapped_interval_length(0)
 {
     const opengl::gl_core& glapi = ren_dev.opengl_api();
 
@@ -158,8 +159,7 @@ buffer::map_range(const render_context& in_context,
         return 0;
     }
 
-    if (   (0 != _mapped_interval_offset)
-        || (0 != _mapped_interval_length)) {
+    if (_mapped) {
         // buffer allready mapped
         state().set(object_state::OS_ERROR_INVALID_OPERATION);
         return 0;
@@ -176,6 +176,7 @@ buffer::map_range(const render_context& in_context,
     }
 
     if (0 != return_value) {
+        _mapped                 = true;
         _mapped_interval_offset = in_offset;
         _mapped_interval_length = in_size;
     }
@@ -195,8 +196,7 @@ buffer::unmap(const render_context& in_context)
     assert(object_id() != 0);
     assert(state().ok());
 
-    if (   0 == _mapped_interval_offset
-        && 0 == _mapped_interval_length) {
+    if (!_mapped) {
         // buffer not mapped
         return true;
     }
@@ -215,6 +215,7 @@ buffer::unmap(const render_context& in_context)
 
     _mapped_interval_offset = 0;
     _mapped_interval_length = 0;
+    _mapped                 = false;
 
     gl_assert(glapi, leaving buffer::unmap());
 

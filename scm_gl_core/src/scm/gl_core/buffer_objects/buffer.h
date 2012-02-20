@@ -83,6 +83,7 @@ protected:
 protected:
     buffer_desc                 _descriptor;
 
+    bool                        _mapped;
     scm::size_t                 _mapped_interval_offset;
     scm::size_t                 _mapped_interval_length;
 
