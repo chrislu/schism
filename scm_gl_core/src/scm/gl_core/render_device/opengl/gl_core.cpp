@@ -119,6 +119,7 @@ gl_core::gl_core()
     extension_EXT_direct_state_access_available = false;
     extension_EXT_texture_compression_s3tc      = false;
     extension_ARB_texture_compression_bptc      = false;
+    extension_ARB_map_buffer_alignment          = false;
     extension_NVX_gpu_memory_info               = false;
 }
 
@@ -251,6 +252,7 @@ gl_core::initialize()
     extension_ARB_robustness               = extension_ARB_robustness               && is_supported("GL_ARB_robustness");
     extension_EXT_shader_image_load_store  = extension_EXT_shader_image_load_store  && is_supported("GL_EXT_shader_image_load_store");
 
+    extension_ARB_map_buffer_alignment     = is_supported("GL_ARB_map_buffer_alignment");
     extension_EXT_texture_compression_s3tc = is_supported("GL_EXT_texture_compression_s3tc");
     extension_ARB_texture_compression_bptc = is_supported("GL_ARB_texture_compression_bptc");
     extension_NVX_gpu_memory_info          = is_supported("GL_NVX_gpu_memory_info");

@@ -95,6 +95,7 @@ public:
         int             _max_fragment_atomic_counters;
         int             _max_combined_atomic_counters;
         int             _max_atomic_counter_buffer_bindings;
+        int             _min_buffer_alignment;
     }; // struct device_capabilities
 
 protected:

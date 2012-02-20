@@ -30,4 +30,17 @@ typedef std::size_t         size_t;
 
 } // namespace scm
 
+
+namespace scm {
+
+inline
+size_t
+round_to_multiple(const size_t p, const size_t a) {
+    const size_t r  = p % a;
+    //return ((p8 + a - 1) / a) * a;
+    return p + (r == 0 ? 0 : a - r);
+}
+
+} // namespace scm
+
 #endif // INT_TYPES_H_INCLUDED

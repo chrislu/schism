@@ -436,7 +436,8 @@ render_context::map_buffer_range(const buffer_ptr&   in_buffer,
                                  scm::size_t         in_size,
                                  const access_mode in_access) const
 {
-    void* return_value = in_buffer->map_range(*this, in_offset, in_size, in_access);
+    size_t aligned_size = round_to_multiple(in_size, parent_device().capabilities()._min_buffer_alignment);
+    void* return_value = in_buffer->map_range(*this, in_offset, aligned_size, in_access);
 
     if (   (0 == return_value)
         || (!in_buffer->ok())) {

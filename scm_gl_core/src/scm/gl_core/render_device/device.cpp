@@ -237,6 +237,13 @@ render_device::init_capabilities()
         _capabilities._max_atomic_counter_buffer_bindings = 0;
     }
 
+    if (   SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420
+        || glcore.extension_ARB_map_buffer_alignment) {
+        glcore.glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &_capabilities._min_buffer_alignment);
+    }
+    else {
+        _capabilities._min_buffer_alignment = 1;
+    }
     //std::cout << "GL_MAX_IMAGE_UNITS_EXT " << _capabilities._max_image_units << std::endl;
 }
 
@@ -245,7 +252,10 @@ buffer_ptr
 render_device::create_buffer(const buffer_desc& in_buffer_desc,
                              const void*        in_initial_data)
 {
-    buffer_ptr new_buffer(new buffer(*this, in_buffer_desc, in_initial_data),
+    buffer_desc bd(in_buffer_desc);
+    bd._size = round_to_multiple(bd._size, _capabilities._min_buffer_alignment);
+
+    buffer_ptr new_buffer(new buffer(*this, bd, in_initial_data),
                           boost::bind(&render_device::release_resource, this, _1));
     if (new_buffer->fail()) {
         if (new_buffer->bad()) {

@@ -2,6 +2,8 @@
 #ifndef SCM_CORE_MEMORY_H_INCLUDED
 #define SCM_CORE_MEMORY_H_INCLUDED
 
+#include <scm/core/numeric_types.h>
+
 #if 1
 
 #include <boost/array.hpp>
@@ -95,9 +97,7 @@ align_address(const void*const p, const uintptr_t a) {
 inline
 uintptr_t
 align_address(const uintptr_t p, const uintptr_t a) {
-    const uintptr_t r  = p % a;
-    //return ((p8 + a - 1) / a) * a;
-    return p + (r == 0 ? 0 : a - r);
+    return round_to_multiple(p, a);
 }
 
 } // namespace scm

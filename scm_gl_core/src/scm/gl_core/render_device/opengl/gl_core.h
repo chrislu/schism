@@ -100,6 +100,7 @@ public:
     bool extension_EXT_direct_state_access_available;
     bool extension_EXT_texture_compression_s3tc;
     bool extension_ARB_texture_compression_bptc;
+    bool extension_ARB_map_buffer_alignment;
     bool extension_NVX_gpu_memory_info;
 
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
