@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include "pixel_format_selection_win32.h"
 
 #include <scm/core/platform/platform.h>

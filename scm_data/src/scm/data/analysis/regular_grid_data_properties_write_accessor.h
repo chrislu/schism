@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_DATA_REGULAR_GRID_DATA_PROPERTIES_WRITE_ACCESSOR_H_INCLUDED
 #define SCM_DATA_REGULAR_GRID_DATA_PROPERTIES_WRITE_ACCESSOR_H_INCLUDED
 

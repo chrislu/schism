@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef MATH_DETAIL_FLOATING_POINT_H_INCLUDED
 #define MATH_DETAIL_FLOATING_POINT_H_INCLUDED
 

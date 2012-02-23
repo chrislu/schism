@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include <scm/core/utilities/luabind_warning_disable.h>
 
 #include <boost/algorithm/string/trim.hpp>

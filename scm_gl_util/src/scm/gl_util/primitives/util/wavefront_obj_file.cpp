@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include "wavefront_obj_file.h"
 
 #include <boost/lexical_cast.hpp>

@@ -1,4 +1,7 @@
 
+# Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+# Distributed under the Modified BSD License, see license.txt.
+
 project(scm_gl_core)
 
 option(SCHISM_OPT_BUILD_deprecated_classic_scm_gl  "Build deprecated classic scm_gl library (namespace scm::gl_classic"     OFF)

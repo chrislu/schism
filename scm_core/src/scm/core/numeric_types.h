@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef INT_TYPES_H_INCLUDED
 #define INT_TYPES_H_INCLUDED
 

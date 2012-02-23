@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef NV_CPL_SLI_CONTROL_H_INCLUDED
 #define NV_CPL_SLI_CONTROL_H_INCLUDED
 

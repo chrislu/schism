@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_TIME_ACCUMULATE_TIMER_H_INCLUDED
 #define SCM_TIME_ACCUMULATE_TIMER_H_INCLUDED
 

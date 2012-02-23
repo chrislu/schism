@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_GL_CORE_WM_X_SURFACE_IMPL_X_H_INCLUDED
 #define SCM_GL_CORE_WM_X_SURFACE_IMPL_X_H_INCLUDED
 

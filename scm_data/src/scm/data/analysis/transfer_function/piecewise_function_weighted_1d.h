@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_DATA_PIECEWISE_FUNCTION_WEIGHTED_1D_H_INCLUDED
 #define SCM_DATA_PIECEWISE_FUNCTION_WEIGHTED_1D_H_INCLUDED
 

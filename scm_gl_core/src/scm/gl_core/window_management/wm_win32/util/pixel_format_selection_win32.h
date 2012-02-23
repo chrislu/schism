@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 
 #ifndef SCM_GL_CORE_WM_WIN32_PIXEL_FORMAT_SELECTION_WIN32_H_INCLUDED
 #define SCM_GL_CORE_WM_WIN32_PIXEL_FORMAT_SELECTION_WIN32_H_INCLUDED

@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include "glx_extensions.h"
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX

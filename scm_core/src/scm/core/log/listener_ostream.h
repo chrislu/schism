@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_CORE_LOG_LISTENER_OSTREAM_H_INCLUDED
 #define SCM_CORE_LOG_LISTENER_OSTREAM_H_INCLUDED
 
