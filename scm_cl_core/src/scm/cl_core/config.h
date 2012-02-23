@@ -9,7 +9,7 @@
 
 // gl debugging
 #if SCM_DEBUG
-#   define SCM_CL_DEBUG 1
+#   define SCM_CL_DEBUG 0
 #else
 #   define SCM_CL_DEBUG 0
 #endif
