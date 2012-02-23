@@ -1,5 +1,5 @@
 
-// $copyright$
+// $copyright: $
 // $license$
 
 #ifndef SCM_CL_CORE_CONFIG_H_INCLUDED
@@ -9,7 +9,7 @@
 
 // gl debugging
 #if SCM_DEBUG
-#   define SCM_CL_DEBUG 0
+#   define SCM_CL_DEBUG 1
 #else
 #   define SCM_CL_DEBUG 0
 #endif
