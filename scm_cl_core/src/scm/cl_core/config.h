@@ -1,4 +1,7 @@
 
+// $copyright$
+// $license$
+
 #ifndef SCM_CL_CORE_CONFIG_H_INCLUDED
 #define SCM_CL_CORE_CONFIG_H_INCLUDED
 
