@@ -97,17 +97,17 @@ endif (SCHISM_BUILD_STATIC)
 # link libraries
 scm_link_libraries(ALL
     scm_core
-    scm_cl_core
     scm_gl_core
     scm_input
 
+)
+scm_link_libraries(WIN32
+    scm_cl_core
+    FreeImagePlus
+    freetype2
 	general cuda
 	general cudart
     general OpenCL
-)
-scm_link_libraries(WIN32
-    FreeImagePlus
-    freetype2
 )
 scm_link_libraries(UNIX
     freeimageplus

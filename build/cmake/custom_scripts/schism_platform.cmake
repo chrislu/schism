@@ -75,3 +75,10 @@ endif (UNIX)
 add_definitions(-DBOOST_DATE_TIME_POSIX_TIME_STD_CONFIG)
 add_definitions(-DBOOST_FILESYSTEM_VERSION=3)
 add_definitions(-DBOOST_FILESYSTEM_NO_DEPRECATED)
+
+if (UNIX)
+include_directories(/opt/OpenCL/include
+                    /opt/cuda/current/cuda/include)
+link_directories(/opt/cuda/current/cuda/lib64
+                 /usr/lib/nvidia-current)
+endif (UNIX)

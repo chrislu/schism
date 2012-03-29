@@ -132,6 +132,9 @@ scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                    ${SCM_BOOST_LIB_DIR})
 scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
+scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64
+                                      /usr/lib/nvidia-current)
+
 #scm_project_link_directories(UNIX  )
 
 if (WIN32)
@@ -150,7 +153,7 @@ endif (SCHISM_BUILD_STATIC)
 # link libraries
 scm_link_libraries(ALL
 	general scm_core
-	general scm_cl_core
+    general scm_cl_core
 )
 scm_link_libraries(WIN32
     general opengl32
