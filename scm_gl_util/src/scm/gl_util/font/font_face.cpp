@@ -12,6 +12,8 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/assign/std/vector.hpp>
 //#include <boost/tuple/tuple.hpp>
 
 #include <scm/gl_core/log.h>
@@ -42,54 +44,65 @@ check_file(const std::string& file_name)
 }
 
 void
-find_font_style_files(const std::string&         in_regular_font_file,
-                      std::vector<std::string>&  out_font_style_files)
+find_font_style_files(const std::string&        in_regular_font_file,
+                      std::vector<std::string>& out_font_style_files)
 {
+    using namespace std;
+    using namespace boost::assign;
     using namespace boost::filesystem;
 
     out_font_style_files.clear();
     out_font_style_files.resize(font_face::style_count);
 
-    // insert regular style
-    out_font_style_files[font_face::style_regular] = in_regular_font_file;
+    path    font_file_path = path(in_regular_font_file);
+    string  font_file_ext  = font_file_path.extension().string();
+    string  font_file_base = font_file_path.stem().string();
+    path    font_file_dir  = font_file_path.parent_path();
 
-    path            font_file_path = path(in_regular_font_file);
-    std::string     font_file_ext  = font_file_path.extension().string();
-    std::string     font_file_base = font_file_path.stem().string();
-    path            font_file_dir  = font_file_path.parent_path();
+    { // find and insert regular style
+        // TODO: get it working with unix style font file names
+        //vector<string> r_prefixes = list_of("")("-R")("L");
+        //vector<string> extensions = list_of(".ttf")(".fon");
 
-    // search for italic style
-    path    font_file_italic = font_file_dir
-                             / (font_file_base + std::string("i") + font_file_ext);
-    if (exists(font_file_italic) && !is_directory(font_file_italic)) {
-        out_font_style_files[font_face::style_italic] = font_file_italic.string();
+        out_font_style_files[font_face::style_regular] = in_regular_font_file;
+        
+        //font_file_path = path(in_regular_font_file);
+        //font_file_ext  = font_file_path.extension().string();
+        //font_file_base = font_file_path.stem().string();
+        //font_file_dir  = font_file_path.parent_path();
     }
 
-    // search for bold style
-    path    font_file_bold = font_file_dir
-                           / (font_file_base + std::string("b") + font_file_ext);
-    if (exists(font_file_bold) && !is_directory(font_file_bold)) {
-        out_font_style_files[font_face::style_bold] = font_file_bold.string();
-    }
-    else {
-        font_file_bold =  font_file_dir
-                        / (font_file_base + std::string("bd") + font_file_ext);
-        if (exists(font_file_bold) && !is_directory(font_file_bold)) {
-            out_font_style_files[font_face::style_bold] = font_file_bold.string();
+    {// search for italic style
+        vector<string> i_prefixes = list_of("i")("-RI")("-LI");
+
+        for (auto i = i_prefixes.begin(); i != i_prefixes.end() && out_font_style_files[font_face::style_italic].empty(); ++i) {
+            path font_file_italic = font_file_dir / (font_file_base + *i + font_file_ext);
+
+            if (exists(font_file_italic) && !is_directory(font_file_italic)) {
+                out_font_style_files[font_face::style_italic] = font_file_italic.string();
+            }
         }
     }
 
-    // search for bold italic style (z or bi name addition)
-    path    font_file_bold_italic = font_file_dir
-                                  / (font_file_base + std::string("z") + font_file_ext);
-    if (exists(font_file_bold_italic) && !is_directory(font_file_bold_italic)) {
-        out_font_style_files[font_face::style_bold_italic] = font_file_bold_italic.string();
+    {// search for bold style
+        vector<string> b_prefixes = list_of("b")("bd")("-B");
+
+        for (auto i = b_prefixes.begin(); i != b_prefixes.end() && out_font_style_files[font_face::style_bold].empty(); ++i) {
+            path font_file_bold = font_file_dir / (font_file_base + *i + font_file_ext);
+            if (exists(font_file_bold) && !is_directory(font_file_bold)) {
+                out_font_style_files[font_face::style_bold] = font_file_bold.string();
+            }
+        }
     }
-    else {
-        font_file_bold_italic = font_file_dir
-                              / (font_file_base + std::string("bi") + font_file_ext);
-        if (exists(font_file_bold_italic) && !is_directory(font_file_bold_italic)) {
-            out_font_style_files[font_face::style_bold_italic] = font_file_bold_italic.string();
+
+    { // search for bold italic style (z or bi name addition)
+        vector<string> bi_prefixes = list_of("z")("bi")("-BI");
+
+        for (auto i = bi_prefixes.begin(); i != bi_prefixes.end() && out_font_style_files[font_face::style_bold_italic].empty(); ++i) {
+            path font_file_bold_italic = font_file_dir / (font_file_base + *i + font_file_ext);
+            if (exists(font_file_bold_italic) && !is_directory(font_file_bold_italic)) {
+                out_font_style_files[font_face::style_bold_italic] = font_file_bold_italic.string();
+            }
         }
     }
 }
