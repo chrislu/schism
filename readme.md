@@ -2,9 +2,10 @@ schism C++ libraries
 ====================
 The schism C++ libraries offer object-oriented interfaces to the OpenGL C-language API with related interfaces for Nvidia CUDA and OpenCL compute language interoperability and various utilities to help with common real-time graphics related tasks. The libraries are written in standard C++ using OpenGL 3.3 to 4.2 core profile functionality and are useable on Windows as well as Linux operating systems.
 
-The libraries were developed at the [Virtual Reality Systems Group at the Bauhaus-Universität Weimar](http://www.uni-weimar.de/medien/vr) to support my PhD research work and are used in various student thesis and research projects at our group. Current projects include virtual reality applications and visualization software for extremely large image and especially volume data sets.
+The libraries were developed at the [Virtual Reality Systems Group at the Bauhaus-Universitï¿½t Weimar](http://www.uni-weimar.de/medien/vr) to support my PhD research work and are used in various student thesis and research projects at our group. Current projects include virtual reality applications and visualization software for extremely large image and especially volume data sets.
 
 The main features of the schism C++ libraries are:
+
  * basic vector, matrix and quaternion classes and operations for real-time graphics context
  * basic graphics primitives and related intersection tests (ray, plane, box, frustum)
  * object-oriented interface to OpenGL core profile functionality
