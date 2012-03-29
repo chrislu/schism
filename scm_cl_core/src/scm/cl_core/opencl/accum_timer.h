@@ -37,6 +37,8 @@ public:
     void                    stop();
     void                    collect();
     void                    force_collect();
+
+    void                    update(int interval = 100);
     void                    reset();
 
     cl_times                detailed_last_time() const;
@@ -62,6 +64,7 @@ protected:
 
     cl_times                _detailed_last_time;
     cl_times                _detailed_accumulated_time;
+    cl_times                _detailed_average_time;
     time::cpu_timer         _cpu_timer;
 
 }; // class accum_timer

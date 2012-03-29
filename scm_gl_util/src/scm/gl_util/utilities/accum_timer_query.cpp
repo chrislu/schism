@@ -26,6 +26,10 @@ accum_timer_query::accum_timer_query(const render_device_ptr& device)
   , _cpu_timer()
 {
     reset();
+    _detailed_average_time.gl =
+    _detailed_average_time.wall =
+    _detailed_average_time.user =
+    _detailed_average_time.system = 0;
 
     _timer_query_begin = device->create_timer_query();
     _timer_query_end = device->create_timer_query();
@@ -141,6 +145,31 @@ accum_timer_query::force_collect()
 }
 
 void
+accum_timer_query::update(int interval)
+{
+    ++_update_interval;
+
+    if (_update_interval >= interval) {
+        _update_interval = 0;
+
+        _average_time = (_accumulation_count > 0) ? _accumulated_time / _accumulation_count : 0;
+
+        _detailed_average_time.gl =
+        _detailed_average_time.wall =
+        _detailed_average_time.user =
+        _detailed_average_time.system = 0;
+        if (_accumulation_count > 0) {
+            _detailed_average_time.gl     = _detailed_accumulated_time.gl     / _accumulation_count;
+            _detailed_average_time.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
+            _detailed_average_time.user   = _detailed_accumulated_time.user   / _accumulation_count;
+            _detailed_average_time.system = _detailed_accumulated_time.system / _accumulation_count;
+        }
+
+        reset();
+    }
+}
+
+void
 accum_timer_query::reset()
 {
     time::accum_timer_base::reset();
@@ -169,16 +198,7 @@ accum_timer_query::detailed_accumulated_time() const
 accum_timer_query::gl_times
 accum_timer_query::detailed_average_time() const
 {
-    gl_times avg;
-    avg.gl = avg.wall = avg.user = avg.system = 0;
-    if (_accumulation_count > 0) {
-        avg.gl     = _detailed_accumulated_time.gl     / _accumulation_count;
-        avg.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
-        avg.user   = _detailed_accumulated_time.user   / _accumulation_count;
-        avg.system = _detailed_accumulated_time.system / _accumulation_count;
-    }
-
-    return avg;
+    return _detailed_average_time;
 }
 
 void
@@ -243,8 +263,8 @@ accum_timer_query::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "gl:"   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << "gl   "   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
+           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
     }
 }
 
@@ -268,8 +288,8 @@ accum_timer_query::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "gl:"   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << "gl   "   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
+           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
 
         if (0 < dsize) {
             os << ", "

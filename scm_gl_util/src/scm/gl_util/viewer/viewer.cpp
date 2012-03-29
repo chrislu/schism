@@ -496,6 +496,7 @@ viewer::send_render_display()
 
     if (_settings._show_frame_times) {
         if (_frame_timer.accumulated_time(time::timer_base::msec) > 100.0) {
+            _frame_timer.update(0);
         //if (scm::time::to_milliseconds(_frame_timer.accumulated_duration()) > 100.0) {
             std::stringstream   output;
             output.precision(2);

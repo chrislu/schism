@@ -10,7 +10,9 @@ namespace time {
 accum_timer_base::accum_timer_base()
   :  _last_time(0)
   , _accumulated_time(0)
+  , _average_time(0)
   , _accumulation_count(0u)
+  , _update_interval(0)
 {
 }
 
@@ -19,9 +21,23 @@ accum_timer_base::~accum_timer_base()
 }
 
 void
+accum_timer_base::update(int interval)
+{
+    ++_update_interval;
+
+    if (_update_interval >= interval) {
+        _update_interval = 0;
+
+        _average_time = (_accumulation_count > 0) ? _accumulated_time / _accumulation_count : 0;
+
+        reset();
+    }
+}
+
+void
 accum_timer_base::reset()
 {
-     _last_time         = 0;
+    _last_time          = 0;
     _accumulated_time   = 0;
     _accumulation_count = 0u;
 }
@@ -47,7 +63,7 @@ accum_timer_base::accumulation_count() const
 accum_timer_base::nanosec_type
 accum_timer_base::average_time() const
 {
-    return (_accumulation_count > 0) ? _accumulated_time / _accumulation_count : 0;
+    return _average_time;
 }
 
 double

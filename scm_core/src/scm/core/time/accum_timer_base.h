@@ -24,6 +24,8 @@ public:
     virtual void                    stop()          = 0;
     virtual void                    collect()       = 0;
     virtual void                    force_collect() = 0;
+
+    virtual void                    update(int interval = 100);
     virtual void                    reset();
 
     nanosec_type                    last_time() const;
@@ -51,7 +53,9 @@ public:
 protected:
     nanosec_type                    _last_time;
     nanosec_type                    _accumulated_time;
+    nanosec_type                    _average_time;
     unsigned                        _accumulation_count;
+    int                             _update_interval;
 
 }; // class accum_timer_base
 

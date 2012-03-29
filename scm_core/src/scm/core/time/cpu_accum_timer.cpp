@@ -20,6 +20,11 @@ cpu_accum_timer::cpu_accum_timer()
     reset();
     _cpu_timer.start();
     _cpu_timer.stop();
+
+    _detailed_average_time.wall = 
+    _detailed_average_time.user = 
+    _detailed_average_time.system = 0;
+
 }
 
 cpu_accum_timer::~cpu_accum_timer()
@@ -64,6 +69,29 @@ cpu_accum_timer::force_collect()
 }
 
 void
+cpu_accum_timer::update(int interval)
+{
+    ++_update_interval;
+
+    if (_update_interval >= interval) {
+        _update_interval = 0;
+
+        _average_time = (_accumulation_count > 0) ? _accumulated_time / _accumulation_count : 0;
+
+        _detailed_average_time.wall =
+        _detailed_average_time.user =
+        _detailed_average_time.system = 0;
+        if (_accumulation_count > 0) {
+            _detailed_average_time.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
+            _detailed_average_time.user   = _detailed_accumulated_time.user   / _accumulation_count;
+            _detailed_average_time.system = _detailed_accumulated_time.system / _accumulation_count;
+        }
+
+        reset();
+    }
+}
+
+void
 cpu_accum_timer::reset()
 {
     accum_timer_base::reset();
@@ -88,15 +116,7 @@ cpu_accum_timer::detailed_accumulated_time() const
 cpu_accum_timer::cpu_times
 cpu_accum_timer::detailed_average_time() const
 {
-    cpu_times avg;
-    avg.wall = avg.user = avg.system = 0;
-    if (_accumulation_count > 0) {
-        avg.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
-        avg.user   = _detailed_accumulated_time.user   / _accumulation_count;
-        avg.system = _detailed_accumulated_time.system / _accumulation_count;
-    }
-
-    return avg;
+    return _detailed_average_time;
 }
 
 void

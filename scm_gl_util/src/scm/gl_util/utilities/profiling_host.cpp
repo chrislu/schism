@@ -215,6 +215,7 @@ profiling_host::update(int interval)
             _update_interval = 0;
 
             for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
+                t.second._timer->update(0);
                 t.second._time = t.second._timer->average_time();
             });
 
@@ -437,21 +438,21 @@ std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
                 os << "unused timer";
             }
             else {
-                os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname) << ""
-                   << std::setw(6) << std::right << pres.time() << pres.unit_string();
-
-                //profiling_host::timer_ptr t = pres._phost->find_timer(pres._tname);
-
-                //if (dynamic_pointer_cast<cpu_accum_timer>(t)) {
-                //    t->report(os, pres._dsize, pres._tunit, pres._dunit);
-                //}
-                //else {
-                //    t->detailed_report(os, pres._dsize, pres._tunit, pres._dunit);
+                //os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname);// << ""
+                   //<< std::setw(6) << std::right << pres.time() << pres.unit_string();
+                //if (0 < pres._dsize) {
+                //    os << ", "
+                //       << std::setw(9) << std::right << pres.throughput() << pres.throughput_string();
                 //}
 
-                if (0 < pres._dsize) {
-                    os << ", "
-                       << std::setw(9) << std::right << pres.throughput() << pres.throughput_string();
+                profiling_host::timer_ptr t = pres._phost->find_timer(pres._tname);
+
+                if (dynamic_pointer_cast<cpu_accum_timer>(t)) {
+                    os << std::setw(6) << std::left  << pres._phost->timer_prefix_string(pres._tname);// << ""
+                    t->report(os, pres._dsize, pres._tunit, pres._dunit);
+                }
+                else {
+                    t->detailed_report(os, pres._dsize, pres._tunit, pres._dunit);
                 }
             }
         }

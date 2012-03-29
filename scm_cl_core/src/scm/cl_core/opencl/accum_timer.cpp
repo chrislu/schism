@@ -25,6 +25,10 @@ accum_timer::accum_timer()
   , _cpu_timer()
 {
     reset();
+    _detailed_average_time.cl =
+    _detailed_average_time.wall =
+    _detailed_average_time.user =
+    _detailed_average_time.system = 0;
 }
 
 accum_timer::~accum_timer()
@@ -120,6 +124,31 @@ accum_timer::force_collect()
 }
 
 void
+accum_timer::update(int interval)
+{
+    ++_update_interval;
+
+    if (_update_interval >= interval) {
+        _update_interval = 0;
+
+        _average_time = (_accumulation_count > 0) ? _accumulated_time / _accumulation_count : 0;
+
+        _detailed_average_time.cl =
+        _detailed_average_time.wall =
+        _detailed_average_time.user =
+        _detailed_average_time.system = 0;
+        if (_accumulation_count > 0) {
+            _detailed_average_time.cl     = _detailed_accumulated_time.cl     / _accumulation_count;
+            _detailed_average_time.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
+            _detailed_average_time.user   = _detailed_accumulated_time.user   / _accumulation_count;
+            _detailed_average_time.system = _detailed_accumulated_time.system / _accumulation_count;
+        }
+
+        reset();
+    }
+}
+
+void
 accum_timer::reset()
 {
     time::accum_timer_base::reset();
@@ -146,16 +175,7 @@ accum_timer::detailed_accumulated_time() const
 accum_timer::cl_times
 accum_timer::detailed_average_time() const
 {
-    cl_times avg;
-    avg.cl = avg.wall = avg.user = avg.system = 0;
-    if (_accumulation_count > 0) {
-        avg.cl     = _detailed_accumulated_time.cl     / _accumulation_count;
-        avg.wall   = _detailed_accumulated_time.wall   / _accumulation_count;
-        avg.user   = _detailed_accumulated_time.user   / _accumulation_count;
-        avg.system = _detailed_accumulated_time.system / _accumulation_count;
-    }
-
-    return avg;
+    return _detailed_average_time;
 }
 
 void
@@ -220,8 +240,8 @@ accum_timer::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "cl:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, c)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << "cl   " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, c)  << timer_base::time_unit_string(tunit) << ", "
+           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
     }
 }
 
@@ -245,8 +265,8 @@ accum_timer::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "cl:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, c)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall:" << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << "cl   " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, c)  << timer_base::time_unit_string(tunit) << ", "
+           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
 
         if (0 < dsize) {
             os << ", "
