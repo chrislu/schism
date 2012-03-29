@@ -275,6 +275,7 @@ text::update()
             }
             vertex*const    vertex_data = reinterpret_cast<vertex*const>(vb_map.data_ptr());
             vec2i           current_pos = vec2i(0, 0);
+            int             current_lw  = 0;
             char            prev_char   = 0;
 
             _indices_count     = 0;
@@ -290,6 +291,8 @@ text::update()
                     current_pos.y        -= _font->line_advance(_text_style);
                     prev_char             = 0;
                     _text_bounding_box.y += _font->line_advance(_text_style);
+                    _text_bounding_box.x  = max(current_lw, _text_bounding_box.x);
+                    current_lw            = 0;
                 }
                 else if (font_face::min_char <= cur_char && cur_char < font_face::max_char) {
                     const font_face::glyph_info& cur_glyph = _font->glyph(cur_char, _text_style);
@@ -305,8 +308,8 @@ text::update()
 
                     _indices_count += 1;
                     // advance the position
-                    current_pos.x        += cur_glyph._advance;
-                    _text_bounding_box.x += cur_glyph._advance;
+                    current_pos.x += cur_glyph._advance;
+                    current_lw    += cur_glyph._advance;
 
                     // remember just drawn glyph for kerning
                     prev_char = cur_char;
@@ -314,11 +317,13 @@ text::update()
                 else {
                 }
             });
-        
+            _text_bounding_box.x  = max(current_lw, _text_bounding_box.x);
+
             //context->unmap_buffer(_vertex_buffer);
         }
 #else
         vec2i           current_pos = vec2i(0, 0);
+        int             current_lw  = 0;
         char            prev_char   = 0;
         //vertex*         vertex_data = static_cast<vertex*>(context->map_buffer_range(_vertex_buffer, 0, 4 * _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER));
         vertex*         vertex_data = static_cast<vertex*>(context->map_buffer(_vertex_buffer, ACCESS_WRITE_INVALIDATE_BUFFER));
@@ -346,7 +351,8 @@ text::update()
                 current_pos.y        -= _font->line_advance(_text_style);
                 prev_char             = 0;
                 _text_bounding_box.y += _font->line_advance(_text_style);
-                //continue;
+                _text_bounding_box.x  = max(current_lw, _text_bounding_box.x);
+                current_lw            = 0;
             }
             else {
                 //if (!isalnum(cur_char) && (cur_char != ' ')) {
@@ -376,13 +382,14 @@ text::update()
                 _indices_count += 6;
                 ++i;
                 // advance the position
-                current_pos.x        += cur_glyph._advance;
-                _text_bounding_box.x += cur_glyph._advance;
+                current_pos.x += cur_glyph._advance;
+                current_lw    += cur_glyph._advance;
 
                 // remember just drawn glyph for kerning
                 prev_char = cur_char;
             }
         });
+        _text_bounding_box.x  = max(current_lw, _text_bounding_box.x);
         
         context->unmap_buffer(_vertex_buffer);
 #endif
