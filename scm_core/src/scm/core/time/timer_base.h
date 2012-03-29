@@ -49,10 +49,17 @@ public:
                                        time_unit       tunit  = msec,
                                        size_t          dsize  = 0,
                                        throughput_unit tpunit = MiBps) const = 0;
+    virtual void                detailed_report(std::ostream&   os,
+                                                time_unit       tunit  = msec,
+                                                size_t          dsize  = 0,
+                                                throughput_unit tpunit = MiBps) const = 0;
+
+    double                      elapsed(time_unit tu) const;
+
+    static double               to_time_unit(time_unit tu, nanosec_type t);
+    static std::string          time_unit_string(time_unit tu);
 
 protected:
-    double                      to_time_unit(time_unit tu, nanosec_type t) const;
-    std::string                 time_unit_string(time_unit tu) const;
 
 }; // class timer_base
 

@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include "cpu_timer.h"
 
 #include <ostream>
@@ -69,7 +72,24 @@ cpu_timer::report(std::ostream&   os,
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(3);
+        os << std::fixed << std::setprecision(2);
+
+        nanosec_type w  = detailed_elapsed().wall;
+
+        os << to_time_unit(tunit, w)  << time_unit_string(tunit);
+    }
+}
+void
+cpu_timer::detailed_report(std::ostream&   os,
+                           time_unit       tunit,
+                           size_t          dsize,
+                           throughput_unit tpunit) const
+{
+    std::ostream::sentry const  out_sentry(os);
+
+    if (os) {
+        boost::io::ios_all_saver saved_state(os);
+        os << std::fixed << std::setprecision(2);
 
         nanosec_type w  = detailed_elapsed().wall;
         nanosec_type u  = detailed_elapsed().user;
@@ -82,7 +102,6 @@ cpu_timer::report(std::ostream&   os,
            <<             std::setw(6) << std::right << to_time_unit(tunit, us) << time_unit_string(tunit)
            << " (" << std::setprecision(1) << (static_cast<double>(us)/static_cast<double>(w)) * 100.0 << "%)";
     }
-
 }
 
 } // namespace time

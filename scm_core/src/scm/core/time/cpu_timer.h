@@ -34,6 +34,10 @@ public:
                                time_unit       tunit  = msec,
                                size_t          dsize  = 0,
                                throughput_unit tpunit = MiBps) const;
+    void                detailed_report(std::ostream&   os,
+                                        time_unit       tunit  = msec,
+                                        size_t          dsize  = 0,
+                                        throughput_unit tpunit = MiBps) const;
 
 protected:
     boost::timer::cpu_timer _timer;

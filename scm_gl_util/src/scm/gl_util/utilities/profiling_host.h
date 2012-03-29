@@ -44,7 +44,7 @@ namespace util {
 class __scm_export(gl_util) profiling_host
 {
 public:
-    typedef time::accum_timer_base::duration_type               duration_type;
+    typedef time::accum_timer_base_deprecated::duration_type               duration_type;
 
 protected:
     enum timer_type {
@@ -53,9 +53,9 @@ protected:
         CU_TIMER,
         CL_TIMER
     };
-    typedef shared_ptr<time::accum_timer_base>  timer_ptr;
+    typedef shared_ptr<time::accum_timer_base_deprecated>  timer_ptr;
     struct timer_instance {
-        timer_instance(timer_type t, time::accum_timer_base* tm) : _type(t), _timer(tm), _time(duration_type()) {}
+        timer_instance(timer_type t, time::accum_timer_base_deprecated* tm) : _type(t), _timer(tm), _time(duration_type()) {}
         timer_type      _type;
         timer_ptr       _timer;
         duration_type   _time;

@@ -17,7 +17,7 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_util) accum_timer_query : public time::accum_timer_base
+class __scm_export(gl_util) accum_timer_query : public time::accum_timer_base_deprecated
 {
 public:
     accum_timer_query(const render_device_ptr& device);

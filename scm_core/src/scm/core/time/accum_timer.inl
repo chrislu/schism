@@ -7,7 +7,7 @@ namespace time {
 
 template<class timer_t>
 accum_timer<timer_t>::accum_timer()
-  : accum_timer_base()
+  : accum_timer_base_deprecated()
 {
     _timer.start();
     _timer.stop();

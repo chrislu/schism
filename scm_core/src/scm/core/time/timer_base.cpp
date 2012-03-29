@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #include "timer_base.h"
 
 namespace scm {
@@ -13,7 +16,13 @@ timer_base::~timer_base()
 }
 
 double
-timer_base::to_time_unit(time_unit tu, nanosec_type t) const
+timer_base::elapsed(time_unit tu) const
+{
+    return to_time_unit(tu, elapsed());
+}
+
+double
+timer_base::to_time_unit(time_unit tu, nanosec_type t)
 {
     switch (tu) {
         case sec:  return static_cast<double>(t) * 0.000000001;
@@ -25,7 +34,7 @@ timer_base::to_time_unit(time_unit tu, nanosec_type t) const
 }
 
 std::string
-timer_base::time_unit_string(time_unit tu) const
+timer_base::time_unit_string(time_unit tu)
 {
     std::string r;
 

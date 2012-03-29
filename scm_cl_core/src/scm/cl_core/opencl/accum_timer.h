@@ -19,7 +19,7 @@ namespace scm {
 namespace cl {
 namespace util {
 
-class __scm_export(cl_core) accum_timer : public time::accum_timer_base
+class __scm_export(cl_core) accum_timer : public time::accum_timer_base_deprecated
 {
 public:
     accum_timer();

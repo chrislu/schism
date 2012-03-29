@@ -15,7 +15,7 @@ namespace scm {
 namespace gl {
 
 accum_timer_query::accum_timer_query(const render_device_ptr& device)
-  : time::accum_timer_base()
+  : time::accum_timer_base_deprecated()
   , _timer_query_finished(true)
 {
     _timer_query_begin = device->create_timer_query();
@@ -106,7 +106,7 @@ accum_timer_query::force_collect()
 void
 accum_timer_query::reset()
 {
-    time::accum_timer_base::reset();
+    time::accum_timer_base_deprecated::reset();
 
     _timer_query_finished   = true;
     _timer_context.reset();

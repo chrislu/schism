@@ -59,18 +59,18 @@ namespace time {
 //
 //}; // class accum_timer_base
 
-class accum_timer_base
+class accum_timer_base_deprecated
 {
 public:
     typedef time::time_duration     duration_type;
 
 public:
-    accum_timer_base() 
+    accum_timer_base_deprecated() 
       : _last_duration(duration_type())
       , _accumulated_duration(duration_type())
       , _accumulation_count(0u)
     {}
-    virtual ~accum_timer_base() {}
+    virtual ~accum_timer_base_deprecated() {}
 
     virtual void                    stop()  = 0;
     virtual void                    collect() = 0;
@@ -100,10 +100,10 @@ protected:
     duration_type                   _accumulated_duration;
     unsigned                        _accumulation_count;
 
-}; // class accum_timer_base
+}; // class accum_timer_base_deprecated
 
 template<class timer_t>
-class accum_timer : public accum_timer_base
+class accum_timer : public accum_timer_base_deprecated
 {
 public:
     typedef timer_t         timer_type;

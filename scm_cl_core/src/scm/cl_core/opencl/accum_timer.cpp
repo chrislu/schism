@@ -12,7 +12,7 @@ namespace cl {
 namespace util {
 
 accum_timer::accum_timer()
-  : time::accum_timer_base()
+  : time::accum_timer_base_deprecated()
   , _cl_event(new ::cl::Event())
   , _cl_event_finished(true)
 {
@@ -87,7 +87,7 @@ accum_timer::force_collect()
 void
 accum_timer::reset()
 {
-    time::accum_timer_base::reset();
+    time::accum_timer_base_deprecated::reset();
     _cl_event_finished    = false;
 }
 

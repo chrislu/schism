@@ -8,8 +8,7 @@
 #include <boost/function.hpp>
 
 #include <scm/core/math.h>
-#include <scm/core/time/accum_timer.h>
-#include <scm/core/time/high_res_timer.h>
+#include <scm/core/time/cpu_accum_timer.h>
 
 #include <scm/input/devices/devices_fwd.h>
 
@@ -85,8 +84,6 @@ public:
         bool        _show_frame_times;
         bool        _full_screen;
     }; // struct viewer_settings
-
-    typedef scm::time::accum_timer<scm::time::high_res_timer>  accum_timer_type;
 
     typedef boost::function<void (const render_device_ptr&,
                                   const render_context_ptr&)>   update_func;
@@ -230,7 +227,7 @@ protected:
     };
     shared_ptr<render_target>       _render_target;
 
-    accum_timer_type                _frame_timer;
+    time::cpu_accum_timer           _frame_timer;
     float                           _frame_time_us;
 
     gl::text_renderer_ptr           _text_renderer;

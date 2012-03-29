@@ -21,7 +21,7 @@ namespace cu {
 namespace util {
 
 accum_timer::accum_timer()
-  : time::accum_timer_base()
+  : time::accum_timer_base_deprecated()
   , _cu_event_finished(true)
   , _cu_event_stream(0)
 {
@@ -108,7 +108,7 @@ accum_timer::force_collect()
 void
 accum_timer::reset()
 {
-    time::accum_timer_base::reset();
+    time::accum_timer_base_deprecated::reset();
     _cu_event_finished    = false;
 }
 
