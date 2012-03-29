@@ -36,12 +36,16 @@ public:
     double                          average_time(timer_base::time_unit tu) const;
 
     virtual void                    report(std::ostream&               os,
+                                           timer_base::time_unit       tunit  = timer_base::msec) const = 0;
+    virtual void                    report(std::ostream&               os,
+                                           size_t                      dsize,
                                            timer_base::time_unit       tunit  = timer_base::msec,
-                                           size_t                      dsize  = 0,
                                            timer_base::throughput_unit tpunit = timer_base::MiBps) const = 0;
     virtual void                    detailed_report(std::ostream&               os,
+                                                    timer_base::time_unit       tunit  = timer_base::msec) const = 0;
+    virtual void                    detailed_report(std::ostream&               os,
+                                                    size_t                      dsize,
                                                     timer_base::time_unit       tunit  = timer_base::msec,
-                                                    size_t                      dsize  = 0,
                                                     timer_base::throughput_unit tpunit = timer_base::MiBps) const = 0;
 
 protected:

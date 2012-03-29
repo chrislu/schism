@@ -33,6 +33,22 @@ timer_base::to_time_unit(time_unit tu, nanosec_type t)
     }
 }
 
+double
+timer_base::to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d)
+{
+    double b = static_cast<double>(d);
+    double s = to_time_unit(sec, t);
+
+    switch (tu) {
+        case Bps:                                       break;
+        case KiBps: b = b / (1024.0);                   break;
+        case MiBps: b = b / (1024.0 * 1024.0);          break;
+        case GiBps: b = b / (1024.0 * 1024.0 * 1024.0); break;
+    }
+
+    return b / s;
+}
+
 std::string
 timer_base::time_unit_string(time_unit tu)
 {
@@ -48,6 +64,23 @@ timer_base::time_unit_string(time_unit tu)
 
     return r;
 }
+
+std::string
+timer_base::throughput_unit_string(throughput_unit tu)
+{
+    std::string r;
+
+    switch (tu) {
+        case Bps:   r.assign("B/s");   break;
+        case KiBps: r.assign("KiB/s"); break;
+        case MiBps: r.assign("MiB/s"); break;
+        case GiBps: r.assign("GiB/s"); break;
+        default:    r.assign("unknown");
+    }
+
+    return r;
+}
+
 
 } // namespace time
 } // namespace scm

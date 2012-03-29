@@ -5,7 +5,8 @@
 #ifndef SCM_GL_UTIL_accum_timer_query_H_INCLUDED
 #define SCM_GL_UTIL_accum_timer_query_H_INCLUDED
 
-#include <scm/core/time/accum_timer.h>
+#include <scm/core/time/accum_timer_base.h>
+#include <scm/core/time/cpu_timer.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
 
@@ -17,8 +18,15 @@
 namespace scm {
 namespace gl {
 
-class __scm_export(gl_util) accum_timer_query : public time::accum_timer_base_deprecated
+class __scm_export(gl_util) accum_timer_query : public time::accum_timer_base
 {
+public:
+    typedef time::cpu_timer::nanosec_type   nanosec_type;
+    struct gl_times : public time::cpu_timer::cpu_times
+    {
+        nanosec_type    gl;
+    };
+
 public:
     accum_timer_query(const render_device_ptr& device);
     virtual ~accum_timer_query();
@@ -29,12 +37,33 @@ public:
     void                    force_collect();
     void                    reset();
 
+    gl_times                detailed_last_time() const;
+    gl_times                detailed_accumulated_time() const;
+    gl_times                detailed_average_time() const;
+
+    void                    report(std::ostream&                     os,
+                                   time::timer_base::time_unit       tunit  = time::timer_base::msec) const;
+    void                    report(std::ostream&                     os,
+                                   size_t                            dsize,
+                                   time::timer_base::time_unit       tunit  = time::timer_base::msec,
+                                   time::timer_base::throughput_unit tpunit = time::timer_base::MiBps) const;
+    void                    detailed_report(std::ostream&                     os,
+                                            time::timer_base::time_unit       tunit  = time::timer_base::msec) const;
+    void                    detailed_report(std::ostream&                     os,
+                                            size_t                            dsize,
+                                            time::timer_base::time_unit       tunit  = time::timer_base::msec,
+                                            time::timer_base::throughput_unit tpunit = time::timer_base::MiBps) const;
+
 protected:
     timer_query_ptr         _timer_query_begin;
     timer_query_ptr         _timer_query_end;
     bool                    _timer_query_finished;
 
     render_context_ptr      _timer_context;
+
+    gl_times                _detailed_last_time;
+    gl_times                _detailed_accumulated_time;
+    time::cpu_timer         _cpu_timer;
 
 }; // class accum_timer_query
 

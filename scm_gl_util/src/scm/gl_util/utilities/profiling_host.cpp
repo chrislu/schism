@@ -14,7 +14,7 @@
 
 #include <CL/cl.hpp>
 
-#include <scm/core/time/high_res_timer.h>
+#include <scm/core/time/cpu_accum_timer.h>
 
 #include <scm/cl_core/cuda/accum_timer.h>
 #include <scm/cl_core/cuda/command_stream.h>
@@ -26,10 +26,10 @@
 
 namespace {
 
-typedef scm::time::accum_timer<scm::time::high_res_timer>   cpu_accum_timer;
-typedef scm::gl::accum_timer_query                          gl_accum_timer;
-typedef scm::cu::util::accum_timer                          cu_accum_timer;
-typedef scm::cl::util::accum_timer                          cl_accum_timer;
+typedef scm::time::cpu_accum_timer  cpu_accum_timer;
+typedef scm::gl::accum_timer_query  gl_accum_timer;
+typedef scm::cu::util::accum_timer  cu_accum_timer;
+typedef scm::cl::util::accum_timer  cl_accum_timer;
 
 struct null_deleter { void operator()(void const *) const {} };
 
@@ -191,7 +191,7 @@ profiling_host::stop(const std::string& tname) const
     }
 }
 
-profiling_host::duration_type
+profiling_host::nanosec_type
 profiling_host::time(const std::string& tname) const
 {
     auto ti = _timers.find(tname);
@@ -199,13 +199,12 @@ profiling_host::time(const std::string& tname) const
         return ti->second._time;
     }
 
-    return duration_type();
+    return 0;
 }
 
 void
 profiling_host::update(int interval)
 {
-
     if (_enabled) {
         using namespace std;
 
@@ -216,7 +215,7 @@ profiling_host::update(int interval)
             _update_interval = 0;
 
             for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
-                t.second._time = t.second._timer->average_duration();
+                t.second._time = t.second._timer->average_time();
             });
 
             reset_all();
@@ -260,15 +259,15 @@ profiling_host::reset(const std::string& tname)
     }
 }
 
-profiling_host::duration_type
-profiling_host::accumulated_duration(const std::string& tname) const
+profiling_host::nanosec_type
+profiling_host::accumulated_time(const std::string& tname) const
 {
     timer_ptr t = find_timer(tname);
     if (t) {
-        return t->accumulated_duration();
+        return t->accumulated_time();
     }
 
-    return duration_type();
+    return 0;
 }
 
 unsigned
@@ -282,15 +281,15 @@ profiling_host::accumulation_count(const std::string& tname) const
     return 0u;
 }
 
-profiling_host::duration_type
-profiling_host::average_duration(const std::string& tname) const
+profiling_host::nanosec_type
+profiling_host::average_time(const std::string& tname) const
 {
     timer_ptr t = find_timer(tname);
     if (t) {
-        return t->average_duration();
+        return t->average_time();
     }
 
-    return duration_type();
+    return 0;
 }
 
 std::string
@@ -382,7 +381,7 @@ profiling_result::profiling_result(const profiling_host_cptr& host,
   , _tname(tname)
   , _tunit(tunit)
   , _dsize(0)
-  , _dunit(MiBps)
+  , _dunit(time::timer_base::MiBps)
 {
 }
 
@@ -402,65 +401,27 @@ profiling_result::profiling_result(const profiling_host_cptr& host,
 std::string
 profiling_result::unit_string() const
 {
-    std::string r;
-
-    switch (_tunit) {
-        case sec:  r.assign("s");  break;
-        case msec: r.assign("ms"); break;
-        case usec: r.assign("us"); break;
-        case nsec: r.assign("ns"); break;
-        default:   r.assign("unknown");
-    }
-
-    return r;
+    return time::timer_base::time_unit_string(_tunit);
 }
 
 std::string
 profiling_result::throughput_string() const
 {
-    std::string r;
-
-    switch (_dunit) {
-        case Bps:   r.assign("B/s");   break;
-        case KiBps: r.assign("KiB/s"); break;
-        case MiBps: r.assign("MiB/s"); break;
-        case GiBps: r.assign("GiB/s"); break;
-        default:    r.assign("unknown");
-    }
-
-    return r;
+    return time::timer_base::throughput_unit_string(_dunit);
 }
 
 double
 profiling_result::time() const
 {
-    double                        t = 0.0;
-    profiling_host::duration_type d = _phost->time(_tname);
-
-    switch (_tunit) {
-        case sec:  t = time::to_seconds(d);      break;
-        case msec: t = time::to_milliseconds(d); break;
-        case usec: t = time::to_microseconds(d); break;
-        case nsec: t = time::to_nanoseconds(d);  break;
-    }
-
-    return t;
+    profiling_host::nanosec_type d = _phost->time(_tname);
+    return time::timer_base::to_time_unit(_tunit, d);
 }
 
 double
 profiling_result::throughput() const
 {
-    double t = static_cast<double>(_dsize);
-    double d = time::to_seconds(_phost->time(_tname));
-
-    switch (_dunit) {
-        case Bps:                                       break;
-        case KiBps: t = t / (1024.0);                   break;
-        case MiBps: t = t / (1024.0 * 1024.0);          break;
-        case GiBps: t = t / (1024.0 * 1024.0 * 1024.0); break;
-    }
-
-    return t / d;
+    profiling_host::nanosec_type d = _phost->time(_tname);
+    return time::timer_base::to_throughput_unit(_dunit, d, _dsize);
 }
 
 std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
@@ -472,12 +433,21 @@ std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
         os << std::fixed << std::setprecision(3);
 
         if (pres._phost->enabled()) {
-            if (profiling_host::duration_type() == pres._phost->time(pres._tname)) {
+            if (0 == pres._phost->time(pres._tname)) {
                 os << "unused timer";
             }
             else {
                 os << std::setw(4) << std::left  << pres._phost->timer_prefix_string(pres._tname) << ""
                    << std::setw(6) << std::right << pres.time() << pres.unit_string();
+
+                //profiling_host::timer_ptr t = pres._phost->find_timer(pres._tname);
+
+                //if (dynamic_pointer_cast<cpu_accum_timer>(t)) {
+                //    t->report(os, pres._dsize, pres._tunit, pres._dunit);
+                //}
+                //else {
+                //    t->detailed_report(os, pres._dsize, pres._tunit, pres._dunit);
+                //}
 
                 if (0 < pres._dsize) {
                     os << ", "

@@ -33,12 +33,16 @@ public:
     cpu_times                       detailed_average_time() const;
 
     void                            report(std::ostream&               os,
+                                           timer_base::time_unit       tunit  = timer_base::msec) const;
+    void                            report(std::ostream&               os,
+                                           size_t                      dsize,
                                            timer_base::time_unit       tunit  = timer_base::msec,
-                                           size_t                      dsize  = 0,
                                            timer_base::throughput_unit tpunit = timer_base::MiBps) const;
     void                            detailed_report(std::ostream&               os,
+                                                    timer_base::time_unit       tunit  = timer_base::msec) const;
+    void                            detailed_report(std::ostream&               os,
+                                                    size_t                      dsize,
                                                     timer_base::time_unit       tunit  = timer_base::msec,
-                                                    size_t                      dsize  = 0,
                                                     timer_base::throughput_unit tpunit = timer_base::MiBps) const;
 
 protected:

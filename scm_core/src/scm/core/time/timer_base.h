@@ -46,18 +46,24 @@ public:
     virtual nanosec_type        elapsed() const          = 0;
 
     virtual void                report(std::ostream&   os,
+                                       time_unit       tunit  = msec) const = 0;
+    virtual void                report(std::ostream&   os,
+                                       size_t          dsize,
                                        time_unit       tunit  = msec,
-                                       size_t          dsize  = 0,
                                        throughput_unit tpunit = MiBps) const = 0;
     virtual void                detailed_report(std::ostream&   os,
+                                                time_unit       tunit  = msec) const = 0;
+    virtual void                detailed_report(std::ostream&   os,
+                                                size_t          dsize,
                                                 time_unit       tunit  = msec,
-                                                size_t          dsize  = 0,
                                                 throughput_unit tpunit = MiBps) const = 0;
 
     double                      elapsed(time_unit tu) const;
 
     static double               to_time_unit(time_unit tu, nanosec_type t);
+    static double               to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d);
     static std::string          time_unit_string(time_unit tu);
+    static std::string          throughput_unit_string(throughput_unit tu);
 
 protected:
 

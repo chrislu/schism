@@ -31,12 +31,16 @@ public:
     cpu_times           detailed_elapsed() const;
 
     void                report(std::ostream&   os,
+                               time_unit       tunit  = msec) const;
+    void                report(std::ostream&   os,
+                               size_t          dsize,
                                time_unit       tunit  = msec,
-                               size_t          dsize  = 0,
                                throughput_unit tpunit = MiBps) const;
     void                detailed_report(std::ostream&   os,
+                                        time_unit       tunit  = msec) const;
+    void                detailed_report(std::ostream&   os,
+                                        size_t          dsize,
                                         time_unit       tunit  = msec,
-                                        size_t          dsize  = 0,
                                         throughput_unit tpunit = MiBps) const;
 
 protected:

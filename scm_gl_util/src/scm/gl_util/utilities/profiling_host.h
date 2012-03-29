@@ -14,7 +14,7 @@
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
 #include <scm/core/memory.h>
-#include <scm/core/time/accum_timer.h>
+#include <scm/core/time/accum_timer_base.h>
 
 #include <scm/gl_core/render_device/render_device_fwd.h>
 #include <scm/gl_util/utilities/utilities_fwd.h>
@@ -44,7 +44,8 @@ namespace util {
 class __scm_export(gl_util) profiling_host
 {
 public:
-    typedef time::accum_timer_base_deprecated::duration_type               duration_type;
+    typedef time::accum_timer_base::nanosec_type        nanosec_type;
+    typedef shared_ptr<time::accum_timer_base>  timer_ptr;
 
 protected:
     enum timer_type {
@@ -53,12 +54,11 @@ protected:
         CU_TIMER,
         CL_TIMER
     };
-    typedef shared_ptr<time::accum_timer_base_deprecated>  timer_ptr;
     struct timer_instance {
-        timer_instance(timer_type t, time::accum_timer_base_deprecated* tm) : _type(t), _timer(tm), _time(duration_type()) {}
+        timer_instance(timer_type t, time::accum_timer_base* tm) : _type(t), _timer(tm), _time(0) {}
         timer_type      _type;
         timer_ptr       _timer;
-        duration_type   _time;
+        nanosec_type    _time;
     };
     typedef std::map<std::string, timer_instance> timer_map;
 
@@ -75,7 +75,7 @@ public:
     ::cl::Event*const       cl_start(const std::string& tname);
 
     void                    stop(const std::string& tname) const;
-    duration_type           time(const std::string& tname) const;
+    nanosec_type            time(const std::string& tname) const;
 
     void                    update(int interval = 100);
 
@@ -85,17 +85,17 @@ public:
     void                    collect(const std::string& tname);
     void                    reset(const std::string& tname);
     
-    duration_type           accumulated_duration(const std::string& tname) const;
+    nanosec_type            accumulated_time(const std::string& tname) const;
     unsigned                accumulation_count(const std::string& tname) const;
 
-    duration_type           average_duration(const std::string& tname) const;
+    nanosec_type            average_time(const std::string& tname) const;
 
     std::string             timer_prefix_string(const std::string& tname) const;
     std::string             timer_prefix_string(timer_type ttype) const;
     std::string             timer_type_string(timer_type ttype) const;
 
-protected:
     timer_ptr               find_timer(const std::string& tname) const;
+protected:
 
 protected:
     bool                    _enabled;
@@ -123,26 +123,17 @@ private: // declared, never defined
 
 struct __scm_export(gl_util) profiling_result
 {
-    enum time_unit {
-        sec,
-        msec,
-        usec,
-        nsec
-    };
-    enum throughput_unit {
-        Bps,
-        KiBps,
-        MiBps,
-        GiBps
-    };
+    typedef time::timer_base::time_unit       time_unit;
+    typedef time::timer_base::throughput_unit throughput_unit;
+
     profiling_result(const profiling_host_cptr& host,
                      const std::string&         tname,
-                           time_unit            tunit = msec);
+                           time_unit            tunit = time::timer_base::msec);
     profiling_result(const profiling_host_cptr& host,
                      const std::string&         tname,
                            scm::size_t          dsize,
-                           time_unit            tunit = msec,
-                           throughput_unit      d_unit = MiBps);
+                           time_unit            tunit  = time::timer_base::msec,
+                           throughput_unit      d_unit = time::timer_base::MiBps);
 
     std::string         unit_string() const;
     std::string         throughput_string() const;
