@@ -1,7 +1,4 @@
 
-// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
-// Distributed under the Modified BSD License, see license.txt.
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -38,7 +35,7 @@ unsigned          multi_samples;
 
 } // namespace
 
-static const std::string    scm_application_name = "schism example: multi-sample textures";
+static const std::string    scm_application_name = "schism example: volume ray casting";
 
 static bool initialize_cmd_line(scm::core& c)
 {
@@ -106,7 +103,7 @@ int main(int argc, char **argv)
     viewer_attribs._multi_samples   = multi_samples;
     viewer_attribs._super_samples   = 1;
 
-    gui::application_window* app_window(new gui::application_window(viewport_size, viewer_attribs, context_attribs, window_format));
+    data::application_window* app_window(new data::application_window(viewport_size, viewer_attribs, context_attribs, window_format));
 
     app_window->setWindowTitle((std::string("schism: ") + scm_application_name).c_str());
     app_window->show();
