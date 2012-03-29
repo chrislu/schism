@@ -2,6 +2,7 @@
 #ifndef SCM_LARGE_DATA_VOLUME_RENDERER_H_INCLUDED
 #define SCM_LARGE_DATA_VOLUME_RENDERER_H_INCLUDED
 
+#include <scm/core/math.h>
 #include <scm/gl_core/gl_core_fwd.h>
 
 #include <scm/gl_util/primitives/primitives_fwd.h>
@@ -20,7 +21,7 @@ public:
         volume_color_map
     };
 public:
-    volume_renderer(const gl::render_device_ptr& device);
+    volume_renderer(const gl::render_device_ptr& device, const math::vec2ui& vp_size);
     virtual ~volume_renderer();
 
     void                            draw(const gl::render_context_ptr& context,
@@ -32,6 +33,8 @@ public:
     bool                            reload_shaders(const gl::render_device_ptr& device);
 
 protected:
+    math::vec2ui                    _viewport_size;
+
     gl::program_ptr                 _program;
 
     gl::depth_stencil_state_ptr     _dstate;

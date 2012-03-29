@@ -25,7 +25,8 @@
 namespace scm {
 namespace data {
 
-volume_renderer::volume_renderer(const gl::render_device_ptr& device)
+volume_renderer::volume_renderer(const gl::render_device_ptr& device, const math::vec2ui& vp_size)
+  : _viewport_size(vp_size)
 {
     using namespace scm;
     using namespace scm::gl;
@@ -157,6 +158,7 @@ volume_renderer::reload_shaders(const gl::render_device_ptr& device)
 
     _program->uniform("volume_raw",     0);
     _program->uniform("color_map",      2);
+    _program->uniform("viewport_size",  math::vec2f(_viewport_size));
 
     _program->uniform_buffer("camera_matrices",     0);
     _program->uniform_buffer("volume_uniform_data", 1);

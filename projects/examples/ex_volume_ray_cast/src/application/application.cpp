@@ -178,7 +178,7 @@ application_window::init_renderer()
 
     // text rendering
     try {
-        font_face_ptr output_font(new font_face(device, "../../../res/fonts/Segoeui.ttf", 18, 0, font_face::smooth_lcd));
+        font_face_ptr output_font(new font_face(device, "../../../res/fonts/Ubuntu.ttf", 18, 0, font_face::smooth_lcd));
         _text_renderer  = make_shared<text_renderer>(device);
         _output_text    = make_shared<text>(device, output_font, font_face::style_regular, "sick, sad world...");
 

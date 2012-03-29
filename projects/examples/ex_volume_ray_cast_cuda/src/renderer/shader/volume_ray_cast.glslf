@@ -30,6 +30,7 @@ in per_vertex {
 uniform sampler3D volume_raw;
 uniform sampler2D color_map;
 
+uniform vec2  viewport_size;
 uniform float volume_lod;
 
 layout(std140, column_major) uniform;
@@ -86,10 +87,10 @@ struct ray
 void
 make_ray(out ray r,
          in ivec2 spos,
-         in ivec2 ssize)
+         in  vec2 ssize)
 {
-    vec4 spos_nrm = vec4((float(spos.x) / float(ssize.x)) * 2.0 - 1.0,
-                         (float(spos.y) / float(ssize.y)) * 2.0 - 1.0,
+    vec4 spos_nrm = vec4((float(spos.x) / ssize.x) * 2.0 - 1.0,
+                         (float(spos.y) / ssize.y) * 2.0 - 1.0,
                          -1.0,
                           1.0);
 
@@ -148,7 +149,7 @@ void main()
 {
 #if 1
     ray cur_ray;
-    make_ray(cur_ray, ivec2(gl_FragCoord.xy), ivec2(1600, 1024));
+    make_ray(cur_ray, ivec2(gl_FragCoord.xy), viewport_size);
 
     float tmin = 0.0;
     float tmax = 0.0;
