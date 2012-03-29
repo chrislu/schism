@@ -1,6 +1,6 @@
 schism C++ libraries
 ====================
-The schism C++ libraries offer object-oriented interfaces to the OpenGL C-languafe API with related interfaces for Nvidia CUDA and OpenCL compute language interoperability and various utilities to help with common real-time graphis related tasks. The libraries are written in standard C++ using OpenGL 3.3 to 4.2 core profile functionality and are useable on Windows as well as Linux operating systems.
+The schism C++ libraries offer object-oriented interfaces to the OpenGL C-language API with related interfaces for Nvidia CUDA and OpenCL compute language interoperability and various utilities to help with common real-time graphics related tasks. The libraries are written in standard C++ using OpenGL 3.3 to 4.2 core profile functionality and are useable on Windows as well as Linux operating systems.
 
 The libraries were developed at the [Virtual Reality Systems Group at the Bauhaus-Universität Weimar](http://www.uni-weimar.de/medien/vr) to support my PhD research work and are used in various student thesis and research projects at our group. Current projects include virtual reality applications and visualization software for extremely large image and especially volume data sets.
 
@@ -10,8 +10,8 @@ The main features of the schism C++ libraries are:
  * object-oriented interface to OpenGL core profile functionality
  * compute interoperability with OpenCL and Nvidia CUDA
  * window and context management for Windows (Win32) and Linux (X and GLX)
- * basic viewer window provived using Qt GUI-Framework
- * texure-based FreeType2 font rendering (sub-pixel rasterization, outlined drawing)
+ * basic viewer window provided using Qt GUI-Framework
+ * texture-based FreeType2 font rendering (sub-pixel rasterization, outlined drawing)
  * logging functionality (terminal and file output, extendable)
  * timing functionality for profiling tasks (non-blocking OpenGL, OpenCL, CUDA timers)
  * data loaders for image data (standard images through FreeImage and custom DDS loader)
@@ -19,7 +19,7 @@ The main features of the schism C++ libraries are:
 
 schism - external dependencies
 ------------------------------
-For Windows the external dependencies need to be placed into the /externals folder. You can find precompiled versions of the required libraries using the [link below](http://db.tt/8XSt6Rig "schism externals download"). Download the externals package suitable for your platform and extract the contents into the /externals folder.
+For Windows the external dependencies need to be placed into the /externals folder. You can find pre-compiled versions of the required libraries using the [packages linked here](http://db.tt/8XSt6Rig "schism externals download"). Download the externals package suitable for your platform and extract the contents into the /externals folder.
 
 contributors
 ------------
