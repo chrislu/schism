@@ -446,8 +446,8 @@ volume_data::update_color_alpha_map(const gl::render_context_ptr& context) const
     out() << log::indent;
     time::high_res_timer timer;
 
-    out() << "generating color map texture data..." << log::end;
-    timer.start();
+    //out() << "generating color map texture data..." << log::end;
+    //timer.start();
 
     unsigned in_size = _color_alpha_map->descriptor()._size.x;
 
@@ -470,25 +470,25 @@ volume_data::update_color_alpha_map(const gl::render_context_ptr& context) const
         combined_lut[i*4 +2] = color_lut[i].z;
         combined_lut[i*4 +3] = alpha_lut[i];
     }
-    timer.stop();
-    out() << "generating color map texture data done."
-          << " (elapsed time: " << std::fixed << std::setprecision(3)
-          << time::to_seconds(timer.get_time()) << "s)" << log::end;
-    
-    out() << "uploading texture data ("
-          << "dimensions: " << in_size << ", format: " << format_string(FORMAT_RGBA_8)
-          << ", mip-level: " << 1
-          << ", size : " << std::fixed << std::setprecision(3) << static_cast<double>(in_size * size_of_format(FORMAT_RGBA_8)) / (1024.0) << "KiB)..."
-          << log::end;
-    timer.start();
+    //timer.stop();
+    //out() << "generating color map texture data done."
+    //      << " (elapsed time: " << std::fixed << std::setprecision(3)
+    //      << time::to_seconds(timer.get_time()) << "s)" << log::end;
+    //
+    //out() << "uploading texture data ("
+    //      << "dimensions: " << in_size << ", format: " << format_string(FORMAT_RGBA_8)
+    //      << ", mip-level: " << 1
+    //      << ", size : " << std::fixed << std::setprecision(3) << static_cast<double>(in_size * size_of_format(FORMAT_RGBA_8)) / (1024.0) << "KiB)..."
+    //      << log::end;
+    //timer.start();
 
 
     texture_region ur(vec3ui(0u), vec3ui(in_size, 1, 1));
     bool res = context->update_sub_texture(_color_alpha_map, ur, 0u, FORMAT_RGBA_32F, combined_lut.get());
-    timer.stop();
-    out() << "uploading texture data done."
-          << " (elapsed time: " << std::fixed << std::setprecision(3)
-          << time::to_seconds(timer.get_time()) << "s)" << log::end;
+    //timer.stop();
+    //out() << "uploading texture data done."
+    //      << " (elapsed time: " << std::fixed << std::setprecision(3)
+    //      << time::to_seconds(timer.get_time()) << "s)" << log::end;
 
     if (!res) {
         err() << log::error
