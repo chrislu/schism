@@ -163,10 +163,11 @@ opencl_volume_renderer::draw(const gl::render_context_ptr& context,
     //out() << time::to_milliseconds(_cl_release_timer.accumulated_duration());
     //out() << time::to_milliseconds(_cl_kernel_timer.accumulated_duration());
 
-    if (time::to_milliseconds(_cl_kernel_timer.accumulated_duration()) > 300.0) {
-        double acq_time = time::to_milliseconds(_cl_acquire_timer.average_duration());
-        double rel_time = time::to_milliseconds(_cl_release_timer.average_duration());
-        double krn_time = time::to_milliseconds(_cl_kernel_timer.average_duration());
+    //if (time::to_milliseconds(_cl_kernel_timer.accumulated_duration()) > 300.0) {
+    if (_cl_kernel_timer.accumulated_time(time::timer_base::msec) > 300.0) {
+        double acq_time = _cl_acquire_timer.average_time(time::timer_base::msec);
+        double rel_time = _cl_release_timer.average_time(time::timer_base::msec);
+        double krn_time = _cl_kernel_timer.average_time(time::timer_base::msec);
 
         _cl_acquire_timer.reset();
         _cl_release_timer.reset();

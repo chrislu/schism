@@ -775,13 +775,13 @@ readback_benchmark::update(const gl::render_context_ptr& context,
     static double tex_tp_cpu    = 0.0;
 
     if (time::to_milliseconds(_cpu_timer_frame.accumulated_duration()) > 500.0) {
-        draw_time = time::to_milliseconds(_gpu_timer_draw->average_duration());
+        draw_time = _gpu_timer_draw->average_time(time::timer_base::msec);
 
-        read_time = time::to_milliseconds(_gpu_timer_read->average_duration());
+        read_time = _gpu_timer_read->average_time(time::timer_base::msec);
         read_tp   = buf_size * 1000.0 / read_time; // MiB/s
-        copy_time = time::to_milliseconds(_gpu_timer_copy->average_duration());
+        copy_time = _gpu_timer_copy->average_time(time::timer_base::msec);
         copy_tp   = buf_size * 1000.0 / copy_time; // MiB/s
-        tex_time  = time::to_milliseconds(_gpu_timer_tex->average_duration());
+        tex_time  = _gpu_timer_tex->average_time(time::timer_base::msec);
         tex_tp    = buf_size * 1000.0 / tex_time; // MiB/s
 
         frame_time_cpu = time::to_milliseconds(_cpu_timer_frame.average_duration());
