@@ -1,0 +1,57 @@
+
+#version 410 core
+
+#extension GL_ARB_shading_language_include : require
+
+#include </scm/gl_util/camera_block.glsl>
+
+#include </scm/data/height_field/common_constants.glslh>
+#include </scm/data/height_field/common_uniforms.glslh>
+#include </scm/data/height_field/interface_blocks.glslh>
+
+// input/output layout definitions ////////////////////////////////////////////////////////////////
+layout(triangles, invocations = 1) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+// input/output definitions ///////////////////////////////////////////////////////////////////////
+in per_vertex {
+    smooth hf_vertex vertex;
+} te_in[];
+
+out per_vertex {
+    smooth hf_vertex vertex;
+} g_out;
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+bool
+cull_triangle()
+{
+#if 0
+    //vec3 triangle_edge_len = vec3(abs(gl_in[0].gl_Position.z - gl_in[1].gl_Position.z),
+                                  //abs(gl_in[0].gl_Position.z - gl_in[2].gl_Position.z),
+                                  //abs(gl_in[1].gl_Position.z - gl_in[2].gl_Position.z));
+    vec3 triangle_depth    = vec3(gl_in[0].gl_Position.z,
+                                  gl_in[1].gl_Position.z,
+                                  gl_in[2].gl_Position.z);
+
+    return (   any(lessThan(triangle_depth, vec3(epsilon))));
+            //|| any(greaterThan(triangle_edge_len, vec3(height_scale * 0.1))));
+#else
+    return false;
+#endif
+}
+
+void main()
+{
+    if (!cull_triangle())
+    {
+        for (int i = 0; i < gl_in.length(); ++i) {
+            gl_Position              = camera_transform.vp_matrix * model_matrix * gl_in[i].gl_Position;
+            g_out.vertex.ws_position = te_in[i].vertex.ws_position;
+            g_out.vertex.texcoord_hm = te_in[i].vertex.texcoord_hm;
+            g_out.vertex.texcoord_dm = te_in[i].vertex.texcoord_dm;
+            EmitVertex();
+        }
+        EndPrimitive();
+    }
+}

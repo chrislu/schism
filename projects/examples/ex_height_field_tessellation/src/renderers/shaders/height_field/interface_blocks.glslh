@@ -1,0 +1,12 @@
+
+#ifndef SCM_LDATA_HF_TESSELLATE_HEIGHT_FIELD_INTERFACE_BLOCKS_GLSLH_INCLUDED
+#define SCM_LDATA_HF_TESSELLATE_HEIGHT_FIELD_INTERFACE_BLOCKS_GLSLH_INCLUDED
+
+struct hf_vertex
+{
+    vec2 texcoord_hm;
+    vec2 texcoord_dm;
+    vec4 ws_position;
+}; // struct hf_vertex
+
+#endif // SCM_LDATA_HF_TESSELLATE_HEIGHT_FIELD_INTERFACE_BLOCKS_GLSLH_INCLUDED

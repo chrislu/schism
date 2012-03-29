@@ -1,0 +1,82 @@
+
+#version 410 core
+
+#extension GL_ARB_shading_language_include : require
+
+#include </scm/gl_util/camera_block.glsl>
+
+#include </scm/data/height_field/common_constants.glslh>
+#include </scm/data/height_field/common_functions.glslh>
+#include </scm/data/height_field/common_uniforms.glslh>
+#include </scm/data/height_field/interface_blocks.glslh>
+
+// output layout definitions //////////////////////////////////////////////////////////////////////
+layout(vertices = 3) out;
+
+// input/output definitions ///////////////////////////////////////////////////////////////////////
+in per_vertex {
+    smooth hf_vertex vertex;
+} v_in[];
+
+out per_vertex {
+    smooth hf_vertex vertex;
+} tc_out[];
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+bool
+cull_triangle_patch()
+{
+#if 0
+    return all(lessThan(vec3(gl_in[0].gl_Position.z,
+                             gl_in[1].gl_Position.z,
+                             gl_in[2].gl_Position.z),
+               vec3(epsilon)));
+#else
+    return false;
+#endif
+}
+
+void main()
+{
+    vec4 cs_v0 = camera_transform.vp_matrix * model_matrix * gl_in[0].gl_Position;
+    vec4 cs_v1 = camera_transform.vp_matrix * model_matrix * gl_in[1].gl_Position;
+    vec4 cs_v2 = camera_transform.vp_matrix * model_matrix * gl_in[2].gl_Position;
+
+    // for now pass through
+    //if (   !triangle_patch_inside_frustum(cs_v0, cs_v1, cs_v2)
+        //|| cull_triangle_patch()) {
+    //{
+        //gl_TessLevelOuter[0] = 
+        //gl_TessLevelOuter[1] = 
+        //gl_TessLevelOuter[2] = 0.0;
+        //gl_TessLevelInner[0] = 0.0;
+    //}
+    //else
+    {
+        float tess_edge_0 = edge_tessellation_factor(cs_v2, v_in[2].vertex.texcoord_dm,
+                                                     cs_v1, v_in[1].vertex.texcoord_dm);
+        float tess_edge_1 = edge_tessellation_factor(cs_v2, v_in[2].vertex.texcoord_dm,
+                                                     cs_v0, v_in[0].vertex.texcoord_dm);
+        float tess_edge_2 = edge_tessellation_factor(cs_v0, v_in[0].vertex.texcoord_dm,
+                                                     cs_v1, v_in[1].vertex.texcoord_dm);
+
+#if PRIMITIVE_ID_REPRO
+        vec4 tess_outer = texelFetch(edge_densities, gl_PrimitiveID * 2);
+        vec4 tess_inner = texelFetch(edge_densities, gl_PrimitiveID * 2 + 1);
+        gl_TessLevelOuter[0] = tess_outer.x;//2.0;/tess_edge_0 * 
+        gl_TessLevelOuter[1] = tess_outer.y;//2.0;/tess_edge_1 * 
+        gl_TessLevelOuter[2] = tess_outer.z;//2.0;/tess_edge_2 * 
+        gl_TessLevelInner[0] = tess_inner.x;
+#else
+        gl_TessLevelOuter[0] = tess_edge_0;
+        gl_TessLevelOuter[1] = tess_edge_1;
+        gl_TessLevelOuter[2] = tess_edge_2;
+        gl_TessLevelInner[0] = 0.33 * (tess_edge_0 + tess_edge_1 + tess_edge_2); //tess_inner.x;//2.0;//mix(tess_edge_1, tess_edge_3, 0.5);
+#endif
+    }
+
+    gl_out[gl_InvocationID].gl_Position        = gl_in[gl_InvocationID].gl_Position;
+    tc_out[gl_InvocationID].vertex.ws_position = v_in[gl_InvocationID].vertex.ws_position;
+    tc_out[gl_InvocationID].vertex.texcoord_hm = v_in[gl_InvocationID].vertex.texcoord_hm;
+    tc_out[gl_InvocationID].vertex.texcoord_dm = v_in[gl_InvocationID].vertex.texcoord_dm;
+}

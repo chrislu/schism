@@ -1,0 +1,52 @@
+
+#version 410 core
+
+#extension GL_ARB_shading_language_include : require
+
+#include </scm/gl_util/camera_block.glsl>
+
+#include </scm/data/height_field/common_constants.glslh>
+#include </scm/data/height_field/common_uniforms.glslh>
+#include </scm/data/height_field/interface_blocks.glslh>
+
+// input layout definitions ///////////////////////////////////////////////////////////////////////
+//layout(quads, fractional_even_spacing, ccw) in;
+layout(quads, fractional_odd_spacing, ccw) in;
+//layout(quads, equal_spacing, ccw) in;
+
+// input/output definitions ///////////////////////////////////////////////////////////////////////
+in per_vertex {
+    smooth hf_vertex vertex;
+} tc_in[];
+
+out per_vertex {
+    smooth hf_vertex vertex;
+} te_out;
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+void main()
+{
+    // bilinear interpolate the actual position
+    vec4 pos_a    = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
+    vec4 pos_b    = mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x);
+    vec4 position = mix(pos_a, pos_b, gl_TessCoord.y);
+
+    vec4 ws_pos_a    = mix(tc_in[0].vertex.ws_position, tc_in[1].vertex.ws_position, gl_TessCoord.x);
+    vec4 ws_pos_b    = mix(tc_in[3].vertex.ws_position, tc_in[2].vertex.ws_position, gl_TessCoord.x);
+    vec4 ws_position = mix(ws_pos_a, ws_pos_b, gl_TessCoord.y);
+
+    vec2 tex_hm_a    = mix(tc_in[0].vertex.texcoord_hm, tc_in[1].vertex.texcoord_hm, gl_TessCoord.x);
+    vec2 tex_hm_b    = mix(tc_in[3].vertex.texcoord_hm, tc_in[2].vertex.texcoord_hm, gl_TessCoord.x);
+    vec2 texcoord_hm = mix(tex_hm_a, tex_hm_b, gl_TessCoord.y);
+
+    vec2 tex_dm_a    = mix(tc_in[0].vertex.texcoord_dm, tc_in[1].vertex.texcoord_dm, gl_TessCoord.x);
+    vec2 tex_dm_b    = mix(tc_in[3].vertex.texcoord_dm, tc_in[2].vertex.texcoord_dm, gl_TessCoord.x);
+    vec2 texcoord_dm = mix(tex_dm_a, tex_dm_b, gl_TessCoord.y);
+
+    position.z = texture(height_map, texcoord_hm).r * height_scale;
+
+    gl_Position               = position;
+    te_out.vertex.ws_position = ws_position;
+    te_out.vertex.texcoord_hm = texcoord_hm;
+    te_out.vertex.texcoord_dm = texcoord_dm;
+}
