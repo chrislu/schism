@@ -38,6 +38,9 @@ public:
     const string_type&      decorated_message() const;
     const string_type&      full_decorated_message() const;
 
+    const string_type&      postdec_decoration() const;
+    const string_type&      postdec_message() const;
+
 private:
     void                    decorate_message(const string_type& decoration,
                                              const string_type& in_message,
@@ -50,6 +53,9 @@ private:
     mutable string_type     _plain_message;
     mutable string_type     _decorated_message;
     mutable string_type     _full_decorated_message;
+
+    mutable string_type     _postdec_decoration;
+    mutable string_type     _postdec_message;
 
     time::date              _date;
     time::ptime             _time;
