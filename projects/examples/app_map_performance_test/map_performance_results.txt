@@ -1,0 +1,103 @@
+VC10 Release
+Timing boost::unordered_map<std::string, int>
+1: Insert       (456.2580msec 459.2840msec 456.6380msec 469.6860msec 499.7490msec 467.5050msec) 468.1867msec
+2: Lookup       (267.6520msec 263.7140msec 264.7560msec 267.7570msec 267.7000msec 265.6510msec) 266.2050msec
+3: Iterate      (28.3780msec 27.7920msec 27.9810msec 33.8380msec 27.7530msec 27.9450msec) 28.9478msec
+4: Erase        (171.4660msec 171.8740msec 172.6810msec 184.6810msec 169.2560msec 168.3900msec) 173.0580msec
+
+Timing std::tr1::unordered_map<std::string, int>
+1: Insert       (377.4100msec 374.9440msec 379.9370msec 382.7020msec 380.6720msec 375.8130msec) 378.5797msec
+2: Lookup       (196.1750msec 193.9180msec 193.1110msec 194.4190msec 194.4430msec 196.6740msec) 194.7900msec
+3: Iterate      (17.4440msec 21.2620msec 17.5670msec 17.5530msec 18.8480msec 17.8980msec) 18.4287msec
+4: Erase        (202.0210msec 203.0190msec 199.4510msec 202.5520msec 200.8100msec 198.5900msec) 201.0738msec
+
+Timing stdext::hash_map<std::string, int>
+1: Insert       (446.8480msec 447.9910msec 447.7410msec 446.3700msec 448.4240msec 445.3910msec) 447.1275msec
+2: Lookup       (249.7660msec 248.7000msec 249.4500msec 248.9710msec 248.9840msec 249.1440msec) 249.1692msec
+3: Iterate      (18.4520msec 22.7860msec 17.4860msec 18.1290msec 17.5560msec 17.6290msec) 18.6730msec
+4: Erase        (250.7300msec 253.9570msec 251.5220msec 252.3500msec 251.4450msec 252.5090msec) 252.0855msec
+
+Timing std::map<std::string, int>
+1: Insert       (960.6350msec 961.4900msec 964.6590msec 964.9430msec 956.4760msec 962.2670msec) 961.7450msec
+2: Lookup       (1570.5880msec 1573.7330msec 1582.6880msec 1569.5010msec 1576.4610msec 1566.9050msec) 1573.3127msec
+3: Iterate      (41.6660msec 43.0400msec 41.5400msec 42.1930msec 41.8620msec 42.3850msec) 42.1143msec
+4: Erase        (1180.4260msec 1192.3970msec 1178.2680msec 1186.6790msec 1180.1870msec 1196.3820msec) 1185.7232msec
+
+VC9 Release
+Timing boost::unordered_map<std::string, int>
+1: Insert       (552.4520msec 529.9260msec 518.9890msec 531.0950msec 520.5510msec 517.7140msec) 528.4545msec
+2: Lookup       (317.8080msec 315.7000msec 322.3600msec 346.4560msec 321.7230msec 358.1710msec) 330.3697msec
+3: Iterate      (48.5120msec 29.6290msec 30.3860msec 29.6600msec 33.7270msec 29.5140msec) 33.5713msec
+4: Erase        (211.2730msec 220.1440msec 217.3140msec 193.2660msec 195.4410msec 219.0050msec) 209.4072msec
+
+Timing std::tr1::unordered_map<std::string, int>
+1: Insert       (516.2730msec 488.0130msec 519.3800msec 515.8580msec 516.6970msec 489.0650msec) 507.5477msec
+2: Lookup       (397.9580msec 390.8790msec 415.5480msec 408.0390msec 418.9730msec 394.4270msec) 404.3040msec
+3: Iterate      (38.1020msec 35.1180msec 38.0340msec 37.6030msec 37.3250msec 37.5480msec) 37.2883msec
+4: Erase        (311.0870msec 329.8300msec 315.1710msec 320.9040msec 330.6590msec 322.9950msec) 321.7743msec
+
+Timing stdext::hash_map<std::string, int>
+1: Insert       (583.2470msec 545.4540msec 552.7290msec 580.2070msec 547.8530msec 576.4250msec) 564.3192msec
+2: Lookup       (429.1910msec 466.2960msec 457.0710msec 438.6970msec 460.7800msec 432.2130msec) 447.3747msec
+3: Iterate      (38.6220msec 36.8130msec 38.9670msec 38.3540msec 38.0020msec 38.0180msec) 38.1293msec
+4: Erase        (379.2290msec 350.8600msec 342.5300msec 358.3570msec 341.6140msec 340.6220msec) 352.2020msec
+
+Timing std::map<std::string, int>
+1: Insert       (1154.2900msec 1178.7310msec 1142.6240msec 1175.8870msec 1270.8170msec 1198.8740msec) 1186.8705msec
+2: Lookup       (1964.8280msec 1999.7860msec 2031.3230msec 2054.7750msec 2293.3910msec 1936.8760msec) 2046.8298msec
+3: Iterate      (45.2440msec 47.0220msec 47.3140msec 45.3050msec 49.1240msec 45.7460msec) 46.6258msec
+4: Erase        (1536.9470msec 1481.2400msec 1457.1500msec 1606.1800msec 1483.8140msec 1476.4800msec) 1506.9685msec
+
+string length 5-10 chars
+10000 strings/lookups, 10000 iterations
+
+Timing boost::unordered_map<std::string, int>
+1: Insert       () 1.83msec
+2: Lookup       () 1.26msec
+3: Iterate      () 0.06msec
+4: Erase        () 0.91msec
+
+Timing std::tr1::unordered_map<std::string, int>
+1: Insert       () 1.96msec
+2: Lookup       () 1.01msec
+3: Iterate      () 0.03msec
+4: Erase        () 1.18msec
+
+Timing stdext::hash_map<std::string, int>
+1: Insert       () 2.27msec
+2: Lookup       () 1.30msec
+3: Iterate      () 0.03msec
+4: Erase        () 1.40msec
+
+Timing std::map<std::string, int>
+1: Insert       () 3.39msec
+2: Lookup       () 4.34msec
+3: Iterate      () 0.09msec
+4: Erase        () 4.15msec
+
+key_type size_t
+10000 keys, 10000 iterations
+
+Timing boost::unordered_map<std::string, int>
+1: Insert       () 0.879785msec
+2: Lookup       () 0.351946msec
+3: Iterate      () 0.0631937msec
+4: Erase        () 0.440904msec
+
+Timing std::tr1::unordered_map<std::string, int>
+1: Insert       () 1.10616msec
+2: Lookup       () 0.427896msec
+3: Iterate      () 0.0315015msec
+4: Erase        () 0.67982msec
+
+Timing stdext::hash_map<std::string, int>
+1: Insert       () 1.11882msec
+2: Lookup       () 0.416305msec
+3: Iterate      () 0.0315652msec
+4: Erase        () 0.650236msec
+
+Timing std::map<std::string, int>
+1: Insert       () 1.2543msec
+2: Lookup       () 1.16971msec
+3: Iterate      () 0.0829935msec
+4: Erase        () 1.49042msec

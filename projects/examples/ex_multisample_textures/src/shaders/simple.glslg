@@ -1,0 +1,90 @@
+
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
+#version 420 core
+
+// input/output layout definitions ////////////////////////////////////////////////////////////////
+layout(triangles, invocations = 1) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+// input/output definitions ///////////////////////////////////////////////////////////////////////
+in per_vertex {
+    smooth vec3 os_position;
+    smooth vec3 os_normal;
+    smooth vec3 es_position;
+    smooth vec3 es_normal;
+    smooth vec2 texcoord;
+} v_in[];
+
+out per_vertex {
+    smooth vec3 es_position;
+    smooth vec3 es_normal;
+    smooth vec3 os_normal;
+    smooth vec3 os_tangent;
+    smooth vec3 os_binormal;
+    smooth vec2 texcoord;
+} v_out;
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+void main()
+{
+#if 1
+    vec3   P0 = v_in[0].os_position,
+           P1 = v_in[1].os_position,
+           P2 = v_in[2].os_position;
+    float  s0 = v_in[0].texcoord.s,
+           s1 = v_in[1].texcoord.s,
+           s2 = v_in[2].texcoord.s;
+    float  t0 = v_in[0].texcoord.t,
+           t1 = v_in[1].texcoord.t,
+           t2 = v_in[2].texcoord.t;
+
+    vec3 C  = t0*P1-t0*P2-t1*P0+t1*P2-t2*P1+t2*P0,
+         Cn = normalize(C),
+         D  = -s1*P0+s1*P2+s0*P1-s0*P2-s2*P1+s2*P0,
+         Dn = normalize(D);
+
+    for (int i = 0; i < gl_in.length(); ++i) {
+        gl_Position       = gl_in[i].gl_Position;
+
+        vec3 normal   = v_in[i].os_normal,
+             // T = cross(dPdt,N)
+             tangent  = cross(Dn,normal),
+             // B = cross(N,dPds)
+             binormal = cross(Cn,normal); // = cross(normal,-C)
+
+        v_out.os_normal   = normal;
+        v_out.os_tangent  = tangent;
+        v_out.os_binormal = binormal;
+
+        v_out.es_position = v_in[i].es_position;
+        v_out.es_normal   = v_in[i].es_normal;
+        v_out.texcoord    = v_in[i].texcoord;
+        EmitVertex();
+    }
+#else
+    vec3 d_xyz_du = v_in[1].os_position - v_in[0].os_position;
+    vec3 d_xyz_dv = v_in[2].os_position - v_in[0].os_position;
+    vec2 d_st_du  = v_in[1].texcoord - v_in[0].texcoord;
+    vec2 d_st_dv  = v_in[2].texcoord - v_in[0].texcoord;
+
+    vec3  tangent = normalize(d_st_dv.s * d_xyz_du - d_st_du.s * d_xyz_dv);
+    float area    = determinant(transpose(mat2(d_st_dv, d_st_du)));
+
+    tangent = (area >= 0.0) ? tangent : -tangent;
+
+    for (int i = 0; i < gl_in.length(); ++i) {
+        gl_Position       = gl_in[i].gl_Position;
+
+        v_out.os_normal   = v_in[i].os_normal;
+        v_out.os_tangent  = tangent;
+        v_out.os_binormal = cross(v_out.os_normal, tangent);
+
+        v_out.es_position = v_in[i].es_position;
+        v_out.es_normal   = v_in[i].es_normal;
+        v_out.texcoord    = v_in[i].texcoord;
+        EmitVertex();
+    }
+#endif
+}
