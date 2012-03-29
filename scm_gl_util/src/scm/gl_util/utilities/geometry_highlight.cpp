@@ -20,7 +20,7 @@
 
 namespace {
 std::string wire_v_source = "\
-    #version 330\n\
+    #version 330 core\n\
     \n\
     uniform mat4  in_mvp;\n\
     \n\
@@ -33,7 +33,7 @@ std::string wire_v_source = "\
     ";
 
 std::string wire_f_source = "\
-    #version 330\n\
+    #version 330 core\n\
     \n\
     uniform vec4 in_color;\n\
     layout(location = 0, index = 0) out vec4 out_color;\n\
@@ -44,7 +44,7 @@ std::string wire_f_source = "\
     ";
 
 std::string solid_v_source = "\
-    #version 330\n\
+    #version 330 core\n\
     \n\
     uniform mat4  in_mvp;\n\
     uniform mat4  in_mv_it;\n\
@@ -62,7 +62,7 @@ std::string solid_v_source = "\
     ";
 
 std::string solid_f_source = "\
-    #version 330\n\
+    #version 330 core \n\
     \n\
     uniform vec4 in_color;\n\
     \n\
@@ -72,11 +72,12 @@ std::string solid_f_source = "\
     \n\
     void main()\n\
     {\n\
-        vec3 n = normalize(normal);\n\
-        vec3 l = normalize(vec3(1.0));\n\
+        //vec3 n = normalize(normal);\n\
+        //vec3 l = normalize(vec3(1.0));\n\
         \n\
-        out_color.rgb = in_color.rgb * (dot(n, l) * 0.5 + 0.5);\n\
-        out_color.a = in_color.a;\n\
+        //out_color.rgb = in_color.rgb * (dot(n, l) * 0.5 + 0.5);\n\
+        //out_color.a = in_color.a;\n\
+        out_color = in_color;\n\
     }\n\
     ";
 
@@ -103,8 +104,10 @@ geometry_highlight::geometry_highlight(const gl::render_device_ptr& device)
         throw (std::runtime_error("geometry_highlight::geometry_highlight(): error creating shader programs."));
     }
 
+    _blend          = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
     _no_blend       = device->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
     _dstate_less    = device->create_depth_stencil_state(true, true, COMPARISON_LESS);
+    _dstate_noz     = device->create_depth_stencil_state(false, false, COMPARISON_LESS);
     _raster_no_cull = device->create_rasterizer_state(FILL_SOLID, CULL_NONE, ORIENT_CCW, true);
 
     if (   !_no_blend
@@ -120,8 +123,10 @@ geometry_highlight::~geometry_highlight()
     _wire_program.reset();
     _solid_program.reset();
     _dstate_less.reset();
+    _dstate_noz.reset();
     _raster_no_cull.reset();
     _no_blend.reset();
+    _blend.reset();
 }
 
 void
@@ -141,8 +146,57 @@ geometry_highlight::draw(const gl::render_context_ptr& context,
     context_program_guard       cpg(context);
     
     context->set_depth_stencil_state(_dstate_less);
-    context->set_blend_state(_no_blend);
     context->set_rasterizer_state(_raster_no_cull, line_width);
+
+    if (0.0f < color.a) {
+        context->set_blend_state(_blend);
+    }
+    else {
+        context->set_blend_state(_no_blend);
+    }
+
+    if (dm == gl::geometry::MODE_WIRE_FRAME) {
+        _wire_program->uniform("in_mvp", proj_matrix * view_matrix);
+        _wire_program->uniform("in_color", color);
+        
+        context->bind_program(_wire_program);
+        geom->draw(context, geometry::MODE_WIRE_FRAME);
+    }
+    else if (dm == gl::geometry::MODE_SOLID) {
+        _solid_program->uniform("in_mvp", proj_matrix * view_matrix);
+        _solid_program->uniform("in_mv_it", transpose(inverse(view_matrix)));
+        _solid_program->uniform("in_color", color);
+
+        context->bind_program(_solid_program);
+        geom->draw(context, geometry::MODE_SOLID);
+    }
+}
+
+void
+geometry_highlight::draw_overlay(const gl::render_context_ptr& context,
+                                 const gl::geometry_ptr&       geom,
+                                 const math::mat4f&            proj_matrix,
+                                 const math::mat4f&            view_matrix,
+                                 const gl::geometry::draw_mode dm,
+                                 const math::vec4f&            color,
+                                 const float                   line_width)
+{
+    using namespace scm;
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    context_state_objects_guard csg(context);
+    context_program_guard       cpg(context);
+    
+    context->set_depth_stencil_state(_dstate_noz);
+    context->set_rasterizer_state(_raster_no_cull, line_width);
+
+    if (0.0f < color.a) {
+        context->set_blend_state(_blend);
+    }
+    else {
+        context->set_blend_state(_no_blend);
+    }
 
     if (dm == gl::geometry::MODE_WIRE_FRAME) {
         _wire_program->uniform("in_mvp", proj_matrix * view_matrix);

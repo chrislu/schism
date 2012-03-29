@@ -36,13 +36,22 @@ public:
                          const gl::geometry::draw_mode dm,
                          const math::vec4f&            color      = math::vec4f(1.0f),
                          const float                   line_width = 1.0f);
+    void            draw_overlay(const gl::render_context_ptr& context,
+                                 const gl::geometry_ptr&       geom,
+                                 const math::mat4f&            proj_matrix,
+                                 const math::mat4f&            view_matrix,
+                                 const gl::geometry::draw_mode dm,
+                                 const math::vec4f&            color      = math::vec4f(1.0f),
+                                 const float                   line_width = 1.0f);
 
 private:
     gl::program_ptr                 _wire_program;
     gl::program_ptr                 _solid_program;
     gl::depth_stencil_state_ptr     _dstate_less;
+    gl::depth_stencil_state_ptr     _dstate_noz;
     gl::rasterizer_state_ptr        _raster_no_cull;
     gl::blend_state_ptr             _no_blend;
+    gl::blend_state_ptr             _blend;
 }; // geometry_highlight
 
 } // namespace gl
