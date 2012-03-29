@@ -163,7 +163,7 @@ stream_capture_array::operator()(const interleaved_stream_capture& capture)
 void
 stream_capture_array::append_capture(const std::string& varying_name) // appends a separate capture object
 {
-    _stream_captures.push_back(make_shared<separate_stream_capture>(varying_name));
+    _stream_captures.push_back(scm::make_shared<separate_stream_capture>(varying_name));
     _captures_count += 1;
 }
 
