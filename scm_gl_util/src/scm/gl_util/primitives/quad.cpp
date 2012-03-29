@@ -10,8 +10,11 @@
 
 #include <scm/core/memory.h>
 
+#include <scm/gl_core/log.h>
+
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
+#include <scm/gl_core/buffer_objects/scoped_buffer_map.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/buffer_objects/vertex_array.h>
 #include <scm/gl_core/buffer_objects/vertex_format.h>
@@ -39,7 +42,6 @@ quad_geometry::quad_geometry(const render_device_ptr& in_device,
 
     int num_vertices            = 4;
 
-    scoped_array<vertex>            vert(new vertex[num_vertices]);
     scoped_array<unsigned short>    ind_s(new unsigned short[4]);
     scoped_array<unsigned short>    ind_w(new unsigned short[4]);
 
@@ -99,6 +101,28 @@ quad_geometry::update(const render_context_ptr& in_context,
                       const math::vec2f&        in_min_texcoord,
                       const math::vec2f&        in_max_texcoord)
 {
+    using namespace scm::math;
+
+    scoped_buffer_map vb_map(in_context, _vertices, ACCESS_WRITE_INVALIDATE_BUFFER);
+
+    if (!vb_map) {
+        glerr() << log::error
+                << "quad_geometry::update(): unable to map vertex buffer." << log::end;
+        return;
+    }
+
+    vertex*const    data = reinterpret_cast<vertex*const>(vb_map.data_ptr());
+     
+    const vec2f& o = in_min_vertex;
+    const vec2f& l = in_max_vertex;
+
+    const vec2f& ot = in_min_texcoord;
+    const vec2f& lt = in_max_texcoord;
+
+    data[0].pos = vec3f(o.x, o.y, 0.0f); data[0].tex = vec2f(ot.x, ot.y);
+    data[1].pos = vec3f(l.x, o.y, 0.0f); data[1].tex = vec2f(lt.x, ot.y);
+    data[2].pos = vec3f(o.x, l.y, 0.0f); data[2].tex = vec2f(ot.x, lt.y);
+    data[3].pos = vec3f(l.x, l.y, 0.0f); data[3].tex = vec2f(lt.x, lt.y);
 }
 
 void
