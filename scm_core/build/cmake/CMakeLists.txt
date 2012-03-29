@@ -93,15 +93,19 @@ endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(WIN32
+    optimized libboost_chrono-${SCM_BOOST_MT_REL}           debug libboost_chrono-${SCM_BOOST_MT_DBG}
     optimized libboost_date_time-${SCM_BOOST_MT_REL}        debug libboost_date_time-${SCM_BOOST_MT_DBG}
     optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
     optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
     optimized libboost_system-${SCM_BOOST_MT_REL}           debug libboost_system-${SCM_BOOST_MT_DBG}
+    optimized libboost_timer-${SCM_BOOST_MT_REL}            debug libboost_timer-${SCM_BOOST_MT_DBG}
 )
 scm_link_libraries(UNIX
     rt
+    boost_chrono${SCM_BOOST_MT_REL}
     boost_date_time${SCM_BOOST_MT_REL}
     boost_filesystem${SCM_BOOST_MT_REL}
     boost_program_options${SCM_BOOST_MT_REL}
     boost_system${SCM_BOOST_MT_REL}
+    boost_timer${SCM_BOOST_MT_REL}
 )

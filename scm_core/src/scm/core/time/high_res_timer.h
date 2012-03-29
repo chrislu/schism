@@ -2,7 +2,6 @@
 // Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
 // Distributed under the Modified BSD License, see license.txt.
 
-
 #ifndef HIGH_RES_TIMER_H_INCLUDED
 #define HIGH_RES_TIMER_H_INCLUDED
 
