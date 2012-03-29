@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef PROGRAM_OBJECT_H_INCLUDED
 #define PROGRAM_OBJECT_H_INCLUDED
 

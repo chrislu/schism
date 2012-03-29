@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef AXES_COMPASS_H_INCLUDED
 #define AXES_COMPASS_H_INCLUDED
 

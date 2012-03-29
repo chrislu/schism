@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef VOLUME_GENERATOR_CHECKERBOARD_H_INCLUDED
 #define VOLUME_GENERATOR_CHECKERBOARD_H_INCLUDED
 

@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef TEXTURE_1D_H_INCLUDED
 #define TEXTURE_1D_H_INCLUDED
 

@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef VOLUME_TEXTURED_UNIT_CUBE_H_INCLUDED
 #define VOLUME_TEXTURED_UNIT_CUBE_H_INCLUDED
 
