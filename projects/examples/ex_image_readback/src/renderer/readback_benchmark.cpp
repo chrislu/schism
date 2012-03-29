@@ -775,6 +775,11 @@ readback_benchmark::update(const gl::render_context_ptr& context,
     static double tex_tp_cpu    = 0.0;
 
     if (time::to_milliseconds(_cpu_timer_frame.accumulated_duration()) > 500.0) {
+        _gpu_timer_draw->update(0);
+        _gpu_timer_read->update(0);
+        _gpu_timer_copy->update(0);
+        _gpu_timer_tex->update(0);
+
         draw_time = _gpu_timer_draw->average_time(time::timer_base::msec);
 
         read_time = _gpu_timer_read->average_time(time::timer_base::msec);
