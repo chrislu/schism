@@ -14,10 +14,10 @@
 
 #include <scm/core.h>
 
-#include <scm/gl_util/window_management/wm_fwd.h>
-#include <scm/gl_util/window_management/context.h>
-#include <scm/gl_util/window_management/display.h>
-#include <scm/gl_util/window_management/window.h>
+#include <scm/gl_core/window_management/wm_fwd.h>
+#include <scm/gl_core/window_management/context.h>
+#include <scm/gl_core/window_management/display.h>
+#include <scm/gl_core/window_management/window.h>
 
 bool output_device_info()
 {
