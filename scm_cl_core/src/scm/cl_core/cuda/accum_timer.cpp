@@ -29,6 +29,8 @@ namespace util {
 accum_timer::accum_timer()
   : time::accum_timer_base()
   , _cu_event_finished(true)
+  , _cu_event_srecorded(false)
+  , _cu_event_erecorded(false)
   , _cu_event_stream(0)
   , _cpu_timer()
 {
@@ -61,6 +63,7 @@ accum_timer::start(cudaStream_t cu_stream)
 
         cudaError e = cudaSuccess;
         e = cudaEventRecord(_cu_event_start, cu_stream);
+        _cu_event_srecorded = true;
         assert(cudaSuccess == e);
         _cu_event_stream = cu_stream;
     }
@@ -72,6 +75,7 @@ accum_timer::stop()
     if (_cu_event_finished) {
         cudaError e = cudaSuccess;
         e = cudaEventRecord(_cu_event_stop, _cu_event_stream);
+        _cu_event_erecorded = true;
         assert(cudaSuccess == e);
         _cpu_timer.stop();
     }
@@ -85,7 +89,7 @@ accum_timer::collect()
     if (cudaErrorNotReady == f) {
         _cu_event_finished = false;
     }
-    else if (cudaSuccess == f) {
+    else if ((cudaSuccess == f) && (_cu_event_erecorded && _cu_event_srecorded)) {
         cudaError e = cudaStreamSynchronize(_cu_event_stream);
         assert(cudaSuccess == e);
 
@@ -110,7 +114,9 @@ accum_timer::collect()
         _detailed_accumulated_time.system += _detailed_last_time.system;
 
         ++_accumulation_count;
-        _cu_event_finished = true;
+        _cu_event_finished  = true;
+        _cu_event_srecorded = false;
+        _cu_event_erecorded = false;
     }
     else {
         err() << "accum_timer::collect() "
@@ -121,31 +127,36 @@ accum_timer::collect()
 void
 accum_timer::force_collect()
 {
-    cudaError e = cudaStreamSynchronize(_cu_event_stream);
-    assert(cudaSuccess == e);
+    if (_cu_event_erecorded && _cu_event_srecorded) {
 
-    float cu_copy_time = 0.0f;
-    e = cudaEventElapsedTime(&cu_copy_time, _cu_event_start, _cu_event_stop);
-    assert(cudaSuccess == e);
+        cudaError e = cudaStreamSynchronize(_cu_event_stream);
+        assert(cudaSuccess == e);
 
-    int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
-    time::cpu_timer::cpu_times t = _cpu_timer.detailed_elapsed();
+        float cu_copy_time = 0.0f;
+        e = cudaEventElapsedTime(&cu_copy_time, _cu_event_start, _cu_event_stop);
+        assert(cudaSuccess == e);
 
-    _last_time         = static_cast<nanosec_type>(ns);
-    _accumulated_time += _last_time;
+        int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
+        time::cpu_timer::cpu_times t = _cpu_timer.detailed_elapsed();
 
-    _detailed_last_time.cuda   = _last_time;
-    _detailed_last_time.wall   = t.wall;
-    _detailed_last_time.user   = t.user;
-    _detailed_last_time.system = t.system;
+        _last_time         = static_cast<nanosec_type>(ns);
+        _accumulated_time += _last_time;
 
-    _detailed_accumulated_time.cuda   += _detailed_last_time.cuda;
-    _detailed_accumulated_time.wall   += _detailed_last_time.wall;
-    _detailed_accumulated_time.user   += _detailed_last_time.user;
-    _detailed_accumulated_time.system += _detailed_last_time.system;
+        _detailed_last_time.cuda   = _last_time;
+        _detailed_last_time.wall   = t.wall;
+        _detailed_last_time.user   = t.user;
+        _detailed_last_time.system = t.system;
 
-    ++_accumulation_count;
-    _cu_event_finished = true;
+        _detailed_accumulated_time.cuda   += _detailed_last_time.cuda;
+        _detailed_accumulated_time.wall   += _detailed_last_time.wall;
+        _detailed_accumulated_time.user   += _detailed_last_time.user;
+        _detailed_accumulated_time.system += _detailed_last_time.system;
+
+        ++_accumulation_count;
+        _cu_event_finished  = true;
+        _cu_event_srecorded = false;
+        _cu_event_erecorded = false;
+    }
 }
 
 void
@@ -177,7 +188,9 @@ void
 accum_timer::reset()
 {
     time::accum_timer_base::reset();
-    _cu_event_finished    = false;
+    _cu_event_finished  = true;
+    _cu_event_srecorded = false;
+    _cu_event_erecorded = false;
 
     _detailed_accumulated_time.cuda   = 
     _detailed_accumulated_time.wall   = 

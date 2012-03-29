@@ -59,6 +59,8 @@ public:
 
 protected:
     bool                    _cu_event_finished;
+    bool                    _cu_event_srecorded;
+    bool                    _cu_event_erecorded;
     cudaEvent_t             _cu_event_start;
     cudaEvent_t             _cu_event_stop;
     cudaStream_t            _cu_event_stream;
