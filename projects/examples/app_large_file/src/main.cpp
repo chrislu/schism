@@ -15,7 +15,7 @@
 #include <scm/log.h>
 #include <scm/core/pointer_types.h>
 #include <scm/core/io/file.h>
-#include <scm/core/time/accumulate_timer.h>
+#include <scm/core/time/accum_timer.h>
 #include <scm/core/time/high_res_timer.h>
 
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     std::ios_base::sync_with_stdio(false);
     scm::shared_ptr<scm::core>      scm_core(new scm::core(argc, argv));
 
-    typedef scm::time::accumulate_timer<scm::time::high_res_timer>  timer_type;
+    typedef scm::time::accum_timer<scm::time::high_res_timer>  timer_type;
 
     // what we now try is to generate a very large file
     //  - check if it is written correctly by reading it back!
@@ -85,8 +85,7 @@ int main(int argc, char **argv)
     std::cout << "starting to write file..." << std::endl;
     write_timer.start();
     for (file::size_type out_pos = 0; out_pos < out_block_count; ++out_pos) {
-        out_file->seek(out_positions[out_pos], std::ios_base::beg);
-        if (out_file->write(out_buffer.get(), out_block_size) != out_block_size) {
+        if (out_file->write(out_buffer.get(), out_positions[out_pos], out_block_size) != out_block_size) {
             std::cerr << "error writing to file at position: " << out_pos * out_block_size << std::endl;
         }
         if (out_pos % (out_block_count / 100) == 0) {
@@ -123,8 +122,7 @@ int main(int argc, char **argv)
 
     std::cout << "starting to reading file..." << std::endl;
     for (file::size_type in_pos = 0; in_pos < out_block_count; ++in_pos) {
-        in_file->seek(in_pos * out_block_size, std::ios_base::beg);
-        if (in_file->read(in_buffer.get(), out_block_size) != out_block_size) {
+        if (in_file->read(in_buffer.get(), in_pos * out_block_size, out_block_size) != out_block_size) {
             std::cerr << "error reading to file at position: " << in_pos * out_block_size << std::endl;
         }
         if (in_pos % (out_block_count / 100) == 0) {
