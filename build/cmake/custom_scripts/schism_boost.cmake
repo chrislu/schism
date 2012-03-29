@@ -103,8 +103,8 @@ IF (        SCM_BOOST_INC_DIR
                                                 "${CMAKE_SHARED_LIBRARY_PREFIX}boost_filesystem-mt${CMAKE_SHARED_LIBRARY_SUFFIX}${SCM_BOOST_LIB_SUFFIX}"
                                                 "${CMAKE_SHARED_LIBRARY_PREFIX}boost_filesystem${CMAKE_SHARED_LIBRARY_SUFFIX}${SCM_BOOST_LIB_SUFFIX}")
     elseif (WIN32)
-        LIST(APPEND _SCM_BOOST_FILESYSTEM_LIB   "${CMAKE_SHARED_LIBRARY_PREFIX}boost_filesystem-${SCM_COMPILER_SUFFIX}-mt-${SCM_BOOST_LIB_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}"
-                                                "${CMAKE_SHARED_LIBRARY_PREFIX}boost_filesystem-mt${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        LIST(APPEND _SCM_BOOST_FILESYSTEM_LIB   "${CMAKE_STATIC_LIBRARY_PREFIX}libboost_filesystem-${SCM_COMPILER_SUFFIX}-mt-${SCM_BOOST_LIB_VERSION}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+                                                "${CMAKE_STATIC_LIBRARY_PREFIX}libboost_filesystem-mt${CMAKE_STATIC_LIBRARY_SUFFIX}")
     endif (UNIX)
 
 
