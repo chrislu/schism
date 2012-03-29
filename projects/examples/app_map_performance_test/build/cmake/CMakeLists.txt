@@ -1,4 +1,7 @@
 
+# Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+# Distributed under the Modified BSD License, see license.txt.
+
 PROJECT(app_map_performance_test)
 
 include(schism_project)

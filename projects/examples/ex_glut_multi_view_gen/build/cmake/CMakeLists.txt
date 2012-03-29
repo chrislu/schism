@@ -1,4 +1,7 @@
 
+# Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+# Distributed under the Modified BSD License, see license.txt.
+
 project(ex_glut_multi_view_gen)
 
 include(schism_project)

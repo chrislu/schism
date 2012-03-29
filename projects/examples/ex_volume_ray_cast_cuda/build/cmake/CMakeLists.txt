@@ -1,4 +1,7 @@
 
+# Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+# Distributed under the Modified BSD License, see license.txt.
+
 project(ex_volume_ray_cast_cuda)
 
 include(schism_project)

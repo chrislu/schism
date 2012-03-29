@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef SCM_LARGE_DATA_OPENCL_VOLUME_DATA_H_INCLUDED
 #define SCM_LARGE_DATA_OPENCL_VOLUME_DATA_H_INCLUDED
 

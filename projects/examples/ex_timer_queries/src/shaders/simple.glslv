@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #version 420 core
 
 out vec3 normal;

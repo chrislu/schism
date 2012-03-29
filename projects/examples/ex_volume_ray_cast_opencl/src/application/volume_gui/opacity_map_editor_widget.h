@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef opacity_map_editor_WIDGET_H_INCLUDED
 #define opacity_map_editor_WIDGET_H_INCLUDED
 

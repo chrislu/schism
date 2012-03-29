@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef HEIGHT_FIELD_TESSELLATION_APPLICATION_H_INCLUDED
 #define HEIGHT_FIELD_TESSELLATION_APPLICATION_H_INCLUDED
 

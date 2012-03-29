@@ -1,4 +1,7 @@
 
+// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
 #ifndef IMAGE_RENDERING_DRAW_HELPERS_H_INCLUDED
 #define IMAGE_RENDERING_DRAW_HELPERS_H_INCLUDED
 
