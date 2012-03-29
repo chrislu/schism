@@ -141,7 +141,12 @@ profiling_host::cu_start(const std::string& tname, const cu::cuda_command_stream
 
         assert(0 != t);
 
-        t->start(cu_stream->stream());
+        if (cu_stream) {
+            t->start(cu_stream->stream());
+        }
+        else {
+            t->start();
+        }
     }
 }
 
