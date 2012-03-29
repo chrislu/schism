@@ -7,10 +7,10 @@ include(schism_platform)
 option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math calculations"  ON)
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
-#todo make gencode variable
-set(SCM_CUDA_NVCC_OPTIONS "--gpu-architecture=\"compute_20\" --gpu-code=\"sm_20,compute_20\" --optimize 3 --use-local-env --cl-version 2010 --compile" CACHE STRING "schism cuda internal" FORCE)
 
 if (WIN32)
+    #todo make gencode variable
+    set(SCM_CUDA_NVCC_OPTIONS "--gpu-architecture=\"compute_20\" --gpu-code=\"sm_20,compute_20\" --optimize 3 --use-local-env --cl-version 2010 --compile" CACHE STRING "schism cuda internal" FORCE)
     set(SCM_CUDA_NVCC_PATH                  ${GLOBAL_EXT_DIR}/bin/cuda           CACHE PATH   "schism cuda internal")
 	#message(${SCHISM_PLATFORM})
 	#message(${PLATFORM_WIN64})
@@ -20,7 +20,9 @@ if (WIN32)
         set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS}  "--machine 32 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\""  CACHE STRING "schism cuda internal" FORCE)
 	endif (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
 elseif (UNIX)
-    set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/bin                CACHE PATH   "schism cuda internal")
+   #todo make gencode variable
+   set(SCM_CUDA_NVCC_OPTIONS --gpu-architecture=compute_20 --gpu-code=sm_20,compute_20 --optimize 3 --compile CACHE STRING "schism cuda internal" FORCE)
+    set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/cuda/bin                CACHE PATH   "schism cuda internal")
     # set(CUDA_NVCC_OPTIONS              -ccbin \"/usr/bin\")
 endif (WIN32)
 
@@ -31,13 +33,19 @@ string(REPLACE " " "," SCM_CUDA_NVCC_CXX_FLAGS          ${CMAKE_CXX_FLAGS})
 string(REPLACE " " "," SCM_CUDA_NVCC_CXX_FLAGS_RELEASE  ${CMAKE_CXX_FLAGS_RELEASE})
 string(REPLACE " " "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${CMAKE_CXX_FLAGS_DEBUG})
 
+string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS          ${SCM_CUDA_NVCC_CXX_FLAGS})
+string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_RELEASE  ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE})
+string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG})
+
 set(SCM_CUDA_NVCC_DEFINITIONS           "")
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES   "")
 
 set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
 
 if (SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES)
-    set(SCM_CUDA_NVCC_OPTIONS "${SCM_CUDA_NVCC_OPTIONS} --keep-dir \"x64\\Release\"" CACHE STRING "schism cuda internal" FORCE)
+    if (WIN32)
+        set(SCM_CUDA_NVCC_OPTIONS "${SCM_CUDA_NVCC_OPTIONS} --keep-dir \"x64\\Release\"" CACHE STRING "schism cuda internal" FORCE)
+    endif (WIN32)
 endif(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES)
 
 if (SCHISM_CUDA_BUILD_USE_FAST_MATH)
@@ -57,9 +65,11 @@ macro(scm_cuda_definitions)
 endmacro(scm_cuda_definitions)
 
 # add the nvcc command to all .cu files
-macro(scm_cuda_add_nvcc_prepass)
+macro(scm_cuda_add_nvcc_prepass SCM_CUDA_OUTPUT_FILES)
     set(input_file_list  ${ARGV})
     set(output_file_list )
+
+    list(REMOVE_AT input_file_list 0)
 
 	set(inc_dir_list_name "${PROJECT_NAME}_INCLUDE_DIRS")
 	set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES ${${inc_dir_list_name}} ${SCM_CUDA_NVCC_INCLUDE_DIRECTORIES})
@@ -113,7 +123,9 @@ macro(scm_cuda_add_nvcc_prepass)
 
         endif (input_file_ext STREQUAL ".cu")
     endforeach(input_file)
-
+#message(${output_file_list})
     set_source_files_properties(${output_file_list} PROPERTIES GENERATED TRUE)
+    set(${SCM_CUDA_OUTPUT_FILES} ${output_file_list})
+#message(${${SCM_CUDA_OUTPUT_FILES}})
 
 endmacro(scm_cuda_add_nvcc_prepass)

@@ -31,7 +31,7 @@ struct volume_uniform_data
     vec4         _sampling_distance;  // yzw unused
     vec4         _os_camera_position;
     vec4         _value_range;
-
+    
     float4x4     _m_matrix;
     float4x4     _m_matrix_inverse;
     float4x4     _m_matrix_inverse_transpose;

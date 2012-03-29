@@ -169,7 +169,7 @@ application_window::init_renderer()
     cmap.add_stop(1.0f, vec3f(1.0f, 0.0f, 0.0f));
 #endif
 
-    //std::string vfile = "/home/chrislu/devel/data/wfarm_200_w512_h439_d512_c1_b8.raw";
+    std::string vfile = "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw";
     //std::string vfile = "e:/data/volume/vrgeo/parihaka/pari_full_rm_8float_bri.sgy";
     //std::string vfile = "Z:/volume_data/vrgeo/parihaka_new_zealand/source_data/volume/pari_full_rm_8float_bri.vol";
     //std::string vfile = "e:/data/volume/vrgeo/new_zealand/volumes/pari_full_rm_8float_bri_TRIMMED.vol";
@@ -182,8 +182,8 @@ application_window::init_renderer()
         _coord_cross      = make_shared<coordinate_cross>(device, 0.15f);
         _volume_highlight = make_shared<geometry_highlight>(device);
 
-        //_volume_data.reset(new volume_data(device, vfile, cmap, amap));
-        //_volume_data_cuda.reset(new cuda_volume_data(device, _volume_data));
+        _volume_data.reset(new volume_data(device, vfile, cmap, amap));
+        _volume_data_cuda.reset(new cuda_volume_data(device, _volume_data));
 
         _volume_renderer.reset(new volume_renderer(device, _viewport_size));
         _volume_renderer_cuda.reset(new cuda_volume_renderer(device, _viewport_size));

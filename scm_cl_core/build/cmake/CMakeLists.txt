@@ -49,7 +49,8 @@ scm_project_include_directories(UNIX /opt/OpenCL/include
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                    ${SCM_BOOST_LIB_DIR})
 scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
-scm_project_link_directories(UNIX  /opt/cuda/current/cuda/lib64)
+scm_project_link_directories(UNIX  /opt/cuda/current/cuda/lib64
+                                   /usr/lib/nvidia-current)
 
 if (WIN32)
     # add preprocessor defines

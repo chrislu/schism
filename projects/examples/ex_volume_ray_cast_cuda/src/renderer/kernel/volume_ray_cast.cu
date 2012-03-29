@@ -11,7 +11,7 @@
 
 #include <renderer/volume_uniform_data.h>
 
-#define SCM_LDATA_CUDA_VIS_PROFILE_CLOCK 0
+#define SCM_LDATA_CUDA_VIS_PROFILE_CLOCK 0 
 #define SCM_LDATA_CUDA_VIS_ITER_COUNT    0
 #define SCM_LDATA_CUDA_VIS_DEBUG         0
 
@@ -23,7 +23,7 @@ texture<uchar4,        cudaTextureType1D, cudaReadModeNormalizedFloat> colormap_
 //texture<float,  cudaTextureType3D, cudaReadModeElementType> volume_texture;
 //texture<float4, cudaTextureType1D, cudaReadModeElementType> colormap_texture;
 
-__device__ __constant__ const volume_uniform_data uniform_data;
+__device__ __constant__ volume_uniform_data uniform_data;
 
 // helpers
 inline __device__ float4 min(float4 a, float4 b) { return make_float4(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w)); }
@@ -216,10 +216,10 @@ main_vrc(unsigned out_image_w, unsigned out_image_h)
 #endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
 
         uchar4 out_col_data;
-        out_col_data.x = unsigned char(out_color.x * 255.0f);
-        out_col_data.y = unsigned char(out_color.y * 255.0f);
-        out_col_data.z = unsigned char(out_color.z * 255.0f);
-        out_col_data.w = unsigned char(out_color.w * 255.0f);
+        out_col_data.x = (unsigned char)(out_color.x * 255.0f);
+        out_col_data.y = (unsigned char)(out_color.y * 255.0f);
+        out_col_data.z = (unsigned char)(out_color.z * 255.0f);
+        out_col_data.w = (unsigned char)(out_color.w * 255.0f);
 
         surf2Dwrite(out_col_data, out_image, opos.x * sizeof(uchar4), opos.y);
     }

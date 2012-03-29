@@ -50,9 +50,10 @@ scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_QT_INC_DIR})
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
-	                                  ${GLOBAL_EXT_DIR}/inc/cuda
+                                      ${GLOBAL_EXT_DIR}/inc/cuda
                                       ${GLOBAL_EXT_DIR}/inc/freeimage)
-scm_project_include_directories(UNIX  /opt/OpenCL/include)
+scm_project_include_directories(UNIX  /opt/OpenCL/include
+                                      /opt/cuda/current/cuda/include)
 
 #scm_cuda_project_include_directories( ${GLOBAL_EXT_DIR}/inc
 #                                      ${GLOBAL_EXT_DIR}/inc/cuda)
@@ -62,13 +63,18 @@ scm_project_include_directories(UNIX  /opt/OpenCL/include)
 scm_project_link_directories(ALL      ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                       ${SCM_BOOST_LIB_DIR}
                                       ${SCM_QT_LIB_DIR})
+scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64
+                                      /usr/lib/nvidia-current)
 
 #scm_project_link_directories(WIN32    ${GLOBAL_EXT_DIR}/lib)
 #scm_project_link_directories(UNIX     )
 
 # add/create library
-scm_cuda_add_nvcc_prepass(${SOURCE_FILES})
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+#set(cu_output "")
+#message(${KERNEL_FILES})
+scm_cuda_add_nvcc_prepass(cu_output ${KERNEL_FILES})
+#message(${cu_output})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${cu_output})
 
 # link libraries
 scm_link_libraries(ALL
