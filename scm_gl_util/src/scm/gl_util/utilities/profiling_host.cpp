@@ -377,52 +377,49 @@ scoped_timer::~scoped_timer()
 
 profiling_result::profiling_result(const profiling_host_cptr& host,
                                    const std::string&         tname,
-                                         time_unit            tunit)
+                                         time::time_io        unit)
   : _phost(host)
   , _tname(tname)
-  , _tunit(tunit)
   , _dsize(0)
-  , _dunit(time::timer_base::MiBps)
+  , _unit(unit)
 {
 }
 
 profiling_result::profiling_result(const profiling_host_cptr& host,
                                    const std::string&         tname,
                                          scm::size_t          dsize,
-                                         time_unit            tunit,
-                                         throughput_unit      d_unit)
+                                         time::time_io        unit)
   : _phost(host)
   , _tname(tname)
-  , _tunit(tunit)
   , _dsize(dsize)
-  , _dunit(d_unit)
+  , _unit(unit)
 {
 }
 
 std::string
 profiling_result::unit_string() const
 {
-    return time::timer_base::time_unit_string(_tunit);
+    return time::time_io::time_unit_string(_unit._t_unit);
 }
 
 std::string
 profiling_result::throughput_string() const
 {
-    return time::timer_base::throughput_unit_string(_dunit);
+    return time::time_io::throughput_unit_string(_unit._tp_unit);
 }
 
 double
 profiling_result::time() const
 {
     profiling_host::nanosec_type d = _phost->time(_tname);
-    return time::timer_base::to_time_unit(_tunit, d);
+    return time::time_io::to_time_unit(_unit._t_unit, d);
 }
 
 double
 profiling_result::throughput() const
 {
     profiling_host::nanosec_type d = _phost->time(_tname);
-    return time::timer_base::to_throughput_unit(_dunit, d, _dsize);
+    return time::time_io::to_throughput_unit(_unit._tp_unit, d, _dsize);
 }
 
 std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
@@ -449,10 +446,10 @@ std::ostream& operator<<(std::ostream& os, const profiling_result& pres)
 
                 if (dynamic_pointer_cast<cpu_accum_timer>(t)) {
                     os << std::setw(6) << std::left  << pres._phost->timer_prefix_string(pres._tname);// << ""
-                    t->report(os, pres._dsize, pres._tunit, pres._dunit);
+                    t->report(os, pres._dsize, pres._unit);
                 }
                 else {
-                    t->detailed_report(os, pres._dsize, pres._tunit, pres._dunit);
+                    t->detailed_report(os, pres._dsize, pres._unit);
                 }
             }
         }

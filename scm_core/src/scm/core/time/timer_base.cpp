@@ -16,13 +16,13 @@ timer_base::~timer_base()
 }
 
 double
-timer_base::elapsed(time_unit tu) const
+timer_base::elapsed(time_io::time_unit tu) const
 {
-    return to_time_unit(tu, elapsed());
+    return time_io::to_time_unit(tu, elapsed());
 }
 
 double
-timer_base::to_time_unit(time_unit tu, nanosec_type t)
+time_io::to_time_unit(time_unit tu, nanosec_type t)
 {
     switch (tu) {
         case sec:  return static_cast<double>(t) * 0.000000001;
@@ -34,7 +34,7 @@ timer_base::to_time_unit(time_unit tu, nanosec_type t)
 }
 
 double
-timer_base::to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d)
+time_io::to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d)
 {
     double b = static_cast<double>(d);
     double s = to_time_unit(sec, t);
@@ -50,7 +50,7 @@ timer_base::to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d)
 }
 
 std::string
-timer_base::time_unit_string(time_unit tu)
+time_io::time_unit_string(time_unit tu)
 {
     std::string r;
 
@@ -66,7 +66,7 @@ timer_base::time_unit_string(time_unit tu)
 }
 
 std::string
-timer_base::throughput_unit_string(throughput_unit tu)
+time_io::throughput_unit_string(throughput_unit tu)
 {
     std::string r;
 

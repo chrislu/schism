@@ -30,18 +30,10 @@ public:
     nanosec_type        elapsed() const;
     cpu_times           detailed_elapsed() const;
 
-    void                report(std::ostream&   os,
-                               time_unit       tunit  = msec) const;
-    void                report(std::ostream&   os,
-                               size_t          dsize,
-                               time_unit       tunit  = msec,
-                               throughput_unit tpunit = MiBps) const;
-    void                detailed_report(std::ostream&   os,
-                                        time_unit       tunit  = msec) const;
-    void                detailed_report(std::ostream&   os,
-                                        size_t          dsize,
-                                        time_unit       tunit  = msec,
-                                        throughput_unit tpunit = MiBps) const;
+    void                report(std::ostream& os,               time_io unit = time_io(time_io::msec))                 const;
+    void                report(std::ostream& os, size_t dsize, time_io unit = time_io(time_io::msec, time_io::MiBps)) const;
+    void                detailed_report(std::ostream& os,               time_io unit  = time_io(time_io::msec))                 const;
+    void                detailed_report(std::ostream& os, size_t dsize, time_io unit  = time_io(time_io::msec, time_io::MiBps)) const;
 
 protected:
     boost::timer::cpu_timer _timer;

@@ -67,21 +67,21 @@ accum_timer_base::average_time() const
 }
 
 double
-accum_timer_base::last_time(timer_base::time_unit tu) const
+accum_timer_base::last_time(time_io::time_unit tu) const
 {
-    return timer_base::to_time_unit(tu, last_time());
+    return time_io::to_time_unit(tu, last_time());
 }
 
 double
-accum_timer_base::accumulated_time(timer_base::time_unit tu) const
+accum_timer_base::accumulated_time(time_io::time_unit tu) const
 {
-    return timer_base::to_time_unit(tu, accumulated_time());
+    return time_io::to_time_unit(tu, accumulated_time());
 }
 
 double
-accum_timer_base::average_time(timer_base::time_unit tu) const
+accum_timer_base::average_time(time_io::time_unit tu) const
 {
-    return timer_base::to_time_unit(tu, average_time());
+    return time_io::to_time_unit(tu, average_time());
 }
 
 } // namespace time

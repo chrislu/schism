@@ -123,17 +123,13 @@ private: // declared, never defined
 
 struct __scm_export(gl_util) profiling_result
 {
-    typedef time::timer_base::time_unit       time_unit;
-    typedef time::timer_base::throughput_unit throughput_unit;
-
     profiling_result(const profiling_host_cptr& host,
                      const std::string&         tname,
-                           time_unit            tunit = time::timer_base::msec);
+                           time::time_io        unit   = time::time_io(time::time_io::msec));
     profiling_result(const profiling_host_cptr& host,
                      const std::string&         tname,
                            scm::size_t          dsize,
-                           time_unit            tunit  = time::timer_base::msec,
-                           throughput_unit      d_unit = time::timer_base::MiBps);
+                           time::time_io        unit   = time::time_io(time::time_io::msec, time::time_io::MiBps));
 
     std::string         unit_string() const;
     std::string         throughput_string() const;
@@ -142,9 +138,8 @@ struct __scm_export(gl_util) profiling_result
 
     profiling_host_cptr _phost;
     std::string         _tname;
-    time_unit           _tunit;
     scm::size_t         _dsize;
-    throughput_unit     _dunit;
+    time::time_io       _unit;
 }; // struct profiling_result
 
 __scm_export(gl_util) std::ostream& operator<<(std::ostream& os, const profiling_result& pres);

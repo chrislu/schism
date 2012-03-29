@@ -417,7 +417,7 @@ viewer::send_render_display()
     _frame_timer.stop();
     _frame_timer.start();
 
-    _frame_time_us = static_cast<float>(_frame_timer.last_time(time::timer_base::usec));//static_cast<float>(scm::time::to_microseconds(_frame_timer.last_time()));
+    _frame_time_us = static_cast<float>(_frame_timer.last_time(time::time_io::usec));//static_cast<float>(scm::time::to_microseconds(_frame_timer.last_time()));
 
     if (_display_func) {
 
@@ -495,13 +495,13 @@ viewer::send_render_display()
     }
 
     if (_settings._show_frame_times) {
-        if (_frame_timer.accumulated_time(time::timer_base::msec) > 100.0) {
+        if (_frame_timer.accumulated_time(time::time_io::msec) > 100.0) {
             _frame_timer.update(0);
         //if (scm::time::to_milliseconds(_frame_timer.accumulated_duration()) > 100.0) {
             std::stringstream   output;
             output.precision(2);
-            double frame_time = _frame_timer.average_time(time::timer_base::msec);//scm::time::to_milliseconds(_frame_timer.average_duration());
-            double frame_fps  = 1.0 / _frame_timer.average_time(time::timer_base::sec);//scm::time::to_seconds(_frame_timer.average_duration());
+            double frame_time = _frame_timer.average_time(time::time_io::msec);//scm::time::to_milliseconds(_frame_timer.average_duration());
+            double frame_fps  = 1.0 / _frame_timer.average_time(time::time_io::sec);//scm::time::to_seconds(_frame_timer.average_duration());
             //output << std::fixed << "frame_time: " << frame_time << "ms "
             //                     << "fps: " << frame_fps;
             output << std::fixed << "frame_time: ";

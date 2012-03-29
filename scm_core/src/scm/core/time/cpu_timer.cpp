@@ -63,95 +63,92 @@ cpu_timer::detailed_elapsed() const
 }
 
 void
-cpu_timer::report(std::ostream&   os,
-                  time_unit       tunit) const
+cpu_timer::report(std::ostream& os, time_io unit) const
 {
     std::ostream::sentry const  out_sentry(os);
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(2);
 
         nanosec_type w  = detailed_elapsed().wall;
 
-        os << to_time_unit(tunit, w)  << time_unit_string(tunit);
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit);
     }
 }
 
 void
-cpu_timer::report(std::ostream&   os,
-                  size_t          dsize,
-                  time_unit       tunit,
-                  throughput_unit tpunit) const
+cpu_timer::report(std::ostream& os, size_t dsize, time_io unit) const
 {
     std::ostream::sentry const  out_sentry(os);
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(2);
-
         nanosec_type w  = detailed_elapsed().wall;
 
-        os << to_time_unit(tunit, w)  << time_unit_string(tunit);
+
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit);
 
         if (0 < dsize) {
-            os << ", "
-                << std::setw(9) << std::right << timer_base::to_throughput_unit(tpunit, w, dsize)
-                                              << timer_base::throughput_unit_string(tpunit);
+            os << ", " << std::fixed << std::setprecision(unit._tp_dec_places)
+               << std::setw(unit._tp_dec_places + 5) << std::right
+               << time_io::to_throughput_unit(unit._tp_unit, w, dsize)
+               << time_io::throughput_unit_string(unit._tp_unit);
         }
     }
 }
 
 void
-cpu_timer::detailed_report(std::ostream&   os,
-                           time_unit       tunit) const
+cpu_timer::detailed_report(std::ostream& os, time_io unit) const
 {
     std::ostream::sentry const  out_sentry(os);
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(2);
 
         nanosec_type w  = detailed_elapsed().wall;
         nanosec_type u  = detailed_elapsed().user;
         nanosec_type s  = detailed_elapsed().system;
         nanosec_type us = u + s;
 
-        os << "wall: " << std::setw(6) << std::right << to_time_unit(tunit, w)  << time_unit_string(tunit) << ", "
-           << "user: " << std::setw(6) << std::right << to_time_unit(tunit, u)  << time_unit_string(tunit) << "+ "
-           << "sys: "  << std::setw(6) << std::right << to_time_unit(tunit, s)  << time_unit_string(tunit) << "= "
-           <<             std::setw(6) << std::right << to_time_unit(tunit, us) << time_unit_string(tunit)
-           << " (" << std::setprecision(1) << (static_cast<double>(us)/static_cast<double>(w)) * 100.0 << "%)";
+        std::stringstream percent;
+        percent << "(" << std::fixed << std::setprecision(1) << (static_cast<double>(us)/static_cast<double>(w)) * 100.0 << "%)";
+
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << "wall " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit) << ", "
+           << "user " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, u)  << time_io::time_unit_string(unit._t_unit) << "+ "
+           << "sys "  << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, s)  << time_io::time_unit_string(unit._t_unit) << "= "
+           <<            std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, us) << time_io::time_unit_string(unit._t_unit)
+           << std::setw(9) << std::right << percent.str();
     }
 }
 
 void
-cpu_timer::detailed_report(std::ostream&   os,
-                           size_t          dsize,
-                           time_unit       tunit,
-                           throughput_unit tpunit) const
+cpu_timer::detailed_report(std::ostream& os, size_t dsize, time_io unit) const
 {
     std::ostream::sentry const  out_sentry(os);
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(2);
 
         nanosec_type w  = detailed_elapsed().wall;
         nanosec_type u  = detailed_elapsed().user;
         nanosec_type s  = detailed_elapsed().system;
         nanosec_type us = u + s;
 
-        os << "wall: " << std::setw(6) << std::right << to_time_unit(tunit, w)  << time_unit_string(tunit) << ", "
-           << "user: " << std::setw(6) << std::right << to_time_unit(tunit, u)  << time_unit_string(tunit) << "+ "
-           << "sys: "  << std::setw(6) << std::right << to_time_unit(tunit, s)  << time_unit_string(tunit) << "= "
-           <<             std::setw(6) << std::right << to_time_unit(tunit, us) << time_unit_string(tunit)
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << "wall " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit) << ", "
+           << "user " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, u)  << time_io::time_unit_string(unit._t_unit) << "+ "
+           << "sys "  << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, s)  << time_io::time_unit_string(unit._t_unit) << "= "
+           <<            std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, us) << time_io::time_unit_string(unit._t_unit)
            << " (" << std::setprecision(1) << (static_cast<double>(us)/static_cast<double>(w)) * 100.0 << "%)";
 
         if (0 < dsize) {
-            os << ", "
-                << std::setw(9) << std::right << timer_base::to_throughput_unit(tpunit, w, dsize)
-                                              << timer_base::throughput_unit_string(tpunit);
+            os << ", " << std::fixed << std::setprecision(unit._tp_dec_places)
+               << std::setw(unit._tp_dec_places + 5) << std::right
+               << time_io::to_throughput_unit(unit._tp_unit, w, dsize)
+               << time_io::throughput_unit_string(unit._tp_unit);
         }
     }
 }

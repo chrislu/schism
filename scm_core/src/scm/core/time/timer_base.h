@@ -15,11 +15,9 @@
 namespace scm {
 namespace time {
 
-class __scm_export(core) timer_base
-{
-public:
-    typedef boost::timer::nanosecond_type   nanosec_type;
+typedef boost::timer::nanosecond_type   nanosec_type;
 
+struct __scm_export(core) time_io {
     enum time_unit {
         sec,
         msec,
@@ -33,6 +31,26 @@ public:
         GiBps
     };
 
+    time_unit           _t_unit;
+    int                 _t_dec_places;
+    throughput_unit     _tp_unit;
+    int                 _tp_dec_places;
+
+    time_io(time_unit tu, int tdec = 2) : _t_unit(tu), _t_dec_places(tdec), _tp_unit(Bps), _tp_dec_places(1) {}
+    time_io(time_unit tu, throughput_unit tpu, int tdec = 2, int tpdec = 2) : _t_unit(tu), _t_dec_places(tdec), _tp_unit(tpu), _tp_dec_places(tpdec) {}
+
+    static double               to_time_unit(time_unit tu, nanosec_type t);
+    static double               to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d);
+    static std::string          time_unit_string(time_unit tu);
+    static std::string          throughput_unit_string(throughput_unit tu);
+};
+
+
+class __scm_export(core) timer_base
+{
+public:
+    typedef scm::time::nanosec_type   nanosec_type;
+
 public:
     timer_base();
     virtual ~timer_base();
@@ -45,25 +63,12 @@ public:
 
     virtual nanosec_type        elapsed() const          = 0;
 
-    virtual void                report(std::ostream&   os,
-                                       time_unit       tunit  = msec) const = 0;
-    virtual void                report(std::ostream&   os,
-                                       size_t          dsize,
-                                       time_unit       tunit  = msec,
-                                       throughput_unit tpunit = MiBps) const = 0;
-    virtual void                detailed_report(std::ostream&   os,
-                                                time_unit       tunit  = msec) const = 0;
-    virtual void                detailed_report(std::ostream&   os,
-                                                size_t          dsize,
-                                                time_unit       tunit  = msec,
-                                                throughput_unit tpunit = MiBps) const = 0;
+    virtual void                report(std::ostream& os,               time_io unit = time_io(time_io::msec))                 const = 0;
+    virtual void                report(std::ostream& os, size_t dsize, time_io unit = time_io(time_io::msec, time_io::MiBps)) const = 0;
+    virtual void                detailed_report(std::ostream& os,               time_io unit  = time_io(time_io::msec))                 const = 0;
+    virtual void                detailed_report(std::ostream& os, size_t dsize, time_io unit  = time_io(time_io::msec, time_io::MiBps)) const = 0;
 
-    double                      elapsed(time_unit tu) const;
-
-    static double               to_time_unit(time_unit tu, nanosec_type t);
-    static double               to_throughput_unit(throughput_unit tu, nanosec_type t, size_t d);
-    static std::string          time_unit_string(time_unit tu);
-    static std::string          throughput_unit_string(throughput_unit tu);
+    double                      elapsed(time_io::time_unit tu) const;
 
 protected:
 

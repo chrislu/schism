@@ -202,8 +202,7 @@ accum_timer_query::detailed_average_time() const
 }
 
 void
-accum_timer_query::report(std::ostream&                     os,
-                          time::timer_base::time_unit       tunit) const
+accum_timer_query::report(std::ostream& os, time::time_io unit) const
 {
     using namespace scm::time;
 
@@ -211,19 +210,16 @@ accum_timer_query::report(std::ostream&                     os,
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(3);
 
         nanosec_type g  = detailed_average_time().gl;
 
-        os << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit);
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << time_io::to_time_unit(unit._t_unit, g)  << time_io::time_unit_string(unit._t_unit);
     }
 }
 
 void
-accum_timer_query::report(std::ostream&                     os,
-                          size_t                            dsize,
-                          time::timer_base::time_unit       tunit,
-                          time::timer_base::throughput_unit tpunit) const
+accum_timer_query::report(std::ostream& os, size_t dsize, time::time_io unit) const
 {
     using namespace scm::time;
 
@@ -231,23 +227,23 @@ accum_timer_query::report(std::ostream&                     os,
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(3);
 
         nanosec_type g  = detailed_average_time().gl;
 
-        os << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit);
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << time_io::to_time_unit(unit._t_unit, g)  << time_io::time_unit_string(unit._t_unit);
 
         if (0 < dsize) {
-            os << ", "
-                << std::setw(9) << std::right << timer_base::to_throughput_unit(tpunit, g, dsize)
-                                              << timer_base::throughput_unit_string(tpunit);
+            os << ", " << std::fixed << std::setprecision(unit._tp_dec_places)
+               << std::setw(unit._tp_dec_places + 5) << std::right
+               << time_io::to_throughput_unit(unit._tp_unit, g, dsize)
+               << time_io::throughput_unit_string(unit._tp_unit);
         }
     }
 }
 
 void
-accum_timer_query::detailed_report(std::ostream&                     os,
-                                   time::timer_base::time_unit       tunit) const
+accum_timer_query::detailed_report(std::ostream& os, time::time_io unit) const
 {
     using namespace scm::time;
 
@@ -255,7 +251,6 @@ accum_timer_query::detailed_report(std::ostream&                     os,
 
     if (os) {
         boost::io::ios_all_saver saved_state(os);
-        os << std::fixed << std::setprecision(3);
 
         nanosec_type g  = detailed_average_time().gl;
         nanosec_type w  = detailed_average_time().wall;
@@ -263,16 +258,14 @@ accum_timer_query::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "gl   "   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << "gl   " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, g)  << time_io::time_unit_string(unit._t_unit) << ", "
+           << "wall " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit);
     }
 }
 
 void
-accum_timer_query::detailed_report(std::ostream&                     os,
-                                   size_t                            dsize,
-                                   time::timer_base::time_unit       tunit,
-                                   time::timer_base::throughput_unit tpunit) const
+accum_timer_query::detailed_report(std::ostream& os, size_t dsize, time::time_io unit) const
 {
     using namespace scm::time;
 
@@ -288,13 +281,15 @@ accum_timer_query::detailed_report(std::ostream&                     os,
         nanosec_type s  = detailed_average_time().system;
         nanosec_type us = u + s;
 
-        os << "gl   "   << std::setw(6) << std::right << timer_base::to_time_unit(tunit, g)  << timer_base::time_unit_string(tunit) << ", "
-           << "wall " << std::setw(6) << std::right << timer_base::to_time_unit(tunit, w)  << timer_base::time_unit_string(tunit);
+        os << std::fixed << std::setprecision(unit._t_dec_places)
+           << "gl   " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, g)  << time_io::time_unit_string(unit._t_unit) << ", "
+           << "wall " << std::setw(unit._t_dec_places + 3) << std::right << time_io::to_time_unit(unit._t_unit, w)  << time_io::time_unit_string(unit._t_unit);
 
         if (0 < dsize) {
-            os << ", "
-                << std::setw(9) << std::right << timer_base::to_throughput_unit(tpunit, g, dsize)
-                                              << timer_base::throughput_unit_string(tpunit);
+            os << ", " << std::fixed << std::setprecision(unit._tp_dec_places)
+               << std::setw(unit._tp_dec_places + 5) << std::right
+               << time_io::to_throughput_unit(unit._tp_unit, g, dsize)
+               << time_io::throughput_unit_string(unit._tp_unit);
         }
     }
 }

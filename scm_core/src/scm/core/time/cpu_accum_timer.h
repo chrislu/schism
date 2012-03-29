@@ -34,18 +34,10 @@ public:
     cpu_times                       detailed_accumulated_time() const;
     cpu_times                       detailed_average_time() const;
 
-    void                            report(std::ostream&               os,
-                                           timer_base::time_unit       tunit  = timer_base::msec) const;
-    void                            report(std::ostream&               os,
-                                           size_t                      dsize,
-                                           timer_base::time_unit       tunit  = timer_base::msec,
-                                           timer_base::throughput_unit tpunit = timer_base::MiBps) const;
-    void                            detailed_report(std::ostream&               os,
-                                                    timer_base::time_unit       tunit  = timer_base::msec) const;
-    void                            detailed_report(std::ostream&               os,
-                                                    size_t                      dsize,
-                                                    timer_base::time_unit       tunit  = timer_base::msec,
-                                                    timer_base::throughput_unit tpunit = timer_base::MiBps) const;
+    void                            report(std::ostream& os,               time_io unit = time_io(time_io::msec))                 const;
+    void                            report(std::ostream& os, size_t dsize, time_io unit = time_io(time_io::msec, time_io::MiBps)) const;
+    void                            detailed_report(std::ostream& os,               time_io unit  = time_io(time_io::msec))                 const;
+    void                            detailed_report(std::ostream& os, size_t dsize, time_io unit  = time_io(time_io::msec, time_io::MiBps)) const;
 
 protected:
     cpu_times                       _detailed_last_time;

@@ -33,22 +33,14 @@ public:
     unsigned                        accumulation_count() const;
     nanosec_type                    average_time() const;
 
-    double                          last_time(timer_base::time_unit tu) const;
-    double                          accumulated_time(timer_base::time_unit tu) const;
-    double                          average_time(timer_base::time_unit tu) const;
+    double                          last_time(time_io::time_unit tu) const;
+    double                          accumulated_time(time_io::time_unit tu) const;
+    double                          average_time(time_io::time_unit tu) const;
 
-    virtual void                    report(std::ostream&               os,
-                                           timer_base::time_unit       tunit  = timer_base::msec) const = 0;
-    virtual void                    report(std::ostream&               os,
-                                           size_t                      dsize,
-                                           timer_base::time_unit       tunit  = timer_base::msec,
-                                           timer_base::throughput_unit tpunit = timer_base::MiBps) const = 0;
-    virtual void                    detailed_report(std::ostream&               os,
-                                                    timer_base::time_unit       tunit  = timer_base::msec) const = 0;
-    virtual void                    detailed_report(std::ostream&               os,
-                                                    size_t                      dsize,
-                                                    timer_base::time_unit       tunit  = timer_base::msec,
-                                                    timer_base::throughput_unit tpunit = timer_base::MiBps) const = 0;
+    virtual void                    report(std::ostream& os,               time_io unit = time_io(time_io::msec))                 const = 0;
+    virtual void                    report(std::ostream& os, size_t dsize, time_io unit = time_io(time_io::msec, time_io::MiBps)) const = 0;
+    virtual void                    detailed_report(std::ostream& os,               time_io unit  = time_io(time_io::msec))                 const = 0;
+    virtual void                    detailed_report(std::ostream& os, size_t dsize, time_io unit  = time_io(time_io::msec, time_io::MiBps)) const = 0;
 
 protected:
     nanosec_type                    _last_time;

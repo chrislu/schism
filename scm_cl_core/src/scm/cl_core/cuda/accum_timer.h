@@ -44,18 +44,10 @@ public:
     cu_times                detailed_accumulated_time() const;
     cu_times                detailed_average_time() const;
 
-    void                    report(std::ostream&                     os,
-                                   time::timer_base::time_unit       tunit  = time::timer_base::msec) const;
-    void                    report(std::ostream&                     os,
-                                   size_t                            dsize,
-                                   time::timer_base::time_unit       tunit  = time::timer_base::msec,
-                                   time::timer_base::throughput_unit tpunit = time::timer_base::MiBps) const;
-    void                    detailed_report(std::ostream&                     os,
-                                            time::timer_base::time_unit       tunit  = time::timer_base::msec) const;
-    void                    detailed_report(std::ostream&                     os,
-                                            size_t                            dsize,
-                                            time::timer_base::time_unit       tunit  = time::timer_base::msec,
-                                            time::timer_base::throughput_unit tpunit = time::timer_base::MiBps) const;
+    void                    report(std::ostream& os,               time::time_io unit = time::time_io(time::time_io::msec))                       const;
+    void                    report(std::ostream& os, size_t dsize, time::time_io unit = time::time_io(time::time_io::msec, time::time_io::MiBps)) const;
+    void                    detailed_report(std::ostream& os,               time::time_io unit  = time::time_io(time::time_io::msec))                       const;
+    void                    detailed_report(std::ostream& os, size_t dsize, time::time_io unit  = time::time_io(time::time_io::msec, time::time_io::MiBps)) const;
 
 protected:
     bool                    _cu_event_finished;
