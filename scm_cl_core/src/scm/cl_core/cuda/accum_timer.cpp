@@ -89,34 +89,36 @@ accum_timer::collect()
     if (cudaErrorNotReady == f) {
         _cu_event_finished = false;
     }
-    else if ((cudaSuccess == f) && (_cu_event_erecorded && _cu_event_srecorded)) {
-        cudaError e = cudaStreamSynchronize(_cu_event_stream);
-        assert(cudaSuccess == e);
+    else if (cudaSuccess == f) {
+        if (_cu_event_erecorded && _cu_event_srecorded) {
+            cudaError e = cudaStreamSynchronize(_cu_event_stream);
+            assert(cudaSuccess == e);
 
-        float cu_copy_time = 0.0f;
-        e = cudaEventElapsedTime(&cu_copy_time, _cu_event_start, _cu_event_stop);
-        assert(cudaSuccess == e);
+            float cu_copy_time = 0.0f;
+            e = cudaEventElapsedTime(&cu_copy_time, _cu_event_start, _cu_event_stop);
+            assert(cudaSuccess == e);
 
-        int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
-        time::cpu_timer::cpu_times t = _cpu_timer.detailed_elapsed();
+            int64 ns = static_cast<int64>(static_cast<double>(cu_copy_time) * 1000.0 * 1000.0);
+            time::cpu_timer::cpu_times t = _cpu_timer.detailed_elapsed();
 
-        _last_time         = static_cast<nanosec_type>(ns);
-        _accumulated_time += _last_time;
+            _last_time         = static_cast<nanosec_type>(ns);
+            _accumulated_time += _last_time;
 
-        _detailed_last_time.cuda   = _last_time;
-        _detailed_last_time.wall   = t.wall;
-        _detailed_last_time.user   = t.user;
-        _detailed_last_time.system = t.system;
+            _detailed_last_time.cuda   = _last_time;
+            _detailed_last_time.wall   = t.wall;
+            _detailed_last_time.user   = t.user;
+            _detailed_last_time.system = t.system;
 
-        _detailed_accumulated_time.cuda   += _detailed_last_time.cuda;
-        _detailed_accumulated_time.wall   += _detailed_last_time.wall;
-        _detailed_accumulated_time.user   += _detailed_last_time.user;
-        _detailed_accumulated_time.system += _detailed_last_time.system;
+            _detailed_accumulated_time.cuda   += _detailed_last_time.cuda;
+            _detailed_accumulated_time.wall   += _detailed_last_time.wall;
+            _detailed_accumulated_time.user   += _detailed_last_time.user;
+            _detailed_accumulated_time.system += _detailed_last_time.system;
 
-        ++_accumulation_count;
-        _cu_event_finished  = true;
-        _cu_event_srecorded = false;
-        _cu_event_erecorded = false;
+            ++_accumulation_count;
+            _cu_event_finished  = true;
+            _cu_event_srecorded = false;
+            _cu_event_erecorded = false;
+        }
     }
     else {
         err() << "accum_timer::collect() "
