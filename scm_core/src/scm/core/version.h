@@ -38,6 +38,8 @@ static const std::string    VERSION_ARCH_TAG   = std::string("x64");
 //   - to live is to die
 
 // new name candidates:
+//   - flipper died a natural death
+//   - they were all in love with dying
 //   - lux aeterna
 //   - metal, it comes from hell
 //   - evil men in the gardens of paradise
