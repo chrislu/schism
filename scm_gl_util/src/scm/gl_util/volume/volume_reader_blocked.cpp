@@ -40,6 +40,12 @@ volume_reader_blocked::read(const scm::math::vec3ui& o,
         return false;
     }
 
+    if (   o.x >= _dimensions.x
+        || o.y >= _dimensions.y
+        || o.z >= _dimensions.z) {
+        return true;
+    }
+
     if (   o == vec3ui(0u)
         && s == _dimensions) {
         // read complete volume
