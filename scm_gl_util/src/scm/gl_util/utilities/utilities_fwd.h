@@ -33,6 +33,10 @@ struct profiling_result;
 typedef shared_ptr<profiling_host>                  profiling_host_ptr;
 typedef shared_ptr<profiling_host const>            profiling_host_cptr;
 
+class overlay_text_output;
+typedef shared_ptr<overlay_text_output>             overlay_text_output_ptr;
+typedef shared_ptr<overlay_text_output const>       overlay_text_output_cptr;
+
 } // namespace util
 
 } // namespace gl
