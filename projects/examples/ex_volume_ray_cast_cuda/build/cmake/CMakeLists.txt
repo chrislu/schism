@@ -41,7 +41,6 @@ endif (WIN32)
 # set include and lib directories
 scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_data/src
                                       ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
@@ -82,7 +81,6 @@ scm_link_libraries(ALL
     general scm_cl_core
     general scm_gl_core
     general scm_gl_util
-    general scm_data
 
 	general cuda
 	general cudart
@@ -109,5 +107,4 @@ add_dependencies(${PROJECT_NAME}
     scm_cl_core
     scm_gl_core
     scm_gl_util
-    scm_data
 )

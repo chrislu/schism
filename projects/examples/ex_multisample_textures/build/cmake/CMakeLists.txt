@@ -35,7 +35,6 @@ endif (WIN32)
 # set include and lib directories
 scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_data/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_ROOT_DIR}/scm_input/src
@@ -61,7 +60,6 @@ scm_link_libraries(ALL
     general scm_core
     general scm_gl_core
     general scm_gl_util
-    general scm_data
 )
 scm_link_libraries(WIN32
     optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
@@ -83,5 +81,4 @@ add_dependencies(${PROJECT_NAME}
     scm_core
     scm_gl_core
     scm_gl_util
-    scm_data
 )

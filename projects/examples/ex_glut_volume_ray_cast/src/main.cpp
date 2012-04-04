@@ -22,17 +22,16 @@
 #include <scm/core/time/accum_timer.h>
 #include <scm/core/time/high_res_timer.h>
 
-#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
-#include <scm/data/analysis/transfer_function/build_lookup_table.h>
-#include <scm/data/volume/scm_vol/scm_vol.h>
-#include <scm/data/volume/volume_data_loader.h>
-#include <scm/data/volume/volume_data_loader_raw.h>
-#include <scm/data/volume/volume_data_loader_vgeo.h>
+#include <scm/gl_util/data/analysis/transfer_function/piecewise_function_1d.h>
+#include <scm/gl_util/data/analysis/transfer_function/build_lookup_table.h>
+#include <scm/gl_util/data/volume/volume_reader_raw.h>
+#include <scm/gl_util/data/volume/volume_reader_segy.h>
+#include <scm/gl_util/data/volume/volume_reader_vgeo.h>
 
 #include <scm/gl_core.h>
 #include <scm/gl_core/buffer_objects/uniform_buffer_adaptor.h>
 
-#include <scm/gl_util/imaging/texture_loader.h>
+#include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 #include <scm/gl_util/primitives/box.h>
 #include <scm/gl_util/primitives/quad.h>
@@ -216,35 +215,40 @@ demo_app::~demo_app()
 scm::gl::texture_3d_ptr
 demo_app::load_volume(scm::gl::render_device& in_device, const std::string& in_file_name) const
 {
+    using namespace scm;
     using namespace scm::gl;
     using namespace scm::math;
     using namespace boost::filesystem;
 
-    boost::scoped_ptr<scm::data::volume_data_loader> vol_loader;
+    scoped_ptr<gl::volume_reader> vol_reader;
     path                    file_path(in_file_name);
     std::string             file_name       = file_path.filename().string();
     std::string             file_extension  = file_path.extension().string();
 
+    data_format volume_data_format     = FORMAT_NULL;
+
     boost::algorithm::to_lower(file_extension);
 
     if (file_extension == ".raw") {
-        vol_loader.reset(new scm::data::volume_data_loader_raw());
+        vol_reader.reset(new scm::gl::volume_reader_raw(file_path.string(), false));
     }
     else if (file_extension == ".vol") {
-        vol_loader.reset(new scm::data::volume_data_loader_vgeo());
+        vol_reader.reset(new scm::gl::volume_reader_vgeo(file_path.string(), true));
     }
     else {
         std::cout << "demo_app::load_volume(): unsupported volume file format ('" << file_extension << "')." << std::endl;
         return (texture_3d_ptr());
     }
 
-    if (!vol_loader->open_file(in_file_name)) {
+    if (!(*vol_reader)) {
         std::cout << "demo_app::load_volume(): unable to open file ('" << in_file_name << "')." << std::endl;
         return (texture_3d_ptr());
     }
 
     int    max_volume_dim  = in_device.capabilities()._max_texture_3d_size;
-    vec3ui data_dimensions = vol_loader->get_volume_descriptor()._data_dimensions;
+    vec3ui data_offset = vec3ui(0);
+    vec3ui data_dimensions = vol_reader->dimensions();
+    volume_data_format     = vol_reader->format();
 
     if (max(max(data_dimensions.x, data_dimensions.y), data_dimensions.z) > static_cast<unsigned>(max_volume_dim)) {
         std::cout << "demo_app::load_volume(): volume too large to load as single texture ('" << data_dimensions << "')." << std::endl;
@@ -253,34 +257,15 @@ demo_app::load_volume(scm::gl::render_device& in_device, const std::string& in_f
 
     scm::shared_array<unsigned char>    read_buffer;
     scm::size_t                         read_buffer_size =   data_dimensions.x * data_dimensions.y * data_dimensions.z
-                                                           * vol_loader->get_volume_descriptor()._data_byte_per_channel
-                                                           * vol_loader->get_volume_descriptor()._data_num_channels;
+                                                           * size_of_format(volume_data_format);
 
     read_buffer.reset(new unsigned char[read_buffer_size]);
 
-    if (!vol_loader->read_volume_data(read_buffer.get())) {
+    if (!vol_reader->read(data_offset, data_dimensions, read_buffer.get())) {
         std::cout << "demo_app::load_volume(): unable to read data from file ('" << in_file_name << "')." << std::endl;
         return (texture_3d_ptr());
     }
 
-    data_format volume_data_format = FORMAT_NULL;
-
-    if (vol_loader->get_volume_descriptor()._data_byte_per_channel == 1) {
-        switch (vol_loader->get_volume_descriptor()._data_num_channels) {
-        case 1: volume_data_format = FORMAT_R_8; break;
-        case 2: volume_data_format = FORMAT_RG_8; break;
-        case 3: volume_data_format = FORMAT_RGB_8; break;
-        case 4: volume_data_format = FORMAT_RGBA_8; break;
-        }
-    }
-    else if (vol_loader->get_volume_descriptor()._data_byte_per_channel == 2) {
-        switch (vol_loader->get_volume_descriptor()._data_num_channels) {
-        case 1: volume_data_format = FORMAT_R_16; break;
-        case 2: volume_data_format = FORMAT_RG_16; break;
-        case 3: volume_data_format = FORMAT_RGB_16; break;
-        case 4: volume_data_format = FORMAT_RGBA_16; break;
-        }
-    }
     if (volume_data_format == FORMAT_NULL) {
         std::cout << "demo_app::load_volume(): unable to determine volume data format ('" << in_file_name << "')." << std::endl;
         return (texture_3d_ptr());

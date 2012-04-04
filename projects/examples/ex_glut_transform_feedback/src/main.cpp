@@ -21,7 +21,7 @@
 
 #include <scm/gl_core.h>
 
-#include <scm/gl_util/imaging/texture_loader.h>
+#include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 #include <scm/gl_util/primitives/box.h>
 #include <scm/gl_util/primitives/quad.h>

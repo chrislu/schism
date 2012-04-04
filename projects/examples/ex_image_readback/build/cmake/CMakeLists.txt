@@ -41,7 +41,6 @@ scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
-                                      ${SCM_ROOT_DIR}/scm_data/src
                                       ${SCM_ROOT_DIR}/scm_input/src
                                       ${SCM_BOOST_INC_DIR}
                                       ${SCM_QT_INC_DIR})
@@ -65,7 +64,6 @@ scm_link_libraries(ALL
     general scm_core
     general scm_gl_core
     general scm_gl_util
-    general scm_data
     general scm_input
 
     general cuda
@@ -94,6 +92,5 @@ add_dependencies(${PROJECT_NAME}
     scm_core
     scm_gl_core
     scm_gl_util
-    scm_data
     scm_input
 )

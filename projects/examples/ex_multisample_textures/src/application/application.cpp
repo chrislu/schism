@@ -17,8 +17,8 @@
 #include <scm/gl_core.h>
 #include <scm/gl_core/math.h>
 
-#include <scm/gl_util/imaging/texture_loader.h>
-#include <scm/gl_util/imaging/texture_loader_dds.h>
+#include <scm/gl_util/data/imaging/texture_loader.h>
+#include <scm/gl_util/data/imaging/texture_loader_dds.h>
 #include <scm/gl_util/primitives/fullscreen_triangle.h>
 #include <scm/gl_util/primitives/quad.h>
 #include <scm/gl_util/primitives/wavefront_obj.h>

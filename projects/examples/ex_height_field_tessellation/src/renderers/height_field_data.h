@@ -9,14 +9,14 @@
 
 #include <scm/core/math.h>
 
-#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
+#include <scm/gl_util/data/analysis/transfer_function/piecewise_function_1d.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/constants.h>
 #include <scm/gl_core/primitives/box.h>
 
 #include <scm/gl_util/primitives/primitives_fwd.h>
-#include <scm/gl_util/imaging/imaging_fwd.h>
+#include <scm/gl_util/data/imaging/imaging_fwd.h>
 
 #include <renderers/renderers_fwd.h>
 

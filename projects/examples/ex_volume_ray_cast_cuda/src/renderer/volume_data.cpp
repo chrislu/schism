@@ -22,19 +22,19 @@
 #include <scm/core/numeric_types.h>
 #include <scm/core/time/high_res_timer.h>
 
-#include <scm/data/analysis/transfer_function/build_lookup_table.h>
+#include <scm/gl_util/data/analysis/transfer_function/build_lookup_table.h>
 
 #include <scm/gl_core/math.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/texture_objects.h>
 
-#include <scm/gl_util/imaging/texture_data_util.h>
+#include <scm/gl_util/data/imaging/texture_data_util.h>
 #include <scm/gl_util/primitives/box.h>
 #include <scm/gl_util/primitives/box_volume.h>
 #include <scm/gl_util/viewer/camera.h>
-#include <scm/gl_util/volume/volume_reader_raw.h>
-#include <scm/gl_util/volume/volume_reader_segy.h>
-#include <scm/gl_util/volume/volume_reader_vgeo.h>
+#include <scm/gl_util/data/volume/volume_reader_raw.h>
+#include <scm/gl_util/data/volume/volume_reader_segy.h>
+#include <scm/gl_util/data/volume/volume_reader_vgeo.h>
 
 namespace scm {
 namespace data {

@@ -10,7 +10,7 @@
 
 #include <scm/core/math.h>
 
-#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
+#include <scm/gl_util/data/analysis/transfer_function/piecewise_function_1d.h>
 
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/buffer_objects/uniform_buffer_adaptor.h>

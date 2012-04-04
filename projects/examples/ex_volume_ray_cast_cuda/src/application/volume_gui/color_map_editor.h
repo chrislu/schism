@@ -16,7 +16,7 @@
 
 #include <scm/core/memory.h>
 #include <scm/core/math.h>
-#include <scm/data/analysis/transfer_function/piecewise_function_1d.h>
+#include <scm/gl_util/data/analysis/transfer_function/piecewise_function_1d.h>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>

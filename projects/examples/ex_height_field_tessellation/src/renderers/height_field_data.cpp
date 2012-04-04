@@ -15,14 +15,14 @@
 #include <scm/log.h>
 #include <scm/core/log/logger_state.h>
 
-#include <scm/data/analysis/transfer_function/build_lookup_table.h>
+#include <scm/gl_util/data/analysis/transfer_function/build_lookup_table.h>
 
 #include <scm/gl_core/math.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/texture_objects.h>
 
-#include <scm/gl_util/imaging/texture_image_data.h>
-#include <scm/gl_util/imaging/texture_loader.h>
+#include <scm/gl_util/data/imaging/texture_image_data.h>
+#include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/primitives/box.h>
 
 #include <renderers/patch_grid_mesh.h>

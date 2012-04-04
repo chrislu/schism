@@ -33,7 +33,7 @@
 
 #include <scm/gl_core/primitives/box.h>
 
-#include <scm/data/analysis/transfer_function/piecewise_function_1d_serialization.h>
+#include <scm/gl_util/data/analysis/transfer_function/piecewise_function_1d_serialization.h>
 
 #include <application/volume_gui/opacity_map_editor_widget.h>
 #include <application/volume_gui/color_map_editor_widget.h>

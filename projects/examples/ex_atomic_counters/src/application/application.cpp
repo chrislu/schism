@@ -31,9 +31,9 @@
 #include <scm/gl_core/math.h>
 #include <scm/gl_core/primitives.h>
 
-#include <scm/gl_util/imaging/texture_image_data.h>
-#include <scm/gl_util/imaging/texture_loader.h>
-#include <scm/gl_util/imaging/texture_loader_dds.h>
+#include <scm/gl_util/data/imaging/texture_image_data.h>
+#include <scm/gl_util/data/imaging/texture_loader.h>
+#include <scm/gl_util/data/imaging/texture_loader_dds.h>
 #include <scm/gl_util/primitives/wavefront_obj.h>
 #include <scm/gl_util/utilities/geometry_highlight.h>
 #include <scm/gl_util/viewer/camera.h>
