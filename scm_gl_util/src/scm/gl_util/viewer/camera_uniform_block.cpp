@@ -15,31 +15,30 @@
 
 namespace {
 
-const std::string camera_block_include_path = "/scm/gl_util/camera_block.glsl";
-const std::string camera_block_include_src  = "\
-    \n\
-    #ifndef SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    #define SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    \n\
-    layout(std140, column_major) uniform;\n\
-    \n\
-    uniform camera_matrices\n\
-    {\n\
-        vec4 ws_position;\n\
-        \n\
-        mat4 v_matrix;\n\
-        mat4 v_matrix_inverse;\n\
-        mat4 v_matrix_inverse_transpose;\n\
-        \n\
-        mat4 p_matrix;\n\
-        mat4 p_matrix_inverse;\n\
-        \n\
-        mat4 vp_matrix;\n\
-        mat4 vp_matrix_inverse;\n\
-    } camera_transform;\n\
-    \n\
-    #endif // SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED\n\
-    \n\
+const std::string camera_block_include_path = "/scm/gl_util/camera_block.glslh";
+const std::string camera_block_include_src  = "     \
+    #ifndef SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED       \n\
+    #define SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED       \n\
+                                                    \n\
+    layout(std140, column_major)                    \n\
+    uniform camera_matrices                         \n\
+    {                                               \n\
+        vec4 ws_position;                           \n\
+        vec4 ws_near_plane;                         \n\
+                                                    \n\
+        mat4 v_matrix;                              \n\
+        mat4 v_matrix_inverse;                      \n\
+        mat4 v_matrix_inverse_transpose;            \n\
+                                                    \n\
+        mat4 p_matrix;                              \n\
+        mat4 p_matrix_inverse;                      \n\
+                                                    \n\
+        mat4 vp_matrix;                             \n\
+        mat4 vp_matrix_inverse;                     \n\
+    } camera_transform;                             \n\
+                                                    \n\
+    #endif // SCM_GL_UTIL_CAMERA_BLOCK_INCLUDED     \n\
+                                                    \n\
     ";
 
 } // namespace 
@@ -64,6 +63,7 @@ camera_uniform_block::update(const render_context_ptr& context,
 {
     _uniform_block.begin_manipulation(context); {
         _uniform_block->_ws_position                 = cam.position();
+        _uniform_block->_ws_near_plane               = cam.view_frustum().get_plane(frustum::near_plane).vector();
         _uniform_block->_p_matrix                    = cam.projection_matrix();
         _uniform_block->_p_matrix_inverse            = cam.projection_matrix_inverse();
         _uniform_block->_v_matrix                    = cam.view_matrix();
