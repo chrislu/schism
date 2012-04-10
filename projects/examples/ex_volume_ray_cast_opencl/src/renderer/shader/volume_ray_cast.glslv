@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 // attribute layout definitions ///////////////////////////////////////////////////////////////////
 layout(location = 0) in vec3 in_position;

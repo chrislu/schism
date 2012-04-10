@@ -5,7 +5,7 @@
 #ifndef SCM_LDATA_HF_TESSELLATE_HEIGHT_FIELD_COMMON_FUNCTIONS_GLSLH_INCLUDED
 #define SCM_LDATA_HF_TESSELLATE_HEIGHT_FIELD_COMMON_FUNCTIONS_GLSLH_INCLUDED
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 #include </scm/data/height_field/common_uniforms.glslh>
 

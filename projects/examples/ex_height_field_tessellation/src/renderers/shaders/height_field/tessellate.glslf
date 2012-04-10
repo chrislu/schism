@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 #include </scm/data/height_field/common_constants.glslh>
 #include </scm/data/height_field/common_functions.glslh>
@@ -27,7 +27,7 @@ void main()
 #if 1
     float height_value = texture(height_map, g_in.vertex.texcoord_hm).r;
     vec4  mapped_color = texture(color_map, height_value);
-    
+
     vec2 height_map_size       = vec2(textureSize(height_map, 0).xy);
     vec2 height_map_texel_size = vec2(1.0) / vec2(height_map_size);
 

@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 precision highp float;
 

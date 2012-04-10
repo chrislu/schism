@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 #include </scm/data/height_field/common_constants.glslh>
 #include </scm/data/height_field/common_uniforms.glslh>

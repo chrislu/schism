@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 // output layout definitions //////////////////////////////////////////////////////////////////////
 layout(location = 0, index = 0) out vec4 out_color;
@@ -121,7 +121,7 @@ ray_box_intersection(in ray    r,
     l2   = (bbmax.y - r.origin.y) * r.direction_rec.y;
     tmin = max(min(l1,l2), tmin);
     tmax = min(max(l1,l2), tmax);
-        
+
     l1   = (bbmin.z - r.origin.z) * r.direction_rec.z;
     l2   = (bbmax.z - r.origin.z) * r.direction_rec.z;
     tmin = max(min(l1,l2), tmin);
@@ -148,7 +148,7 @@ inside_volume_bounds(const in vec3 sampling_position)
             && all(lessThanEqual(sampling_position, volume_data.volume_extends.xyz)));
 }
 
-void main() 
+void main()
 {
 #if 1
     ray cur_ray;

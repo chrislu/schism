@@ -6,7 +6,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-#include </scm/gl_util/camera_block.glsl>
+#include </scm/gl_util/camera_block.glslh>
 
 #include </scm/data/height_field/common_constants.glslh>
 #include </scm/data/height_field/common_functions.glslh>
@@ -48,13 +48,13 @@ void main()
     vec4 cs_v3 = camera_transform.vp_matrix * model_matrix * gl_in[3].gl_Position;
 
     // for now pass through
-    if (   !quad_patch_inside_frustum(cs_v0, cs_v1, cs_v2, cs_v3) 
+    if (   !quad_patch_inside_frustum(cs_v0, cs_v1, cs_v2, cs_v3)
         || cull_quad_patch()) {
-        gl_TessLevelOuter[0] = 
-        gl_TessLevelOuter[1] = 
-        gl_TessLevelOuter[2] = 
+        gl_TessLevelOuter[0] =
+        gl_TessLevelOuter[1] =
+        gl_TessLevelOuter[2] =
         gl_TessLevelOuter[3] = 0.0;
-        gl_TessLevelInner[0] = 
+        gl_TessLevelInner[0] =
         gl_TessLevelInner[1] = 0.0;
     }
     else {
