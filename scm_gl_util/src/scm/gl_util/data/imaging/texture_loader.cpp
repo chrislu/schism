@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <memory.h>
+#include <sstream>
 
 #include <FreeImagePlus.h>
 
@@ -75,11 +76,15 @@ texture_loader::load_texture_2d(render_device&       in_device,
         return (texture_2d_ptr());
     }
 
-    FREE_IMAGE_TYPE image_type = in_image->getImageType();
+    FREE_IMAGE_TYPE       image_type = in_image->getImageType();
     math::vec2ui    image_size(in_image->getWidth(), in_image->getHeight());
     data_format     image_format = FORMAT_NULL;
     data_format     internal_format = FORMAT_NULL;
+    unsigned        image_bit_count = in_image->getInfoHeader()->biBitCount;
+    //int             image_pitch     = in_image->getScanWidth();
     
+    //glout() << log::info << "bitcount " << image_bit_count << " scan width " << static_cast<float>(image_pitch) / 3;
+
     switch (image_type) {
         case FIT_BITMAP: {
             unsigned num_components = in_image->getBitsPerPixel() / 8;
@@ -120,6 +125,7 @@ texture_loader::load_texture_2d(render_device&       in_device,
         math::vec2ui lev_size = util::mip_level_dimensions(image_size, i);
 
         if (i == 0) {
+            lev_size      = image_size;
             cur_data_size =   image_size.x * image_size.y;
             cur_data_size *=  channel_count(image_format);
             cur_data_size *=  size_of_channel(image_format);
@@ -134,6 +140,28 @@ texture_loader::load_texture_2d(render_device&       in_device,
                         << "unable to scale image (level: " << i << ", dim: " << lev_size << ")" << log::end;
                 return (texture_2d_ptr());
             }
+            //image_pitch     = in_image->getScanWidth();
+    
+            ////glout() << log::info << "bitcount " << image_bit_count << " scan width " << static_cast<float>(image_pitch) / 3;
+
+            ////std::stringstream ofn;
+            ////ofn << in_image_path << "_" << i << ".png";
+            ////in_image->save(ofn.str().c_str());
+
+            if (in_image->getWidth() != lev_size.x || in_image->getHeight() != lev_size.y) {
+                glerr() << log::error << "texture_loader::load_texture_2d(): "
+                        << "image dimensions changed after resamling (level: " << i
+                        << ", dim: " << lev_size 
+                        << ", type: " << std::hex << in_image->getImageType() << ")" << log::end;
+                return (texture_2d_ptr());
+            }
+            if (in_image->getInfoHeader()->biBitCount != image_bit_count) {
+                glerr() << log::error << "texture_loader::load_texture_2d(): "
+                        << "image bitcount changed after resamling (level: " << i
+                        << ", bit_count: " << image_bit_count 
+                        << ", img_bit_count: " << in_image->getInfoHeader()->biBitCount << ")" << log::end;
+                return (texture_2d_ptr());
+            }
             if (image_type != in_image->getImageType()) {
                 glerr() << log::error << "texture_loader::load_texture_2d(): "
                         << "image type changed after resamling (level: " << i
@@ -145,11 +173,21 @@ texture_loader::load_texture_2d(render_device&       in_device,
 
         scm::shared_array<unsigned char> cur_data(new unsigned char[cur_data_size]);
 
-        if (memcpy(cur_data.get(), in_image->accessPixels(), cur_data_size) != cur_data.get()) {
-            glerr() << log::error << "texture_loader::load_texture_2d(): "
-                    << "unable to copy image data (level: " << i << ", size: " << cur_data_size << "byte)" << log::end;
-            return (texture_2d_ptr());
+        size_t line_pitch = in_image->getScanWidth();
+        for (unsigned l = 0; l < lev_size.y; ++l) {
+            size_t ls = static_cast<size_t>(lev_size.x) * size_of_format(image_format);
+            uint8* s =   reinterpret_cast<uint8*>(in_image->accessPixels())
+                       + line_pitch * l;
+            uint8* d =   reinterpret_cast<uint8*>(cur_data.get())
+                       + ls * l;
+            memcpy(d, s, ls);
         }
+
+        //if (memcpy(cur_data.get(), in_image->accessPixels(), cur_data_size) != cur_data.get()) {
+        //    glerr() << log::error << "texture_loader::load_texture_2d(): "
+        //            << "unable to copy image data (level: " << i << ", size: " << cur_data_size << "byte)" << log::end;
+        //    return (texture_2d_ptr());
+        //}
         if (0 != i && in_color_mips) {
             if      (i % 6 == 1) scale_colors(1, 0, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
             else if (i % 6 == 2) scale_colors(0, 1, 0, lev_size.x, lev_size.y, image_format, cur_data.get());
