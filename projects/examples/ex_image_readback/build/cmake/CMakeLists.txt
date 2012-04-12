@@ -86,7 +86,6 @@ scm_link_libraries(UNIX
     general QtGui
 )
 scm_copy_schism_libraries()
-scm_copy_shared_libraries(WIN32 cudart64_41_28.dll)
 
 add_dependencies(${PROJECT_NAME}
     scm_core

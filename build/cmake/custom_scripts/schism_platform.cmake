@@ -77,8 +77,8 @@ add_definitions(-DBOOST_FILESYSTEM_VERSION=3)
 add_definitions(-DBOOST_FILESYSTEM_NO_DEPRECATED)
 
 if (UNIX)
-include_directories(/opt/OpenCL/include
-                    /opt/cuda/current/cuda/include)
-link_directories(/opt/cuda/current/cuda/lib64
-                 /usr/lib/nvidia-current)
+    include_directories(/opt/OpenCL/include
+                        /opt/cuda/current/cuda/include)
+    link_directories(/opt/cuda/current/cuda/lib64
+                     /usr/lib/nvidia-current)
 endif (UNIX)

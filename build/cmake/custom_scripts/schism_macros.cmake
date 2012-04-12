@@ -4,6 +4,8 @@
 
 #include(GetPrerequisites)
 
+include(schism_cuda)
+
 macro(scm_project_files)
     set(out_file_list     ${ARGV0})
     set(in_project_path   ${ARGV1})
@@ -98,6 +100,11 @@ macro(scm_link_libraries)
 
 			foreach(conf ${conf_list})
 				foreach(link_lib ${in_libraries})
+					#message(${link_lib})
+					if (link_lib STREQUAL "cuda")
+						set(link_lib ${SCM_CUDA_SHARED_LIB_NAME})
+						#message(${link_lib})
+					endif (link_lib STREQUAL "cuda")
 					set(link_lib_dll ${link_lib}.dll)
 					foreach(ldir ${link_dirs})
 						set(dll_path ${ldir}/${conf}/${link_lib_dll})
