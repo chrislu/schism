@@ -121,7 +121,7 @@ file_core_linux::open(const std::string&       file_path,
 
 
     int    open_flags  = O_LARGEFILE; // yes, we mainly go through this pain for large files
-    mode_t create_mode = umode(0644);
+    mode_t create_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
     if (   (open_mode & std::ios_base::in)
         && (open_mode & std::ios_base::out)) {
