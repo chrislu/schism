@@ -32,11 +32,7 @@ public:
                              const draw_mode           in_draw_mode = MODE_SOLID) const;
 
 protected:
-    buffer_ptr          _positions;
-    buffer_ptr          _texcoords;
-    buffer_ptr          _normals;
-    buffer_ptr          _binormals;
-    buffer_ptr          _tangents;
+    buffer_ptr          _vertices;
 
     buffer_ptr          _solid_indices;
     buffer_ptr          _wire_indices;

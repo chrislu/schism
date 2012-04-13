@@ -11,7 +11,6 @@
 #include <scm/core/memory.h>
 
 #include <scm/gl_core/log.h>
-
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/buffer_objects/buffer.h>
 #include <scm/gl_core/buffer_objects/scoped_buffer_map.h>
