@@ -65,9 +65,9 @@ file_adopter(int fd, const std::string& fn)
 }
 
 file_core_linux::handle
-file_open(const std::string& fn, int open_flags) {
+file_open(const std::string& fn, int open_flags, mode_t create_mode) {
 
-    int fd = ::open64(fn.c_str(), open_flags);
+    int fd = ::open64(fn.c_str(), open_flags, create_mode);
 
     if (fd > -1) {
         return (file_adopter(fd, fn));
@@ -120,7 +120,8 @@ file_core_linux::open(const std::string&       file_path,
     std::string     input_root_path = complete_input_file_path.root_name().string();
 
 
-    int open_flags = O_LARGEFILE; // yes, we mainly go through this pain for large files
+    int    open_flags  = O_LARGEFILE; // yes, we mainly go through this pain for large files
+    mode_t create_mode = umode(0644);
 
     if (   (open_mode & std::ios_base::in)
         && (open_mode & std::ios_base::out)) {
@@ -186,7 +187,7 @@ file_core_linux::open(const std::string&       file_path,
     }
 
     // do open
-    _file_handle = detail::file_open(complete_input_file_path.string(), open_flags);
+    _file_handle = detail::file_open(complete_input_file_path.string(), open_flags, create_mode);
 
     if (!_file_handle) {
         scm::err() << log::error
