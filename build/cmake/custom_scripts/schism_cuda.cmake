@@ -25,7 +25,7 @@ if (WIN32)
 	endif (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
 elseif (UNIX)
    #todo make gencode variable
-   set(SCM_CUDA_NVCC_OPTIONS --gpu-architecture=compute_20 --gpu-code=sm_20,compute_20 --optimize 3 --compile CACHE STRING "schism cuda internal" FORCE)
+   set(SCM_CUDA_NVCC_OPTIONS --gpu-architecture=compute_20 --gpu-code=sm_20,compute_20 --compile CACHE STRING "schism cuda internal" FORCE)
     set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/cuda/bin                CACHE PATH   "schism cuda internal")
     # set(CUDA_NVCC_OPTIONS              -ccbin \"/usr/bin\")
 endif (WIN32)
