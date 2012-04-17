@@ -1,0 +1,10 @@
+# schism project generated files
+_moc/
+[Bb]in/
+[Ll]ib/
+build/out_*
+enternals/bin
+externals/inc
+externals/lib
+externals/vc10
+externals/vc11
