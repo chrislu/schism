@@ -1580,6 +1580,127 @@ render_context::resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buff
 }
 
 void
+render_context::copy_color_buffer(const frame_buffer_ptr& in_read_buffer,
+                                  const frame_buffer_ptr& in_draw_buffer,
+                                  const unsigned          in_buffer) const
+{
+    const opengl::gl_core& glapi = opengl_api();
+
+    if (_applied_state._draw_framebuffer != in_draw_buffer) {
+        in_draw_buffer->apply_attachments(*this);
+        in_draw_buffer->bind(*this, FRAMEBUFFER_DRAW);
+    }
+    if (_applied_state._read_framebuffer != in_read_buffer) {
+        in_read_buffer->apply_attachments(*this);
+        in_read_buffer->bind(*this, FRAMEBUFFER_READ);
+    }
+
+    math::vec2ui min_drawable_region = math::min(in_draw_buffer->drawable_region(),
+                                                 in_read_buffer->drawable_region());
+
+    gl_assert(glapi, render_context::copy_color_buffer() before glBlitFramebuffer);
+
+    glapi.glBlitFramebuffer(0, 0, min_drawable_region.x, min_drawable_region.y,
+                            0, 0, min_drawable_region.x, min_drawable_region.y,
+                            GL_COLOR_BUFFER_BIT,// | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
+                            GL_NEAREST);
+
+    gl_assert(glapi, render_context::copy_color_buffer() after glBlitFramebuffer);
+
+    if (_applied_state._read_framebuffer != in_read_buffer) {
+        if (_applied_state._read_framebuffer) {
+            _applied_state._read_framebuffer->bind(*this, FRAMEBUFFER_READ);
+        }
+        else {
+            in_read_buffer->unbind(*this);
+        }
+    }
+    if (_applied_state._draw_framebuffer != in_draw_buffer) {
+        if (_applied_state._draw_framebuffer) {
+            _applied_state._draw_framebuffer->bind(*this, FRAMEBUFFER_DRAW);
+        }
+        else {
+            in_draw_buffer->unbind(*this);
+        }
+    }
+    gl_assert(glapi, leaving render_context::copy_color_buffer());
+}
+
+void
+render_context::copy_depth_stencil_buffer(const frame_buffer_ptr& in_read_buffer,
+                                          const frame_buffer_ptr& in_draw_buffer) const
+{
+    const opengl::gl_core& glapi = opengl_api();
+
+    if (_applied_state._draw_framebuffer != in_draw_buffer) {
+        in_draw_buffer->apply_attachments(*this);
+        in_draw_buffer->bind(*this, FRAMEBUFFER_DRAW);
+    }
+    if (_applied_state._read_framebuffer != in_read_buffer) {
+        in_read_buffer->apply_attachments(*this);
+        in_read_buffer->bind(*this, FRAMEBUFFER_READ);
+    }
+
+    if (   !(in_read_buffer->_current_depth_stencil_attachment._target)
+        || !(in_draw_buffer->_current_depth_stencil_attachment._target)) {
+        glerr() << log::error
+                << "render_context::copy_depth_stencil_buffer(): missing depth attachment on input or output buffer."
+                << log::end;
+    }
+    else {
+        if (   in_read_buffer->_current_depth_stencil_attachment._target->format()
+            != in_draw_buffer->_current_depth_stencil_attachment._target->format()) {
+            glerr() << log::error
+                    << "render_context::copy_depth_stencil_buffer(): non-matching depth/stencil format."
+                    << log::end;
+        }
+        else {
+            math::vec2ui min_drawable_region = math::min(in_draw_buffer->drawable_region(),
+                                                         in_read_buffer->drawable_region());
+
+            gl_assert(glapi, render_context::copy_depth_stencil_buffer() before glBlitFramebuffer);
+
+            unsigned mask = 0u;
+
+            data_format in_fmt = in_read_buffer->_current_depth_stencil_attachment._target->format();
+
+            if (is_depth_format(in_fmt)) {
+                mask = mask | GL_DEPTH_BUFFER_BIT;
+            }
+
+            if (is_stencil_format(in_fmt)) {
+                mask = mask | GL_STENCIL_BUFFER_BIT;
+            }
+
+            glapi.glBlitFramebuffer(0, 0, min_drawable_region.x, min_drawable_region.y,
+                                    0, 0, min_drawable_region.x, min_drawable_region.y,
+                                    mask,
+                                    GL_NEAREST);
+
+            gl_assert(glapi, render_context::copy_depth_stencil_buffer() after glBlitFramebuffer);
+        }
+    }
+
+    if (_applied_state._read_framebuffer != in_read_buffer) {
+        if (_applied_state._read_framebuffer) {
+            _applied_state._read_framebuffer->bind(*this, FRAMEBUFFER_READ);
+        }
+        else {
+            in_read_buffer->unbind(*this);
+        }
+    }
+    if (_applied_state._draw_framebuffer != in_draw_buffer) {
+        if (_applied_state._draw_framebuffer) {
+            _applied_state._draw_framebuffer->bind(*this, FRAMEBUFFER_DRAW);
+        }
+        else {
+            in_draw_buffer->unbind(*this);
+        }
+    }
+    gl_assert(glapi, leaving render_context::copy_depth_stencil_buffer());
+}
+
+void
 render_context::generate_mipmaps(const texture_image_ptr& in_texture) const
 {
     const opengl::gl_core& glapi = opengl_api();

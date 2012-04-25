@@ -309,6 +309,11 @@ public:
 
     void                        resolve_multi_sample_buffer(const frame_buffer_ptr& in_read_buffer,
                                                             const frame_buffer_ptr& in_draw_buffer) const;
+    void                        copy_color_buffer(const frame_buffer_ptr& in_read_buffer,
+                                                  const frame_buffer_ptr& in_draw_buffer,
+                                                  const unsigned          in_buffer) const;
+    void                        copy_depth_stencil_buffer(const frame_buffer_ptr& in_read_buffer,
+                                                          const frame_buffer_ptr& in_draw_buffer) const;
     void                        generate_mipmaps(const texture_image_ptr& in_texture) const;
 
     void                        capture_color_buffer(const frame_buffer_ptr& in_frame_buffer,
