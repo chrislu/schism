@@ -251,15 +251,11 @@ viewer::clear_color() const
 {
     using namespace scm::math;
 
-    if (   !_attributes._post_process_aa
-        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+    if (_attributes._multi_samples > 1 || _attributes._super_samples > 1) {
         context()->clear_color_buffer(_render_target->_framebuffer_aa, 0, _settings._clear_color);
     }
-    else if (_attributes._post_process_aa) {
-        context()->clear_color_buffer(_render_target->_framebuffer_resolved, 0, _settings._clear_color);
-    }
     else {
-        context()->clear_default_color_buffer(FRAMEBUFFER_BACK, _settings._clear_color);
+        context()->clear_color_buffer(_render_target->_framebuffer_resolved, 0, _settings._clear_color);
     }
 }
 
@@ -268,15 +264,11 @@ viewer::clear_depth_stencil() const
 {
     using namespace scm::math;
 
-    if (   !_attributes._post_process_aa
-        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+    if (_attributes._multi_samples > 1 || _attributes._super_samples > 1) {
         context()->clear_depth_stencil_buffer(_render_target->_framebuffer_aa, _settings._clear_depth, _settings._clear_stencil);
     }
-    else if (_attributes._post_process_aa) {
-        context()->clear_depth_stencil_buffer(_render_target->_framebuffer_resolved, _settings._clear_depth, _settings._clear_stencil);
-    }
     else {
-        context()->clear_default_depth_stencil_buffer(_settings._clear_depth, _settings._clear_stencil);
+        context()->clear_depth_stencil_buffer(_render_target->_framebuffer_resolved, _settings._clear_depth, _settings._clear_stencil);
     }
 }
 
@@ -428,9 +420,7 @@ viewer::send_render_display()
 
         context_all_guard cguard(context());
 
-        // for AA (multi or super sampling) render to render target
-        if (   !_attributes._post_process_aa
-            && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+        if (_attributes._multi_samples > 1 || _attributes._super_samples > 1) {
             context_all_guard fguard(context());
 
             // set the render target
@@ -445,40 +435,44 @@ viewer::send_render_display()
             if (_attributes._super_samples > 1) {
                 context()->generate_mipmaps(_render_target->_color_buffer_resolved);
             }
+        }
+        else {
+            context_all_guard fguard(context());
 
+            // set the render target
+            context()->set_frame_buffer(_render_target->_framebuffer_resolved);
+            {
+                // client code
+                _display_func(context());
+            }
+        }
+
+
+        if (_attributes._post_process_aa) {
             context()->set_default_frame_buffer();
             context()->set_viewport(_viewport);
             
             context()->set_depth_stencil_state(_render_target->_dstate_no_zwrite);
             context()->set_blend_state(_render_target->_no_blend);
-
-            context()->bind_program(_render_target->_color_present_program);
-            context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_nearest, 0);
-
-            _render_target->_fs_geom->draw(context());
-        }
-        else if (_attributes._post_process_aa) {
-            context_all_guard fguard(context());
-
-            // set the render target
-            context()->set_frame_buffer(_render_target->_framebuffer_resolved);
-            
-            {
-                // client code
-                _display_func(context());
-            }
-            context()->set_default_frame_buffer();
-            
-            context()->set_depth_stencil_state(_render_target->_dstate_no_zwrite);
-            context()->set_blend_state(_render_target->_no_blend);
+            context()->set_rasterizer_state(_render_target->_cull_back);
 
             context()->bind_program(_render_target->_post_process_aa_program);
             context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_linear, 0);
 
             _render_target->_fs_geom->draw(context());
         }
-        else {
-            _display_func(context());
+        else { // present results
+            context()->set_default_frame_buffer();
+            context()->set_viewport(_viewport);
+            
+            context()->set_depth_stencil_state(_render_target->_dstate_no_zwrite);
+            context()->set_blend_state(_render_target->_no_blend);
+            context()->set_rasterizer_state(_render_target->_cull_back);
+
+            context()->bind_program(_render_target->_color_present_program);
+            context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_nearest, 0);
+
+            _render_target->_fs_geom->draw(context());
         }
 
         if (_settings._show_frame_times) {
@@ -672,9 +666,7 @@ viewer::initialize_render_target()
     using namespace scm::math;
     using boost::assign::list_of;
 
-    // shader programs
-    if (   !_attributes._post_process_aa
-        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+    {
 
         _render_target->_color_present_program = device()->create_program(list_of(device()->create_shader(STAGE_VERTEX_SHADER, color_present_vsrc,   "viewer::color_present_vsrc"))
                                                                                  (device()->create_shader(STAGE_FRAGMENT_SHADER, color_present_fsrc, "viewer::color_present_fsrc")),
@@ -682,6 +674,11 @@ viewer::initialize_render_target()
         if (   !_render_target->_color_present_program) {
             scm::err() << "viewer::initialize_render_target(): error creating pass through shader program" << log::end;
             return false;
+        }
+        else {
+            _render_target->_color_present_program->uniform("mvp",          make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
+            _render_target->_color_present_program->uniform("in_texture",   0);
+            _render_target->_color_present_program->uniform("in_level",     0);
         }
     }
 
@@ -698,8 +695,7 @@ viewer::initialize_render_target()
     }
 
     // render targets
-    if (   !_attributes._post_process_aa
-        && (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
+    if (_attributes._multi_samples > 1 || _attributes._super_samples > 1) {
         _render_target->_viewport_scale           = static_cast<int>(floor(sqrt(static_cast<double>(_attributes._super_samples))));
         _render_target->_viewport_color_mip_level = floor_log2(static_cast<uint32>(_render_target->_viewport_scale));
 
@@ -730,13 +726,13 @@ viewer::initialize_render_target()
         _render_target->_framebuffer_aa->attach_depth_stencil_buffer(_render_target->_depth_buffer_aa);
     }
 
-    if (    _attributes._post_process_aa
-        || (_attributes._multi_samples > 1 || _attributes._super_samples > 1)) {
-
+    {
         _render_target->_color_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, _render_target->_viewport_color_mip_level + 1);
+        _render_target->_depth_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8);
 
-        if (!_render_target->_color_buffer_resolved) {
-            err() << "viewer::initialize_render_target(): error creating resolve color texture" << log::end;
+        if (   !_render_target->_depth_buffer_resolved
+            || !_render_target->_color_buffer_resolved) {
+            err() << "viewer::initialize_render_target(): error creating resolve color or depth texture" << log::end;
             return false;
         }
 
@@ -748,6 +744,8 @@ viewer::initialize_render_target()
         }
 
         _render_target->_framebuffer_resolved->attach_color_buffer(0, _render_target->_color_buffer_resolved);
+        _render_target->_framebuffer_resolved->attach_depth_stencil_buffer(_render_target->_depth_buffer_resolved);
+
         if (_attributes._post_process_aa) {
             vec2f vp_size = vec2f(_viewport._dimensions);
             _render_target->_post_process_aa_program->uniform("mvp",            make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
@@ -755,13 +753,6 @@ viewer::initialize_render_target()
             //_render_target->_post_process_aa_program->uniform("in_vp_size",     vp_size);
             _render_target->_post_process_aa_program->uniform("in_vp_size_rec", vec2f(1.0) / vp_size);
 
-            _render_target->_depth_buffer_resolved = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_D24_S8);
-
-            if (!_render_target->_depth_buffer_resolved) {
-                err() << "viewer::initialize_render_target(): error creating resolve depth texture" << log::end;
-                return false;
-            }
-            _render_target->_framebuffer_resolved->attach_depth_stencil_buffer(_render_target->_depth_buffer_resolved);
         }
 
         // state objects
