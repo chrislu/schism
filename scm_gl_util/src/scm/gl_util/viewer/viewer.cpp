@@ -34,6 +34,7 @@
 #include <scm/gl_util/font/font_face.h>
 #include <scm/gl_util/font/text.h>
 #include <scm/gl_util/font/text_renderer.h>
+#include <scm/gl_util/primitives/fullscreen_triangle.h>
 #include <scm/gl_util/primitives/quad.h>
 #include <scm/gl_core/window_management/context.h>
 #include <scm/gl_core/window_management/display.h>
@@ -119,7 +120,7 @@ viewer::render_target::~render_target()
     _dstate_no_zwrite.reset();
     _cull_back.reset();
 
-    _quad_geom.reset();
+    _fs_geom.reset();
 }
 
 viewer::viewer(const math::vec2ui&                  vp_dim,
@@ -454,7 +455,7 @@ viewer::send_render_display()
             context()->bind_program(_render_target->_color_present_program);
             context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_nearest, 0);
 
-            _render_target->_quad_geom->draw(context());
+            _render_target->_fs_geom->draw(context());
         }
         else if (_attributes._post_process_aa) {
             context_all_guard fguard(context());
@@ -474,7 +475,7 @@ viewer::send_render_display()
             context()->bind_program(_render_target->_post_process_aa_program);
             context()->bind_texture(_render_target->_color_buffer_resolved, _render_target->_filter_linear, 0);
 
-            _render_target->_quad_geom->draw(context());
+            _render_target->_fs_geom->draw(context());
         }
         else {
             _display_func(context());
@@ -778,7 +779,7 @@ viewer::initialize_render_target()
             return false;
         }
 
-        _render_target->_quad_geom = make_shared<gl::quad_geometry>(device(), vec2f(0.0f, 0.0f), vec2f(1.0f, 1.0f));
+        _render_target->_fs_geom.reset(new gl::fullscreen_triangle(device()));
     }
 
     return true;

@@ -221,8 +221,8 @@ protected:
         gl::depth_stencil_state_ptr     _dstate_no_zwrite;
         gl::rasterizer_state_ptr        _cull_back;
 
-        // fullscreen quad geometry
-        shared_ptr<gl::quad_geometry>   _quad_geom;
+        // fullscreen geometry
+        gl::fullscreen_triangle_ptr     _fs_geom;
 
     };
     shared_ptr<render_target>       _render_target;
