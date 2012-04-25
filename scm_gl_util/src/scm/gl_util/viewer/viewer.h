@@ -127,6 +127,8 @@ public:
     camera&                         main_camera();
 
     const viewport&                 main_viewport() const;
+    
+    const gl::frame_buffer_ptr&     main_framebuffer() const;
 
     void                            enable_main_manipulator(const bool f);
     bool                            main_manipulator_enabled() const;

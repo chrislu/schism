@@ -246,6 +246,17 @@ viewer::main_viewport() const
     return _viewport;
 }
 
+const gl::frame_buffer_ptr&
+viewer::main_framebuffer() const
+{
+    if (_attributes._multi_samples > 1 || _attributes._super_samples > 1) {
+        return _render_target->_framebuffer_aa;
+    }
+    else {
+        return _render_target->_framebuffer_resolved;
+    }
+}
+
 void
 viewer::clear_color() const
 {
