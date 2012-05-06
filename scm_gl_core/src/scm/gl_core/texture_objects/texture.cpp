@@ -42,9 +42,8 @@ texture::texture(render_device& in_device)
 
 texture::~texture()
 {
-    gl_assert(glapi, entering texture::~texture());
-
     const opengl::gl_core& glapi = parent_device().opengl_api();
+    gl_assert(glapi, entering texture::~texture());
 
     if (   glapi.extension_NV_bindless_texture
         && _native_handle
