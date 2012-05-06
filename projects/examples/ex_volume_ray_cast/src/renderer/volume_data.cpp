@@ -26,7 +26,9 @@
 
 #include <scm/gl_core/math.h>
 #include <scm/gl_core/render_device.h>
+#include <scm/gl_core/state_objects.h>
 #include <scm/gl_core/texture_objects.h>
+#include <scm/gl_core/buffer_objects/scoped_buffer_map.h>
 
 #include <scm/gl_util/data/imaging/texture_data_util.h>
 #include <scm/gl_util/primitives/box.h>
@@ -56,6 +58,7 @@ volume_data::volume_data(const gl::render_device_ptr& device,
     if (!_volume_raw) {
         throw std::runtime_error("volume_data::volume_data(): error loading volume data from file: " + file_name);
     }
+    _sstate_linear = device->create_sampler_state(FILTER_MIN_MAG_LINEAR, WRAP_CLAMP_TO_EDGE);
     out() << log::info << "volume_data::volume_data(): loading raw volume done." << log::end;
 
     out() << log::info << "volume_data::volume_data(): generating color map..." << log::end;
@@ -89,6 +92,29 @@ volume_data::volume_data(const gl::render_device_ptr& device,
     out() << log::info << "volume_data::volume_data(): generating render resources done." << log::end;
 
     out() << log::info << "volume_data::volume_data(): successfully loaded volume file: " << file_name << log::end;
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+    if (   !device->main_context()->make_resident(_volume_raw, _sstate_linear)
+        || !device->main_context()->make_resident(_color_alpha_map, _sstate_linear)) {
+        out() << log::info << "volume_data::volume_data(): unable to make texture resident." << log::end;
+    }
+    else {
+        _texture_handles = device->create_texture_buffer(FORMAT_RG_32UI, USAGE_STATIC_DRAW, 2 * sizeof(uint64));
+
+        if (!_texture_handles) {
+            throw std::runtime_error(std::string("volume_data::volume_data(): error creating texture_handles buffer."));
+        }
+        scoped_buffer_map th_map(device->main_context(), _texture_handles->descriptor()._buffer, ACCESS_WRITE_INVALIDATE_BUFFER);
+
+        if (!th_map) {
+            throw std::runtime_error(std::string("volume_data::volume_data(): error mapping texture_handles buffer."));
+        }
+
+        uint64*const th_data = reinterpret_cast<uint64*const>(th_map.data_ptr());
+        th_data[0] = _volume_raw->native_handle();
+        th_data[1] = _color_alpha_map->native_handle();
+    }
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
 
     sample_distance_factor(0.5f);
     sample_distance_ref_factor(0.5f);
@@ -222,6 +248,12 @@ const gl::box_volume_geometry_ptr&
 volume_data::bbox_geometry() const
 {
     return _bbox_geometry;
+}
+
+const gl::texture_buffer_ptr&
+volume_data::texture_handles() const
+{
+    return _texture_handles;
 }
 
 const gl::texture_3d_ptr&
@@ -509,6 +541,12 @@ volume_data::update(const gl::render_context_ptr& context,
     using namespace scm::gl;
     using namespace scm::math;
 
+    if (_color_alpha_map_dirty) {
+        update_color_alpha_map(context);
+        _color_alpha_map_dirty = false;
+    }
+
+
     float max_dim = static_cast<float>(max(max(_data_dimensions.x,
                                                _data_dimensions.y),
                                                _data_dimensions.z));
@@ -531,12 +569,14 @@ volume_data::update(const gl::render_context_ptr& context,
         _volume_block->_mv_matrix_inverse_transpose  = transpose(mv_matrix_inv);
         _volume_block->_mvp_matrix                   = cam.projection_matrix() * mv_matrix;
         _volume_block->_mvp_matrix_inverse           = inverse(_volume_block->_mvp_matrix);
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+        _volume_block->_volume_texture              = _volume_raw->native_handle();
+        _volume_block->_color_map                   = _color_alpha_map->native_handle();
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+
     } _volume_block.end_manipulation();
 
-    if (_color_alpha_map_dirty) {
-        update_color_alpha_map(context);
-        _color_alpha_map_dirty = false;
-    }
 }
 
 const volume_data::volume_uniform_block&

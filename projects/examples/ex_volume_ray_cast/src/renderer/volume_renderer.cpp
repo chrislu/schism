@@ -23,6 +23,7 @@
 #include <scm/gl_util/viewer/camera.h>
 #include <scm/gl_util/viewer/camera_uniform_block.h>
 
+#include <renderer/renderer_config.h>
 #include <renderer/volume_data.h>
 
 namespace scm {
@@ -44,12 +45,14 @@ volume_renderer::volume_renderer(const gl::render_device_ptr& device)
     _bstate = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
     _dstate = device->create_depth_stencil_state(true, true, COMPARISON_LESS);
     _rstate = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true);
+    _sstate_nearest = device->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
     _sstate_lin = device->create_sampler_state(FILTER_MIN_MAG_LINEAR, WRAP_CLAMP_TO_EDGE);
     _sstate_lin_mip = device->create_sampler_state(FILTER_MIN_MAG_MIP_LINEAR, WRAP_CLAMP_TO_EDGE);
 
     if (   !_bstate
         || !_dstate
         || !_rstate
+        || !_sstate_nearest
         || !_sstate_lin
         || !_sstate_lin_mip) {
         throw (std::runtime_error("volume_renderer::volume_renderer(): error creating state objects"));
@@ -76,6 +79,7 @@ volume_renderer::~volume_renderer()
     _dstate.reset();
     _bstate.reset();
     _rstate.reset();
+    _sstate_nearest.reset();
     _sstate_lin.reset();
     _sstate_lin_mip.reset();
 
@@ -118,8 +122,13 @@ volume_renderer::draw(const gl::render_context_ptr& context,
     context->bind_program(_program);
 
     context->reset_texture_units();
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES != 1
     context->bind_texture(vdata->volume_raw(),      _sstate_lin_mip, 0);
     context->bind_texture(vdata->color_alpha_map(), _sstate_lin,     2);
+#else
+    context->bind_texture(vdata->texture_handles(), _sstate_nearest, 4);
+#endif SCM_TEXT_NV_BINDLESS_TEXTURES != 1
 
     vdata->bbox_geometry()->draw(context, geometry::MODE_SOLID);
 }
@@ -144,8 +153,12 @@ volume_renderer::reload_shaders(const gl::render_device_ptr& device)
                << "reloading shader strings." << log::end;
 
     // ray casting program ////////////////////////////////////////////////////////////////////////
+    shader_macro_array sm;
+    sm(shader_macro("SCM_TEXT_NV_BINDLESS_TEXTURES", SCM_TEXT_NV_BINDLESS_TEXTURES == 1 ? "1" : "0"));
+
     program_ptr prog_rcraw  = device->create_program(list_of(device->create_shader_from_file(STAGE_VERTEX_SHADER,   "../../../src/renderer/shader/volume_ray_cast.glslv"))
-                                                            (device->create_shader_from_file(STAGE_FRAGMENT_SHADER, "../../../src/renderer/shader/volume_ray_cast.glslf")),
+                                                            (device->create_shader_from_file(STAGE_FRAGMENT_SHADER, "../../../src/renderer/shader/volume_ray_cast.glslf",
+                                                                                             sm)),
                                                      "volume_renderer::program");
 
     if (!prog_rcraw) {

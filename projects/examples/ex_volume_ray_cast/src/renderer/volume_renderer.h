@@ -40,6 +40,7 @@ protected:
     gl::depth_stencil_state_ptr     _dstate;
     gl::blend_state_ptr             _bstate;
     gl::rasterizer_state_ptr        _rstate;
+    gl::sampler_state_ptr           _sstate_nearest;
     gl::sampler_state_ptr           _sstate_lin;
     gl::sampler_state_ptr           _sstate_lin_mip;
 

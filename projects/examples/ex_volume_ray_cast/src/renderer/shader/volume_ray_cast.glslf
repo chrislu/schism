@@ -6,6 +6,11 @@
 
 #extension GL_ARB_shading_language_include : require
 
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+#extension GL_NV_bindless_texture : require
+#extension GL_NV_gpu_shader5      : require
+#endif
+
 #include </scm/gl_util/camera_block.glslh>
 
 // output layout definitions //////////////////////////////////////////////////////////////////////
@@ -27,8 +32,12 @@ in per_vertex {
 } vertex_in;
 
 // uniform input definitions //////////////////////////////////////////////////////////////////////
+#if SCM_TEXT_NV_BINDLESS_TEXTURES != 1
 uniform sampler3D volume_raw;
 uniform sampler1D color_map;
+#else
+layout (binding = 4) uniform usamplerBuffer texture_handles;
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES != 1
 
 uniform float volume_lod;
 
@@ -52,6 +61,11 @@ uniform volume_uniform_data
 
     mat4 mvp_matrix;
     mat4 mvp_matrix_inverse;
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+    sampler3D volume_texture;
+    sampler1D color_map;
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
 } volume_data;
 
 // subroutine declaration
@@ -61,8 +75,11 @@ subroutine uniform color_lookup volume_color_lookup;
 subroutine (color_lookup)
 vec4 raw_lookup(in vec3 spos)
 {
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+    float v = textureLod(volume_data.volume_texture, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
+#else // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     float v = textureLod(volume_raw, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
-
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     //v *= 65535.0/4096.0;
 
     return vec4((v - volume_data.value_range.x) * volume_data.value_range.w);
@@ -71,13 +88,31 @@ vec4 raw_lookup(in vec3 spos)
 subroutine (color_lookup)
 vec4 raw_color_map_lookup(in vec3 spos)
 {
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+#if 1
+    uvec2     vtex_hndl_enc = texelFetch(texture_handles, 0).xy;
+    uint64_t  vtex_hndl     = packUint2x32(vtex_hndl_enc);
+    sampler3D vtex_smpl     = sampler3D(vtex_hndl);
+    float v = textureLod(vtex_smpl, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
+    v = (v - volume_data.value_range.x) * volume_data.value_range.w;
+
+    uvec2     ctex_hndl_enc = texelFetch(texture_handles, 1).xy;
+    uint64_t  ctex_hndl     = packUint2x32(ctex_hndl_enc);
+    sampler1D ctex_smpl     = sampler1D(ctex_hndl);
+
+    return texture(ctex_smpl, v);
+#else
+    float v = textureLod(volume_data.volume_texture, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
+    v = (v - volume_data.value_range.x) * volume_data.value_range.w;
+
+    return texture(volume_data.color_map, v);
+#endif
+#else // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     float v = textureLod(volume_raw, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
     v = (v - volume_data.value_range.x) * volume_data.value_range.w;
 
-    //v *= 65535.0/4096.0;
-
     return texture(color_map, v);
-    //return vec4(texture(color_map, v).rgb, 1.0);
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
 }
 
 // implementation /////////////////////////////////////////////////////////////////////////////////
@@ -98,12 +133,8 @@ void main()
     bool inside_volume = inside_volume_bounds(sampling_pos);
 
     while (inside_volume) {
-#if 0
-        float s  = texture(volume_raw, sampling_pos * volume_data.scale_obj_to_tex.xyz).r;
-        vec4 src = texture(color_map, s);
-#else
         vec4 src = volume_color_lookup(sampling_pos);
-#endif
+
         // increment ray
         sampling_pos  += ray_increment;
         inside_volume  = inside_volume_bounds(sampling_pos) && (dst.a < 0.99);

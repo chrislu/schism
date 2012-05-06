@@ -6,6 +6,10 @@
 
 #extension GL_ARB_shading_language_include : require
 
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+#extension GL_NV_bindless_texture : require
+#endif
+
 #include </scm/gl_util/camera_block.glslh>
 
 // attribute layout definitions ///////////////////////////////////////////////////////////////////
@@ -40,6 +44,11 @@ uniform volume_uniform_data
 
     mat4 mvp_matrix;
     mat4 mvp_matrix_inverse;
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+    sampler3D volume_texture;
+    sampler1D color_map;
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
 } volume_data;
 
 // implementation /////////////////////////////////////////////////////////////////////////////////

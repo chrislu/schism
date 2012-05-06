@@ -21,6 +21,7 @@
 #include <scm/gl_util/viewer/viewer_fwd.h>
 
 #include <renderer/renderer_fwd.h>
+#include <renderer/renderer_config.h>
 
 namespace scm {
 namespace data {
@@ -52,6 +53,11 @@ public:
 
         math::mat4f _mvp_matrix;
         math::mat4f _mvp_matrix_inverse;
+
+#if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
+        uint64      _volume_texture;
+        uint64      _color_map;
+#endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     }; // struct volume_uniform_data
 
     typedef gl::uniform_block<volume_uniform_data>  volume_uniform_block;
@@ -84,6 +90,8 @@ public:
 
     const gl::box&                      bbox() const;
     const gl::box_volume_geometry_ptr&  bbox_geometry() const;
+
+    const gl::texture_buffer_ptr&       texture_handles() const;
 
     const gl::texture_3d_ptr&           volume_raw() const;
     const gl::texture_1d_ptr&           color_alpha_map() const;
@@ -125,9 +133,11 @@ protected:
 
     volume_uniform_block                _volume_block;
 
+    gl::texture_buffer_ptr              _texture_handles;
     gl::texture_3d_ptr                  _volume_raw;
     gl::texture_1d_ptr                  _color_alpha_map;
     bool                                _color_alpha_map_dirty;
+    gl::sampler_state_ptr               _sstate_linear;
 
 }; // volume_data
 
