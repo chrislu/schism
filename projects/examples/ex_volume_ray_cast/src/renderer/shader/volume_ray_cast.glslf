@@ -11,6 +11,9 @@
 #extension GL_NV_gpu_shader5      : require
 #endif
 
+#define SCM_TEST_NV_BINDLESS_TEX_BUFFER     1
+#define SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE 0
+
 #include </scm/gl_util/camera_block.glslh>
 
 // output layout definitions //////////////////////////////////////////////////////////////////////
@@ -36,7 +39,14 @@ in per_vertex {
 uniform sampler3D volume_raw;
 uniform sampler1D color_map;
 #else
+
 layout (binding = 4) uniform usamplerBuffer texture_handles;
+
+#if SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1 && SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE == 1
+uint64_t vtex_smpl = 0;
+uint64_t ctex_smpl = 0;
+#endif // SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
+
 #endif // SCM_TEXT_NV_BINDLESS_TEXTURES != 1
 
 uniform float volume_lod;
@@ -89,7 +99,13 @@ subroutine (color_lookup)
 vec4 raw_color_map_lookup(in vec3 spos)
 {
 #if SCM_TEXT_NV_BINDLESS_TEXTURES == 1
-#if 1
+#if SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
+#if SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE == 1
+    float v = textureLod(sampler3D(vtex_smpl), spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
+    v = (v - volume_data.value_range.x) * volume_data.value_range.w;
+
+    return texture(sampler1D(ctex_smpl), v);
+#else // SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE == 1
     uvec2     vtex_hndl_enc = texelFetch(texture_handles, 0).xy;
     uint64_t  vtex_hndl     = packUint2x32(vtex_hndl_enc);
     sampler3D vtex_smpl     = sampler3D(vtex_hndl);
@@ -101,12 +117,13 @@ vec4 raw_color_map_lookup(in vec3 spos)
     sampler1D ctex_smpl     = sampler1D(ctex_hndl);
 
     return texture(ctex_smpl, v);
-#else
+#endif // SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE == 1
+#else // SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
     float v = textureLod(volume_data.volume_texture, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
     v = (v - volume_data.value_range.x) * volume_data.value_range.w;
 
     return texture(volume_data.color_map, v);
-#endif
+#endif // SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
 #else // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     float v = textureLod(volume_raw, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
     v = (v - volume_data.value_range.x) * volume_data.value_range.w;
@@ -125,6 +142,14 @@ inside_volume_bounds(const in vec3 sampling_position)
 
 void main()
 {
+#if SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1 && SCM_TEST_NV_BINDLESS_TEX_BUFFER_PRE == 1
+    uvec2     vtex_hndl_enc = texelFetch(texture_handles, 0).xy;
+    uvec2     ctex_hndl_enc = texelFetch(texture_handles, 1).xy;
+    vtex_smpl     = packUint2x32(vtex_hndl_enc);
+    ctex_smpl     = packUint2x32(ctex_hndl_enc);
+#endif // SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
+
+
     vec3 ray_increment      = normalize(vertex_in.ray_entry_os - volume_data.os_camera_position.xyz) * volume_data.sampling_distance.x;
     vec3 sampling_pos       = vertex_in.ray_entry_os + ray_increment; // test, increment just to be sure we are in the volume
 
