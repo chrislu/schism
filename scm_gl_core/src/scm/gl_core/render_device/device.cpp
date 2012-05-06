@@ -16,6 +16,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include <scm/core/io/tools.h>
+#include <scm/core/log/logger_state.h>
 #include <scm/core/utilities/foreach.h>
 
 #include <scm/gl_core/config.h>
@@ -174,19 +175,27 @@ render_device::init_capabilities()
     assert(_capabilities._max_texture_buffer_size > 0);
     assert(_capabilities._max_frame_buffer_color_attachments > 0);
 
-    glcore.glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS,        &_capabilities._max_vertex_uniform_blocks);
-    glcore.glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS,      &_capabilities._max_geometry_uniform_blocks);
-    glcore.glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS,      &_capabilities._max_fragment_uniform_blocks);
-    glcore.glGetIntegerv(GL_MAX_COMBINED_UNIFORM_BLOCKS,      &_capabilities._max_combined_uniform_blocks);
-    glcore.glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS,      &_capabilities._max_uniform_buffer_bindings);
-    glcore.glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,  &_capabilities._uniform_buffer_offset_alignment);
+    glcore.glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS,                  &_capabilities._max_vertex_uniform_blocks);
+    glcore.glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS,                &_capabilities._max_geometry_uniform_blocks);
+    glcore.glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS,                &_capabilities._max_fragment_uniform_blocks);
+    glcore.glGetIntegerv(GL_MAX_COMBINED_UNIFORM_BLOCKS,                &_capabilities._max_combined_uniform_blocks);
+    glcore.glGetIntegerv(GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS,     &_capabilities._max_combined_vertex_uniform_components);
+    glcore.glGetIntegerv(GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS,   &_capabilities._max_combined_geometry_uniform_components);
+    glcore.glGetIntegerv(GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS,   &_capabilities._max_combined_fragment_uniform_components);
+    glcore.glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS,                &_capabilities._max_uniform_buffer_bindings);
+    glcore.glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,            &_capabilities._uniform_buffer_offset_alignment);
+    glcore.glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE,                     &_capabilities._max_uniform_block_size);
 
     assert(_capabilities._max_vertex_uniform_blocks > 0);
     assert(_capabilities._max_geometry_uniform_blocks > 0);
     assert(_capabilities._max_fragment_uniform_blocks > 0);
     assert(_capabilities._max_combined_uniform_blocks > 0);
+    assert(_capabilities._max_combined_vertex_uniform_components > 0);
+    assert(_capabilities._max_combined_geometry_uniform_components > 0);
+    assert(_capabilities._max_combined_fragment_uniform_components > 0);
     assert(_capabilities._max_uniform_buffer_bindings > 0);
     assert(_capabilities._uniform_buffer_offset_alignment > 0);
+    assert(_capabilities._max_uniform_block_size > 0);
 
     if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
         glcore.glGetIntegerv(GL_MAX_VIEWPORTS,                    &_capabilities._max_viewports);
@@ -247,6 +256,72 @@ render_device::init_capabilities()
     else {
         _capabilities._min_buffer_alignment = 1;
     }
+
+
+
+    log::logger_format_saver ofs(glout().associated_logger());
+    glout() << "render_device::init_capabilities(): OpenGL capabilities"
+            << log::indent;
+
+    glout() << "general: " << log::nline
+            << log::indent
+            << "MAX_VERTEX_ATTRIBS                          " << _capabilities._max_vertex_attributes << log::nline
+            << "MAX_DRAW_BUFFERS                            " << _capabilities._max_draw_buffers << log::nline
+            << "MAX_DUAL_SOURCE_DRAW_BUFFERS                " << _capabilities._max_dual_source_draw_buffers << log::nline
+            << "MAX_TEXTURE_SIZE                            " << _capabilities._max_texture_size << log::nline
+            << "MAX_3D_TEXTURE_SIZE                         " << _capabilities._max_texture_3d_size << log::nline
+            << "MAX_ARRAY_TEXTURE_LAYERS                    " << _capabilities._max_array_texture_layers << log::nline
+            << "MAX_SAMPLES                                 " << _capabilities._max_samples << log::nline
+            << "MAX_DEPTH_TEXTURE_SAMPLES                   " << _capabilities._max_depth_texture_samples << log::nline
+            << "MAX_COLOR_TEXTURE_SAMPLES                   " << _capabilities._max_color_texture_samples << log::nline
+            << "MAX_INTEGER_SAMPLES                         " << _capabilities._max_integer_samples << log::nline
+            << "MAX_TEXTURE_IMAGE_UNITS                     " << _capabilities._max_texture_image_units << log::nline
+            << "MAX_TEXTURE_BUFFER_SIZE                     " << _capabilities._max_texture_buffer_size << log::nline
+            << "MAX_COLOR_ATTACHMENTS                       " << _capabilities._max_frame_buffer_color_attachments << log::nline
+            << "MAX_VIEWPORTS                               " << _capabilities._max_viewports
+            << log::outdent;
+
+    glout() << "uniform blocks: " << log::nline
+            << log::indent
+            << "MAX_UNIFORM_BLOCK_SIZE                      " << _capabilities._max_uniform_block_size << log::nline
+            << "MAX_VERTEX_UNIFORM_BLOCKS                   " << _capabilities._max_vertex_uniform_blocks << log::nline
+            << "MAX_GEOMETRY_UNIFORM_BLOCKS                 " << _capabilities._max_geometry_uniform_blocks << log::nline
+            << "MAX_FRAGMENT_UNIFORM_BLOCKS                 " << _capabilities._max_fragment_uniform_blocks << log::nline
+            << "MAX_COMBINED_UNIFORM_BLOCKS                 " << _capabilities._max_combined_uniform_blocks << log::nline
+            << "MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS      " << _capabilities._max_combined_vertex_uniform_components << log::nline
+            << "MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS    " << _capabilities._max_combined_geometry_uniform_components << log::nline
+            << "MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS    " << _capabilities._max_combined_fragment_uniform_components << log::nline
+            << "MAX_UNIFORM_BUFFER_BINDINGS                 " << _capabilities._max_uniform_buffer_bindings << log::nline
+            << "UNIFORM_BUFFER_OFFSET_ALIGNMENT             " << _capabilities._uniform_buffer_offset_alignment
+            << log::outdent;
+
+    glout() << "transform feedback: " << log::nline
+            << log::indent
+            << "MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS     " << _capabilities._max_transform_feedback_separate_attribs << log::nline
+            << "MAX_TRANSFORM_FEEDBACK_BUFFERS              " << _capabilities._max_transform_feedback_buffers << log::nline
+            << "MAX_VERTEX_STREAMS                          " << _capabilities._max_vertex_streams
+            << log::outdent;
+
+    glout() << "image load/store: " << log::nline
+            << log::indent
+            << "MAX_IMAGE_UNITS                             " << _capabilities._max_image_units
+            << log::outdent;
+
+    glout() << "atomic counters: " << log::nline
+            << log::indent
+            << "MAX_VERTEX_ATOMIC_COUNTERS                  " << _capabilities._max_vertex_atomic_counters << log::nline
+            << "MAX_FRAGMENT_ATOMIC_COUNTERS                " << _capabilities._max_geometry_atomic_counters << log::nline
+            << "MAX_GEOMETRY_ATOMIC_COUNTERS                " << _capabilities._max_fragment_atomic_counters << log::nline
+            << "MAX_COMBINED_ATOMIC_COUNTERS                " << _capabilities._max_combined_atomic_counters << log::nline
+            << "MAX_ATOMIC_COUNTER_BUFFER_BINDINGS          " << _capabilities._max_atomic_counter_buffer_bindings
+            << log::outdent;
+
+    glout() << "map buffer alignment: " << log::nline
+            << log::indent
+            << "MIN_MAP_BUFFER_ALIGNMENT                    " << _capabilities._min_buffer_alignment
+            << log::outdent;
+
+
     //std::cout << "GL_MAX_IMAGE_UNITS_EXT " << _capabilities._max_image_units << std::endl;
 }
 

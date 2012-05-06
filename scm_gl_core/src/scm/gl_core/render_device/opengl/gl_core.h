@@ -95,15 +95,18 @@ public:
     bool version_4_2_available;
 
 
-    bool extension_ARB_shading_language_include;
     bool extension_ARB_cl_event;
     bool extension_ARB_debug_output;
-    bool extension_ARB_robustness;
-    bool extension_EXT_shader_image_load_store;
-    bool extension_EXT_direct_state_access_available;
-    bool extension_EXT_texture_compression_s3tc;
-    bool extension_ARB_texture_compression_bptc;
     bool extension_ARB_map_buffer_alignment;
+    bool extension_ARB_robustness;
+    bool extension_ARB_shading_language_include;
+    bool extension_ARB_texture_compression_bptc;
+
+    bool extension_EXT_direct_state_access_available;
+    bool extension_EXT_shader_image_load_store;
+    bool extension_EXT_texture_compression_s3tc;
+
+    bool extension_NV_bindless_texture;
     bool extension_NVX_gpu_memory_info;
 
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
@@ -835,6 +838,21 @@ public:
     PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC         glNamedRenderbufferStorageMultisampleEXT;
     PFNGLNAMEDFRAMEBUFFERTEXTUREEXTPROC                     glNamedFramebufferTextureEXT;
     PFNGLNAMEDFRAMEBUFFERTEXTURELAYEREXTPROC                glNamedFramebufferTextureLayerEXT;
+
+    // GL_NV_bindless_texture
+    PFNGLGETTEXTUREHANDLENVPROC                     glGetTextureHandleNV;
+    PFNGLGETTEXTURESAMPLERHANDLENVPROC              glGetTextureSamplerHandleNV;
+    PFNGLMAKETEXTUREHANDLERESIDENTNVPROC            glMakeTextureHandleResidentNV;
+    PFNGLMAKETEXTUREHANDLENONRESIDENTNVPROC         glMakeTextureHandleNonResidentNV;
+    PFNGLGETIMAGEHANDLENVPROC                       glGetImageHandleNV;
+    PFNGLMAKEIMAGEHANDLERESIDENTNVPROC              glMakeImageHandleResidentNV;
+    PFNGLMAKEIMAGEHANDLENONRESIDENTNVPROC           glMakeImageHandleNonResidentNV;
+    PFNGLUNIFORMHANDLEUI64NVPROC                    glUniformHandleui64NV;
+    PFNGLUNIFORMHANDLEUI64VNVPROC                   glUniformHandleui64vNV;
+    PFNGLPROGRAMUNIFORMHANDLEUI64NVPROC             glProgramUniformHandleui64NV;
+    PFNGLPROGRAMUNIFORMHANDLEUI64VNVPROC            glProgramUniformHandleui64vNV;
+    PFNGLISTEXTUREHANDLERESIDENTNVPROC              glIsTextureHandleResidentNV;
+    PFNGLISIMAGEHANDLERESIDENTNVPROC                glIsImageHandleResidentNV;
 
 }; // class gl_core
 

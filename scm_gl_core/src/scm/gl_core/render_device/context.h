@@ -268,6 +268,10 @@ public:
                                                       const unsigned           in_level,
                                                             void*              in_data);
 
+    bool                        make_resident(const texture_ptr&       in_texture,
+                                              const sampler_state_ptr& in_sstate);
+    bool                        make_non_resident(const texture_ptr&       in_texture);
+
 protected:
     void                        apply_texture_units();
     void                        apply_image_units();

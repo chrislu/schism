@@ -86,7 +86,11 @@ public:
         int             _max_geometry_uniform_blocks;
         int             _max_fragment_uniform_blocks;
         int             _max_combined_uniform_blocks;
+        int             _max_combined_vertex_uniform_components;
+        int             _max_combined_geometry_uniform_components;
+        int             _max_combined_fragment_uniform_components;
         int             _max_uniform_buffer_bindings;
+        int             _max_uniform_block_size;
         int             _uniform_buffer_offset_alignment;
         int             _max_viewports;
         int             _max_transform_feedback_separate_attribs;

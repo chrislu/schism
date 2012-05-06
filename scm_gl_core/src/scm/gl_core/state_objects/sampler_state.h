@@ -68,6 +68,7 @@ protected:
 private:
     friend class scm::gl::render_device;
     friend class scm::gl::render_context;
+    friend class scm::gl::texture;
 }; // class sampler_state
 
 } // namespace gl

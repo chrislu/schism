@@ -114,16 +114,19 @@ gl_core::gl_core()
     version_4_1_available   = false;
     version_4_2_available   = false;
 
-    extension_ARB_shading_language_include      = false;
     extension_ARB_cl_event                      = false;
     extension_ARB_debug_output                  = false;
-    extension_ARB_robustness                    = false;
-    extension_EXT_shader_image_load_store       = false;
-    extension_EXT_direct_state_access_available = false;
-    extension_EXT_texture_compression_s3tc      = false;
-    extension_ARB_texture_compression_bptc      = false;
     extension_ARB_map_buffer_alignment          = false;
+    extension_ARB_robustness                    = false;
+    extension_ARB_shading_language_include      = false;
+    extension_ARB_texture_compression_bptc      = false;
+
+    extension_EXT_direct_state_access_available = false;
+    extension_EXT_shader_image_load_store       = false;
+    extension_EXT_texture_compression_s3tc      = false;
+
     extension_NVX_gpu_memory_info               = false;
+    extension_NV_bindless_texture               = false;
 }
 
 bool
@@ -259,6 +262,8 @@ gl_core::initialize()
     extension_EXT_texture_compression_s3tc = is_supported("GL_EXT_texture_compression_s3tc");
     extension_ARB_texture_compression_bptc = is_supported("GL_ARB_texture_compression_bptc");
     extension_NVX_gpu_memory_info          = is_supported("GL_NVX_gpu_memory_info");
+
+    extension_NV_bindless_texture          = extension_NV_bindless_texture && is_supported("GL_NV_bindless_texture");
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
@@ -1095,6 +1100,24 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLNAMEDFRAMEBUFFERTEXTURELAYEREXTPROC, glNamedFramebufferTextureLayerEXT, "EXT_direct_state_access", init_success);
 
     extension_EXT_direct_state_access_available = init_success;
+
+
+    // GL_NV_bindless_texture
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLGETTEXTUREHANDLENVPROC, glGetTextureHandleNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETTEXTURESAMPLERHANDLENVPROC, glGetTextureSamplerHandleNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKETEXTUREHANDLERESIDENTNVPROC, glMakeTextureHandleResidentNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKETEXTUREHANDLENONRESIDENTNVPROC, glMakeTextureHandleNonResidentNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETIMAGEHANDLENVPROC, glGetImageHandleNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKEIMAGEHANDLERESIDENTNVPROC, glMakeImageHandleResidentNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKEIMAGEHANDLENONRESIDENTNVPROC, glMakeImageHandleNonResidentNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMHANDLEUI64NVPROC, glUniformHandleui64NV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMHANDLEUI64VNVPROC, glUniformHandleui64vNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMHANDLEUI64NVPROC, glProgramUniformHandleui64NV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMHANDLEUI64VNVPROC, glProgramUniformHandleui64vNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISTEXTUREHANDLERESIDENTNVPROC, glIsTextureHandleResidentNV, "GL_NV_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISIMAGEHANDLERESIDENTNVPROC, glIsImageHandleResidentNV, "GL_NV_bindless_texture", init_success);
+    extension_NV_bindless_texture = init_success;
 
     glout() << log::outdent;
     glout() << log::info << "finished initializing function entry points..." << log::end;

@@ -1097,6 +1097,33 @@ render_context::retrieve_texture_data(const texture_image_ptr& in_texture,
     return true;
 }
 
+bool
+render_context::make_resident(const texture_ptr&       in_texture,
+                              const sampler_state_ptr& in_sstate)
+{
+    if (!opengl_api().extension_NV_bindless_texture) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_bindless_texture extension."
+                << log::end;
+        return false;
+    }
+    return in_texture->make_resident(*this, in_sstate);
+}
+
+bool
+render_context::make_non_resident(const texture_ptr&       in_texture)
+{
+    if (!opengl_api().extension_NV_bindless_texture) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_bindless_texture extension."
+                << log::end;
+        return false;
+    }
+    return in_texture->make_non_resident(*this);
+}
+
 void
 render_context::apply_texture_units()
 {
