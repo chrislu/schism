@@ -104,6 +104,9 @@ volume_reader_vgeo::volume_reader_vgeo(const std::string& file_path,
         case 16: _format = FORMAT_R_16; break;
         }
     }
+    else if (0 == vgeo_vol_hdr->volume_form && 0 == vgeo_vol_hdr->voxelbits) {
+        _format = FORMAT_R_8;
+    }
     else {
         _file.reset();
         glerr() << scm::log::error
