@@ -40,7 +40,7 @@ typed_generate_mipmaps(const math::vec3ui&        src_dim,
 
     for (int l = 1; l < static_cast<int>(util::max_mip_levels(src_dim)); ++l) {
         const vec3i  lsize  = vec3i(util::mip_level_dimensions(src_dim, l));
-        const size_t ldsize = lsize.x * lsize.y * lsize.z;
+        const size_t ldsize = static_cast<size_t>(lsize.x) * static_cast<size_t>(lsize.y) * static_cast<size_t>(lsize.z);
         const vec3i  slsize = vec3i(util::mip_level_dimensions(src_dim, l - 1));
 
         uint8* lrawdata = new uint8[ldsize * sizeof(varr)];
@@ -62,7 +62,8 @@ typed_generate_mipmaps(const math::vec3ui&        src_dim,
                     if (x_samples == 1) { // 
                         for (int zs = 0; zs < z_samples; ++zs) {
                             for (int ys = 0; ys < y_samples; ++ys) {
-                                const varr* ld  = sldata + ((2 * y + ys) * slsize.x + (2 * z + zs) * slsize.x * slsize.y);
+                                const varr* ld  = sldata + ( static_cast<size_t>(2 * y + ys) * slsize.x
+                                                           + static_cast<size_t>(2 * z + zs) * slsize.x * slsize.y);
                                 tlines[(ys + zs * y_max_lines) * lsize.x] = ld[0];
                             }
                         }
@@ -70,7 +71,8 @@ typed_generate_mipmaps(const math::vec3ui&        src_dim,
                     else if (x_samples == 2) { // box filter
                         for (int zs = 0; zs < z_samples; ++zs) {
                             for (int ys = 0; ys < y_samples; ++ys) {
-                                const varr* ld  = sldata + ((2 * y + ys) * slsize.x + (2 * z + zs) * slsize.x * slsize.y);
+                                const varr* ld  = sldata + ( static_cast<size_t>(2 * y + ys) * slsize.x
+                                                           + static_cast<size_t>(2 * z + zs) * slsize.x * slsize.y);
                                 const int   lo  = (ys + zs * y_max_lines) * lsize.x;
                                 for (int x = 0; x < lsize.x; ++x) {
                                     tlines[lo + x] += ld[0];
@@ -84,7 +86,8 @@ typed_generate_mipmaps(const math::vec3ui&        src_dim,
                     else { // x_samples == 3 ==> polyphase box filter
                         for (int zs = 0; zs < z_samples; ++zs) {
                             for (int ys = 0; ys < y_samples; ++ys) {
-                                const varr* ld    = sldata + ((2 * y + ys) * slsize.x + (2 * z + zs) * slsize.x * slsize.y);
+                                const varr* ld    = sldata + ( static_cast<size_t>(2 * y + ys) * slsize.x
+                                                             + static_cast<size_t>(2 * z + zs) * slsize.x * slsize.y);
                                 const int   lo    = (ys + zs * y_max_lines) * lsize.x;
                                 const float scale = 1.0f / (2.0f * lsize.x + 1.0f);
                                 for (int x = 0; x < lsize.x; ++x) {
@@ -158,7 +161,8 @@ typed_generate_mipmaps(const math::vec3ui&        src_dim,
                     }
                 }
                 { // write out samples
-                    const size_t dst_off = y * lsize.x + z * lsize.x * lsize.y;
+                    const size_t dst_off =   static_cast<size_t>(y) * lsize.x
+                                           + static_cast<size_t>(z) * lsize.x * lsize.y;
                     for (int x = 0; x < lsize.x; ++x) {
                         ldata[dst_off + x] = varr(clamp(tlines[x], tarr(vmin), tarr(vmax)));
                     }

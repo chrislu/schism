@@ -114,7 +114,7 @@ volume_reader_segy::~volume_reader_segy()
 
 bool
 volume_reader_segy::read(const scm::math::vec3ui& o,
-                         const scm::math::vec3ui& s,
+                         const scm::math::vec3ui& sz,
                                void*              d)
 {
     using namespace scm;
@@ -133,7 +133,7 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
         //    return false;
         //}
 #if 1
-        if (o.x == 0 && s.x >= _dimensions.x) {
+        if (o.x == 0 && sz.x >= _dimensions.x) {
             // we can read complete sets of lines/traces
             scm::int64 offset_src;
             scm::int64 offset_dst;
@@ -141,8 +141,8 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
             const int64             data_value_size = static_cast<int64>(size_of_format(_format));
             const vec<int64, 3>     o64(o);
             const vec<int64, 3>     d64(_dimensions);
-            const vec<int64, 3>     s64(s);
-            const vec3ui            read_dim = clamp(s + o, vec3ui(0u), _dimensions) - o;
+            const vec<int64, 3>     s64(sz);
+            const vec3ui            read_dim = clamp(sz + o, vec3ui(0u), _dimensions) - o;
             const int64             dstart = _segy_data->_traces_start;
             const int64             thsize = sizeof(data::segy_trace_header);
 
@@ -253,8 +253,8 @@ volume_reader_segy::read(const scm::math::vec3ui& o,
             const int64             data_value_size = static_cast<int64>(size_of_format(_format));
             const vec<int64, 3>     o64(o);
             const vec<int64, 3>     d64(_dimensions);
-            const vec<int64, 3>     s64(s);
-            const vec3ui            read_dim = clamp(s + o, vec3ui(0u), _dimensions) - o;
+            const vec<int64, 3>     s64(sz);
+            const vec3ui            read_dim = clamp(sz + o, vec3ui(0u), _dimensions) - o;
             const int64             dstart = _segy_data->_traces_start;
             const int64             thsize = sizeof(data::segy_trace_header);
 
