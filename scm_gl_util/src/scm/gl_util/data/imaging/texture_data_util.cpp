@@ -347,14 +347,38 @@ generate_mipmaps(const math::vec3ui&        src_dim,
     case FORMAT_R_32F:
         typed_generate_mipmaps<float, 1, 2>(src_dim, src_data, dst_data);
         break;
+    case FORMAT_RG_32F:
+        typed_generate_mipmaps<float, 2, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGB_32F:
+        typed_generate_mipmaps<float, 3, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGBA_32F:
+        typed_generate_mipmaps<float, 4, 2>(src_dim, src_data, dst_data);
+        break;
     case FORMAT_R_8:
         typed_generate_mipmaps<uint8, 1, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RG_8:
+        typed_generate_mipmaps<uint8, 2, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGB_8:
+        typed_generate_mipmaps<uint8, 3, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGBA_8:
+        typed_generate_mipmaps<uint8, 4, 2>(src_dim, src_data, dst_data);
         break;
     case FORMAT_R_16:
         typed_generate_mipmaps<uint16, 1, 2>(src_dim, src_data, dst_data);
         break;
-    case FORMAT_RGBA_8:
-        typed_generate_mipmaps<uint8, 4, 2>(src_dim, src_data, dst_data);
+    case FORMAT_RG_16:
+        typed_generate_mipmaps<uint16, 2, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGB_16:
+        typed_generate_mipmaps<uint16, 3, 2>(src_dim, src_data, dst_data);
+        break;
+    case FORMAT_RGBA_16:
+        typed_generate_mipmaps<uint16, 4, 2>(src_dim, src_data, dst_data);
         break;
     default:
         glerr() << log::error
