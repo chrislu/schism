@@ -146,8 +146,12 @@ public:
     
     // callbacks
     void                            render_update_func(const update_func& f);
+    void                            render_pre_frame_update_func(const update_func& f);
+    void                            render_post_frame_update_func(const update_func& f);
     void                            render_resize_func(const resize_func& f);
     void                            render_display_func(const display_func& f);
+    void                            render_display_scene_func(const display_func& f);
+    void                            render_display_gui_func(const display_func& f);
 
     void                            keyboard_input_func(const keyboard_func& f);
     void                            mouse_double_click_func(const mouse_func& f);
@@ -159,6 +163,8 @@ public:
 
     // callback invoke (to be hidden somewhere else)
     void                            send_render_update();
+    void                            send_render_pre_frame_update();
+    void                            send_render_post_frame_update();
     void                            send_render_display();
     void                            send_render_reshape(int width, int height);
 
@@ -243,9 +249,11 @@ protected:
     inp::space_navigator_ptr        _device_space_navigator;
 
     // callbacks
-    update_func                     _update_func;
+    update_func                     _pre_frame_update_func;
+    update_func                     _post_frame_update_func;
     resize_func                     _resize_func;
-    display_func                    _display_func;
+    display_func                    _display_scene_func;
+    display_func                    _display_gui_func;
 
     keyboard_func                   _keyboard_func;
     mouse_func                      _mouse_double_click_func;

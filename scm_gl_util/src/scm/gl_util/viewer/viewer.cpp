@@ -343,7 +343,19 @@ viewer::take_screenshot(const std::string& f) const
 void
 viewer::render_update_func(const update_func& f)
 {
-    _update_func = f;
+    _pre_frame_update_func = f;
+}
+
+void
+viewer::render_pre_frame_update_func(const update_func& f)
+{
+    _pre_frame_update_func = f;
+}
+
+void
+viewer::render_post_frame_update_func(const update_func& f)
+{
+    _post_frame_update_func = f;
 }
 
 void
@@ -355,7 +367,19 @@ viewer::render_resize_func(const resize_func& f)
 void
 viewer::render_display_func(const display_func& f)
 {
-    _display_func = f;
+    _display_scene_func = f;
+}
+
+void
+viewer::render_display_scene_func(const display_func& f)
+{
+    _display_scene_func = f;
+}
+
+void
+viewer::render_display_gui_func(const display_func& f)
+{
+    _display_gui_func = f;
 }
 
 void
@@ -397,6 +421,12 @@ viewer::tablet_input_func(const tablet_func& f)
 void
 viewer::send_render_update()
 {
+    send_render_pre_frame_update();
+}
+
+void
+viewer::send_render_pre_frame_update()
+{
     using namespace scm::math;
 
     _device_space_navigator->update(); // update done directly (poll), callback of the device disabled!
@@ -407,8 +437,16 @@ viewer::send_render_update()
     _camera.view_matrix(view_matrix);
     _trackball.transform_matrix(view_matrix);
 
-    if (_update_func) {
-        _update_func(device(), context());
+    if (_pre_frame_update_func) {
+        _pre_frame_update_func(device(), context());
+    }
+}
+
+void
+viewer::send_render_post_frame_update()
+{
+    if (_post_frame_update_func) {
+        _post_frame_update_func(device(), context());
     }
 }
 
@@ -423,7 +461,7 @@ viewer::send_render_display()
 
     _frame_time_us = static_cast<float>(_frame_timer.last_time(time::time_io::usec));//static_cast<float>(scm::time::to_microseconds(_frame_timer.last_time()));
 
-    if (_display_func) {
+    if (_display_scene_func) {
 
         // clear
         clear_color();
@@ -439,7 +477,7 @@ viewer::send_render_display()
             context()->set_viewport(viewport(vec2ui(0, 0), vec2ui(_viewport._dimensions) * _render_target->_viewport_scale));
             
             // client code
-            _display_func(context());
+            _display_scene_func(context());
 
             // resolve framebuffer
             context()->resolve_multi_sample_buffer(_render_target->_framebuffer_aa, _render_target->_framebuffer_resolved);
@@ -454,7 +492,7 @@ viewer::send_render_display()
             context()->set_frame_buffer(_render_target->_framebuffer_resolved);
             {
                 // client code
-                _display_func(context());
+                _display_scene_func(context());
             }
         }
 
@@ -496,8 +534,9 @@ viewer::send_render_display()
             //_text_renderer->draw_shadowed(context(), text_ur, _frame_counter_text);
         }
     }
-    if (!_settings._swap_explicit) {
-        swap_buffers(_settings._vsync ? 1 : 0);
+
+    if (_display_gui_func) {
+        _display_gui_func(context());
     }
 
     if (_settings._show_frame_times) {
@@ -525,6 +564,10 @@ viewer::send_render_display()
             }
             _frame_timer.reset();
         }
+    }
+
+    if (!_settings._swap_explicit) {
+        swap_buffers(_settings._vsync ? 1 : 0);
     }
 
     // hack to catch a bug in fraps
