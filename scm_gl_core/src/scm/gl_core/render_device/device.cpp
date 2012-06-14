@@ -257,6 +257,18 @@ render_device::init_capabilities()
         _capabilities._min_buffer_alignment = 1;
     }
 
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
+        glcore.glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &_capabilities._num_program_binary_formats);
+        if (_capabilities._num_program_binary_formats > 0) {
+            _capabilities._program_binary_formats.reset(new int[_capabilities._num_program_binary_formats]);
+            glcore.glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, _capabilities._program_binary_formats.get());
+        }
+    }
+    else {
+        _capabilities._num_program_binary_formats = 0;
+    }
+
+
 
 
     log::logger_format_saver ofs(glout().associated_logger());
@@ -321,6 +333,25 @@ render_device::init_capabilities()
             << "MIN_MAP_BUFFER_ALIGNMENT                    " << _capabilities._min_buffer_alignment
             << log::outdent;
 
+    std::stringstream pbf;
+    pbf << "(";
+    if (0 < _capabilities._num_program_binary_formats) {
+        for (int f = 0; f < _capabilities._num_program_binary_formats; ++f) {
+            pbf << std::hex << "0x" << _capabilities._program_binary_formats[f];
+            if (f < _capabilities._num_program_binary_formats - 1) {
+                pbf << ", ";
+            }
+        }
+    } else {
+        pbf << "N/A";
+    }
+    pbf << ")";
+
+    glout() << "program binary formats: " << log::nline
+            << log::indent
+            << "GL_NUM_PROGRAM_BINARY_FORMATS               " << _capabilities._num_program_binary_formats << log::nline
+            << "GL_PROGRAM_BINARY_FORMATS                   " << pbf.str() << log::nline
+            << log::outdent;
 
     //std::cout << "GL_MAX_IMAGE_UNITS_EXT " << _capabilities._max_image_units << std::endl;
 }
@@ -753,6 +784,10 @@ render_device::create_shader_from_file(shader_stage                    in_stage,
     bfs::path       file_path(in_file_name);
     std::string     source_string;
 
+    if (!bfs::exists(file_path)) {
+        glerr() << "render_device::create_shader_from_file(): unable to find shader file " << in_file_name << log::end;
+        return (shader_ptr());
+    }
     if (   !io::read_text_file(in_file_name, source_string)) {
         glerr() << "render_device::create_shader_from_file(): error reading shader file " << in_file_name << log::end;
         return (shader_ptr());
