@@ -225,11 +225,39 @@ profiling_host::update(int interval)
 }
 
 void
+profiling_host::force_update()
+{
+    if (_enabled) {
+        using namespace std;
+
+        force_collect_all();
+
+        _update_interval = 0;
+
+        for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
+            t.second._timer->update(0);
+            t.second._time = t.second._timer->average_time();
+        });
+
+        reset_all();
+    }
+}
+
+void
 profiling_host::collect_all()
 {
     using namespace std;
     for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
         t.second._timer->collect();
+    });
+}
+
+void
+profiling_host::force_collect_all()
+{
+    using namespace std;
+    for_each(_timers.begin(), _timers.end(), [](timer_map::value_type& t) -> void {
+        t.second._timer->force_collect();
     });
 }
 

@@ -78,8 +78,10 @@ public:
     nanosec_type            time(const std::string& tname) const;
 
     void                    update(int interval = 100);
+    void                    force_update();
 
     void                    collect_all();
+    void                    force_collect_all();
     void                    reset_all();
 
     void                    collect(const std::string& tname);
