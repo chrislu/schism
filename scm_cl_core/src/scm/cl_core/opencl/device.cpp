@@ -323,7 +323,7 @@ opencl_device::init_opencl()
     { // find devices that support gl sharing
         clGetGLContextInfoKHR_fn cl_get_GLContextInfoKHR = 0;
 
-        cl_get_GLContextInfoKHR = reinterpret_cast<clGetGLContextInfoKHR_fn>(clGetExtensionFunctionAddress("clGetGLContextInfoKHR"));
+        cl_get_GLContextInfoKHR = 0;//reinterpret_cast<clGetGLContextInfoKHR_fn>(clGetExtensionFunctionAddress("clGetGLContextInfoKHR"));
 
         if (cl_get_GLContextInfoKHR == 0) {
             err() << log::error
