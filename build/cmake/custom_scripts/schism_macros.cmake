@@ -127,17 +127,22 @@ macro(scm_copy_shared_libraries)
     set(in_libraries        ${ARGV})
 
 	list(REMOVE_AT in_libraries 0)
+	#message("in " ${in_libraries})
 
     if (${in_platform} OR in_platform MATCHES ALL)
 		foreach(shlib ${in_libraries})
-			#message(${shlib})
+			#message("shlib " ${shlib})
 			#message(${in_platform})
-			#file(GLOB_RECURSE scm_glob_dlls ${GLOBAL_EXT_DIR}/lib/$<CONFIGURATION>/ ${shlib})
+			#file(GLOB_RECURSE scm_glob_dlls ${GLOBAL_EXT_DIR}/lib/$<CONFIGURATION>/${shlib}.dll)
 			#message(${scm_glob_dlls})
-			set(scm_copy_dlls ${GLOBAL_EXT_DIR}/lib/$<CONFIGURATION>/${shlib})
+			set(scm_copy_dlls ${GLOBAL_EXT_DIR}/lib/$<CONFIGURATION>/${shlib}.dll)
+			#message("scmcp " ${scm_copy_dlls})
 			set(scm_copy_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/)
 			string(REPLACE "/" "\\" scm_copy_dlls ${scm_copy_dlls})
 			string(REPLACE "/" "\\" scm_copy_path ${scm_copy_path})
+			
+			#message{${scm_copy_dlls})
+			#message(${scm_copy_path})
 			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 							   COMMAND if EXIST ${scm_copy_dlls} ${CMAKE_COMMAND} -E echo "copying ${shlib} to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/"
 							   COMMAND if EXIST ${scm_copy_dlls} ${CMAKE_COMMAND} -E copy_if_different ${scm_copy_dlls} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/)
@@ -158,6 +163,7 @@ macro(scm_copy_shared_libraries)
 endmacro(scm_copy_shared_libraries)
 
 macro(scm_copy_schism_libraries)
+    scm_copy_shared_libraries(WIN32 ${SCM_CUDA_SHARED_LIB_NAME})
 	if (NOT SCHISM_BUILD_STATIC AND WIN32)
 		set(scm_copy_dlls ${SCHISM_LIBRARY_DIR}/$<CONFIGURATION>/*.dll)
 		set(scm_copy_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/)
