@@ -13,7 +13,7 @@
 
 #include <scm/gl_core/log.h>
 
-#include <scm/gl_util/data/volume/voxel_geo/vv_shm.h>
+#include <scm/gl_util/data/volume/vgeo/vgeo.h>
 
 namespace {
 
@@ -47,9 +47,9 @@ volume_reader_vgeo::volume_reader_vgeo(const std::string& file_path,
         return;
     }
 
-    scoped_ptr<VV_volume>  vgeo_vol_hdr(new VV_volume);
+    scoped_ptr<vgeo_header>  vgeo_vol_hdr(new vgeo_header);
 
-    if (_file->read(vgeo_vol_hdr.get(), 0, sizeof(VV_volume)) != sizeof(VV_volume)) {
+    if (_file->read(vgeo_vol_hdr.get(), 0, sizeof(vgeo_header)) != sizeof(vgeo_header)) {
         _file.reset();
         glerr() << scm::log::error
                 << "volume_reader_vgeo::volume_reader_vgeo(): "
@@ -58,53 +58,20 @@ volume_reader_vgeo::volume_reader_vgeo(const std::string& file_path,
     }
  
     if (is_host_little_endian()) {
-        swap_endian(vgeo_vol_hdr->magic);
-        swap_endian(vgeo_vol_hdr->volume_form);
-        swap_endian(vgeo_vol_hdr->size);
-        swap_endian(vgeo_vol_hdr->flag);
-        swap_endian(vgeo_vol_hdr->count);
-        swap_endian(vgeo_vol_hdr->databits);
-        swap_endian(vgeo_vol_hdr->normbits);
-        swap_endian(vgeo_vol_hdr->gradbits);
-        swap_endian(vgeo_vol_hdr->voxelbits);
-        swap_endian(vgeo_vol_hdr->xsize);
-        swap_endian(vgeo_vol_hdr->ysize);
-        swap_endian(vgeo_vol_hdr->zsize);
-        swap_endian(vgeo_vol_hdr->interspace);
-        swap_endian(vgeo_vol_hdr->voffset);
-        swap_endian(vgeo_vol_hdr->xoffset);
-        swap_endian(vgeo_vol_hdr->yoffset);
-        swap_endian(vgeo_vol_hdr->zoffset);
-        swap_endian(vgeo_vol_hdr->vcal);
-        swap_endian(vgeo_vol_hdr->xcal);
-        swap_endian(vgeo_vol_hdr->ycal);
-        swap_endian(vgeo_vol_hdr->zcal);
-        for (unsigned int i = 0; i < VV_LEVELS; i++) {
-            swap_endian(vgeo_vol_hdr->histogram[i]);
-            swap_endian(vgeo_vol_hdr->grad_histogram[i]);
-        }
-        swap_endian(vgeo_vol_hdr->tags);
-        swap_endian(vgeo_vol_hdr->voxels_changed_count);
-        swap_endian(vgeo_vol_hdr->volSurveyUnits);
-        swap_endian(vgeo_vol_hdr->volWorldUnits);
-        for (unsigned int i = 0; i < 4; i++)
-            for (unsigned int k = 0; k < 3; k++)
-                swap_endian(vgeo_vol_hdr->worldXref[i][k]);
-        swap_endian(vgeo_vol_hdr->worldFlag);
-        swap_endian(vgeo_vol_hdr->orig_x);
-        swap_endian(vgeo_vol_hdr->orig_y);
-        swap_endian(vgeo_vol_hdr->orig_z);
-        swap_endian(vgeo_vol_hdr->catbits);
-        swap_endian(vgeo_vol_hdr->segCreatorProcGrp);
+        swap_endian(vgeo_vol_hdr->_volume_type);
+        swap_endian(vgeo_vol_hdr->_bits_per_voxel);
+        swap_endian(vgeo_vol_hdr->_size_x);
+        swap_endian(vgeo_vol_hdr->_size_y);
+        swap_endian(vgeo_vol_hdr->_size_z);
     }
 
-    if (vgeo_vol_hdr->volume_form == VV_FULL_VOL) {
-        switch (vgeo_vol_hdr->voxelbits) {
+    if (vgeo_vol_hdr->_volume_type == 0x01) {
+        switch (vgeo_vol_hdr->_bits_per_voxel) {
         case 8:  _format = FORMAT_R_8;  break;
         case 16: _format = FORMAT_R_16; break;
         }
     }
-    else if (0 == vgeo_vol_hdr->volume_form && 0 == vgeo_vol_hdr->voxelbits) {
+    else if (0 == vgeo_vol_hdr->_volume_type && 0 == vgeo_vol_hdr->_bits_per_voxel) {
         _format = FORMAT_R_8;
     }
     else {
@@ -119,20 +86,20 @@ volume_reader_vgeo::volume_reader_vgeo(const std::string& file_path,
         _file.reset();
         glerr() << scm::log::error
                 << "volume_reader_vgeo::volume_reader_vgeo(): "
-                << "unable match data format (vgeo_vol_hdr->voxelbits: " << vgeo_vol_hdr->voxelbits << ")." << scm::log::end;
+                << "unable match data format (vgeo_vol_hdr->voxelbits: " << vgeo_vol_hdr->_bits_per_voxel << ")." << scm::log::end;
         return;
     }
+    glout() << sizeof(vgeo_header);
+    _data_start_offset  = sizeof(vgeo_header);
 
-    _data_start_offset  = sizeof(VV_volume);
-
-    _dimensions.x = vgeo_vol_hdr->xsize;
-    _dimensions.y = vgeo_vol_hdr->ysize;
-    _dimensions.z = vgeo_vol_hdr->zsize;
+    _dimensions.x = vgeo_vol_hdr->_size_x;
+    _dimensions.y = vgeo_vol_hdr->_size_y;
+    _dimensions.z = vgeo_vol_hdr->_size_z;
 
 
-    scm::size_t data_size =   static_cast<scm::size_t>(vgeo_vol_hdr->xsize)
-                            * static_cast<scm::size_t>(vgeo_vol_hdr->ysize)
-                            * static_cast<scm::size_t>(vgeo_vol_hdr->zsize)
+    scm::size_t data_size =   static_cast<scm::size_t>(vgeo_vol_hdr->_size_x)
+                            * static_cast<scm::size_t>(vgeo_vol_hdr->_size_y)
+                            * static_cast<scm::size_t>(vgeo_vol_hdr->_size_z)
                             * size_of_format(_format);
 
     if (data_size != (_file->size() - _data_start_offset)) {
