@@ -35,8 +35,8 @@ scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/data/imaging *.h *.inl)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/data/volume *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/data/volume *.h *.inl)
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/data/volume/voxel_geo *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/data/volume/voxel_geo *.h *.inl)
+scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/data/volume/vgeo *.cpp)
+scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/data/volume/vgeo *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/gl_util/data/volume/segy *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/gl_util/data/volume/segy *.h *.inl)
 
