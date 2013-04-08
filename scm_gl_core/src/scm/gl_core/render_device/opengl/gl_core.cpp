@@ -113,6 +113,7 @@ gl_core::gl_core()
     version_4_0_available   = false;
     version_4_1_available   = false;
     version_4_2_available   = false;
+    version_4_3_available   = false;
 
     extension_ARB_cl_event                      = false;
     extension_ARB_debug_output                  = false;
@@ -942,6 +943,88 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE3DEXTPROC, glTextureStorage3DEXT, "OpenGL Core 4.2", init_success);
     version_4_2_available = version_4_1_available && init_success;
 
+    // version 4.3 ////////////////////////////////////////////////////////////////////////////////
+    init_success = true;
+    // ARB_arrays_of_arrays (no entry points, GLSL only)
+    // ARB_fragment_layer_viewport (no entry points, GLSL only)
+    // ARB_shader_image_size (no entry points, GLSL only)
+    // ARB_ES3_compatibility (no entry points)
+    // ARB_clear_buffer_object
+    SCM_INIT_GL_ENTRY(PFNGLCLEARBUFFERDATAPROC, glClearBufferData, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCLEARBUFFERSUBDATAPROC, glClearBufferSubData, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCLEARNAMEDBUFFERDATAEXTPROC, glClearNamedBufferDataEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCLEARNAMEDBUFFERSUBDATAEXTPROC, glClearNamedBufferSubDataEXT, "OpenGL Core 4.3", init_success);
+    // ARB_compute_shader
+    SCM_INIT_GL_ENTRY(PFNGLDISPATCHCOMPUTEPROC, glDispatchCompute, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDISPATCHCOMPUTEINDIRECTPROC, glDispatchComputeIndirect, "OpenGL Core 4.3", init_success);
+    // ARB_copy_image
+    SCM_INIT_GL_ENTRY(PFNGLCOPYIMAGESUBDATAPROC, glCopyImageSubData, "OpenGL Core 4.3", init_success);
+    // KHR_debug (includes ARB_debug_output commands promoted to KHR without suffixes)
+    SCM_INIT_GL_ENTRY(PFNGLDEBUGMESSAGECONTROLPROC, glDebugMessageControl, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDEBUGMESSAGEINSERTPROC, glDebugMessageInsert, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLDEBUGMESSAGECALLBACKPROC, glDebugMessageCallback, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETDEBUGMESSAGELOGPROC, glGetDebugMessageLog, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPUSHDEBUGGROUPPROC, glPushDebugGroup, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPOPDEBUGGROUPPROC, glPopDebugGroup, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLOBJECTLABELPROC, glObjectLabel, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETOBJECTLABELPROC, glGetObjectLabel, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLOBJECTPTRLABELPROC, glObjectPtrLabel, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETOBJECTPTRLABELPROC, glGetObjectPtrLabel, "OpenGL Core 4.3", init_success);
+    // ARB_explicit_uniform_location (no entry points)
+    // ARB_framebuffer_no_attachments
+    SCM_INIT_GL_ENTRY(PFNGLFRAMEBUFFERPARAMETERIPROC, glFramebufferParameteri, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETFRAMEBUFFERPARAMETERIVPROC, glGetFramebufferParameteriv, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLNAMEDFRAMEBUFFERPARAMETERIEXTPROC, glNamedFramebufferParameteriEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETNAMEDFRAMEBUFFERPARAMETERIVEXTPROC, glGetNamedFramebufferParameterivEXT, "OpenGL Core 4.3", init_success);
+    // ARB_internalformat_query2
+    SCM_INIT_GL_ENTRY(PFNGLGETINTERNALFORMATI64VPROC, glGetInternalformati64v, "OpenGL Core 4.3", init_success);
+    // ARB_invalidate_subdata
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATETEXSUBIMAGEPROC, glInvalidateTexSubImage, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATETEXIMAGEPROC, glInvalidateTexImage, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATEBUFFERSUBDATAPROC, glInvalidateBufferSubData, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATEBUFFERDATAPROC, glInvalidateBufferData, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATEFRAMEBUFFERPROC, glInvalidateFramebuffer, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLINVALIDATESUBFRAMEBUFFERPROC, glInvalidateSubFramebuffer, "OpenGL Core 4.3", init_success);
+    // ARB_multi_draw_indirect
+    SCM_INIT_GL_ENTRY(PFNGLMULTIDRAWARRAYSINDIRECTPROC, glMultiDrawArraysIndirect, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMULTIDRAWELEMENTSINDIRECTPROC, glMultiDrawElementsIndirect, "OpenGL Core 4.3", init_success);
+    // ARB_program_interface_query
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMINTERFACEIVPROC, glGetProgramInterfaceiv, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMRESOURCEINDEXPROC, glGetProgramResourceIndex, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMRESOURCENAMEPROC, glGetProgramResourceName, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMRESOURCEIVPROC, glGetProgramResourceiv, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMRESOURCELOCATIONPROC, glGetProgramResourceLocation, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC, glGetProgramResourceLocationIndex, "OpenGL Core 4.3", init_success);
+    // ARB_robust_buffer_access_behavior (no entry points)
+    // ARB_shader_storage_buffer_object
+    SCM_INIT_GL_ENTRY(PFNGLSHADERSTORAGEBLOCKBINDINGPROC, glShaderStorageBlockBinding, "OpenGL Core 4.3", init_success);
+    // ARB_stencil_texturing (no entry points)
+    // ARB_texture_buffer_range
+    SCM_INIT_GL_ENTRY(PFNGLTEXBUFFERRANGEPROC, glTexBufferRange, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTUREBUFFERRANGEEXTPROC, glTextureBufferRangeEXT, "OpenGL Core 4.3", init_success);
+    // ARB_texture_query_levels (no entry points)
+    // ARB_texture_storage_multisample
+    SCM_INIT_GL_ENTRY(PFNGLTEXSTORAGE2DMULTISAMPLEPROC, glTexStorage2DMultisample, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXSTORAGE3DMULTISAMPLEPROC, glTexStorage3DMultisample, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE2DMULTISAMPLEEXTPROC, glTextureStorage2DMultisampleEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTURESTORAGE3DMULTISAMPLEEXTPROC, glTextureStorage3DMultisampleEXT, "OpenGL Core 4.3", init_success);
+    // ARB_texture_view
+    SCM_INIT_GL_ENTRY(PFNGLTEXTUREVIEWPROC, glTextureView, "OpenGL Core 4.3", init_success);
+    // ARB_vertex_attrib_binding
+    SCM_INIT_GL_ENTRY(PFNGLBINDVERTEXBUFFERPROC, glBindVertexBuffer, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBFORMATPROC, glVertexAttribFormat, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBIFORMATPROC, glVertexAttribIFormat, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBLFORMATPROC, glVertexAttribLFormat, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBBINDINGPROC, glVertexAttribBinding, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXBINDINGDIVISORPROC, glVertexBindingDivisor, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYBINDVERTEXBUFFEREXTPROC, glVertexArrayBindVertexBufferEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBFORMATEXTPROC, glVertexArrayVertexAttribFormatEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBIFORMATEXTPROC, glVertexArrayVertexAttribIFormatEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBLFORMATEXTPROC, glVertexArrayVertexAttribLFormatEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXATTRIBBINDINGEXTPROC, glVertexArrayVertexAttribBindingEXT, "OpenGL Core 4.3", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXBINDINGDIVISOREXTPROC, glVertexArrayVertexBindingDivisorEXT, "OpenGL Core 4.3", init_success);
+    version_4_3_available = version_4_2_available && init_success;
+
     // GL_ARB_shading_language_include
     init_success = true;
     SCM_INIT_GL_ENTRY(PFNGLNAMEDSTRINGARBPROC, glNamedStringARB, "GL_ARB_shading_language_include", init_success);
@@ -968,18 +1051,18 @@ gl_core::init_entry_points()
     // ARB_robustness /////////////////////////////////////////////////////////////////////////////
     init_success = true;
     SCM_INIT_GL_ENTRY(PFNGLGETGRAPHICSRESETSTATUSARBPROC, glGetGraphicsResetStatusARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNMAPDVARBPROC, glGetnMapdvARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNMAPFVARBPROC, glGetnMapfvARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNMAPIVARBPROC, glGetnMapivARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPFVARBPROC, glGetnPixelMapfvARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPUIVARBPROC, glGetnPixelMapuivARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPUSVARBPROC, glGetnPixelMapusvARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNPOLYGONSTIPPLEARBPROC, glGetnPolygonStippleARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNCOLORTABLEARBPROC, glGetnColorTableARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNCONVOLUTIONFILTERARBPROC, glGetnConvolutionFilterARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNSEPARABLEFILTERARBPROC, glGetnSeparableFilterARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNHISTOGRAMARBPROC, glGetnHistogramARB, "ARB_robustness", init_success);
-    SCM_INIT_GL_ENTRY(PFNGLGETNMINMAXARBPROC, glGetnMinmaxARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNMAPDVARBPROC, glGetnMapdvARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNMAPFVARBPROC, glGetnMapfvARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNMAPIVARBPROC, glGetnMapivARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPFVARBPROC, glGetnPixelMapfvARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPUIVARBPROC, glGetnPixelMapuivARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNPIXELMAPUSVARBPROC, glGetnPixelMapusvARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNPOLYGONSTIPPLEARBPROC, glGetnPolygonStippleARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNCOLORTABLEARBPROC, glGetnColorTableARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNCONVOLUTIONFILTERARBPROC, glGetnConvolutionFilterARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNSEPARABLEFILTERARBPROC, glGetnSeparableFilterARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNHISTOGRAMARBPROC, glGetnHistogramARB, "ARB_robustness", init_success);
+    //SCM_INIT_GL_ENTRY(PFNGLGETNMINMAXARBPROC, glGetnMinmaxARB, "ARB_robustness", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETNTEXIMAGEARBPROC, glGetnTexImageARB, "ARB_robustness", init_success);
     SCM_INIT_GL_ENTRY(PFNGLREADNPIXELSARBPROC, glReadnPixelsARB, "ARB_robustness", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETNCOMPRESSEDTEXIMAGEARBPROC, glGetnCompressedTexImageARB, "ARB_robustness", init_success);

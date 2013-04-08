@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 
-#include <scm/gl_core/render_device/opengl/GL/gl3.h>
+#include <scm/gl_core/render_device/opengl/GL/glcorearb.h>
 #include <scm/gl_core/render_device/opengl/GL/glext.h>
 
 // temporary
@@ -93,6 +93,7 @@ public:
     bool version_4_0_available;
     bool version_4_1_available;
     bool version_4_2_available;
+    bool version_4_3_available;
 
 
     bool extension_ARB_cl_event;
@@ -692,6 +693,86 @@ public:
     PFNGLTEXTURESTORAGE2DEXTPROC                    glTextureStorage2DEXT;
     PFNGLTEXTURESTORAGE3DEXTPROC                    glTextureStorage3DEXT;
 
+    // version 4.3 ////////////////////////////////////////////////////////////////////////////////
+    // ARB_arrays_of_arrays (no entry points, GLSL only)
+    // ARB_fragment_layer_viewport (no entry points, GLSL only)
+    // ARB_shader_image_size (no entry points, GLSL only)
+    // ARB_ES3_compatibility (no entry points)
+    // ARB_clear_buffer_object
+    PFNGLCLEARBUFFERDATAPROC                        glClearBufferData;
+    PFNGLCLEARBUFFERSUBDATAPROC                     glClearBufferSubData;
+    PFNGLCLEARNAMEDBUFFERDATAEXTPROC                glClearNamedBufferDataEXT;
+    PFNGLCLEARNAMEDBUFFERSUBDATAEXTPROC             glClearNamedBufferSubDataEXT;
+    // ARB_compute_shader
+    PFNGLDISPATCHCOMPUTEPROC                        glDispatchCompute;
+    PFNGLDISPATCHCOMPUTEINDIRECTPROC                glDispatchComputeIndirect;
+    // ARB_copy_image
+    PFNGLCOPYIMAGESUBDATAPROC                       glCopyImageSubData;
+    // KHR_debug (includes ARB_debug_output commands promoted to KHR without suffixes)
+    PFNGLDEBUGMESSAGECONTROLPROC                    glDebugMessageControl;
+    PFNGLDEBUGMESSAGEINSERTPROC                     glDebugMessageInsert;
+    PFNGLDEBUGMESSAGECALLBACKPROC                   glDebugMessageCallback;
+    PFNGLGETDEBUGMESSAGELOGPROC                     glGetDebugMessageLog;
+    PFNGLPUSHDEBUGGROUPPROC                         glPushDebugGroup;
+    PFNGLPOPDEBUGGROUPPROC                          glPopDebugGroup;
+    PFNGLOBJECTLABELPROC                            glObjectLabel;
+    PFNGLGETOBJECTLABELPROC                         glGetObjectLabel;
+    PFNGLOBJECTPTRLABELPROC                         glObjectPtrLabel;
+    PFNGLGETOBJECTPTRLABELPROC                      glGetObjectPtrLabel;
+    // ARB_explicit_uniform_location (no entry points)
+    // ARB_framebuffer_no_attachments
+    PFNGLFRAMEBUFFERPARAMETERIPROC                  glFramebufferParameteri;
+    PFNGLGETFRAMEBUFFERPARAMETERIVPROC              glGetFramebufferParameteriv;
+    PFNGLNAMEDFRAMEBUFFERPARAMETERIEXTPROC          glNamedFramebufferParameteriEXT;
+    PFNGLGETNAMEDFRAMEBUFFERPARAMETERIVEXTPROC      glGetNamedFramebufferParameterivEXT;
+    // ARB_internalformat_query2
+    PFNGLGETINTERNALFORMATI64VPROC                  glGetInternalformati64v;
+    // ARB_invalidate_subdata
+    PFNGLINVALIDATETEXSUBIMAGEPROC                  glInvalidateTexSubImage;
+    PFNGLINVALIDATETEXIMAGEPROC                     glInvalidateTexImage;
+    PFNGLINVALIDATEBUFFERSUBDATAPROC                glInvalidateBufferSubData;
+    PFNGLINVALIDATEBUFFERDATAPROC                   glInvalidateBufferData;
+    PFNGLINVALIDATEFRAMEBUFFERPROC                  glInvalidateFramebuffer;
+    PFNGLINVALIDATESUBFRAMEBUFFERPROC               glInvalidateSubFramebuffer;
+    // ARB_multi_draw_indirect
+    PFNGLMULTIDRAWARRAYSINDIRECTPROC                glMultiDrawArraysIndirect;
+    PFNGLMULTIDRAWELEMENTSINDIRECTPROC              glMultiDrawElementsIndirect;
+    // ARB_program_interface_query
+    PFNGLGETPROGRAMINTERFACEIVPROC                  glGetProgramInterfaceiv;
+    PFNGLGETPROGRAMRESOURCEINDEXPROC                glGetProgramResourceIndex;
+    PFNGLGETPROGRAMRESOURCENAMEPROC                 glGetProgramResourceName;
+    PFNGLGETPROGRAMRESOURCEIVPROC                   glGetProgramResourceiv;
+    PFNGLGETPROGRAMRESOURCELOCATIONPROC             glGetProgramResourceLocation;
+    PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC        glGetProgramResourceLocationIndex;
+    // ARB_robust_buffer_access_behavior (no entry points)
+    // ARB_shader_storage_buffer_object
+    PFNGLSHADERSTORAGEBLOCKBINDINGPROC              glShaderStorageBlockBinding;
+    // ARB_stencil_texturing (no entry points)
+    // ARB_texture_buffer_range
+    PFNGLTEXBUFFERRANGEPROC                         glTexBufferRange;
+    PFNGLTEXTUREBUFFERRANGEEXTPROC                  glTextureBufferRangeEXT;
+    // ARB_texture_query_levels (no entry points)
+    // ARB_texture_storage_multisample
+    PFNGLTEXSTORAGE2DMULTISAMPLEPROC                glTexStorage2DMultisample;
+    PFNGLTEXSTORAGE3DMULTISAMPLEPROC                glTexStorage3DMultisample;
+    PFNGLTEXTURESTORAGE2DMULTISAMPLEEXTPROC         glTextureStorage2DMultisampleEXT;
+    PFNGLTEXTURESTORAGE3DMULTISAMPLEEXTPROC         glTextureStorage3DMultisampleEXT;
+    // ARB_texture_view
+    PFNGLTEXTUREVIEWPROC                            glTextureView;
+    // ARB_vertex_attrib_binding
+    PFNGLBINDVERTEXBUFFERPROC                       glBindVertexBuffer;
+    PFNGLVERTEXATTRIBFORMATPROC                     glVertexAttribFormat;
+    PFNGLVERTEXATTRIBIFORMATPROC                    glVertexAttribIFormat;
+    PFNGLVERTEXATTRIBLFORMATPROC                    glVertexAttribLFormat;
+    PFNGLVERTEXATTRIBBINDINGPROC                    glVertexAttribBinding;
+    PFNGLVERTEXBINDINGDIVISORPROC                   glVertexBindingDivisor;
+    PFNGLVERTEXARRAYBINDVERTEXBUFFEREXTPROC         glVertexArrayBindVertexBufferEXT;
+    PFNGLVERTEXARRAYVERTEXATTRIBFORMATEXTPROC       glVertexArrayVertexAttribFormatEXT;
+    PFNGLVERTEXARRAYVERTEXATTRIBIFORMATEXTPROC      glVertexArrayVertexAttribIFormatEXT;
+    PFNGLVERTEXARRAYVERTEXATTRIBLFORMATEXTPROC      glVertexArrayVertexAttribLFormatEXT;
+    PFNGLVERTEXARRAYVERTEXATTRIBBINDINGEXTPROC      glVertexArrayVertexAttribBindingEXT;
+    PFNGLVERTEXARRAYVERTEXBINDINGDIVISOREXTPROC     glVertexArrayVertexBindingDivisorEXT;
+
     // GL_ARB_shading_language_include
     PFNGLNAMEDSTRINGARBPROC                         glNamedStringARB;
     PFNGLDELETENAMEDSTRINGARBPROC                   glDeleteNamedStringARB;
@@ -711,18 +792,18 @@ public:
 
     // ARB_robustness
     PFNGLGETGRAPHICSRESETSTATUSARBPROC              glGetGraphicsResetStatusARB;
-    PFNGLGETNMAPDVARBPROC                           glGetnMapdvARB;
-    PFNGLGETNMAPFVARBPROC                           glGetnMapfvARB;
-    PFNGLGETNMAPIVARBPROC                           glGetnMapivARB;
-    PFNGLGETNPIXELMAPFVARBPROC                      glGetnPixelMapfvARB;
-    PFNGLGETNPIXELMAPUIVARBPROC                     glGetnPixelMapuivARB;
-    PFNGLGETNPIXELMAPUSVARBPROC                     glGetnPixelMapusvARB;
-    PFNGLGETNPOLYGONSTIPPLEARBPROC                  glGetnPolygonStippleARB;
-    PFNGLGETNCOLORTABLEARBPROC                      glGetnColorTableARB;
-    PFNGLGETNCONVOLUTIONFILTERARBPROC               glGetnConvolutionFilterARB;
-    PFNGLGETNSEPARABLEFILTERARBPROC                 glGetnSeparableFilterARB;
-    PFNGLGETNHISTOGRAMARBPROC                       glGetnHistogramARB;
-    PFNGLGETNMINMAXARBPROC                          glGetnMinmaxARB;
+    //PFNGLGETNMAPDVARBPROC                           glGetnMapdvARB;
+    //PFNGLGETNMAPFVARBPROC                           glGetnMapfvARB;
+    //PFNGLGETNMAPIVARBPROC                           glGetnMapivARB;
+    //PFNGLGETNPIXELMAPFVARBPROC                      glGetnPixelMapfvARB;
+    //PFNGLGETNPIXELMAPUIVARBPROC                     glGetnPixelMapuivARB;
+    //PFNGLGETNPIXELMAPUSVARBPROC                     glGetnPixelMapusvARB;
+    //PFNGLGETNPOLYGONSTIPPLEARBPROC                  glGetnPolygonStippleARB;
+    //PFNGLGETNCOLORTABLEARBPROC                      glGetnColorTableARB;
+    //PFNGLGETNCONVOLUTIONFILTERARBPROC               glGetnConvolutionFilterARB;
+    //PFNGLGETNSEPARABLEFILTERARBPROC                 glGetnSeparableFilterARB;
+    //PFNGLGETNHISTOGRAMARBPROC                       glGetnHistogramARB;
+    //PFNGLGETNMINMAXARBPROC                          glGetnMinmaxARB;
     PFNGLGETNTEXIMAGEARBPROC                        glGetnTexImageARB;
     PFNGLREADNPIXELSARBPROC                         glReadnPixelsARB;
     PFNGLGETNCOMPRESSEDTEXIMAGEARBPROC              glGetnCompressedTexImageARB;

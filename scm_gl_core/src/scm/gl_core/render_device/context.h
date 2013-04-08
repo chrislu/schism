@@ -170,6 +170,17 @@ public:
                                                        scm::size_t in_src_offset,
                                                        scm::size_t in_size) const;
 
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
+    bool                        clear_buffer_data(const buffer_ptr& in_buffer,
+                                                        data_format in_format,
+                                                  const void*       in_data) const;
+    bool                        clear_buffer_sub_data(const buffer_ptr& in_buffer,
+                                                            data_format in_format,
+                                                            scm::size_t in_offset,
+                                                            scm::size_t in_size,
+                                                      const void*       in_data) const;
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
+
     bool                        orphane_buffer(const buffer_ptr& in_buffer) const;
 
     void                        bind_uniform_buffer(const buffer_ptr& in_buffer,

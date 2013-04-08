@@ -499,6 +499,45 @@ render_context::copy_buffer_data(const buffer_ptr& in_dst_buffer,
     return return_value;
 }
 
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
+bool
+render_context::clear_buffer_data(const buffer_ptr& in_buffer,
+                                        data_format in_format,
+                                  const void*       in_data) const
+{
+    assert(in_buffer);
+
+    bool return_value = in_buffer->clear_buffer_data(*this, in_format, in_data);
+
+    if (   (false == return_value)
+        || (!in_buffer->ok())) {
+        SCM_GL_DGB("render_context::clear_buffer_data(): error clearing buffer data ('" << in_buffer->state().state_string() << "')");
+    }
+
+    return return_value;
+}
+
+bool
+render_context::clear_buffer_sub_data(const buffer_ptr& in_buffer,
+                                            data_format in_format,
+                                            scm::size_t in_offset,
+                                            scm::size_t in_size,
+                                      const void*       in_data) const
+{
+    assert(in_buffer);
+
+    bool return_value = in_buffer->clear_buffer_sub_data(*this, in_format, in_offset, in_size, in_data);
+
+    if (   (false == return_value)
+        || (!in_buffer->ok())) {
+        SCM_GL_DGB("render_context::clear_buffer_sub_data(): error clearing buffer sub data ('" << in_buffer->state().state_string() << "')");
+    }
+
+    return return_value;
+}
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
+
+
 bool
 render_context::orphane_buffer(const buffer_ptr& in_buffer) const
 {

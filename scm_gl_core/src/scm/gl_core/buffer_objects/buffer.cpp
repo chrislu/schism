@@ -12,8 +12,9 @@
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
-#include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/binding_guards.h>
+#include <scm/gl_core/render_device/opengl/util/constants_helper.h>
+#include <scm/gl_core/render_device/opengl/util/data_format_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
 
 namespace scm {
@@ -312,6 +313,96 @@ buffer::buffer_sub_data(const render_device& ren_dev,
     }
 
     gl_assert(glcore, leaving buffer::buffer_sub_data());
+
+    return true;
+}
+
+bool
+buffer::clear_buffer_data(const render_context& in_context,
+                                data_format     in_format,
+                          const void*           in_data)
+{
+    const opengl::gl_core& glcore = in_context.opengl_api();
+
+    gl_assert(glcore, entering buffer::clear_buffer_data());
+
+    util::gl_error          glerror(glcore);
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (_mapped_interval_length > 0) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    unsigned gl_internal_format = util::gl_internal_format(in_format);
+    unsigned gl_base_format     = util::gl_base_format(in_format);
+    unsigned gl_base_type       = util::gl_base_type(in_format);
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glClearNamedBufferDataEXT(object_id(), gl_internal_format, gl_base_format, gl_base_type, in_data);
+    }
+    else {
+        util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
+
+        glcore.glBindBuffer(object_target(), object_id());
+        glcore.glClearBufferData(object_target(), gl_internal_format, gl_base_format, gl_base_type, in_data);
+    }
+    
+    gl_assert(glcore, leaving buffer::clear_buffer_data());
+
+    return true;
+}
+
+bool
+buffer::clear_buffer_sub_data(const render_context& in_context,
+                                    data_format     in_format,
+                                    scm::size_t     in_offset,
+                                    scm::size_t     in_size,
+                              const void*           in_data)
+{
+    const opengl::gl_core& glcore = in_context.opengl_api();
+
+    gl_assert(glcore, entering buffer::clear_buffer_sub_data());
+
+    util::gl_error          glerror(glcore);
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+    if (0 > in_offset || 0 > in_size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if ((in_offset + in_size) > _descriptor._size) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if (   in_offset < (_mapped_interval_offset + _mapped_interval_length)
+        && (in_offset + in_size) > _mapped_interval_offset) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    unsigned gl_internal_format = util::gl_internal_format(in_format);
+    unsigned gl_base_format     = util::gl_base_format(in_format);
+    unsigned gl_base_type       = util::gl_base_type(in_format);
+    if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+        glcore.glClearNamedBufferSubDataEXT(object_id(), gl_internal_format, gl_base_format, gl_base_type, in_offset, in_size, in_data);
+    }
+    else {
+        util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
+
+        glcore.glBindBuffer(object_target(), object_id());
+        glcore.glClearBufferSubData(object_target(), gl_internal_format, in_offset, in_size, gl_base_format, gl_base_type, in_data);
+    }
+
+    gl_assert(glcore, leaving buffer::clear_buffer_sub_data());
 
     return true;
 }

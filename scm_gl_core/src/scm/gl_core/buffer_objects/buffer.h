@@ -9,6 +9,7 @@
 #include <scm/core/memory.h>
 
 #include <scm/gl_core/constants.h>
+#include <scm/gl_core/data_formats.h>
 #include <scm/gl_core/gl_core_fwd.h>
 #include <scm/gl_core/render_device/context_bindable_object.h>
 #include <scm/gl_core/render_device/device_resource.h>
@@ -61,7 +62,7 @@ protected:
     void*                       map_range(const render_context& in_context,
                                           scm::size_t           in_offset,
                                           scm::size_t           in_size,
-                                          const access_mode   in_access);
+                                          const access_mode     in_access);
     bool                        unmap(const render_context& in_context);
 
 
@@ -72,6 +73,15 @@ protected:
                                                 scm::size_t          offset,
                                                 scm::size_t          size,
                                                 const void*          data);
+
+    bool                        clear_buffer_data(const render_context& in_context,
+                                                        data_format     in_format,
+                                                  const void*           in_data);
+    bool                        clear_buffer_sub_data(const render_context& in_context,
+                                                            data_format     in_format,
+                                                            scm::size_t     in_offset,
+                                                            scm::size_t     in_size,
+                                                      const void*           in_data);
 
     bool                        get_buffer_sub_data(const render_context& in_context,
                                                     scm::size_t           offset,
