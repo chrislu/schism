@@ -158,6 +158,8 @@ application_window::init_renderer()
         }
     }
 
+    device->main_context()->make_resident(_texture, _sstate_linear);
+
 
     // load shader program
     _shader_prog = device->create_program(list_of(device->create_shader_from_file(STAGE_VERTEX_SHADER,   "../../../src/shaders/texture_program.glslv"))
@@ -234,6 +236,10 @@ application_window::display(const gl::render_context_ptr& context)
         { // texture
             _shader_prog->uniform("tex_color", 0);
             context->bind_texture(_texture, _sstate_linear, 0);
+
+            vec2ui tex_handle = vec2ui(static_cast<uint32>(_texture->native_handle() & 0x00000000ffffffffull),
+                                       static_cast<uint32>(_texture->native_handle() >> 32ull));
+            _shader_prog->uniform("tex_color_resident", tex_handle);
         }
 
         _model_geometry->draw_raw(context, geometry::MODE_SOLID);

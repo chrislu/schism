@@ -2,7 +2,10 @@
 // Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
 // Distributed under the Modified BSD License, see license.txt.
 
-#version 410 core
+#version 420 core
+
+#extension GL_NV_bindless_texture : require
+#extension GL_NV_gpu_shader5      : require
 
 // input layout definitions ///////////////////////////////////////////////////////////////////////
 
@@ -18,6 +21,7 @@ layout(location = 0, index = 0) out vec4 out_color;
 
 // uniform input definitions //////////////////////////////////////////////////////////////////////
 uniform sampler2D tex_color;
+uniform uvec2     tex_color_resident;
 
 // global constants ///////////////////////////////////////////////////////////////////////////////
 const float epsilon                 = 0.0001;
@@ -32,7 +36,17 @@ const vec3 lblue = vec3(0.2, 0.7, 0.9);
 // implementation /////////////////////////////////////////////////////////////////////////////////
 void main() 
 {
-    vec4 c = texture(tex_color, v_in.texcoord);
+    vec4 c = vec4(0.0);
+    if (gl_FragCoord.x < 800) {
+        c = texture(tex_color, v_in.texcoord);
+    }
+    else {
+        uint64_t  tex_hndl = packUint2x32(tex_color_resident);
+        sampler2D tex_smpl = sampler2D(tex_hndl);
+        c = texture(tex_smpl, v_in.texcoord);
+
+        c *= vec4(1.0, 0.5, 0.5, 1.0);
+    }
 
     vec3 n = normalize(v_in.normal); 
     vec3 l = normalize(vec3(1.0, 1.0, 1.0)); // assume parallel light!
