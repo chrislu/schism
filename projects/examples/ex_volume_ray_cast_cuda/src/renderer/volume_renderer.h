@@ -29,7 +29,8 @@ public:
 
     void                            draw(const gl::render_context_ptr& context,
                                          const volume_data_ptr&        vdata,
-                                         const vr_mode                 mode) const;
+                                         const vr_mode                 mode,
+                                         bool                          use_supersampling) const;
     void                            update(const gl::render_context_ptr& context,
                                            const gl::camera&             cam);
 

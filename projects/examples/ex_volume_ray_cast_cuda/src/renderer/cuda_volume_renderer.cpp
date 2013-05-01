@@ -126,7 +126,8 @@ cuda_volume_renderer::cleanup()
 
 void
 cuda_volume_renderer::draw(const gl::render_context_ptr& context,
-                           const cuda_volume_data_ptr&   vdata)
+                           const cuda_volume_data_ptr&   vdata,
+                           bool                          use_supersampling)
 {
     using namespace scm::math;
 
@@ -154,6 +155,7 @@ cuda_volume_renderer::draw(const gl::render_context_ptr& context,
                             vdata->volume_image().get(),
                             vdata->color_alpha_image().get(),
                             vdata->volume_uniform_buffer(),
+                            use_supersampling,
                             cu_stream);
 
     cu_err = cudaGraphicsUnmapResources(cu_gfx_res_count, cu_gfx_res, cu_stream);

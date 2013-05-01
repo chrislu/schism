@@ -82,6 +82,7 @@ application_window::application_window(const math::vec2ui&                    vp
   : gl::gui::viewer_window(vp_size, view_attrib, ctx_attrib, win_fmt)
   , _viewport_size(vp_size)
   , _show_raw(false)
+  , _use_volume_supersampling(false)
   , _use_opencl_renderer(false)
   , _volume_data_dialog(0)
 {
@@ -118,6 +119,8 @@ application_window::init_renderer()
     using namespace scm::math;
 
     _viewer->settings()._clear_color      = vec4f(0.0f, 0.0f, 0.0f, 1.0f);
+    _viewer->settings()._vsync            = false;
+    _viewer->settings()._show_frame_times = true;
 
 
     if (!_viewer->device()->enable_cuda_interop()) {
@@ -134,7 +137,7 @@ application_window::init_renderer()
     volume_data::color_map_type cmap;
     volume_data::alpha_map_type amap;
 
-#if 1
+#if 0
     amap.add_stop(0,       1.0f);
     amap.add_stop(0.42f,   0.5f);
     amap.add_stop(0.48f,   0.0f);
@@ -169,13 +172,13 @@ application_window::init_renderer()
     cmap.add_stop(1.0f, vec3f(1.0f, 0.0f, 0.0f));
 #endif
 
-    std::string vfile = "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw";
+    //std::string vfile = "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw";
     //std::string vfile = "e:/data/volume/vrgeo/parihaka/pari_full_rm_8float_bri.sgy";
     //std::string vfile = "Z:/volume_data/vrgeo/parihaka_new_zealand/source_data/volume/pari_full_rm_8float_bri.vol";
     //std::string vfile = "e:/data/volume/vrgeo/new_zealand/volumes/pari_full_rm_8float_bri_TRIMMED.vol";
     //std::string vfile = "g:/volume/vrgeo/eni_fp_volume/test_data3far.segy";
     //std::string vfile = "e:/data/volume/vrgeo/reflect.vol";
-    //std::string vfile = "e:/data/volume/vrgeo/gfaks.vol";
+    std::string vfile = "d:/data/volume/vrgeo/gfaks.vol";
     //std::string vfile = "e:/data/volume/vrgeo/wfarm_200_w512_h439_d512_c1_b8.raw";
 
     try {
@@ -277,11 +280,13 @@ application_window::display(const gl::render_context_ptr& context)
                                             geometry::MODE_WIRE_FRAME, vec4f(0.0f, 1.0f, 0.3f, 1.0f), 2.0f);
 #endif
             if (_use_opencl_renderer) {
-                _volume_renderer_cuda->draw(context, _volume_data_cuda);
+                _volume_renderer_cuda->draw(context, _volume_data_cuda, _use_volume_supersampling);
                 _volume_renderer_cuda->present(context);
             }
             else {
-                _volume_renderer->draw(context, _volume_data, _show_raw ? volume_renderer::volume_raw : volume_renderer::volume_color_map);
+                _volume_renderer->draw(context, _volume_data,
+                                       _show_raw ? volume_renderer::volume_raw : volume_renderer::volume_color_map,
+                                       _use_volume_supersampling);
             }
         }
     }
@@ -322,6 +327,7 @@ application_window::keyboard_input(int k, bool state, scm::uint32 mod)
             case Qt::Key_C:         _use_opencl_renderer = !_use_opencl_renderer; break;
             case Qt::Key_S:         _volume_renderer->reload_shaders(_viewer->device());
                                     //_volume_renderer_cuda->reload_kernels(_viewer->device());
+            case Qt::Key_Q:         _use_volume_supersampling = !_use_volume_supersampling;
             case Qt::Key_1:         _volume_data->selected_lod(_volume_data->selected_lod() - 0.25f);break;
             case Qt::Key_2:         _volume_data->selected_lod(_volume_data->selected_lod() + 0.25f);break;
             default:;

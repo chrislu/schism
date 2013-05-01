@@ -86,7 +86,8 @@ volume_renderer::~volume_renderer()
 void
 volume_renderer::draw(const gl::render_context_ptr& context,
                       const volume_data_ptr&        vdata,
-                      const vr_mode                 mode) const
+                      const vr_mode                 mode,
+                      bool                          use_supersampling) const
 {
     using namespace scm;
     using namespace scm::gl;
@@ -102,6 +103,7 @@ volume_renderer::draw(const gl::render_context_ptr& context,
     }
 
     _program->uniform("volume_lod", vdata->selected_lod());
+    _program->uniform("use_ss",     use_supersampling);
 
     context_state_objects_guard     csg(context);
     context_texture_units_guard     tug(context);
