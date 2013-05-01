@@ -15,6 +15,8 @@
 #define SCM_LDATA_CUDA_VIS_ITER_COUNT    0
 #define SCM_LDATA_CUDA_VIS_DEBUG         0
 
+#define SCM_LDATA_CUDA_VIS_SS_COUNT      8 // supported modes: 4, 8
+
 // cuda globals
 surface<void, cudaSurfaceType2D> out_image;
 
@@ -136,16 +138,45 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
     int2 opos  = make_int2(blockIdx.x * blockDim.x + threadIdx.x,
                            blockIdx.y * blockDim.y + threadIdx.y);
 
+#if SCM_LDATA_CUDA_VIS_SS_COUNT == 4
     const int    ss_count      = use_ss ? 4 : 1;
-    const float2 ss_pixel_offsets[4] = {{0.25f, 0.25f},
-                                        {0.75f, 0.25f},
-                                        {0.25f, 0.75f},
-                                        {0.75f, 0.75f}};
+    // regular grid
+    //const float2 ss_pixel_offsets[4] = {{0.25f, 0.25f},
+    //                                    {0.75f, 0.25f},
+    //                                    {0.25f, 0.75f},
+    //                                    {0.75f, 0.75f}};
+    // rotated grid grid
+    const float  ss_grid_res = 0.125f;
+    const float2 ss_pixel_offsets[4] = {{ss_grid_res * 5.0f, ss_grid_res * 1.0f},
+                                        {ss_grid_res * 7.0f, ss_grid_res * 5.0f},
+                                        {ss_grid_res * 3.0f, ss_grid_res * 7.0f},
+                                        {ss_grid_res * 1.0f, ss_grid_res * 3.0f}};
     const float ss_sample_offsets[4] = {0.00f,
                                         0.25f,
                                         0.50f,
                                         0.75f};
     struct ray ss_rays[4];
+#elif SCM_LDATA_CUDA_VIS_SS_COUNT == 8
+    const int    ss_count      = use_ss ? 8 : 1;
+    // NV pattern
+    const float2 ss_pixel_offsets[8] = {{0.630f, 0.206f},
+                                        {0.667f, 0.079f},
+                                        {0.413f, 0.333f},
+                                        {0.794f, 0.460f},
+                                        {0.032f, 0.587f},
+                                        {0.531f, 0.714f},
+                                        {0.286f, 0.841f},
+                                        {0.921f, 0.968f}};
+    const float ss_sample_offsets[8] = {0.000f,
+                                        0.125f,
+                                        0.250f,
+                                        0.375f,
+                                        0.500f,
+                                        0.625f,
+                                        0.750f,
+                                        0.875f};
+    struct ray ss_rays[8];
+#endif
 
     if (opos.x < osize.x && opos.y < osize.y) {
 

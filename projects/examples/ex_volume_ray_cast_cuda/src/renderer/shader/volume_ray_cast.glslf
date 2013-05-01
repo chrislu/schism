@@ -8,6 +8,8 @@
 
 #include </scm/gl_util/camera_block.glslh>
 
+#define SCM_LDATA_OPENGL_VIS_SS_COUNT       8 // supported modes: 4, 8
+
 // output layout definitions //////////////////////////////////////////////////////////////////////
 layout(location = 0, index = 0) out vec4 out_color;
 
@@ -152,26 +154,55 @@ inside_volume_bounds(const in vec3 sampling_position)
 void main()
 {
 #if 1
+#if SCM_LDATA_OPENGL_VIS_SS_COUNT == 4
     const int    ss_count      = use_ss ? 4 : 1;
-    const vec2   ss_pixel_offsets[4] = {{0.25, 0.25},
-                                        {0.75, 0.25},
-                                        {0.25, 0.75},
-                                        {0.75, 0.75}};
+    // regular grid
+    //const vec2 ss_pixel_offsets[4] = {{0.25, 0.25},
+    //                                  {0.75, 0.25},
+    //                                  {0.25, 0.75},
+    //                                  {0.75, 0.75}};
+    // rotated grid grid
+    const float  ss_grid_res = 0.125;
+    const vec2 ss_pixel_offsets[4] = {{ss_grid_res * 5.0, ss_grid_res * 1.0},
+                                      {ss_grid_res * 7.0, ss_grid_res * 5.0},
+                                      {ss_grid_res * 3.0, ss_grid_res * 7.0},
+                                      {ss_grid_res * 1.0, ss_grid_res * 3.0}};
     const float ss_sample_offsets[4] = {0.00,
                                         0.25,
                                         0.50,
                                         0.75};
     ray ss_rays[4];
+#elif SCM_LDATA_OPENGL_VIS_SS_COUNT == 8
+    const int    ss_count      = use_ss ? 8 : 1;
+    // NV pattern
+    const vec2 ss_pixel_offsets[8]   = {{0.630f, 0.206f},
+                                        {0.667f, 0.079f},
+                                        {0.413f, 0.333f},
+                                        {0.794f, 0.460f},
+                                        {0.032f, 0.587f},
+                                        {0.531f, 0.714f},
+                                        {0.286f, 0.841f},
+                                        {0.921f, 0.968f}};
+    const float ss_sample_offsets[8] = {0.000f,
+                                        0.125f,
+                                        0.250f,
+                                        0.375f,
+                                        0.500f,
+                                        0.625f,
+                                        0.750f,
+                                        0.875f};
+    ray ss_rays[8];
+#endif
 
     // setup rays
     if (use_ss) {
         for (int i = 0; i < ss_count; ++i) {
-            const vec2 opos_pc = vec2(vec2(gl_FragCoord.xy) + ss_pixel_offsets[i]);
+            const vec2 opos_pc = vec2(vec2(gl_FragCoord.xy) + ss_pixel_offsets[i]) - vec2(0.5);
             make_ray(ss_rays[i], opos_pc, viewport_size);
         }
     }
     else {
-        const vec2 ppos_pc = vec2(vec2(gl_FragCoord.xy) + 0.5);
+        const vec2 ppos_pc = vec2(vec2(gl_FragCoord.xy));
         make_ray(ss_rays[0], ppos_pc, viewport_size);
     }
 
