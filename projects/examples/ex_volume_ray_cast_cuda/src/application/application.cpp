@@ -178,7 +178,8 @@ application_window::init_renderer()
     //std::string vfile = "e:/data/volume/vrgeo/new_zealand/volumes/pari_full_rm_8float_bri_TRIMMED.vol";
     //std::string vfile = "g:/volume/vrgeo/eni_fp_volume/test_data3far.segy";
     //std::string vfile = "e:/data/volume/vrgeo/reflect.vol";
-    std::string vfile = "d:/data/volume/vrgeo/gfaks.vol";
+    //std::string vfile = "d:/data/volume/vrgeo/gfaks.vol";
+    std::string vfile = "c:/data/seismic_volume_raw_w751_h321_d326_c1_b8.raw";
     //std::string vfile = "e:/data/volume/vrgeo/wfarm_200_w512_h439_d512_c1_b8.raw";
 
     try {

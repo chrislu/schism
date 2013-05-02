@@ -184,7 +184,7 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
         thread_start = clock();
 #endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
         float4 out_color = make_float4(0.0);;
-
+        
         // setup rays
         if (use_ss) {
             for (int i = 0; i < ss_count; ++i) {
@@ -222,9 +222,7 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
                 float  opc = uniform_data._sampling_distance.y;
                 int    loop_count = 0;
 
-    #if SCM_LDATA_CUDA_VIS_DEBUG == 1
-                out_color = make_float4(ray_exit, 1.0);
-    #else // SCM_LDATA_CUDA_VIS_DEBUG == 1
+                //out_color = make_float4(ray_exit, 1.0);
                 while ((exit_sqr_dist - smpl_sqr_dist) > 0.0f && dst.w < 0.99f) {
                     ++loop_count;
                     float3 tc_vol = sampling_pos * to_tex;
@@ -259,8 +257,10 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
 #else // SCM_LDATA_CUDA_VIS_ITER_COUNT == 1
                 out_color += dst;
 #endif // SCM_LDATA_CUDA_VIS_ITER_COUNT == 1
-#endif // SCM_LDATA_CUDA_VIS_DEBUG == 1
             }
+            //else {
+            //    out_color += make_float4(1.0f, 0.0f, 0.0f, 1.0f);
+            //}
         }
 
 #if SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
@@ -286,7 +286,6 @@ startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
                         cudaGraphicsResource_t                   output_image_res,
                         cudaGraphicsResource_t                   volume_image_res,
                         cudaGraphicsResource_t                   cmap_image_res,
-                        const thrust::device_ptr<volume_uniform_data>& uniform_data,
                         bool                                     use_supersampling,
                         cudaStream_t                             cuda_stream)
 {
@@ -315,12 +314,9 @@ startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
     cu_err = cudaGraphicsSubResourceGetMappedArray(&cu_ci_array, cmap_image_res, 0, 0);
     cu_err = cudaBindTextureToArray(colormap_texture, cu_ci_array);
 
-    // uniform data
-    volume_uniform_data* uniform_data_raw = uniform_data.get();
-    
     // calculate the grid and block sizes
-    cudaFuncAttributes  cu_krnl_attr;
-    cu_err = cudaFuncGetAttributes(&cu_krnl_attr, "main_vrc");
+    //cudaFuncAttributes  cu_krnl_attr;
+    //cu_err = cudaFuncGetAttributes(&cu_krnl_attr, "main_vrc");
 
     dim3 vsize = dim3(out_image_w, out_image_h, 1);
     //dim3 bsize = dim3(32, cu_krnl_attr.maxThreadsPerBlock / 32, 1);
@@ -334,4 +330,13 @@ startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
     dim3 block_size(bsize.x, bsize.y, 1);
 
     main_vrc<<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h, use_supersampling);//, uniform_data_raw);
+}
+
+extern "C"
+bool
+upload_uniform_data(const volume_uniform_data& vud,
+                    cudaStream_t               cuda_stream)
+{
+    cudaError cu_err = cudaMemcpyToSymbolAsync(uniform_data, &vud, sizeof(volume_uniform_data), 0, cudaMemcpyHostToDevice, cuda_stream);
+    return cudaSuccess == cu_err;
 }

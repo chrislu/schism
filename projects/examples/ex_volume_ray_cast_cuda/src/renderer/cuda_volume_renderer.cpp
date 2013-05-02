@@ -80,6 +80,7 @@ cuda_volume_renderer::cuda_volume_renderer(const gl::render_device_ptr& device,
             _output_image.reset(cu_oi_resource, boost::bind<cudaError>(cudaGraphicsUnregisterResource, _1));
         }
 
+#if 0
         cudaFuncAttributes  cu_krnl_attr;
         cu_err = cudaFuncGetAttributes(&cu_krnl_attr, "main_vrc");
         if (cudaSuccess != cu_err) {
@@ -100,7 +101,7 @@ cuda_volume_renderer::cuda_volume_renderer(const gl::render_device_ptr& device,
                   << "    - binary version:        " << cu_krnl_attr.binaryVersion              << log::nline
                   << log::end;
         }
-
+#endif
     }
     catch (...) {
         cleanup();
@@ -154,7 +155,6 @@ cuda_volume_renderer::draw(const gl::render_context_ptr& context,
                             _output_image.get(),
                             vdata->volume_image().get(),
                             vdata->color_alpha_image().get(),
-                            vdata->volume_uniform_buffer(),
                             use_supersampling,
                             cu_stream);
 

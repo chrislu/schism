@@ -15,12 +15,6 @@
 #include <scm/core/platform/windows.h>
 #include <cuda_gl_interop.h>
 
-#include <thrust/device_ptr.h>
-#include <thrust/device_malloc.h>
-#include <thrust/device_free.h>
-#include <thrust/device_new.h>
-#include <thrust/device_delete.h>
-
 #include <scm/log.h>
 #include <scm/core/log/logger_state.h>
 #include <scm/gl_core/render_device.h>
@@ -31,6 +25,7 @@
 #include <scm/cl_core/cuda.h>
 
 #include <renderer/volume_data.h>
+#include <renderer/kernel/volume_ray_cast.h>
 
 namespace scm {
 namespace data {
@@ -79,15 +74,12 @@ cuda_volume_data::cuda_volume_data(const gl::render_device_ptr& device,
     else {
         _color_alpha_image.reset(cu_ca_resource, boost::bind<cudaError>(cudaGraphicsUnregisterResource, _1));
     }
-
-    _volume_uniform_buffer = thrust::device_malloc<volume_uniform_data>(1);
 }
 
 cuda_volume_data::~cuda_volume_data()
 {
     _data.reset();
 
-    thrust::device_free(_volume_uniform_buffer);
     _volume_image.reset();
     _color_alpha_image.reset();
 }
@@ -110,9 +102,11 @@ cuda_volume_data::update(const gl::render_context_ptr& context)
     cudaError cu_err = cudaSuccess;
 
     //cu_err = cudaMemcpyAsync(_volume_uniform_buffer.get(), &d, sizeof(volume_uniform_data), cudaMemcpyHostToDevice, cuda_stream);
-    cu_err = cudaMemcpyToSymbolAsync("uniform_data", &d, sizeof(volume_uniform_data), 0, cudaMemcpyHostToDevice, context->cuda_command_stream()->stream());
-        
-    assert(cudaSuccess == cu_err);
+    //cu_err = cudaMemcpyToSymbolAsync("uniform_data", &d, sizeof(volume_uniform_data), 0, cudaMemcpyHostToDevice, context->cuda_command_stream()->stream());
+    //    
+    //assert(cudaSuccess == cu_err);
+
+    upload_uniform_data(d, context->cuda_command_stream()->stream());
 }
 
 const volume_data_ptr&
@@ -131,12 +125,6 @@ const shared_ptr<cudaGraphicsResource>&
 cuda_volume_data::color_alpha_image() const
 {
     return _color_alpha_image;
-}
-
-const thrust::device_ptr<volume_uniform_data>&
-cuda_volume_data::volume_uniform_buffer() const
-{
-    return _volume_uniform_buffer;
 }
 
 } // namespace data
