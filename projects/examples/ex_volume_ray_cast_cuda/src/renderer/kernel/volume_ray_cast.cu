@@ -15,7 +15,7 @@
 #define SCM_LDATA_CUDA_VIS_ITER_COUNT    0
 #define SCM_LDATA_CUDA_VIS_DEBUG         0
 
-#define SCM_LDATA_CUDA_VIS_SS_COUNT      8 // supported modes: 4, 8
+#define SCM_LDATA_CUDA_VIS_SS_COUNT      4 // supported modes: 4, 8
 
 // cuda globals
 surface<void, cudaSurfaceType2D> out_image;
@@ -138,8 +138,8 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
     int2 opos  = make_int2(blockIdx.x * blockDim.x + threadIdx.x,
                            blockIdx.y * blockDim.y + threadIdx.y);
 
+    const int    ss_count      = use_ss ? SCM_LDATA_CUDA_VIS_SS_COUNT : 1;
 #if SCM_LDATA_CUDA_VIS_SS_COUNT == 4
-    const int    ss_count      = use_ss ? 4 : 1;
     // regular grid
     //const float2 ss_pixel_offsets[4] = {{0.25f, 0.25f},
     //                                    {0.75f, 0.25f},
@@ -157,7 +157,6 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
                                         0.75f};
     struct ray ss_rays[4];
 #elif SCM_LDATA_CUDA_VIS_SS_COUNT == 8
-    const int    ss_count      = use_ss ? 8 : 1;
     // NV pattern
     const float2 ss_pixel_offsets[8] = {{0.630f, 0.206f},
                                         {0.667f, 0.079f},
@@ -175,7 +174,7 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
                                         0.625f,
                                         0.750f,
                                         0.875f};
-    struct ray ss_rays[8];
+    //struct ray ss_rays[8];
 #endif
 
     if (opos.x < osize.x && opos.y < osize.y) {
@@ -184,7 +183,102 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
         thread_start = clock();
 #endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
         float4 out_color = make_float4(0.0);;
-        
+
+#if 1
+        struct ray_state {
+            ray         _ray;       // the sub-pixel ray
+            float       _t;
+            float4      _cdst;      // destination color 
+            float2      _trange;    // the t min/max range of the ray
+
+        };
+        ray_state ray_states[SCM_LDATA_CUDA_VIS_SS_COUNT];
+        bool any_ray_running = false;
+
+        // setup rays
+        if (use_ss) {
+            for (int i = 0; i < ss_count; ++i) {
+                const float2 opos_pc = ss_pixel_offsets[i] + make_float2(opos.x, opos.y);
+                make_ray(&(ray_states[i]._ray), opos_pc, osize);
+
+                ray_states[i]._cdst = make_float4(0.0f);
+
+                if (ray_box_intersection(&(ray_states[i]._ray),
+                                         make_float3(0.0),
+                                         make_float3(uniform_data._volume_extends),
+                                         &(ray_states[i]._trange.x),
+                                         &(ray_states[i]._trange.y)))
+                {
+                    ray_states[i]._t =   ray_states[i]._trange.x
+                                       + ss_sample_offsets[i] * uniform_data._sampling_distance.x;
+                    any_ray_running = true;
+                }
+                else {
+                    ray_states[i]._t = ray_states[i]._trange.y;
+                    ray_states[i]._cdst = make_float4(1.0f, 0.0f, 0.0f, 1.0f);
+                }
+            }
+        }
+        else {
+            const float2 opos_pc = make_float2(0.5f + opos.x, 0.5f + opos.y);
+            make_ray(&(ray_states[0]._ray), opos_pc, osize);
+
+            ray_states[0]._cdst = make_float4(0.0f);
+
+            if (ray_box_intersection(&(ray_states[0]._ray),
+                                     make_float3(0.0),
+                                     make_float3(uniform_data._volume_extends),
+                                     &(ray_states[0]._trange.x),
+                                     &(ray_states[0]._trange.y)))
+            {
+                ray_states[0]._t = ray_states[0]._trange.x;
+                any_ray_running = true;
+            }
+            else {
+                ray_states[0]._t = ray_states[0]._trange.y;
+            }
+        }
+
+        const float3 obj_to_tex  = make_float3(uniform_data._scale_obj_to_tex);
+        const float  op_corr     = uniform_data._sampling_distance.y;
+        const float  s_dist      = uniform_data._sampling_distance.x;
+
+        while (any_ray_running) {
+            any_ray_running = false;
+            for (int s = 0; s < ss_count; ++s) {
+                ray_state& r = ray_states[s];
+
+                if (   r._t < r._trange.y
+                    && r._cdst.w < 0.99f)
+                {
+                    any_ray_running = true;
+                    const float3 spos      = r._ray.origin + r._t * r._ray.direction;
+                    const float3 vtexcoord = obj_to_tex * spos;
+
+                    const float  s   = tex3D(volume_texture, vtexcoord.x, vtexcoord.y, vtexcoord.z);
+                    float4 src = tex1D(colormap_texture, s);
+
+                    // advance ray
+                    r._t += s_dist;
+
+                    // opacity correction
+                    src.w = 1.0f - pow(1.0f - src.w, op_corr);
+
+                    // compositing
+                    float omda_sa = (1.0 - r._cdst.w) * src.w;
+                    r._cdst.x += omda_sa * src.x;
+                    r._cdst.y += omda_sa * src.y;
+                    r._cdst.z += omda_sa * src.z;
+                    r._cdst.w += omda_sa;
+                }
+            }
+        }
+
+        for (int s = 0; s < ss_count; ++s) {
+            out_color += ray_states[s]._cdst;
+        }
+
+#else
         // setup rays
         if (use_ss) {
             for (int i = 0; i < ss_count; ++i) {
@@ -252,17 +346,13 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
                     dst.z += omda_sa * src.z;
                     dst.w   += omda_sa;
                 }
-#if SCM_LDATA_CUDA_VIS_ITER_COUNT == 1
-                out_color += tex1D(colormap_texture, (float)(loop_count) / 1500.0f);
-#else // SCM_LDATA_CUDA_VIS_ITER_COUNT == 1
                 out_color += dst;
-#endif // SCM_LDATA_CUDA_VIS_ITER_COUNT == 1
             }
             //else {
             //    out_color += make_float4(1.0f, 0.0f, 0.0f, 1.0f);
             //}
         }
-
+#endif
 #if SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
         thread_stop = clock();
         out_color = tex1D(colormap_texture, (float)(thread_stop - thread_start) / 3000000.0f);

@@ -8,7 +8,7 @@
 
 #include </scm/gl_util/camera_block.glslh>
 
-#define SCM_LDATA_OPENGL_VIS_SS_COUNT       8 // supported modes: 4, 8
+#define SCM_LDATA_OPENGL_VIS_SS_COUNT       4 // supported modes: 4, 8
 
 // output layout definitions //////////////////////////////////////////////////////////////////////
 layout(location = 0, index = 0) out vec4 out_color;
@@ -222,7 +222,7 @@ void main()
             vec3 ray_exit  = tmax * cur_ray.direction + cur_ray.origin;
 
             vec3 ray_increment = cur_ray.direction * volume_data.sampling_distance.x;
-            vec3 sampling_pos  = ray_entry + ray_increment; // test, increment just to be sure we are in the volume
+            vec3 sampling_pos  = ray_entry;// + ray_increment; // test, increment just to be sure we are in the volume
             if (use_ss) {
                 sampling_pos += ray_increment * ss_sample_offsets[i];
             }
