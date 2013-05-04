@@ -34,6 +34,8 @@ public:
 
     void                            draw(const gl::render_context_ptr& context,
                                          const cuda_volume_data_ptr&   vdata,
+                                         int                           render_mode,
+                                         int                           sample_count,
                                          bool                          use_supersampling);
     void                            present(const gl::render_context_ptr& context) const;
 

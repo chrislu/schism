@@ -128,6 +128,8 @@ cuda_volume_renderer::cleanup()
 void
 cuda_volume_renderer::draw(const gl::render_context_ptr& context,
                            const cuda_volume_data_ptr&   vdata,
+                           int                           render_mode,
+                           int                           sample_count,
                            bool                          use_supersampling)
 {
     using namespace scm::math;
@@ -151,12 +153,14 @@ cuda_volume_renderer::draw(const gl::render_context_ptr& context,
     cu_err = cudaEventRecord(cu_start, cu_stream);
     cu_err = cudaGraphicsMapResources(cu_gfx_res_count, cu_gfx_res, cu_stream);
 
-    startup_ray_cast_kernel(_viewport_size.x, _viewport_size.y,
-                            _output_image.get(),
-                            vdata->volume_image().get(),
-                            vdata->color_alpha_image().get(),
-                            use_supersampling,
-                            cu_stream);
+    cuda::startup_ray_cast_kernel(_viewport_size.x, _viewport_size.y,
+                                  _output_image.get(),
+                                  vdata->volume_image().get(),
+                                  vdata->color_alpha_image().get(),
+                                  render_mode,
+                                  sample_count,
+                                  use_supersampling,
+                                  cu_stream);
 
     cu_err = cudaGraphicsUnmapResources(cu_gfx_res_count, cu_gfx_res, cu_stream);
     cu_err = cudaEventRecord(cu_stop, cu_stream);

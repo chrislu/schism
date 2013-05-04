@@ -84,6 +84,9 @@ protected:
     cuda_volume_renderer_ptr        _volume_renderer_cuda;
 
     bool                            _use_volume_supersampling;
+    int                             _cuda_render_mode;
+    int                             _cuda_sample_count;
+
     bool                            _use_opencl_renderer;
 
     gl::geometry_highlight_ptr      _volume_highlight;

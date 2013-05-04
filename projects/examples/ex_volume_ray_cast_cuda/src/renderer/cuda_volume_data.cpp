@@ -106,7 +106,7 @@ cuda_volume_data::update(const gl::render_context_ptr& context)
     //    
     //assert(cudaSuccess == cu_err);
 
-    upload_uniform_data(d, context->cuda_command_stream()->stream());
+    cuda::upload_uniform_data(d, context->cuda_command_stream()->stream());
 }
 
 const volume_data_ptr&

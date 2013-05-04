@@ -4,6 +4,8 @@
 
 #include "volume_ray_cast.h"
 
+#include <iostream>
+
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 
@@ -15,7 +17,73 @@
 #define SCM_LDATA_CUDA_VIS_ITER_COUNT    0
 #define SCM_LDATA_CUDA_VIS_DEBUG         0
 
-#define SCM_LDATA_CUDA_VIS_SS_COUNT      4 // supported modes: 4, 8
+#define SCM_LDATA_CUDA_VIS_SS_COUNT      4 // supported modes: 1, 4, 8
+
+namespace scm {
+namespace cuda {
+
+__device__ __constant__ float2 ss_pixel_offsets_01  = {0.5f, 0.5f};
+__device__ __constant__ float  ss_sample_offsets_01 = 0.00f;
+
+    // regular grid
+    //const float2 ss_pixel_offsets[4] = {{0.25f, 0.25f},
+    //                                    {0.75f, 0.25f},
+    //                                    {0.25f, 0.75f},
+    //                                    {0.75f, 0.75f}};
+    // rotated grid grid
+#define ss_grid_res 0.125f
+//__device__ __constant__ float2 ss_pixel_offsets[4] = {{0.5f, 0.5f},
+//                                                      {0.5f, 0.5f},
+//                                                      {0.5f, 0.5f},
+//                                                      {0.5f, 0.5f}};
+//__device__ __constant__ float ss_sample_offsets[4] = {0.00f,
+//                                                      0.00f,
+//                                                      0.00f,
+//                                                      0.00f};
+__device__ __constant__ float2 ss_pixel_offsets_04[4] = {{ss_grid_res * 5.0f, ss_grid_res * 1.0f},
+                                                         {ss_grid_res * 7.0f, ss_grid_res * 5.0f},
+                                                         {ss_grid_res * 3.0f, ss_grid_res * 7.0f},
+                                                         {ss_grid_res * 1.0f, ss_grid_res * 3.0f}};
+__device__ __constant__ float ss_sample_offsets_04[4] = {0.00f,
+                                                         0.25f,
+                                                         0.50f,
+                                                         0.75f};
+// NV pattern
+__device__ __constant__ float2 ss_pixel_offsets_08[8] = {{0.630f, 0.206f},
+                                                         {0.667f, 0.079f},
+                                                         {0.413f, 0.333f},
+                                                         {0.794f, 0.460f},
+                                                         {0.032f, 0.587f},
+                                                         {0.531f, 0.714f},
+                                                         {0.286f, 0.841f},
+                                                         {0.921f, 0.968f}};
+__device__ __constant__ float ss_sample_offsets_08[8] = {0.000f,
+                                                         0.125f,
+                                                         0.250f,
+                                                         0.375f,
+                                                         0.500f,
+                                                         0.625f,
+                                                         0.750f,
+                                                         0.875f};
+template<int SAMPLE_COUNT, bool ENABLE_SS>
+float2 __device__ __inline__ subpixel_offset(int i) { return make_float2(0.0f); }
+
+template<> __device__ __inline__ float2 subpixel_offset<1, true>(int i)  { return ss_pixel_offsets_01; }
+template<> __device__ __inline__ float2 subpixel_offset<1, false>(int i) { return ss_pixel_offsets_01; }
+template<> __device__ __inline__ float2 subpixel_offset<4, true>(int i)  { return ss_pixel_offsets_04[i]; }
+template<> __device__ __inline__ float2 subpixel_offset<4, false>(int i) { return ss_pixel_offsets_01; }
+template<> __device__ __inline__ float2 subpixel_offset<8, true>(int i)  { return ss_pixel_offsets_08[i]; }
+template<> __device__ __inline__ float2 subpixel_offset<8, false>(int i) { return ss_pixel_offsets_01; }
+
+template<int SAMPLE_COUNT, bool ENABLE_SS>
+float __device__ __inline__ sample_offset(int i) { return 0.0f; }
+
+template<> __device__ __inline__ float sample_offset<1, true>(int i)  { return ss_sample_offsets_01; }
+template<> __device__ __inline__ float sample_offset<1, false>(int i) { return ss_sample_offsets_01; }
+template<> __device__ __inline__ float sample_offset<4, true>(int i)  { return ss_sample_offsets_04[i]; }
+template<> __device__ __inline__ float sample_offset<4, false>(int i) { return ss_sample_offsets_01; }
+template<> __device__ __inline__ float sample_offset<8, true>(int i)  { return ss_sample_offsets_08[i]; }
+template<> __device__ __inline__ float sample_offset<8, false>(int i) { return ss_sample_offsets_01; }
 
 // cuda globals
 surface<void, cudaSurfaceType2D> out_image;
@@ -28,13 +96,15 @@ texture<uchar4,        cudaTextureType1D, cudaReadModeNormalizedFloat> colormap_
 __device__ __constant__ volume_uniform_data uniform_data;
 
 // helpers
+inline __device__ float min(float a, float b) { return (a < b) ? a : b; }
+inline __device__ float max(float a, float b) { return (a > b) ? a : b; }
 inline __device__ float4 min(float4 a, float4 b) { return make_float4(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w)); }
 inline __device__ float4 max(float4 a, float4 b) { return make_float4(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w)); }
 inline __device__ float3 min(float3 a, float3 b) { return make_float3(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z)); }
 inline __device__ float3 max(float3 a, float3 b) { return make_float3(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z)); }
 
 inline
-__device__
+__device__ __inline__
 float4
 mul_matrix4(const float4x4 m, const float4 v)
 {
@@ -52,7 +122,7 @@ struct ray
 }; // struct ray
 
 inline
-__device__
+__device__ __inline__
 void
 make_ray(struct ray*const r,
          const float2 spos,
@@ -72,7 +142,7 @@ make_ray(struct ray*const r,
 }
 
 bool
-__device__
+__device__ __inline__
 ray_box_intersection(const struct ray*const r,
                      float3   bbmin,
                      float3   bbmax,
@@ -114,7 +184,7 @@ ray_box_intersection(const struct ray*const r,
 }
 
 inline
-__device__
+__device__ __inline__
 float
 length_sqr(const float3 a, const float3 b)
 {
@@ -123,189 +193,85 @@ length_sqr(const float3 a, const float3 b)
     return dot(d, d);
 }
 
-
-extern "C"
-void
-__global__
-main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
+template<bool ENABLED>
+struct thread_vis_clock
 {
-#if SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
-    clock_t thread_start;
-    clock_t thread_stop;
-#endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
+    clock_t _thread_start;
+    clock_t _thread_stop;
+    
+    __device__ __inline__ bool enabled() const {
+        return ENABLED;
+    }
+    __device__ __inline__ void start() {
+        _thread_start = clock();
+    }
+    __device__ __inline__ void stop() {
+        _thread_stop = clock();
+    }
+    __device__ __inline__ float4 pseudo_colored_elapsed() const {
+        return tex1D(colormap_texture, (float)(_thread_stop - _thread_start) / 3000000.0f);
+    }
+};
 
-    int2 osize = make_int2(out_image_w, out_image_h);
-    int2 opos  = make_int2(blockIdx.x * blockDim.x + threadIdx.x,
-                           blockIdx.y * blockDim.y + threadIdx.y);
+template<>
+struct thread_vis_clock<false>
+{
+    __device__ __inline__ bool enabled() const { return false; }
+    __device__ __inline__ void start() {}
+    __device__ __inline__ void stop()  {}
+    __device__ __inline__ float4 pseudo_colored_elapsed() const { return make_float4(0.0f); }
+};
 
-    const int    ss_count      = use_ss ? SCM_LDATA_CUDA_VIS_SS_COUNT : 1;
-#if SCM_LDATA_CUDA_VIS_SS_COUNT == 4
-    // regular grid
-    //const float2 ss_pixel_offsets[4] = {{0.25f, 0.25f},
-    //                                    {0.75f, 0.25f},
-    //                                    {0.25f, 0.75f},
-    //                                    {0.75f, 0.75f}};
-    // rotated grid grid
-    const float  ss_grid_res = 0.125f;
-    const float2 ss_pixel_offsets[4] = {{ss_grid_res * 5.0f, ss_grid_res * 1.0f},
-                                        {ss_grid_res * 7.0f, ss_grid_res * 5.0f},
-                                        {ss_grid_res * 3.0f, ss_grid_res * 7.0f},
-                                        {ss_grid_res * 1.0f, ss_grid_res * 3.0f}};
-    const float ss_sample_offsets[4] = {0.00f,
-                                        0.25f,
-                                        0.50f,
-                                        0.75f};
-    struct ray ss_rays[4];
-#elif SCM_LDATA_CUDA_VIS_SS_COUNT == 8
-    // NV pattern
-    const float2 ss_pixel_offsets[8] = {{0.630f, 0.206f},
-                                        {0.667f, 0.079f},
-                                        {0.413f, 0.333f},
-                                        {0.794f, 0.460f},
-                                        {0.032f, 0.587f},
-                                        {0.531f, 0.714f},
-                                        {0.286f, 0.841f},
-                                        {0.921f, 0.968f}};
-    const float ss_sample_offsets[8] = {0.000f,
-                                        0.125f,
-                                        0.250f,
-                                        0.375f,
-                                        0.500f,
-                                        0.625f,
-                                        0.750f,
-                                        0.875f};
-    //struct ray ss_rays[8];
-#endif
+struct ray_state {
+    ray         _ray;       // the sub-pixel ray
+    float       _t;
+    float4      _cdst;      // destination color 
+    float2      _trange;    // the t min/max range of the ray
+};
 
-    if (opos.x < osize.x && opos.y < osize.y) {
+template<render_mode  RENDER_MODE,
+         int          SAMPLE_COUNT,
+         bool         ENABLE_SS>
+struct super_sample_volume_traversal
+{
+    __device__ __inline__
+    float4 traverse_volume(const int2& osize,
+                           const int2& opos) const
+    {
+        return make_float4(0.0f);
+    }
+};
 
-#if SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
-        thread_start = clock();
-#endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
-        float4 out_color = make_float4(0.0);;
+template<int  SAMPLE_COUNT,
+         bool ENABLE_SS>
+struct super_sample_volume_traversal<RENDER_SS_RAYS_SEQUENTIALLY_00, SAMPLE_COUNT, ENABLE_SS>
+{
+    __device__ __inline__
+    float4 traverse_volume(const int2& osize,
+                           const int2& opos) const
+    {
+        float4     out_color = make_float4(0.0);
+        const int  ss_sample_count = ENABLE_SS ? SAMPLE_COUNT : 1;
 
-#if 1
-        struct ray_state {
-            ray         _ray;       // the sub-pixel ray
-            float       _t;
-            float4      _cdst;      // destination color 
-            float2      _trange;    // the t min/max range of the ray
-
-        };
-        ray_state ray_states[SCM_LDATA_CUDA_VIS_SS_COUNT];
-        bool any_ray_running = false;
-
-        // setup rays
-        if (use_ss) {
-            for (int i = 0; i < ss_count; ++i) {
-                const float2 opos_pc = ss_pixel_offsets[i] + make_float2(opos.x, opos.y);
-                make_ray(&(ray_states[i]._ray), opos_pc, osize);
-
-                ray_states[i]._cdst = make_float4(0.0f);
-
-                if (ray_box_intersection(&(ray_states[i]._ray),
-                                         make_float3(0.0),
-                                         make_float3(uniform_data._volume_extends),
-                                         &(ray_states[i]._trange.x),
-                                         &(ray_states[i]._trange.y)))
-                {
-                    ray_states[i]._t =   ray_states[i]._trange.x
-                                       + ss_sample_offsets[i] * uniform_data._sampling_distance.x;
-                    any_ray_running = true;
-                }
-                else {
-                    ray_states[i]._t = ray_states[i]._trange.y;
-                    ray_states[i]._cdst = make_float4(1.0f, 0.0f, 0.0f, 1.0f);
-                }
-            }
-        }
-        else {
-            const float2 opos_pc = make_float2(0.5f + opos.x, 0.5f + opos.y);
-            make_ray(&(ray_states[0]._ray), opos_pc, osize);
-
-            ray_states[0]._cdst = make_float4(0.0f);
-
-            if (ray_box_intersection(&(ray_states[0]._ray),
-                                     make_float3(0.0),
-                                     make_float3(uniform_data._volume_extends),
-                                     &(ray_states[0]._trange.x),
-                                     &(ray_states[0]._trange.y)))
-            {
-                ray_states[0]._t = ray_states[0]._trange.x;
-                any_ray_running = true;
-            }
-            else {
-                ray_states[0]._t = ray_states[0]._trange.y;
-            }
-        }
-
-        const float3 obj_to_tex  = make_float3(uniform_data._scale_obj_to_tex);
-        const float  op_corr     = uniform_data._sampling_distance.y;
-        const float  s_dist      = uniform_data._sampling_distance.x;
-
-        while (any_ray_running) {
-            any_ray_running = false;
-            for (int s = 0; s < ss_count; ++s) {
-                ray_state& r = ray_states[s];
-
-                if (   r._t < r._trange.y
-                    && r._cdst.w < 0.99f)
-                {
-                    any_ray_running = true;
-                    const float3 spos      = r._ray.origin + r._t * r._ray.direction;
-                    const float3 vtexcoord = obj_to_tex * spos;
-
-                    const float  s   = tex3D(volume_texture, vtexcoord.x, vtexcoord.y, vtexcoord.z);
-                    float4 src = tex1D(colormap_texture, s);
-
-                    // advance ray
-                    r._t += s_dist;
-
-                    // opacity correction
-                    src.w = 1.0f - pow(1.0f - src.w, op_corr);
-
-                    // compositing
-                    float omda_sa = (1.0 - r._cdst.w) * src.w;
-                    r._cdst.x += omda_sa * src.x;
-                    r._cdst.y += omda_sa * src.y;
-                    r._cdst.z += omda_sa * src.z;
-                    r._cdst.w += omda_sa;
-                }
-            }
-        }
-
-        for (int s = 0; s < ss_count; ++s) {
-            out_color += ray_states[s]._cdst;
-        }
-
-#else
-        // setup rays
-        if (use_ss) {
-            for (int i = 0; i < ss_count; ++i) {
-                const float2 opos_pc = ss_pixel_offsets[i] + make_float2(opos.x, opos.y);
-                make_ray(&(ss_rays[i]), opos_pc, osize);
-            }
-        }
-        else {
-            const float2 opos_pc = make_float2(0.5f + opos.x, 0.5f + opos.y);
-            make_ray(&(ss_rays[0]), opos_pc, osize);
-        }
-
-        for (int i = 0; i < ss_count; ++i) {
+        for (int i = 0; i < ss_sample_count; ++i) {
             float tmin = 0.0;
             float tmax = 0.0;
         
-            if (ray_box_intersection(&(ss_rays[i]), make_float3(0.0), make_float3(uniform_data._volume_extends), &tmin, &tmax)) {
+            // setup ray 
+            struct ray cur_ray;
+            const float2 opos_pc =   subpixel_offset<SAMPLE_COUNT, ENABLE_SS>(i)
+                                    + make_float2(opos.x, opos.y);
+            make_ray(&cur_ray, opos_pc, osize);
 
-                const struct ray& cur_ray = ss_rays[i];
+            if (ray_box_intersection(&cur_ray, make_float3(0.0), make_float3(uniform_data._volume_extends), &tmin, &tmax)) {
                 float3 cam_pos   = make_float3(uniform_data._os_camera_position);
                 float3 ray_entry = tmin * cur_ray.direction + cur_ray.origin;
                 float3 ray_exit  = tmax * cur_ray.direction + cur_ray.origin;
 
                 float3 ray_increment = cur_ray.direction * uniform_data._sampling_distance.x;
                 float3 sampling_pos  = ray_entry + ray_increment; // test, increment just to be sure we are in the volume
-                if (use_ss) {
-                    sampling_pos += ray_increment * ss_sample_offsets[i];
+                if (ENABLE_SS) {
+                    sampling_pos += ray_increment * sample_offset<SAMPLE_COUNT, ENABLE_SS>(i);
                 }
                 float3 to_tex        = make_float3(uniform_data._scale_obj_to_tex);
 
@@ -314,11 +280,9 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
 
                 float4 dst = make_float4(0.0f);
                 float  opc = uniform_data._sampling_distance.y;
-                int    loop_count = 0;
 
                 //out_color = make_float4(ray_exit, 1.0);
                 while ((exit_sqr_dist - smpl_sqr_dist) > 0.0f && dst.w < 0.99f) {
-                    ++loop_count;
                     float3 tc_vol = sampling_pos * to_tex;
 
                     float  s   = tex3D(volume_texture, tc_vol.x, tc_vol.y, tc_vol.z);// texture(volume_raw, sampling_pos * volume_data.scale_obj_to_tex.xyz).r;
@@ -352,13 +316,181 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
             //    out_color += make_float4(1.0f, 0.0f, 0.0f, 1.0f);
             //}
         }
-#endif
-#if SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
-        thread_stop = clock();
-        out_color = tex1D(colormap_texture, (float)(thread_stop - thread_start) / 3000000.0f);
-#else
-        out_color /= float(ss_count);
-#endif // SCM_LDATA_CUDA_VIS_PROFILE_CLOCK == 1
+
+        return out_color / float(ss_sample_count);
+    }
+}; // RENDER_SS_RAYS_SEQUENTIALLY_00
+
+template<int  SAMPLE_COUNT,
+         bool ENABLE_SS>
+struct super_sample_volume_traversal<RENDER_SS_RAYS_SEQUENTIALLY_01, SAMPLE_COUNT, ENABLE_SS>
+{
+    __device__ __inline__
+    float4 traverse_volume(const int2& osize,
+                           const int2& opos) const
+    {
+        float4     out_color = make_float4(0.0);
+        const int  ss_sample_count = ENABLE_SS ? SAMPLE_COUNT : 1;
+        //ray_state  ray_states[ENABLE_SS ? SAMPLE_COUNT : 1];
+
+        for (int i = 0; i < ss_sample_count; ++i) {
+            // setup ray
+            ray_state r;
+            const float2 opos_pc =   subpixel_offset<SAMPLE_COUNT, ENABLE_SS>(i)
+                                    + make_float2(opos.x, opos.y);
+            make_ray(&(r._ray), opos_pc, osize);
+            r._cdst = make_float4(0.0f);
+
+            if (ray_box_intersection(&(r._ray),
+                                     make_float3(0.0),
+                                     make_float3(uniform_data._volume_extends),
+                                     &(r._trange.x),
+                                     &(r._trange.y)))
+            {
+                r._t = r._trange.x + sample_offset<SAMPLE_COUNT, ENABLE_SS>(i) * uniform_data._sampling_distance.x;
+
+                const float3 obj_to_tex  = make_float3(uniform_data._scale_obj_to_tex);
+                const float  op_corr     = uniform_data._sampling_distance.y;
+                const float  s_dist      = uniform_data._sampling_distance.x;
+
+                while (   r._t < r._trange.y
+                       && r._cdst.w < 0.99f)
+                {
+                    const float3 spos      = r._ray.origin + r._t * r._ray.direction;
+                    const float3 vtexcoord = obj_to_tex * spos;
+
+                    const float  s   = tex3D(volume_texture, vtexcoord.x, vtexcoord.y, vtexcoord.z);
+                    float4 src       = tex1D(colormap_texture, s);
+
+                    // advance ray
+                    r._t += s_dist;
+
+                    // opacity correction
+                    src.w = 1.0f - pow(1.0f - src.w, op_corr);
+
+                    // compositing
+                    float omda_sa = (1.0 - r._cdst.w) * src.w;
+                    r._cdst.x += omda_sa * src.x;
+                    r._cdst.y += omda_sa * src.y;
+                    r._cdst.z += omda_sa * src.z;
+                    r._cdst.w += omda_sa;
+                }
+                out_color += r._cdst;
+            }
+        }
+
+        return out_color / float(ss_sample_count);
+    }
+}; // RENDER_SS_RAYS_SEQUENTIALLY_01
+
+template<int  SAMPLE_COUNT,
+         bool ENABLE_SS>
+struct super_sample_volume_traversal<RENDER_SS_RAYS_PARALLEL_00, SAMPLE_COUNT, ENABLE_SS>
+{
+    __device__ __inline__
+    float4 traverse_volume(const int2& osize,
+                           const int2& opos) const
+    {
+        float4     out_color        = make_float4(0.0);
+        const int  ss_sample_count  = ENABLE_SS ? SAMPLE_COUNT : 1;
+        bool       any_ray_running  = false;
+        ray_state  ray_states[ENABLE_SS ? SAMPLE_COUNT : 1];
+        //ray_state* ray_states = &(sray_states[threadIdx.x][threadIdx.y][0]);
+
+        // setup rays
+        #pragma unroll
+        for (int i = 0; i < ss_sample_count; ++i) {
+            const float2 opos_pc =    subpixel_offset<SAMPLE_COUNT, ENABLE_SS>(i)
+                                    + make_float2(opos.x, opos.y);
+            make_ray(&(ray_states[i]._ray), opos_pc, osize);
+
+            ray_states[i]._cdst = make_float4(0.0f);
+
+            if (ray_box_intersection(&(ray_states[i]._ray),
+                                        make_float3(0.0),
+                                        make_float3(uniform_data._volume_extends),
+                                        &(ray_states[i]._trange.x),
+                                        &(ray_states[i]._trange.y)))
+            {
+                ray_states[i]._t = ray_states[i]._trange.x + sample_offset<SAMPLE_COUNT, ENABLE_SS>(i) * uniform_data._sampling_distance.x;
+                any_ray_running = true;
+            }
+            else {
+                ray_states[i]._t = ray_states[i]._trange.y;
+                //ray_states[i]._cdst = make_float4(1.0f, 0.0f, 0.0f, 1.0f);
+            }
+        }
+
+        const float3& obj_to_tex  = make_float3(uniform_data._scale_obj_to_tex);
+        const float&  op_corr     = uniform_data._sampling_distance.y;
+        const float&  s_dist      = uniform_data._sampling_distance.x;
+
+        while (any_ray_running) {
+            any_ray_running = false;
+            
+            #pragma unroll
+            for (int s = 0; s < ss_sample_count; ++s) {
+                ray_state& r = ray_states[s];
+
+                if (   r._t < r._trange.y
+                    && r._cdst.w < 0.99f)
+                {
+                    any_ray_running = true;
+                    const float3 spos      = r._ray.origin + r._t * r._ray.direction;
+                    const float3 vtexcoord = obj_to_tex * spos;
+
+                    const float  s   = tex3D(volume_texture, vtexcoord.x, vtexcoord.y, vtexcoord.z);
+                    float4 src = tex1D(colormap_texture, s);
+
+                    // advance ray
+                    r._t += s_dist;
+
+                    // opacity correction
+                    src.w = 1.0f - pow(1.0f - src.w, op_corr);
+
+                    // compositing
+                    float omda_sa = (1.0 - r._cdst.w) * src.w;
+                    r._cdst.x += omda_sa * src.x;
+                    r._cdst.y += omda_sa * src.y;
+                    r._cdst.z += omda_sa * src.z;
+                    r._cdst.w += omda_sa;
+                }
+            }
+        }
+
+        #pragma unroll
+        for (int s = 0; s < ss_sample_count; ++s) {
+            out_color += ray_states[s]._cdst;
+        }
+
+        return out_color / float(ss_sample_count);
+    }
+}; // RENDER_SS_RAYS_PARALLEL_00
+
+
+template<render_mode  RENDER_MODE,
+         int          SAMPLE_COUNT,
+         bool         ENABLE_SS>
+void
+__global__
+main_vrc(unsigned out_image_w, unsigned out_image_h)
+{
+    thread_vis_clock<false> thread_clock_vis;
+
+    const int2 osize = make_int2(out_image_w, out_image_h);
+    const int2 opos  = make_int2(blockIdx.x * blockDim.x + threadIdx.x,
+                                 blockIdx.y * blockDim.y + threadIdx.y);
+
+    if (opos.x < osize.x && opos.y < osize.y) {
+        thread_clock_vis.start();
+
+        super_sample_volume_traversal<RENDER_MODE, SAMPLE_COUNT, ENABLE_SS> ss_vol_trav;
+        float4 out_color = ss_vol_trav.traverse_volume(osize, opos);
+
+        thread_clock_vis.stop();
+        if (thread_clock_vis.enabled()) {
+            out_color = thread_clock_vis.pseudo_colored_elapsed();
+        }
 
         uchar4 out_col_data;
         out_col_data.x = (unsigned char)(out_color.x * 255.0f);
@@ -370,12 +502,13 @@ main_vrc(unsigned out_image_w, unsigned out_image_h, bool use_ss)
     }
 }
 
-extern "C"
 void
 startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
                         cudaGraphicsResource_t                   output_image_res,
                         cudaGraphicsResource_t                   volume_image_res,
                         cudaGraphicsResource_t                   cmap_image_res,
+                        int                                      render_mode,
+                        int                                      sample_count,
                         bool                                     use_supersampling,
                         cudaStream_t                             cuda_stream)
 {
@@ -404,9 +537,13 @@ startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
     cu_err = cudaGraphicsSubResourceGetMappedArray(&cu_ci_array, cmap_image_res, 0, 0);
     cu_err = cudaBindTextureToArray(colormap_texture, cu_ci_array);
 
+    //cudaFuncSetCacheConfig(main_vrc, cudaFuncCachePreferL1);
+
     // calculate the grid and block sizes
     //cudaFuncAttributes  cu_krnl_attr;
-    //cu_err = cudaFuncGetAttributes(&cu_krnl_attr, "main_vrc");
+    //cu_err = cudaFuncGetAttributes(&cu_krnl_attr, main_vrc);
+
+    //std::cout << cu_krnl_attr.maxThreadsPerBlock;
 
     dim3 vsize = dim3(out_image_w, out_image_h, 1);
     //dim3 bsize = dim3(32, cu_krnl_attr.maxThreadsPerBlock / 32, 1);
@@ -419,10 +556,43 @@ startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
     dim3 grid_size(gsize.x, gsize.y, 1);
     dim3 block_size(bsize.x, bsize.y, 1);
 
-    main_vrc<<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h, use_supersampling);//, uniform_data_raw);
+    if (use_supersampling) {
+        switch (render_mode) {
+            case RENDER_SS_RAYS_SEQUENTIALLY_00:
+                switch (sample_count) {
+                    case 1: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_00, 1, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 4: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_00, 4, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 8: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_00, 8, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                }
+            break;
+            case RENDER_SS_RAYS_SEQUENTIALLY_01:
+                switch (sample_count) {
+                    case 1: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_01, 1, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 4: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_01, 4, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 8: main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_01, 8, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                }
+            break;
+            case RENDER_SS_RAYS_PARALLEL_00:
+                switch (sample_count) {
+                    case 1: main_vrc<RENDER_SS_RAYS_PARALLEL_00, 1, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 4: main_vrc<RENDER_SS_RAYS_PARALLEL_00, 4, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                    case 8: main_vrc<RENDER_SS_RAYS_PARALLEL_00, 8, true><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+                }
+            break;
+        }
+    }
+    else {
+        switch (render_mode) {
+            case RENDER_SS_RAYS_SEQUENTIALLY_00:
+                main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_00, 1, false><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+            case RENDER_SS_RAYS_SEQUENTIALLY_01:
+                main_vrc<RENDER_SS_RAYS_SEQUENTIALLY_01, 1, false><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+            case RENDER_SS_RAYS_PARALLEL_00:
+                main_vrc<RENDER_SS_RAYS_PARALLEL_00, 1, false><<<grid_size, block_size, 0, cuda_stream>>>(out_image_w, out_image_h);break;
+        }
+    } 
 }
 
-extern "C"
 bool
 upload_uniform_data(const volume_uniform_data& vud,
                     cudaStream_t               cuda_stream)
@@ -430,3 +600,6 @@ upload_uniform_data(const volume_uniform_data& vud,
     cudaError cu_err = cudaMemcpyToSymbolAsync(uniform_data, &vud, sizeof(volume_uniform_data), 0, cudaMemcpyHostToDevice, cuda_stream);
     return cudaSuccess == cu_err;
 }
+
+} // namespace cuda
+} // namespace scm
