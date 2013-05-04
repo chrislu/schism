@@ -5,6 +5,10 @@
 include(schism_platform)
 
 option(SCHISM_CUDA_BUILD_DEBUG                     "Build debug"                            OFF)
+option(SCHISM_CUDA_BUILD_VERBOSE                   "Verbose Output"                         OFF)
+option(SCHISM_CUDA_BUILD_COMPUTE20                 "Enable Compute 2.0"                     ON)
+option(SCHISM_CUDA_BUILD_COMPUTE30                 "Enable Compute 3.0"                     OFF)
+option(SCHISM_CUDA_BUILD_COMPUTE35                 "Enable Compute 3.5"                     OFF)
 option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math calculations"  ON)
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
@@ -14,20 +18,15 @@ endif (WIN32)
 
 if (WIN32)
     #todo make gencode variable
-    set(SCM_CUDA_NVCC_OPTIONS "--gpu-architecture=\"compute_20\" --gpu-code=\"sm_20,compute_20\" --use-local-env --cl-version 2010 --compile" CACHE STRING "schism cuda internal" FORCE)
+    set(SCM_CUDA_NVCC_OPTIONS --use-local-env --cl-version 2010 --compile CACHE STRING "schism cuda internal" FORCE)
     set(SCM_CUDA_NVCC_PATH                  ${GLOBAL_EXT_DIR}/bin/cuda           CACHE PATH   "schism cuda internal")
-	#message(${SCHISM_PLATFORM})
-	#message(${PLATFORM_WIN64})
     if (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
-        set(SCM_CUDA_NVCC_OPTIONS  ${SCM_CUDA_NVCC_OPTIONS} "--machine 64 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\""  CACHE STRING "schism cuda internal" FORCE)
+        set(SCM_CUDA_NVCC_OPTIONS  ${SCM_CUDA_NVCC_OPTIONS} --machine 64 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\"  CACHE STRING "schism cuda internal" FORCE)
 	else (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
-        set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS}  "--machine 32 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\""  CACHE STRING "schism cuda internal" FORCE)
+        set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS}  --machine 32 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\"  CACHE STRING "schism cuda internal" FORCE)
 	endif (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
 elseif (UNIX)
-   #todo make gencode variable
-   set(SCM_CUDA_NVCC_OPTIONS --gpu-architecture=compute_20 --gpu-code=sm_20,compute_20 --compile CACHE STRING "schism cuda internal" FORCE)
     set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/cuda/bin                CACHE PATH   "schism cuda internal")
-    # set(CUDA_NVCC_OPTIONS              -ccbin \"/usr/bin\")
 endif (WIN32)
 
 set(SCM_CUDA_NVCC_COMMAND "${SCM_CUDA_NVCC_PATH}/nvcc" CACHE STRING "schism cuda internal")
@@ -44,12 +43,27 @@ string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVC
 set(SCM_CUDA_NVCC_DEFINITIONS           "")
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES   "")
 
-#set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
 if (SCHISM_CUDA_BUILD_DEBUG)
     set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
 else (SCHISM_CUDA_BUILD_DEBUG)
     set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --optimize 3 -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
 endif (SCHISM_CUDA_BUILD_DEBUG)
+
+if (SCHISM_CUDA_BUILD_VERBOSE)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --ptxas-options=-v CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_VERBOSE)
+
+if (SCHISM_CUDA_BUILD_COMPUTE20)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_20\",code=\"sm_20\" CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_COMPUTE20)
+
+if (SCHISM_CUDA_BUILD_COMPUTE30)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_30\",code=\"sm_30\" CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_COMPUTE30)
+
+if (SCHISM_CUDA_BUILD_COMPUTE35)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_35\",code=\"sm_35\" CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_COMPUTE35)
 
 if (SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES)
     if (WIN32)
