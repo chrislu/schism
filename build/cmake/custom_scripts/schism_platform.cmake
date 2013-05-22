@@ -73,8 +73,6 @@ endif (UNIX)
 #-----------------------------------------------------------------------------
 # enable nanosec precision of boost::date_time library
 add_definitions(-DBOOST_DATE_TIME_POSIX_TIME_STD_CONFIG)
-add_definitions(-DBOOST_FILESYSTEM_VERSION=3)
-add_definitions(-DBOOST_FILESYSTEM_NO_DEPRECATED)
 
 if (UNIX)
     include_directories(/opt/OpenCL/include

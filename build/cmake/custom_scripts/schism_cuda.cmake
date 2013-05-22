@@ -13,7 +13,7 @@ option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math cal
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
 if (WIN32)
-    set(SCM_CUDA_SHARED_LIB_NAME "cudart64_50_7" CACHE STRING "schism cuda internal" FORCE)
+    set(SCM_CUDA_SHARED_LIB_NAME "cudart64_50_32" CACHE STRING "schism cuda internal" FORCE)
 endif (WIN32)
 
 if (WIN32)
