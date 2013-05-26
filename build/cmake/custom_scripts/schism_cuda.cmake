@@ -13,13 +13,18 @@ option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math cal
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
 if (WIN32)
-    set(SCM_CUDA_SHARED_LIB_NAME "cudart64_50_32" CACHE STRING "schism cuda internal" FORCE)
-endif (WIN32)
+    if (MSVC10)
+        set (SCM_CUDA_NVCC_OPTIONS --cl-version 2010 CACHE STRING "schism cuda internal" FORCE)
+        set(SCM_CUDA_SHARED_LIB_NAME "cudart64_50_32" CACHE STRING "schism cuda internal" FORCE)
+    endif(MSVC10)
 
-if (WIN32)
-    #todo make gencode variable
-    set(SCM_CUDA_NVCC_OPTIONS --use-local-env --cl-version 2010 --compile CACHE STRING "schism cuda internal" FORCE)
-    set(SCM_CUDA_NVCC_PATH                  ${GLOBAL_EXT_DIR}/bin/cuda           CACHE PATH   "schism cuda internal")
+    if (MSVC11)
+        set (SCM_CUDA_NVCC_OPTIONS --cl-version 2012 CACHE STRING "schism cuda internal" FORCE)
+        set(SCM_CUDA_SHARED_LIB_NAME "cudart64_55" CACHE STRING "schism cuda internal" FORCE)
+    endif(MSVC11)
+
+    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --use-local-env --compile CACHE STRING "schism cuda internal" FORCE)
+    set(SCM_CUDA_NVCC_PATH                  ${GLOBAL_EXT_DIR}/bin/cuda/bin       CACHE PATH   "schism cuda internal")
     if (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
         set(SCM_CUDA_NVCC_OPTIONS  ${SCM_CUDA_NVCC_OPTIONS} --machine 64 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\"  CACHE STRING "schism cuda internal" FORCE)
 	else (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
