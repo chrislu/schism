@@ -60,12 +60,6 @@ protected:
                const data_format         in_initial_data_format,
                const std::vector<void*>& in_initial_mip_level_data);
 
-#if 0
-    bool                    image_data(const render_device&      in_device,
-                                       const texture_2d_desc&    in_desc,
-                                       const data_format         in_initial_data_format,
-                                       const std::vector<void*>& in_initial_mip_level_data);
-#endif // 0
     bool                    allocate_storage(const render_device&      in_device,
                                              const texture_2d_desc&    in_desc);
     bool                    upload_initial_data(const render_device&      in_device,
