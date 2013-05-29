@@ -55,6 +55,11 @@ protected:
                const texture_1d_desc&    in_desc,
                const data_format         in_initial_data_format,
                const std::vector<void*>& in_initial_mip_level_data);
+    texture_1d(render_device&            in_device,
+               const texture_1d&         in_orig_texture,
+               const data_format         in_data_format,
+               const math::vec2ui&       in_mip_range,
+               const math::vec2ui&       in_layer_range);
 
     bool                    allocate_storage(const render_device&      in_device,
                                              const texture_1d_desc&    in_desc);
@@ -67,14 +72,19 @@ protected:
                                            const unsigned        in_level,
                                            const data_format     in_data_format,
                                            const void*const      in_data);
+    bool                    create_texture_view(const render_device&      in_device,
+                                                const texture_1d&         in_orig_texture,
+                                                const data_format         in_data_format,
+                                                const math::vec2ui&       in_mip_range,
+                                                const math::vec2ui&       in_layer_range);
 
 protected:
     texture_1d_desc         _descriptor;
 
 private:
-
     friend class render_device;
     friend class render_context;
+
 }; // class texture_1d
 
 } // namespace gl

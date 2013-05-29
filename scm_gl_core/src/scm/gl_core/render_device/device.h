@@ -228,6 +228,10 @@ public:
                                                       const unsigned            in_array_layers,
                                                       const data_format         in_initial_data_format,
                                                       const std::vector<void*>& in_initial_mip_level_data);
+    texture_1d_ptr                  create_texture_1d(const texture_1d_ptr&     in_orig_texture,
+                                                      const data_format         in_format,
+                                                      const math::vec2ui&       in_mip_range,
+                                                      const math::vec2ui&       in_layer_range);
 
     texture_2d_ptr                  create_texture_2d(const texture_2d_desc&    in_desc);
     texture_2d_ptr                  create_texture_2d(const texture_2d_desc&    in_desc,
@@ -245,6 +249,10 @@ public:
                                                       const unsigned            in_samples,
                                                       const data_format         in_initial_data_format,
                                                       const std::vector<void*>& in_initial_mip_level_data);
+    texture_2d_ptr                  create_texture_2d(const texture_2d_ptr&     in_orig_texture,
+                                                      const data_format         in_format,
+                                                      const math::vec2ui&       in_mip_range,
+                                                      const math::vec2ui&       in_layer_range);
 
     texture_3d_ptr                  create_texture_3d(const texture_3d_desc&    in_desc);
     texture_3d_ptr                  create_texture_3d(const texture_3d_desc&    in_desc,
@@ -258,6 +266,9 @@ public:
                                                       const unsigned            in_mip_levels,
                                                       const data_format         in_initial_data_format,
                                                       const std::vector<void*>& in_initial_mip_level_data);
+    texture_3d_ptr                  create_texture_3d(const texture_3d_ptr&     in_orig_texture,
+                                                      const data_format         in_format,
+                                                      const math::vec2ui&       in_mip_range);
 
     texture_buffer_ptr              create_texture_buffer(const texture_buffer_desc& in_desc);
     texture_buffer_ptr              create_texture_buffer(const data_format   in_format,

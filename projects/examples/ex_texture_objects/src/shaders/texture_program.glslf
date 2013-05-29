@@ -2,7 +2,7 @@
 // Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
 // Distributed under the Modified BSD License, see license.txt.
 
-#version 420 core
+#version 430 core
 
 #extension GL_NV_bindless_texture : require
 #extension GL_NV_gpu_shader5      : require
@@ -20,8 +20,9 @@ in per_vertex {
 layout(location = 0, index = 0) out vec4 out_color;
 
 // uniform input definitions //////////////////////////////////////////////////////////////////////
-uniform sampler2D tex_color;
-uniform uvec2     tex_color_resident;
+layout(binding  = 0) uniform sampler2D  tex_color;
+layout(binding  = 1) uniform usampler2D tex_color_view;
+uniform uvec2        tex_color_resident;
 
 // global constants ///////////////////////////////////////////////////////////////////////////////
 const float epsilon                 = 0.0001;
@@ -37,7 +38,11 @@ const vec3 lblue = vec3(0.2, 0.7, 0.9);
 void main() 
 {
     vec4 c = vec4(0.0);
-    if (gl_FragCoord.x < 800) {
+    if (gl_FragCoord.x < 400) {
+        c = vec4(texture(tex_color_view, v_in.texcoord)) / 255.0;
+        c *= vec4(0.5, 0.5, 1.0, 1.0);
+    }
+    else if (gl_FragCoord.x < 800) {
         c = texture(tex_color, v_in.texcoord);
     }
     else {
@@ -56,7 +61,7 @@ void main()
     out_color.rgb =    c.rgb * (dot(n, l) * 0.5 + 0.5)//max(0.0, dot(n, l))
                      + lblue * pow(max(0.0, dot(n, h)), 120.0);
     
-    //out_color.rgb =  + c.rgb;
+    out_color.rgb =  + c.rgb;
     out_color.a   = 1.0;
 }
 

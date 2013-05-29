@@ -82,6 +82,31 @@ texture_3d::texture_3d(render_device&            in_device,
     gl_assert(glapi, leaving texture_3d::texture_3d());
 }
 
+texture_3d::texture_3d(render_device&            in_device,
+                       const texture_3d&         in_orig_texture,
+                       const data_format         in_data_format,
+                       const math::vec2ui&       in_mip_range)
+  : texture_image(in_device)
+  , _descriptor(in_orig_texture.descriptor())
+{
+    const opengl::gl_core& glapi = in_device.opengl_api();
+
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+    }
+    else {
+        if (state().ok()) {
+            if(in_orig_texture.state().ok()) {
+                create_texture_view(in_device, in_orig_texture, in_data_format, in_mip_range);
+            }
+            else {
+                state().set(object_state::OS_ERROR_INVALID_VALUE);
+            }
+        }
+    }
+    gl_assert(glapi, leaving texture_3d::texture_2d());
+}
+
 texture_3d::~texture_3d()
 {
 }
@@ -256,6 +281,60 @@ texture_3d::image_sub_data(const render_context& in_context,
     }
 
     return true;
+}
+
+bool
+texture_3d::create_texture_view(const render_device&      in_device,
+                                const texture_3d&         in_orig_texture,
+                                const data_format         in_data_format,
+                                const math::vec2ui&       in_mip_range)
+{
+    assert(state().ok());
+
+    const opengl::gl_core& glapi = in_device.opengl_api();
+    util::gl_error         glerror(glapi);
+    
+    if (in_mip_range.y <= in_mip_range.x) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    const unsigned nb_mip_levels      =   math::min(_descriptor._mip_levels, in_mip_range.y)
+                                        - math::min(_descriptor._mip_levels, in_mip_range.x);
+
+    if (nb_mip_levels < 1u) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    const unsigned gl_internal_format = util::gl_internal_format(in_data_format);
+
+    context_bindable_object::_gl_object_target  = GL_TEXTURE_3D;
+    context_bindable_object::_gl_object_binding = GL_TEXTURE_BINDING_3D;
+
+    glapi.glTextureView(object_id(),
+                        object_target(),
+                        in_orig_texture.object_id(),
+                        gl_internal_format,
+                        in_mip_range.x,
+                        nb_mip_levels,
+                        0,
+                        1);
+
+    gl_assert(glapi, texture_3d::create_texture_view() after glTextureView());
+
+    if (glerror) {
+        state().set(glerror.to_object_state());
+
+        return false;
+    }
+    else {
+        // setup view descriptor
+        _descriptor._format       = in_data_format;
+        _descriptor._mip_levels   = nb_mip_levels;
+
+        return true;
+    }
 }
 
 data_format

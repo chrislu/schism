@@ -111,11 +111,13 @@ application_window::init_renderer()
 
     //_sstate_linear  = device->create_sampler_state(FILTER_MIN_MAG_MIP_LINEAR, WRAP_CLAMP_TO_EDGE);
     _sstate_linear  = device->create_sampler_state(FILTER_ANISOTROPIC, WRAP_CLAMP_TO_EDGE, 16u);
+    _sstate_nearest = device->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
 
     if (   !_bstate_off
         || !_dstate_less
         || !_rstate_cback
-        || !_sstate_linear) {
+        || !_sstate_linear
+        || !_sstate_nearest) {
         err() << "application_window::initialize(): error creating state objects" << log::end;
         return false;
     }
@@ -154,6 +156,16 @@ application_window::init_renderer()
 
         if (!_texture) {
             err() << "application_window::init_renderer(): error loading texture image." << log::end;
+            return false;
+        }
+
+        _texture_uint_view = device->create_texture_2d(_texture,
+                                                       gl::FORMAT_RGB_8UI,
+                                                       math::vec2ui(3, 4),//_texture->descriptor()._mip_levels),
+                                                       math::vec2ui(0, 1));
+
+        if (!_texture_uint_view) {
+            err() << "application_window::init_renderer(): error creating texture view." << log::end;
             return false;
         }
     }
@@ -234,8 +246,8 @@ application_window::display(const gl::render_context_ptr& context)
         context->set_blend_state(_bstate_off);
 
         { // texture
-            _shader_prog->uniform("tex_color", 0);
-            context->bind_texture(_texture, _sstate_linear, 0);
+            context->bind_texture(_texture,           _sstate_linear,  0);
+            context->bind_texture(_texture_uint_view, _sstate_nearest, 1);
 
             vec2ui tex_handle = vec2ui(static_cast<uint32>(_texture->native_handle() & 0x00000000ffffffffull),
                                        static_cast<uint32>(_texture->native_handle() >> 32ull));

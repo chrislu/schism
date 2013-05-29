@@ -86,11 +86,13 @@ private:
     gl::depth_stencil_state_ptr     _dstate_less;
     gl::rasterizer_state_ptr        _rstate_cback;
     gl::sampler_state_ptr           _sstate_linear;
+    gl::sampler_state_ptr           _sstate_nearest;
 
     gl::camera_uniform_block_ptr    _camera_block;
 
     // texturing
     gl::texture_2d_ptr              _texture;
+    gl::texture_2d_ptr              _texture_uint_view;
 
     // geometry
     gl::wavefront_obj_geometry_ptr  _model_geometry;
