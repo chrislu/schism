@@ -899,6 +899,23 @@ render_device::create_texture_1d(const unsigned            in_size,
                              in_initial_mip_level_data);
 }
 
+texture_1d_ptr
+render_device::create_texture_1d(const texture_1d_ptr&     in_orig_texture,
+                                 const data_format         in_format,
+                                 const math::vec2ui&       in_mip_range,
+                                 const math::vec2ui&       in_layer_range)
+{
+    texture_1d_ptr  new_tex(new texture_1d(*this, *in_orig_texture, in_format, in_mip_range, in_layer_range));
+    if (new_tex->fail()) {
+        glerr() << log::error << "render_device::create_texture_1d(): unable to create texture view object ("
+                << new_tex->state().state_string() << ")." << log::end;
+        return texture_1d_ptr();
+    }
+    else {
+        return new_tex;
+    }
+}
+
 texture_2d_ptr
 render_device::create_texture_2d(const texture_2d_desc&   in_desc)
 {
@@ -965,6 +982,23 @@ render_device::create_texture_2d(const math::vec2ui&       in_size,
                              in_initial_mip_level_data);
 }
 
+texture_2d_ptr
+render_device::create_texture_2d(const texture_2d_ptr&     in_orig_texture,
+                                 const data_format         in_format,
+                                 const math::vec2ui&       in_mip_range,
+                                 const math::vec2ui&       in_layer_range)
+{
+    texture_2d_ptr  new_tex(new texture_2d(*this, *in_orig_texture, in_format, in_mip_range, in_layer_range));
+    if (new_tex->fail()) {
+        glerr() << log::error << "render_device::create_texture_2d(): unable to create texture view object ("
+                << new_tex->state().state_string() << ")." << log::end;
+        return texture_2d_ptr();
+    }
+    else {
+        return new_tex;
+    }
+}
+
 texture_3d_ptr
 render_device::create_texture_3d(const texture_3d_desc&   in_desc)
 {
@@ -1025,6 +1059,22 @@ render_device::create_texture_3d(const math::vec3ui&       in_size,
     return create_texture_3d(texture_3d_desc(in_size, in_format, in_mip_levels),
                              in_initial_data_format,
                              in_initial_mip_level_data);
+}
+
+texture_3d_ptr
+render_device::create_texture_3d(const texture_3d_ptr&     in_orig_texture,
+                                 const data_format         in_format,
+                                 const math::vec2ui&       in_mip_range)
+{
+    texture_3d_ptr  new_tex(new texture_3d(*this, *in_orig_texture, in_format, in_mip_range));
+    if (new_tex->fail()) {
+        glerr() << log::error << "render_device::create_texture_3d(): unable to create texture view object ("
+                << new_tex->state().state_string() << ")." << log::end;
+        return texture_3d_ptr();
+    }
+    else {
+        return new_tex;
+    }
 }
 
 texture_buffer_ptr
