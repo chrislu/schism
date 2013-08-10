@@ -273,7 +273,7 @@ render_context::register_debug_callback(const debug_output_ptr& f)
 
     if (_debug_outputs.empty()) {
         // register the debug callback
-        glapi.glDebugMessageCallbackARB(&render_context::gl_debug_callback, this);
+        glapi.glDebugMessageCallbackARB(reinterpret_cast<GLDEBUGPROCARB>(&render_context::gl_debug_callback), this);
         gl_assert(glapi, render_context::register_debug_callback() after glDebugMessageCallbackARB());
 
         if (_debug_synchronous_reporting) {
@@ -1166,10 +1166,20 @@ render_context::make_non_resident(const texture_ptr&       in_texture)
 void
 render_context::apply_texture_units()
 {
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+    std::vector<uint32> texture_obj_ids;
+    std::vector<uint32> sampler_obj_ids;
+
+    const uint32 nb_tex_units = static_cast<uint32>(_current_state._texture_units.size());
+    texture_obj_ids.resize(nb_tex_units, 0u);
+    sampler_obj_ids.resize(nb_tex_units, 0u);
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
+
     for (int u = 0; u < _current_state._texture_units.size(); ++u) {
         texture_ptr&        cti = _current_state._texture_units[u]._texture_image;
         texture_ptr&        ati = _applied_state._texture_units[u]._texture_image;
 
+#if SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
         if (cti != ati) {
             if (cti) {
                 cti->bind(*this, u);
@@ -1179,8 +1189,18 @@ render_context::apply_texture_units()
             }
             ati = cti;
         }
+#else // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
+        if (cti != ati) {
+            if (cti) {
+                texture_obj_ids[u] = cti->object_id();
+            }
+            ati = cti;
+        }
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
+
         sampler_state_ptr&  css = _current_state._texture_units[u]._sampler_state;
         sampler_state_ptr&  ass = _applied_state._texture_units[u]._sampler_state;
+#if SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
         if (css != ass) {
             if (css) {
                 css->bind(*this, u);
@@ -1190,7 +1210,23 @@ render_context::apply_texture_units()
             }
             ass = css;
         }
+#else // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
+        if (css != ass) {
+            if (css) {
+                sampler_obj_ids[u] = css->sampler_id();
+            }
+            ass = css;
+        }
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
     }
+
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+    const opengl::gl_core& glapi = opengl_api();
+
+    glapi.glBindTextures(0, nb_tex_units, &(texture_obj_ids[0]));
+    glapi.glBindSamplers(0, nb_tex_units, &(sampler_obj_ids[0]));
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
+
     gl_assert(opengl_api(), leaving render_context::apply_texture_units());
 }
 

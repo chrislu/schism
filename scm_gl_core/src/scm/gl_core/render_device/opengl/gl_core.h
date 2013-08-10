@@ -94,13 +94,16 @@ public:
     bool version_4_1_available;
     bool version_4_2_available;
     bool version_4_3_available;
+    bool version_4_4_available;
 
-
+    bool extension_ARB_bindless_texture;
     bool extension_ARB_cl_event;
+    bool extension_ARB_compute_variable_group_size;
     bool extension_ARB_debug_output;
     bool extension_ARB_map_buffer_alignment;
     bool extension_ARB_robustness;
     bool extension_ARB_shading_language_include;
+    bool extension_ARB_sparse_texture;
     bool extension_ARB_texture_compression_bptc;
 
     bool extension_EXT_direct_state_access_available;
@@ -773,6 +776,25 @@ public:
     PFNGLVERTEXARRAYVERTEXATTRIBBINDINGEXTPROC      glVertexArrayVertexAttribBindingEXT;
     PFNGLVERTEXARRAYVERTEXBINDINGDIVISOREXTPROC     glVertexArrayVertexBindingDivisorEXT;
 
+    // version 4.4 ////////////////////////////////////////////////////////////////////////////////
+    // ARB_buffer_storage
+    PFNGLBUFFERSTORAGEPROC                          glBufferStorage;
+    // ARB_clear_texture
+    PFNGLCLEARTEXIMAGEPROC                          glClearTexImage;
+    PFNGLCLEARTEXSUBIMAGEPROC                       glClearTexSubImage;
+    // ARB_enhanced_layouts (no entry points)
+    // ARB_multi_bind
+    PFNGLBINDBUFFERSBASEPROC                        glBindBuffersBase;
+    PFNGLBINDBUFFERSRANGEPROC                       glBindBuffersRange; 
+    PFNGLBINDTEXTURESPROC                           glBindTextures;
+    PFNGLBINDSAMPLERSPROC                           glBindSamplers;
+    PFNGLBINDIMAGETEXTURESPROC                      glBindImageTextures;
+    PFNGLBINDVERTEXBUFFERSPROC                      glBindVertexBuffers;
+    // ARB_query_buffer_object (no entry points)
+    // ARB_texture_mirror_clamp_to_edge (no entry points)
+    // ARB_texture_stencil8 (no entry points)
+    // ARB_vertex_type_10f_11f_11f_rev (no entry points)
+
     // GL_ARB_shading_language_include
     PFNGLNAMEDSTRINGARBPROC                         glNamedStringARB;
     PFNGLDELETENAMEDSTRINGARBPROC                   glDeleteNamedStringARB;
@@ -934,6 +956,31 @@ public:
     PFNGLPROGRAMUNIFORMHANDLEUI64VNVPROC            glProgramUniformHandleui64vNV;
     PFNGLISTEXTUREHANDLERESIDENTNVPROC              glIsTextureHandleResidentNV;
     PFNGLISIMAGEHANDLERESIDENTNVPROC                glIsImageHandleResidentNV;
+
+    // GL_ARB_bindless_texture
+    PFNGLGETTEXTUREHANDLEARBPROC                    glGetTextureHandleARB;
+    PFNGLGETTEXTURESAMPLERHANDLEARBPROC             glGetTextureSamplerHandleARB;
+    PFNGLMAKETEXTUREHANDLERESIDENTARBPROC           glMakeTextureHandleResidentARB;
+    PFNGLMAKETEXTUREHANDLENONRESIDENTARBPROC        glMakeTextureHandleNonResidentARB;
+    PFNGLGETIMAGEHANDLEARBPROC                      glGetImageHandleARB;
+    PFNGLMAKEIMAGEHANDLERESIDENTARBPROC             glMakeImageHandleResidentARB;
+    PFNGLMAKEIMAGEHANDLENONRESIDENTARBPROC          glMakeImageHandleNonResidentARB;
+    PFNGLUNIFORMHANDLEUI64ARBPROC                   glUniformHandleui64ARB;
+    PFNGLUNIFORMHANDLEUI64VARBPROC                  glUniformHandleui64vARB;
+    PFNGLPROGRAMUNIFORMHANDLEUI64ARBPROC            glProgramUniformHandleui64ARB;
+    PFNGLPROGRAMUNIFORMHANDLEUI64VARBPROC           glProgramUniformHandleui64vARB;
+    PFNGLISTEXTUREHANDLERESIDENTARBPROC             glIsTextureHandleResidentARB;
+    PFNGLISIMAGEHANDLERESIDENTARBPROC               glIsImageHandleResidentARB;
+    PFNGLVERTEXATTRIBL1UI64ARBPROC                  glVertexAttribL1ui64ARB;
+    PFNGLVERTEXATTRIBL1UI64VARBPROC                 glVertexAttribL1ui64vARB;
+    PFNGLGETVERTEXATTRIBLUI64VARBPROC               glGetVertexAttribLui64vARB;
+
+    // ARB_sparse_texture
+    PFNGLTEXPAGECOMMITMENTARBPROC                   glTexPageCommitmentARB;
+    PFNGLTEXTUREPAGECOMMITMENTEXTPROC               glTexturePageCommitmentEXT;
+
+    // ARB_compute_variable_group_size
+    PFNGLDISPATCHCOMPUTEGROUPSIZEARBPROC            glDispatchComputeGroupSizeARB;
 
 }; // class gl_core
 

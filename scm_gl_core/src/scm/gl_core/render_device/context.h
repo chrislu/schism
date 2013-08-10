@@ -279,6 +279,19 @@ public:
                                                       const unsigned           in_level,
                                                             void*              in_data);
 
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+    //bool                        clear_texture(const texture_image_ptr& in_texture,
+    //                                          const unsigned           in_level,
+
+    //                                                    data_format in_format,
+    //                                              const void*       in_data) const;
+    //bool                        clear_buffer_sub_data(const buffer_ptr& in_buffer,
+    //                                                        data_format in_format,
+    //                                                        scm::size_t in_offset,
+    //                                                        scm::size_t in_size,
+    //                                                  const void*       in_data) const;
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+
     bool                        make_resident(const texture_ptr&       in_texture,
                                               const sampler_state_ptr& in_sstate);
     bool                        make_non_resident(const texture_ptr&       in_texture);
