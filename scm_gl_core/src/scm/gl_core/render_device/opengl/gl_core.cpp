@@ -114,12 +114,16 @@ gl_core::gl_core()
     version_4_1_available   = false;
     version_4_2_available   = false;
     version_4_3_available   = false;
+    version_4_4_available   = false;
 
+    extension_ARB_bindless_texture              = false;
     extension_ARB_cl_event                      = false;
+    extension_ARB_compute_variable_group_size   = false;
     extension_ARB_debug_output                  = false;
     extension_ARB_map_buffer_alignment          = false;
     extension_ARB_robustness                    = false;
     extension_ARB_shading_language_include      = false;
+    extension_ARB_sparse_texture                = false;
     extension_ARB_texture_compression_bptc      = false;
 
     extension_EXT_direct_state_access_available = false;
@@ -1025,6 +1029,22 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLVERTEXARRAYVERTEXBINDINGDIVISOREXTPROC, glVertexArrayVertexBindingDivisorEXT, "OpenGL Core 4.3", init_success);
     version_4_3_available = version_4_2_available && init_success;
 
+    // version 4.4 ////////////////////////////////////////////////////////////////////////////////
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLBUFFERSTORAGEPROC, glBufferStorage, "OpenGL Core 4.4", init_success);
+    // ARB_clear_texture
+    SCM_INIT_GL_ENTRY(PFNGLCLEARTEXIMAGEPROC, glClearTexImage, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCLEARTEXSUBIMAGEPROC, glClearTexSubImage, "OpenGL Core 4.4", init_success);
+    // ARB_enhanced_layouts (no entry points)
+    // ARB_multi_bind
+    SCM_INIT_GL_ENTRY(PFNGLBINDBUFFERSBASEPROC, glBindBuffersBase, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBINDBUFFERSRANGEPROC, glBindBuffersRange, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBINDTEXTURESPROC, glBindTextures, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBINDSAMPLERSPROC, glBindSamplers, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBINDIMAGETEXTURESPROC, glBindImageTextures, "OpenGL Core 4.4", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLBINDVERTEXBUFFERSPROC, glBindVertexBuffers, "OpenGL Core 4.4", init_success);
+    version_4_4_available = version_4_3_available && init_success;
+
     // GL_ARB_shading_language_include
     init_success = true;
     SCM_INIT_GL_ENTRY(PFNGLNAMEDSTRINGARBPROC, glNamedStringARB, "GL_ARB_shading_language_include", init_success);
@@ -1201,6 +1221,38 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLISTEXTUREHANDLERESIDENTNVPROC, glIsTextureHandleResidentNV, "GL_NV_bindless_texture", init_success);
     SCM_INIT_GL_ENTRY(PFNGLISIMAGEHANDLERESIDENTNVPROC, glIsImageHandleResidentNV, "GL_NV_bindless_texture", init_success);
     extension_NV_bindless_texture = init_success;
+
+    // GL_ARB_bindless_texture
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLGETTEXTUREHANDLEARBPROC, glGetTextureHandleARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETTEXTURESAMPLERHANDLEARBPROC, glGetTextureSamplerHandleARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKETEXTUREHANDLERESIDENTARBPROC, glMakeTextureHandleResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKETEXTUREHANDLENONRESIDENTARBPROC, glMakeTextureHandleNonResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETIMAGEHANDLEARBPROC, glGetImageHandleARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKEIMAGEHANDLERESIDENTARBPROC, glMakeImageHandleResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKEIMAGEHANDLENONRESIDENTARBPROC, glMakeImageHandleNonResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMHANDLEUI64ARBPROC, glUniformHandleui64ARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMHANDLEUI64VARBPROC, glUniformHandleui64vARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMHANDLEUI64ARBPROC, glProgramUniformHandleui64ARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMHANDLEUI64VARBPROC, glProgramUniformHandleui64vARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISTEXTUREHANDLERESIDENTARBPROC, glIsTextureHandleResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISIMAGEHANDLERESIDENTARBPROC, glIsImageHandleResidentARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBL1UI64ARBPROC, glVertexAttribL1ui64ARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBL1UI64VARBPROC, glVertexAttribL1ui64vARB, "GL_ARB_bindless_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETVERTEXATTRIBLUI64VARBPROC, glGetVertexAttribLui64vARB, "GL_ARB_bindless_texture", init_success);
+    extension_ARB_bindless_texture = init_success;
+
+    // ARB_sparse_texture
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLTEXPAGECOMMITMENTARBPROC, glTexPageCommitmentARB, "ARB_sparse_texture", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLTEXTUREPAGECOMMITMENTEXTPROC, glTexturePageCommitmentEXT, "ARB_sparse_texture", init_success);
+    extension_ARB_sparse_texture = init_success;
+
+    // ARB_compute_variable_group_size
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLDISPATCHCOMPUTEGROUPSIZEARBPROC, glDispatchComputeGroupSizeARB, "ARB_compute_variable_group_size", init_success);
+    extension_ARB_compute_variable_group_size = init_success;
+
 
     glout() << log::outdent;
     glout() << log::info << "finished initializing function entry points..." << log::end;

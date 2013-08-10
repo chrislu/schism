@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_core/render_device/opengl/gl_core.h>
 #include <scm/gl_core/render_device/opengl/util/assert.h>
@@ -78,6 +79,9 @@ texture_image::retrieve_image_data(const render_context& in_context,
 
     gl_assert(glapi, leaving texture::generate_mipmaps());
 
+    // NO blocking error test here!
+    return true;
+#if 0
     if (glerror) {
         //state().set(glerror.to_object_state());
         return false;
@@ -85,7 +89,66 @@ texture_image::retrieve_image_data(const render_context& in_context,
     else {
         return true;
     }
+#endif
 }
+
+bool
+texture_image::clear_sub_data(const render_context& in_context,
+                              const texture_region& in_region,
+                              const unsigned        in_level,
+                              const data_format     in_data_format,
+                              const void*const      in_data)
+{
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+    const opengl::gl_core& glapi = in_context.opengl_api();
+
+    util::gl_error         glerror(glapi);
+
+    unsigned gl_internal_format = util::gl_internal_format(in_data_format);
+    unsigned gl_base_format     = util::gl_base_format(in_data_format);
+    unsigned gl_base_type       = util::gl_base_type(in_data_format);
+
+    unsigned gl_this_internal_format = util::gl_internal_format(format());
+    unsigned gl_this_base_format     = util::gl_base_format(format());
+    unsigned gl_this_base_type       = util::gl_base_type(format());
+
+    if (is_compressed_format(format())) {
+        return false;
+    }
+
+    if (   gl_this_base_format == GL_DEPTH_COMPONENT
+        && gl_base_format      != GL_DEPTH_COMPONENT)
+    {
+        return false;
+    }
+    if (   gl_this_base_format == GL_DEPTH_STENCIL
+        && gl_base_format      != GL_DEPTH_STENCIL)
+    {
+        return false;
+    }
+    if (   gl_this_base_format == GL_STENCIL_INDEX
+        && gl_base_format      != GL_STENCIL_INDEX)
+    {
+        return false;
+    }
+
+    if (is_integer_type(format()) && !is_integer_type(in_data_format)) {
+        return false;
+    }
+    if (!is_integer_type(format()) && is_integer_type(in_data_format)) {
+        return false;
+    }
+
+    // todo
+
+
+    return true;
+
+#else // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+    return false;
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+}
+
 
 unsigned
 texture_image::object_id() const
