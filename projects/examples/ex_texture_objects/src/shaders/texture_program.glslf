@@ -22,7 +22,8 @@ layout(location = 0, index = 0) out vec4 out_color;
 // uniform input definitions //////////////////////////////////////////////////////////////////////
 layout(binding  = 0) uniform sampler2D  tex_color;
 layout(binding  = 1) uniform usampler2D tex_color_view;
-uniform uvec2        tex_color_resident;
+uniform uvec2        tex_color_resident_lin;
+uniform uvec2        tex_color_resident_near;
 
 // global constants ///////////////////////////////////////////////////////////////////////////////
 const float epsilon                 = 0.0001;
@@ -45,8 +46,15 @@ void main()
     else if (gl_FragCoord.x < 800) {
         c = texture(tex_color, v_in.texcoord);
     }
+    else if (gl_FragCoord.x < 1200) {
+        uint64_t  tex_hndl = packUint2x32(tex_color_resident_near);
+        sampler2D tex_smpl = sampler2D(tex_hndl);
+        c = texture(tex_smpl, v_in.texcoord);
+
+        c *= vec4(0.5, 1.0, 0.5, 1.0);
+    }
     else {
-        uint64_t  tex_hndl = packUint2x32(tex_color_resident);
+        uint64_t  tex_hndl = packUint2x32(tex_color_resident_lin);
         sampler2D tex_smpl = sampler2D(tex_hndl);
         c = texture(tex_smpl, v_in.texcoord);
 

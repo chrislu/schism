@@ -14,6 +14,8 @@ class texture;
 
 class texture_image;
 
+class texture_handle;
+
 struct texture_1d_desc;
 class  texture_1d;
 
@@ -30,6 +32,8 @@ typedef shared_ptr<texture>                 texture_ptr;
 typedef shared_ptr<texture const>           texture_cptr;
 typedef shared_ptr<texture_image>           texture_image_ptr;
 typedef shared_ptr<texture_image const>     texture_image_cptr;
+typedef shared_ptr<texture_handle>          texture_handle_ptr;
+typedef shared_ptr<texture_handle const>    texture_handle_cptr;
 typedef shared_ptr<texture_1d>              texture_1d_ptr;
 typedef shared_ptr<texture_1d const>        texture_1d_cptr;
 typedef shared_ptr<texture_2d>              texture_2d_ptr;

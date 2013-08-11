@@ -1140,6 +1140,14 @@ bool
 render_context::make_resident(const texture_ptr&       in_texture,
                               const sampler_state_ptr& in_sstate)
 {
+    static bool warned = false;
+
+    if (!warned) {
+        glout() << log::warning 
+                << "render_context::make_resident(): this function is deprecated, please use the render_device::create_resident_handle() facilities.";
+        warned = true;
+    }
+
     if (!opengl_api().extension_NV_bindless_texture) {
         glerr() << log::error
                 << "render_context::make_resident(): "
@@ -1153,6 +1161,13 @@ render_context::make_resident(const texture_ptr&       in_texture,
 bool
 render_context::make_non_resident(const texture_ptr&       in_texture)
 {
+    static bool warned = false;
+    if (!warned) {
+        glout() << log::warning 
+                << "render_context::make_resident(): this function is deprecated, please use the render_device::create_resident_handle() facilities.";
+        warned = true;
+    }
+
     if (!opengl_api().extension_NV_bindless_texture) {
         glerr() << log::error
                 << "render_context::make_resident(): "

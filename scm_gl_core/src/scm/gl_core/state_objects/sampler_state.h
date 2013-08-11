@@ -50,11 +50,11 @@ public:
 
     const sampler_state_desc&   descriptor() const;
 
+    unsigned                    sampler_id() const;
+
 protected:
     sampler_state(render_device&            in_device,
                   const sampler_state_desc& in_desc);
-
-    unsigned                    sampler_id() const;
 
     void                        bind(const render_context&     in_context,
                                      const int                 in_unit) const;

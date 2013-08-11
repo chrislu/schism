@@ -8,6 +8,7 @@
 #include <scm/gl_core/texture_objects/texture_objects_fwd.h>
 #include <scm/gl_core/texture_objects/texture.h>
 #include <scm/gl_core/texture_objects/texture_image.h>
+#include <scm/gl_core/texture_objects/texture_handle.h>
 #include <scm/gl_core/texture_objects/texture_1d.h>
 #include <scm/gl_core/texture_objects/texture_2d.h>
 #include <scm/gl_core/texture_objects/texture_3d.h>

@@ -93,6 +93,8 @@ private:
     // texturing
     gl::texture_2d_ptr              _texture;
     gl::texture_2d_ptr              _texture_uint_view;
+    gl::texture_handle_ptr          _texture_resident_handle_lin;
+    gl::texture_handle_ptr          _texture_resident_handle_near;
 
     // geometry
     gl::wavefront_obj_geometry_ptr  _model_geometry;
