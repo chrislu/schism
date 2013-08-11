@@ -601,9 +601,10 @@ demo_app::display()
             //_shader_program->uniform("model_view_matrix_inverse",   _current_transforms->_mv_matrix_inverse);
             //_shader_program->uniform("mvp_inverse",                 _current_transforms->_mvp_matrix_inverse);
             //_shader_program->uniform("model_view_matrix_inverse_transpose", mv_inv_transpose);
-            _shader_program->uniform("volume_texture", 0);
-            _shader_program->uniform("color_map_texture", 1);
-            _shader_program->uniform("depth_texture", 2);
+            _shader_program->uniform_sampler("volume_texture",    0);
+            _shader_program->uniform_sampler("color_map_texture", 1);
+            _shader_program->uniform_sampler("depth_texture",     2);
+
             _shader_program->uniform_buffer("transform_matrices", 0);
 
             _context->reset_state_objects();
@@ -649,7 +650,7 @@ demo_app::display()
         mat4f   pass_mvp = mat4f::identity();
         ortho_matrix(pass_mvp, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 
-        _pass_through_shader->uniform("in_texture", 0);
+        _pass_through_shader->uniform_sampler("in_texture", 0);
         _pass_through_shader->uniform("mvp", pass_mvp);
 
         _context->set_default_frame_buffer();

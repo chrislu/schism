@@ -79,6 +79,7 @@ public:
 public:
     virtual ~program();
 
+    unsigned                    program_id() const;
     const std::string&          info_log() const;
 
     template<typename T> void   uniform(const std::string& name, const T& v) const;
@@ -116,6 +117,12 @@ public:
     uniform_mat3d_ptr           uniform_mat3d(const std::string& name) const;
     uniform_mat4d_ptr           uniform_mat4d(const std::string& name) const;
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
+
+    void                        uniform_sampler(const std::string& name, scm::int32 u);
+    void                        uniform_sampler_handle(const std::string& name, scm::uint64 h);
+
+    void                        uniform_image(const std::string& name, scm::int32 u);
+    void                        uniform_image_handle(const std::string& name, scm::uint64 h);
 
     void                        uniform_buffer(const std::string& name, const unsigned binding);
     void                        uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine);

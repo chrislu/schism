@@ -6,6 +6,8 @@
 
 #include <boost/static_assert.hpp>
 
+#include <scm/core/numeric_types.h>
+
 namespace scm {
 namespace gl {
 
@@ -40,7 +42,10 @@ size_of_type(data_type d)
         sizeof(short),
         sizeof(unsigned short),
         sizeof(char),
-        sizeof(unsigned char)
+        sizeof(unsigned char),
+        // samplers and images
+        sizeof(scm::uint64),
+        sizeof(scm::uint64)
     };
 
     BOOST_STATIC_ASSERT((sizeof(type_sizes) / sizeof(int)) == TYPE_COUNT);
@@ -81,6 +86,10 @@ components(data_type d)
         1,
         1,
         1,
+        1,
+
+        // samplers and images
+        1,
         1
     };
 
@@ -96,7 +105,8 @@ inline
 bool is_integer_type(data_type d)
 {
     assert(TYPE_UNKNOWN <= d && d < TYPE_COUNT);
-    return (TYPE_INT <= d && d <= TYPE_UBYTE);
+    return (   TYPE_INT     <= d && d <= TYPE_UBYTE
+            || TYPE_SAMPLER <= d && d <= TYPE_IMAGE); // image and sampler handled as integers
 }
 
 inline
@@ -108,6 +118,20 @@ bool is_float_type(data_type d)
 #else // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
     return (TYPE_FLOAT <= d && d <= TYPE_MAT4X3F);
 #endif //SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
+}
+
+inline
+bool is_sampler_type(data_type d)
+{
+    assert(TYPE_UNKNOWN <= d && d < TYPE_COUNT);
+    return d == TYPE_SAMPLER;
+}
+
+inline
+bool is_image_type(data_type d)
+{
+    assert(TYPE_UNKNOWN <= d && d < TYPE_COUNT);
+    return d == TYPE_IMAGE;
 }
 
 } // namespace gl

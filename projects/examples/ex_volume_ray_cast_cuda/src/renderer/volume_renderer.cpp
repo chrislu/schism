@@ -161,8 +161,8 @@ volume_renderer::reload_shaders(const gl::render_device_ptr& device)
         _program = prog_rcraw;
     }
 
-    _program->uniform("volume_raw",     0);
-    _program->uniform("color_map",      2);
+    _program->uniform_sampler("volume_raw",     0);
+    _program->uniform_sampler("color_map",      2);
     _program->uniform("viewport_size",  math::vec2f(_viewport_size));
 
     _program->uniform_buffer("camera_matrices",     0);

@@ -95,18 +95,18 @@ height_field_tessellator::height_field_tessellator(const gl::render_device_ptr& 
 
     // set default uniforms
     _hf_quad_tessellation_program->uniform_buffer("camera_matrices", 0);
-    _hf_quad_tessellation_program->uniform("height_map",          0);
-    _hf_quad_tessellation_program->uniform("height_map_nearest",  1);
-    _hf_quad_tessellation_program->uniform("density_map",         2);
-    _hf_quad_tessellation_program->uniform("color_map",           3);
+    _hf_quad_tessellation_program->uniform_sampler("height_map",          0);
+    _hf_quad_tessellation_program->uniform_sampler("height_map_nearest",  1);
+    _hf_quad_tessellation_program->uniform_sampler("density_map",         2);
+    _hf_quad_tessellation_program->uniform_sampler("color_map",           3);
 
     // set default uniforms
     _hf_triangle_tessellation_program->uniform_buffer("camera_matrices", 0);
-    _hf_triangle_tessellation_program->uniform("height_map",         0);
-    _hf_triangle_tessellation_program->uniform("height_map_nearest", 1);
-    _hf_triangle_tessellation_program->uniform("density_map",        2);
-    _hf_triangle_tessellation_program->uniform("color_map",          3);
-    _hf_triangle_tessellation_program->uniform("edge_densities",     4);
+    _hf_triangle_tessellation_program->uniform_sampler("height_map",         0);
+    _hf_triangle_tessellation_program->uniform_sampler("height_map_nearest", 1);
+    _hf_triangle_tessellation_program->uniform_sampler("density_map",        2);
+    _hf_triangle_tessellation_program->uniform_sampler("color_map",          3);
+    _hf_triangle_tessellation_program->uniform_sampler("edge_densities",     4);
 
     _main_camera_block.reset(new gl::camera_uniform_block(device));
 }

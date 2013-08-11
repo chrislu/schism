@@ -94,7 +94,7 @@ int main(int argc, char **argv)
                                               true /*double_buffer*/,
                                               false /*quad_buffer*/);
     wm::context::attribute_desc context_attribs(4, //SCM_GL_CORE_OPENGL_VERSION / 100,
-                                                2, //SCM_GL_CORE_OPENGL_VERSION / 10 % 10,
+                                                3, //SCM_GL_CORE_OPENGL_VERSION / 10 % 10,
                                                 false /*compatibility*/,
                                                 false /*debug*/,
                                                 false /*forward*/);

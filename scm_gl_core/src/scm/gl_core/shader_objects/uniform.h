@@ -69,10 +69,10 @@ public:
     virtual ~uniform();
 
     value_param_type        value() const;
-    void                    value(value_param_type v);
+    void                    set_value(value_param_type v);
 
     value_param_type        value(int i) const;
-    void                    value(int i, value_param_type v);
+    void                    set_value(int i, value_param_type v);
     
     void                    apply_value(const render_context& context, const program& p);
 
@@ -124,17 +124,48 @@ SCM_UNIFORM_TYPE_DECLARE(scm::math::mat3d,  TYPE_MAT3D,  uniform_mat3d)
 SCM_UNIFORM_TYPE_DECLARE(scm::math::mat4d,  TYPE_MAT4D,  uniform_mat4d)
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
 
-// convenience
-typedef uniform_1i                                      uniform_sampler;
-typedef shared_ptr<scm::gl::uniform_sampler>            uniform_sampler_ptr;
-typedef shared_ptr<scm::gl::uniform_sampler const>      uniform_sampler_cptr;
+//SCM_UNIFORM_TYPE_DECLARE(scm::uint64,       TYPE_SAMPLER, uniform_sampler)
+//SCM_UNIFORM_TYPE_DECLARE(scm::uint64,       TYPE_IMAGE,   uniform_image)
 
-typedef uniform_1i                                      uniform_image;
-typedef shared_ptr<scm::gl::uniform_image>              uniform_image_ptr;
-typedef shared_ptr<scm::gl::uniform_image const>        uniform_image_cptr;
+// convenience
+//typedef uniform_1i                                      uniform_sampler;
+//typedef shared_ptr<scm::gl::uniform_sampler>            uniform_sampler_ptr;
+//typedef shared_ptr<scm::gl::uniform_sampler const>      uniform_sampler_cptr;
+//
+//typedef uniform_1i                                      uniform_image;
+//typedef shared_ptr<scm::gl::uniform_image>              uniform_image_ptr;
+//typedef shared_ptr<scm::gl::uniform_image const>        uniform_image_cptr;
 
 template<> struct uniform_type<bool>      { typedef uniform_1i  type; };
 template<> struct uniform_data_type<bool> { static const data_type  type = TYPE_INT; };
+
+class uniform_image_sampler_base : public uniform_base
+{
+public:
+    uniform_image_sampler_base(const std::string& n, const int l, const unsigned e, const data_type t);
+    virtual ~uniform_image_sampler_base();
+
+    scm::int32              bound_unit() const;
+    void                    bound_unit(scm::int32 v);
+
+    scm::uint64             resident_handle();
+    void                    resident_handle(scm::uint64 v);
+    
+    void                    apply_value(const render_context& context, const program& p);
+
+protected:
+    scm::int32              _bound_unit;
+    scm::uint64             _resident_handle;
+
+}; // class uniform_image_sampler_base
+
+typedef uniform_image_sampler_base  uniform_sampler;
+typedef shared_ptr<scm::gl::uniform_sampler>            uniform_sampler_ptr;
+typedef shared_ptr<scm::gl::uniform_sampler const>      uniform_sampler_cptr;
+
+typedef uniform_image_sampler_base  uniform_image;
+typedef shared_ptr<scm::gl::uniform_image>              uniform_image_ptr;
+typedef shared_ptr<scm::gl::uniform_image const>        uniform_image_cptr;
 
 #undef SCM_UNIFORM_TYPE_DECLARE
 

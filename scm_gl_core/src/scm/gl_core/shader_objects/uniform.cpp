@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/device.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/opengl/gl_core.h>
@@ -14,6 +15,7 @@
 #include <scm/gl_core/render_device/opengl/util/constants_helper.h>
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 #include <scm/gl_core/render_device/opengl/util/error_helper.h>
+#include <scm/gl_core/shader_objects/program.h>
 
 namespace scm {
 namespace gl {
@@ -40,9 +42,9 @@ uniform<T, D>::value() const
 
 template<typename T, data_type D>
 void
-uniform<T, D>::value(value_param_type v)
+uniform<T, D>::set_value(value_param_type v)
 {
-    value(0, v);
+    set_value(0, v);
 }
 
 template<typename T, data_type D>
@@ -55,7 +57,7 @@ uniform<T, D>::value(int i) const
 
 template<typename T, data_type D>
 void
-uniform<T, D>::value(int i, value_param_type v)
+uniform<T, D>::set_value(int i, value_param_type v)
 {
     assert(i < static_cast<int>(_elements));
     if (!_status._initialized || v != _value[i]) {
@@ -155,6 +157,79 @@ bool
 uniform_base::update_required() const
 {
     return _status._update_required;
+}
+
+// class uniform_image_sampler_base ///////////////////////////////////////////////////////////////
+uniform_image_sampler_base::uniform_image_sampler_base(const std::string& n, const int l, const unsigned e, const data_type t)
+  : uniform_base(n, l, e, t)
+  , _bound_unit(-1)
+  , _resident_handle(0ull)
+{
+}
+
+uniform_image_sampler_base::~uniform_image_sampler_base()
+{
+}
+
+scm::int32
+uniform_image_sampler_base::bound_unit() const
+{
+    return _bound_unit;
+}
+
+void
+uniform_image_sampler_base::bound_unit(scm::int32 v)
+{
+    if (!_status._initialized || v != _bound_unit) {
+        _bound_unit              = v;
+        _resident_handle         = 0ull;
+        _status._update_required = true;
+        _status._initialized     = true;
+    }
+}
+
+scm::uint64
+uniform_image_sampler_base::resident_handle()
+{
+    return _resident_handle;
+}
+
+void
+uniform_image_sampler_base::resident_handle(scm::uint64 v)
+{
+    if (!_status._initialized || v != _resident_handle) {
+        _bound_unit              = -1;
+        _resident_handle         = v;
+        _status._update_required = true;
+        _status._initialized     = true;
+    }
+}
+
+void
+uniform_image_sampler_base::apply_value(const render_context& context, const program& p)
+{
+    const opengl::gl_core& glapi = context.opengl_api();
+#if SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS
+    if (_bound_unit >= 0) {
+        glapi.glProgramUniform1i(p.program_id(), _location, _bound_unit);
+    }
+    else if (   glapi.extension_ARB_bindless_texture
+             && _resident_handle != 0ull)
+    {
+        glapi.glProgramUniformHandleui64ARB(p.program_id(), _location, _resident_handle);
+    }
+#else
+    if (_bound_unit >= 0) {
+        glapi.glUniform1i(_location, _bound_unit);
+    }
+    else if (   glapi.extension_ARB_bindless_texture
+             && _resident_handle != 0ull)
+    {
+        glapi.glUniformHandleui64ARB(_location, _resident_handle);
+    }
+#endif
+    gl_assert(glapi, leaving uniform_1f::apply_value());
+
 }
 
 // float types ////////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +436,6 @@ uniform_vec4ui::apply_value(const render_context& context, const program& p)
     glapi.glUniform4uiv(_location, _elements, (_value.front().data_array));//_value.data_array);
     gl_assert(glapi, leaving uniform_vec4ui::apply_value());
 }
-
 
 } // namespace gl
 } // namespace scm
