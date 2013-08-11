@@ -1,7 +1,4 @@
 
-// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
-// Distributed under the Modified BSD License, see license.txt.
-
 #ifndef SCM_IMAGE_GUI_SUPPORT_VIEWER_WIDGET_H_INCLUDED
 #define SCM_IMAGE_GUI_SUPPORT_VIEWER_WIDGET_H_INCLUDED
 
@@ -32,6 +29,9 @@ public:
                   const wm::surface::format_desc&      win_fmt = wm::surface::default_format());
     virtual ~viewer_widget();
 
+    bool                        auto_update() const;
+    void                        auto_update(bool a);
+
     QPaintEngine*               paintEngine() const;
 
     const shared_ptr<viewer>&   base_viewer() const;
@@ -50,6 +50,7 @@ protected:
 
 protected:
     shared_ptr<viewer>          _viewer;
+    bool                        _auto_update;
 
 }; // class viewer_widget
 

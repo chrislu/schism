@@ -1,7 +1,4 @@
 
-// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
-// Distributed under the Modified BSD License, see license.txt.
-
 #include "viewer_widget.h"
 
 #include <exception>
@@ -61,6 +58,7 @@ viewer_widget::viewer_widget(QWidget* parent,
                              const wm::context::attribute_desc&   ctx_attrib,
                              const wm::surface::format_desc&      win_fmt)
   : QWidget(parent, Qt::MSWindowsOwnDC)
+  , _auto_update(true)
 {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
@@ -79,6 +77,7 @@ viewer_widget::viewer_widget(QWidget* parent,
 
         // ok set the native window as this widgets window...and hold thumbs
         this->create(_viewer->window()->window_handle(), true, true);
+        _viewer->window_context()->make_current(_viewer->window());
     }
     catch(std::exception& e) {
         std::stringstream msg;
@@ -94,24 +93,44 @@ viewer_widget::~viewer_widget()
     _viewer.reset();
 }
 
+bool
+viewer_widget::auto_update() const
+{
+    return _auto_update;
+}
+
+void
+viewer_widget::auto_update(bool a)
+{
+    _auto_update = a;
+}
+
 QPaintEngine*
 viewer_widget::paintEngine() const
 {
-    return (0);//(QWidget::paintEngine());
+    return 0;//(QWidget::paintEngine());
 }
 
 void
 viewer_widget::keyPressEvent(QKeyEvent* key_event)
 {
     _viewer->send_keyboard_input(key_event->key(), true, detail::qt_to_key_modifier(key_event->modifiers()));
-    //this->update();
+    
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
 viewer_widget::keyReleaseEvent(QKeyEvent* key_event)
 {
     _viewer->send_keyboard_input(key_event->key(), false, detail::qt_to_key_modifier(key_event->modifiers()));
-    //this->update();
+    
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
@@ -121,7 +140,11 @@ viewer_widget::mouseDoubleClickEvent(QMouseEvent* mouse_event)
     _viewer->send_mouse_double_click(detail::mouse_button(mouse_event->button()),
                                      mouse_event->x(),
                                      mouse_event->y());
-    //this->update();
+    
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
@@ -131,7 +154,11 @@ viewer_widget::mouseMoveEvent(QMouseEvent* mouse_event)
     _viewer->send_mouse_move(detail::mouse_button(mouse_event->button()),
                              mouse_event->x(),
                              mouse_event->y());
-    //this->update();
+    
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
@@ -141,7 +168,10 @@ viewer_widget::mousePressEvent(QMouseEvent* mouse_event)
     _viewer->send_mouse_press(detail::mouse_button(mouse_event->button()),
                               mouse_event->x(),
                               mouse_event->y());
-    //this->update();
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
@@ -151,7 +181,11 @@ viewer_widget::mouseReleaseEvent(QMouseEvent* mouse_event)
     _viewer->send_mouse_release(detail::mouse_button(mouse_event->button()),
                                 mouse_event->x(),
                                 mouse_event->y());
-    //this->update();
+    
+    if (!_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 bool
@@ -173,12 +207,16 @@ viewer_widget::paintEvent(QPaintEvent* paint_event)
 {
     paint_event->accept();
 
-    _viewer->window_context()->make_current(_viewer->window());
-    
-    _viewer->send_render_update();
+    //_viewer->window_context()->make_current(_viewer->window());
+    //
+    _viewer->send_render_pre_frame_update();
     _viewer->send_render_display();
+    _viewer->send_render_post_frame_update();
 
-    this->update();
+    if (_auto_update) {
+        this->update( _viewer->main_viewport()._position.x,   _viewer->main_viewport()._position.y,
+                      _viewer->main_viewport()._dimensions.x, _viewer->main_viewport()._dimensions.y);
+    }
 }
 
 void
@@ -191,7 +229,7 @@ viewer_widget::resizeEvent(QResizeEvent* resize_event)
 const shared_ptr<viewer>&
 viewer_widget::base_viewer() const
 {
-    return (_viewer);
+    return _viewer;
 }
 
 } // namespace gui
