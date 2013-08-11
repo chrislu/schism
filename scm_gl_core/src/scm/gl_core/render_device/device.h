@@ -278,6 +278,9 @@ public:
                                                           scm::size_t         in_buffer_size,
                                                           const void*         in_buffer_initial_data = 0);
 
+    texture_handle_ptr              create_resident_handle(const texture_ptr&       in_texture,
+                                                           const sampler_state_ptr& in_sampler);
+
     sampler_state_ptr               create_sampler_state(const sampler_state_desc& in_desc);
     sampler_state_ptr               create_sampler_state(texture_filter_mode  in_filter1,
                                                          texture_wrap_mode    in_wrap,

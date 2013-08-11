@@ -168,9 +168,15 @@ application_window::init_renderer()
             err() << "application_window::init_renderer(): error creating texture view." << log::end;
             return false;
         }
-    }
 
-    device->main_context()->make_resident(_texture, _sstate_linear);
+        _texture_resident_handle_lin = device->create_resident_handle(_texture,  _sstate_linear);
+        _texture_resident_handle_near = device->create_resident_handle(_texture, _sstate_nearest);
+        if (   !_texture_resident_handle_lin
+            || !_texture_resident_handle_near) {
+            err() << "application_window::init_renderer(): error creating texture resident handles." << log::end;
+            return false;
+        }
+    }
 
 
     // load shader program
@@ -212,7 +218,11 @@ application_window::shutdown()
     
     _camera_block.reset();
     
+    _texture_resident_handle_lin.reset();
+    _texture_resident_handle_near.reset();
+    _texture_uint_view.reset();
     _texture.reset();
+
     _model_geometry.reset();
     _shader_prog.reset();
 }
@@ -249,9 +259,12 @@ application_window::display(const gl::render_context_ptr& context)
             context->bind_texture(_texture,           _sstate_linear,  0);
             context->bind_texture(_texture_uint_view, _sstate_nearest, 1);
 
-            vec2ui tex_handle = vec2ui(static_cast<uint32>(_texture->native_handle() & 0x00000000ffffffffull),
-                                       static_cast<uint32>(_texture->native_handle() >> 32ull));
-            _shader_prog->uniform("tex_color_resident", tex_handle);
+            vec2ui tex_handle_lin  = vec2ui(static_cast<uint32>(_texture_resident_handle_lin->native_handle() & 0x00000000ffffffffull),
+                                            static_cast<uint32>(_texture_resident_handle_lin->native_handle() >> 32ull));
+            vec2ui tex_handle_near = vec2ui(static_cast<uint32>(_texture_resident_handle_near->native_handle() & 0x00000000ffffffffull),
+                                            static_cast<uint32>(_texture_resident_handle_near->native_handle() >> 32ull));
+            _shader_prog->uniform("tex_color_resident_lin",  tex_handle_lin);
+            _shader_prog->uniform("tex_color_resident_near", tex_handle_near);
         }
 
         _model_geometry->draw_raw(context, geometry::MODE_SOLID);

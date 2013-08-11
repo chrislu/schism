@@ -1118,6 +1118,24 @@ render_device::create_texture_buffer(const data_format   in_format,
     return create_texture_buffer(in_format, tex_buffer);
 }
 
+texture_handle_ptr
+render_device::create_resident_handle(const texture_ptr&       in_texture,
+                                      const sampler_state_ptr& in_sampler)
+{
+    assert(in_texture);
+    assert(in_sampler);
+
+    texture_handle_ptr new_tex_handle(new texture_handle(*this, *in_texture, *in_sampler));
+    if (new_tex_handle->fail()) {
+        glerr() << log::error << "render_device::create_resident_handle(): unable to create texture handle ("
+                << new_tex_handle->state().state_string() << ")." << log::end;
+        return texture_handle_ptr();
+    }
+    else {
+        return new_tex_handle;
+    }
+}
+
 sampler_state_ptr
 render_device::create_sampler_state(const sampler_state_desc& in_desc)
 {
