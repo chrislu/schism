@@ -1,7 +1,4 @@
 
-// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
-// Distributed under the Modified BSD License, see license.txt.
-
 #ifndef SCM_GL_GUI_VIEWER_WINDOW_H_INCLUDED
 #define SCM_GL_GUI_VIEWER_WINDOW_H_INCLUDED
 
@@ -42,9 +39,12 @@ public:
     virtual ~viewer_window();
 
 protected:
-    virtual void                    update(const gl::render_device_ptr& device,
-                                           const gl::render_context_ptr& context) = 0;
-    virtual void                    display(const gl::render_context_ptr& context) = 0;
+    virtual void                    pre_frame_update(const gl::render_device_ptr& device,
+                                                     const gl::render_context_ptr& context);
+    virtual void                    post_frame_update(const gl::render_device_ptr& device,
+                                                      const gl::render_context_ptr& context);
+    virtual void                    display_scene(const gl::render_context_ptr& context) = 0;
+    virtual void                    display_gui(const gl::render_context_ptr& context);
     virtual void                    reshape(const gl::render_device_ptr& device,
                                             const gl::render_context_ptr& context,
                                             int w, int h);
@@ -62,6 +62,7 @@ protected Q_SLOTS:
     void                            switch_vsync_mode(bool c);
     void                            switch_full_screen_mode(bool f);
     void                            switch_frame_time_display(bool c);
+    void                            switch_auto_update_display(bool a);
 
 protected:
     // GUI

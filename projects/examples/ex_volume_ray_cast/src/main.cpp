@@ -102,7 +102,7 @@ int main(int argc, char **argv)
                                                 false /*debug*/,
                                                 false /*forward*/);
 
-    viewer_attribs._post_process_aa = false;
+    viewer_attribs._post_process_aa = true;
     viewer_attribs._multi_samples   = multi_samples;
     viewer_attribs._super_samples   = 1;
 

@@ -1,7 +1,4 @@
 
-// Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
-// Distributed under the Modified BSD License, see license.txt.
-
 #include "viewer_window.h"
 
 #include <exception>
@@ -82,9 +79,11 @@ viewer_window::init_viewer(const gl::viewer::viewer_attributes&     view_attrib,
     _viewer_widget      = new gl::gui::viewer_widget(this, view_attrib, ctx_attrib, win_fmt);
     _viewer             = _viewer_widget->base_viewer();
 
-    _viewer->render_update_func(boost::bind(&viewer_window::update, this, _1, _2));
+    _viewer->render_pre_frame_update_func(boost::bind(&viewer_window::pre_frame_update, this, _1, _2));
+    _viewer->render_post_frame_update_func(boost::bind(&viewer_window::post_frame_update, this, _1, _2));
     _viewer->render_resize_func(boost::bind(&viewer_window::reshape, this, _1, _2, _3, _4));
-    _viewer->render_display_func(boost::bind(&viewer_window::display, this, _1));
+    _viewer->render_display_scene_func(boost::bind(&viewer_window::display_scene, this, _1));
+    _viewer->render_display_gui_func(boost::bind(&viewer_window::display_gui, this, _1));
 
     _viewer->keyboard_input_func(boost::bind(&viewer_window::keyboard_input, this, _1, _2, _3));
     _viewer->mouse_double_click_func(boost::bind(&viewer_window::mouse_double_click, this, _1, _2, _3));
@@ -113,6 +112,7 @@ viewer_window::init_gui()
     QAction*        toggle_vsync    = viewer_menu->addAction("vsync");
     QAction*        toggle_frmtme   = viewer_menu->addAction("show frame time");
     QAction*        toggle_fllscn   = viewer_menu->addAction("full screen");
+    QAction*        toggle_aupdte   = viewer_menu->addAction("screen auto update");
                                       viewer_menu->addSeparator();
     QAction*        close_app       = viewer_menu->addAction("Exit");
 
@@ -122,10 +122,13 @@ viewer_window::init_gui()
     toggle_frmtme->setChecked(_viewer->settings()._show_frame_times);
     toggle_fllscn->setCheckable(true);
     toggle_fllscn->setChecked(_viewer->settings()._full_screen);
+    toggle_aupdte->setCheckable(true);
+    toggle_aupdte->setChecked(_viewer_widget->auto_update());
 
     connect(toggle_vsync,  SIGNAL(toggled(bool)), this, SLOT(switch_vsync_mode(bool)));
     connect(toggle_frmtme, SIGNAL(toggled(bool)), this, SLOT(switch_frame_time_display(bool)));
     connect(toggle_fllscn, SIGNAL(toggled(bool)), this, SLOT(switch_full_screen_mode(bool)));
+    connect(toggle_aupdte, SIGNAL(toggled(bool)), this, SLOT(switch_auto_update_display(bool)));
     connect(close_app, SIGNAL(triggered()), this, SLOT(close_program()));
 
     _main_menubar->addMenu(viewer_menu);
@@ -134,8 +137,24 @@ viewer_window::init_gui()
 }
 
 void
-viewer_window::update(const gl::render_device_ptr& device,
-                           const gl::render_context_ptr& context)
+viewer_window::pre_frame_update(const gl::render_device_ptr& device,
+                                const gl::render_context_ptr& context)
+{
+}
+
+void
+viewer_window::post_frame_update(const gl::render_device_ptr& device,
+                                 const gl::render_context_ptr& context)
+{
+}
+
+//void
+//viewer_window::display_scene(const gl::render_context_ptr& context)
+//{
+//}
+
+void
+viewer_window::display_gui(const gl::render_context_ptr& context)
 {
 }
 
@@ -247,6 +266,12 @@ void
 viewer_window::switch_frame_time_display(bool c)
 {
     _viewer->settings()._show_frame_times = c;
+}
+
+void
+viewer_window::switch_auto_update_display(bool a)
+{
+    _viewer_widget->auto_update(a);
 }
 
 } // namespace gui

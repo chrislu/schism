@@ -195,7 +195,7 @@ application_window::init_renderer()
     //std::string vfile = "e:/data/volume/vrgeo/new_zealand/volumes/pari_full_rm_8float_bri_TRIMMED.vol";
     //std::string vfile = "g:/volume/vrgeo/eni_fp_volume/test_data3far.segy";
     //std::string vfile = "e:/data/volume/vrgeo/reflect.vol";
-    std::string vfile = "d:/data/volume/vrgeo/gfaks.vol";
+    std::string vfile = "e:/data/volume/vrgeo/gfaks.vol";
     //std::string vfile = "c:/data/seismic_volume_raw_w751_h321_d326_c1_b8.raw";
     //std::string vfile = "e:/data/volume/vrgeo/wfarm_200_w512_h439_d512_c1_b8.raw";
 
@@ -258,8 +258,8 @@ application_window::shutdown()
 }
 
 void
-application_window::update(const gl::render_device_ptr& device,
-                           const gl::render_context_ptr& context)
+application_window::pre_frame_update(const gl::render_device_ptr& device,
+                                     const gl::render_context_ptr& context)
 {
     _viewer->main_camera().projection_perspective(60.f, float(_viewport_size.x) / float(_viewport_size.y), 0.01f, 10.0f);
 
@@ -272,7 +272,13 @@ application_window::update(const gl::render_device_ptr& device,
 }
 
 void
-application_window::display(const gl::render_context_ptr& context)
+application_window::post_frame_update(const gl::render_device_ptr& device,
+                                      const gl::render_context_ptr& context)
+{
+}
+
+void
+application_window::display_scene(const gl::render_context_ptr& context)
 {
     using namespace scm::gl;
     using namespace scm::math;
@@ -308,6 +314,13 @@ application_window::display(const gl::render_context_ptr& context)
             }
         }
     }
+}
+
+void
+application_window::display_gui(const gl::render_context_ptr& context)
+{
+    using namespace scm::gl;
+    using namespace scm::math;
 
     if (_volume_data) { // text overlay
         vec3ui lod_size = util::mip_level_dimensions(_volume_data->data_dimensions(), static_cast<unsigned>(_volume_data->selected_lod()));

@@ -55,9 +55,12 @@ protected:
     void                            shutdown();
     bool                            init_renderer();
 
-    void                            update(const gl::render_device_ptr& device,
-                                           const gl::render_context_ptr& context);
-    void                            display(const gl::render_context_ptr& context);
+    void                            pre_frame_update(const gl::render_device_ptr& device,
+                                                     const gl::render_context_ptr& context);
+    void                            post_frame_update(const gl::render_device_ptr& device,
+                                                      const gl::render_context_ptr& context);
+    void                            display_scene(const gl::render_context_ptr& context);
+    void                            display_gui(const gl::render_context_ptr& context);
     void                            reshape(const gl::render_device_ptr& device,
                                             const gl::render_context_ptr& context,
                                             int w, int h);
