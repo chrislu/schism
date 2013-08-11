@@ -4,8 +4,7 @@
 
 #version 430 core
 
-#extension GL_NV_bindless_texture : require
-#extension GL_NV_gpu_shader5      : require
+#extension GL_ARB_bindless_texture : require
 
 // input layout definitions ///////////////////////////////////////////////////////////////////////
 
@@ -22,8 +21,10 @@ layout(location = 0, index = 0) out vec4 out_color;
 // uniform input definitions //////////////////////////////////////////////////////////////////////
 layout(binding  = 0) uniform sampler2D  tex_color;
 layout(binding  = 1) uniform usampler2D tex_color_view;
-uniform uvec2        tex_color_resident_lin;
-uniform uvec2        tex_color_resident_near;
+
+// two ways to get binless texture in here
+uniform uvec2                               tex_color_resident_lin;
+layout (bindless_sampler) uniform sampler2D tex_color_resident_near;
 
 // global constants ///////////////////////////////////////////////////////////////////////////////
 const float epsilon                 = 0.0001;
@@ -47,15 +48,15 @@ void main()
         c = texture(tex_color, v_in.texcoord);
     }
     else if (gl_FragCoord.x < 1200) {
-        uint64_t  tex_hndl = packUint2x32(tex_color_resident_near);
-        sampler2D tex_smpl = sampler2D(tex_hndl);
-        c = texture(tex_smpl, v_in.texcoord);
+        //uint64_t  tex_hndl = packUint2x32(tex_color_resident_near);
+        //sampler2D tex_smpl = sampler2D(tex_color_resident_near);
+        c = texture(tex_color_resident_near, v_in.texcoord);
 
         c *= vec4(0.5, 1.0, 0.5, 1.0);
     }
     else {
-        uint64_t  tex_hndl = packUint2x32(tex_color_resident_lin);
-        sampler2D tex_smpl = sampler2D(tex_hndl);
+        //uint64_t  tex_hndl = packUint2x32(tex_color_resident_lin);
+        sampler2D tex_smpl = sampler2D(tex_color_resident_lin);
         c = texture(tex_smpl, v_in.texcoord);
 
         c *= vec4(1.0, 0.5, 0.5, 1.0);

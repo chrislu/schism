@@ -71,6 +71,9 @@ enum data_type {
     TYPE_BYTE,
     TYPE_UBYTE,
 
+    TYPE_SAMPLER,
+    TYPE_IMAGE,
+
     TYPE_COUNT
 }; // enum data_type
 
@@ -79,6 +82,9 @@ int components(data_type d);
 
 bool is_integer_type(data_type d);
 bool is_float_type(data_type d);
+
+bool is_sampler_type(data_type d);
+bool is_image_type(data_type d);
 
 __scm_export(gl_core) const char* type_string(data_type d);
 

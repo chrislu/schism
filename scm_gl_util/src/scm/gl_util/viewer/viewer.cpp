@@ -731,8 +731,8 @@ viewer::initialize_render_target()
         }
         else {
             _render_target->_color_present_program->uniform("mvp",          make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
-            _render_target->_color_present_program->uniform("in_texture",   0);
             _render_target->_color_present_program->uniform("in_level",     0);
+            _render_target->_color_present_program->uniform_sampler("in_texture", 0);
         }
     }
 
@@ -755,8 +755,8 @@ viewer::initialize_render_target()
 
         // set default uniforms
         _render_target->_color_present_program->uniform("mvp",          make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
-        _render_target->_color_present_program->uniform("in_texture",   0);
         _render_target->_color_present_program->uniform("in_level",     _render_target->_viewport_color_mip_level);
+        _render_target->_color_present_program->uniform_sampler("in_texture", 0);
 
          // textures
         _render_target->_color_buffer_aa = device()->create_texture_2d(vec2ui(_viewport._dimensions) * _render_target->_viewport_scale, FORMAT_RGBA_8, 1, 1, _attributes._multi_samples);
@@ -803,9 +803,9 @@ viewer::initialize_render_target()
         if (_attributes._post_process_aa) {
             vec2f vp_size = vec2f(_viewport._dimensions);
             _render_target->_post_process_aa_program->uniform("mvp",            make_ortho_matrix(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f));
-            _render_target->_post_process_aa_program->uniform("in_texture",     0);
             //_render_target->_post_process_aa_program->uniform("in_vp_size",     vp_size);
             _render_target->_post_process_aa_program->uniform("in_vp_size_rec", vec2f(1.0) / vp_size);
+            _render_target->_post_process_aa_program->uniform_sampler("in_texture", 0);
 
         }
 

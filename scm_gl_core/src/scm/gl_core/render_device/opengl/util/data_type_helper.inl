@@ -20,6 +20,14 @@ inline
 data_type
 from_gl_data_type(unsigned gl_type)
 {
+    if (is_sampler_type(gl_type)) {
+        return TYPE_SAMPLER;
+    }
+    
+    if (is_image_type(gl_type)) {
+        return TYPE_IMAGE;
+    }
+
     switch (gl_type) {
         case GL_FLOAT:                  return TYPE_FLOAT; break;
         case GL_FLOAT_VEC2:             return TYPE_VEC2F; break;
@@ -258,7 +266,11 @@ gl_base_type(const data_type d)
         GL_SHORT,
         GL_UNSIGNED_SHORT,
         GL_BYTE,
-        GL_UNSIGNED_BYTE
+        GL_UNSIGNED_BYTE,
+
+        // samplers and images
+        GL_UNSIGNED_INT64_ARB,
+        GL_UNSIGNED_INT64_ARB
     };
 
     BOOST_STATIC_ASSERT((sizeof(gl_base_types) / sizeof(unsigned)) == TYPE_COUNT);

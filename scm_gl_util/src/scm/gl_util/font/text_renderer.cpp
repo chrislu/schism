@@ -362,18 +362,18 @@ text_renderer::draw(const render_context_ptr& context,
     switch (txt->font()->smooth_style()) {
         case font_face::smooth_normal:
             _font_program_gray->uniform("in_mvp", mvp);
-            _font_program_gray->uniform("in_font_array", 0);
             _font_program_gray->uniform("in_style", static_cast<int>(txt->text_style()));
             _font_program_gray->uniform("in_color", txt->text_color());
+            _font_program_gray->uniform_sampler("in_font_array", 0);
 
             context->set_blend_state(_font_blend_gray);
             context->bind_program(_font_program_gray);
            break;
         case font_face::smooth_lcd:
             _font_program_lcd->uniform("in_mvp", mvp);
-            _font_program_lcd->uniform("in_font_array", 0);
             _font_program_lcd->uniform("in_style", static_cast<int>(txt->text_style()));
             _font_program_lcd->uniform("in_color", txt->text_color());
+            _font_program_lcd->uniform_sampler("in_font_array", 0);
 
             context->set_blend_state(_font_blend_lcd/*, txt->text_color()*/);
             context->bind_program(_font_program_lcd);
@@ -434,10 +434,10 @@ text_renderer::draw_outlined(const render_context_ptr& context,
         case font_face::smooth_normal:
             _font_program_outline_gray->uniform("in_mvp",               mvp);
             _font_program_outline_gray->uniform("in_style",             static_cast<int>(txt->text_style()));
-            _font_program_outline_gray->uniform("in_font_array",        0);
-            _font_program_outline_gray->uniform("in_font_border_array", 1);
             _font_program_outline_gray->uniform("in_color",             txt->text_color());
             _font_program_outline_gray->uniform("in_outline_color",     txt->text_outline_color());
+            _font_program_outline_gray->uniform_sampler("in_font_array",        0);
+            _font_program_outline_gray->uniform_sampler("in_font_border_array", 1);
 
             context->set_blend_state(_font_blend_gray);
             context->bind_texture(txt->font()->styles_texture_array(),        _font_sampler_state, 0);
@@ -495,10 +495,10 @@ text_renderer::draw_outlined(const render_context_ptr& context,
         case font_face::smooth_lcd:
             _font_program_outline_lcd->uniform("in_mvp",               mvp);
             _font_program_outline_lcd->uniform("in_style",             static_cast<int>(txt->text_style()));
-            _font_program_outline_lcd->uniform("in_font_array",        0);
-            _font_program_outline_lcd->uniform("in_font_border_array", 1);
             _font_program_outline_lcd->uniform("in_color",             txt->text_color());
             _font_program_outline_lcd->uniform("in_outline_color",     txt->text_outline_color());
+            _font_program_outline_lcd->uniform_sampler("in_font_array",        0);
+            _font_program_outline_lcd->uniform_sampler("in_font_border_array", 1);
 
             context->set_blend_state(_font_blend_lcd);
             context->bind_texture(txt->font()->styles_texture_array(),        _font_sampler_state, 0);
@@ -592,7 +592,7 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
 
     switch (txt->font()->smooth_style()) {
         case font_face::smooth_normal:
-            _font_program_gray->uniform("in_font_array", 0);
+            _font_program_gray->uniform_sampler("in_font_array", 0);
             context->set_blend_state(_font_blend_gray);
             context->bind_program(_font_program_gray);
             { // shadow
@@ -638,7 +638,7 @@ text_renderer::draw_shadowed(const render_context_ptr& context,
             }
             break;
         case font_face::smooth_lcd:
-            _font_program_lcd->uniform("in_font_array", 0);
+            _font_program_lcd->uniform_sampler("in_font_array", 0);
             context->bind_program(_font_program_lcd);
             { // shadow
                 mat4f v   = make_translation(vec3f(vec2f(pos + txt->text_shadow_offset()), 0.0f));

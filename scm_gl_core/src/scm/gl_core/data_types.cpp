@@ -32,7 +32,10 @@ const char* type_strings[] = {
     "SHORT",
     "USHORT",
     "BYTE",
-    "UBYTE"
+    "UBYTE",
+
+    "SAMPLER",
+    "IMAGE"
 };
 
 } // namespace 

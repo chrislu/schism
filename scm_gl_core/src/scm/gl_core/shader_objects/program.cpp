@@ -112,6 +112,12 @@ program::~program()
     gl_assert(glapi, leaving program::~program());
 }
 
+unsigned
+program::program_id() const
+{
+    return _gl_program_obj;
+}
+
 const std::string&
 program::info_log() const
 {
@@ -211,7 +217,6 @@ program::bind_uniforms(render_context& ren_ctx) const
             }
         }
     }
-#if 1
     { // subroutines
         for (int s = 0; s < SHADER_STAGE_COUNT; ++s) {
             name_subroutine_uniform_map::const_iterator b = _subroutine_uniforms[s].begin();
@@ -230,7 +235,7 @@ program::bind_uniforms(render_context& ren_ctx) const
             }
         }
     }
-#endif
+
     gl_assert(glapi, leaving program::bind_uniforms());
 }
 
@@ -503,10 +508,10 @@ program::retrieve_uniform_information(render_device& in_device)
                 uniform_ptr current_uniform;
 
                 if (util::is_sampler_type(actual_uniform_type)) { // samplers as integer uniforms
-                    current_uniform.reset(new scm::gl::uniform_sampler(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_INT));
+                    current_uniform.reset(new scm::gl::uniform_sampler(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_SAMPLER));
                 }
                 else if (util::is_image_type(actual_uniform_type)) { // images as integer uniforms
-                    current_uniform.reset(new scm::gl::uniform_image(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_INT));
+                    current_uniform.reset(new scm::gl::uniform_image(actual_uniform_name, actual_uniform_location, actual_uniform_size, TYPE_IMAGE));
                 }
                 else {
                     switch (actual_uniform_type) {
@@ -625,64 +630,6 @@ program::retrieve_uniform_information(render_device& in_device)
                 }
                 gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
             }
-#if 0
-            if (0){ // subroutines
-                int act_routines = 0;
-                int act_routine_max_len = 0;
-                char*  temp_name = 0;
-                glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                          GL_ACTIVE_SUBROUTINES, &act_routines);
-                glapi.glGetProgramStageiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                          GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &act_routine_max_len);
-                if (act_routine_max_len > 0) {
-                    temp_name = new char[act_routine_max_len + 1]; // reserve for null termination
-                }
-                for (int i = 0; i < act_routines; ++i) {
-                    std::string         actual_routine_name;
-                    unsigned            actual_routine_index = 0;
-
-                    int ret_size = 0;
-
-                    glapi.glGetActiveSubroutineName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                    unsigned(i), act_routine_max_len, &ret_size, temp_name);
-                    actual_routine_name.assign(temp_name);
-                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
-
-                    actual_routine_index = 
-                        glapi.glGetSubroutineIndex(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                   temp_name);
-                                                   //actual_routine_name.c_str());
-                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
-                    // init the subroutine struct
-                    subroutine_type actual_routine(actual_routine_name, actual_routine_index);
-                    _subroutines[stge][actual_routine_name] = actual_routine;
-                    gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
-                }
-                delete [] temp_name;
-            }
-                // compatible routines
-                int                 num_comp_routines = 0;
-                scoped_array<int>   comp_routines;
-                glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                     i, GL_NUM_COMPATIBLE_SUBROUTINES, &num_comp_routines);
-
-    gl_assert(glapi, leaving program::retrieve_uniform_information());
-                if (0 < num_comp_routines) {
-                    comp_routines.reset(new int[num_comp_routines]);
-                    glapi.glGetActiveSubroutineUniformiv(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                         i, GL_COMPATIBLE_SUBROUTINES, comp_routines.get());
-                }
-
-    gl_assert(glapi, leaving program::retrieve_uniform_information());
-                for (int r = 0; r < num_comp_routines; ++r) {
-                    std::string rname;
-                    glapi.glGetActiveSubroutineName(_gl_program_obj, util::gl_shader_types(static_cast<shader_stage>(stge)),
-                                                    comp_routines[r], max_act_routine_len, 0, temp_name.get());
-    gl_assert(glapi, leaving program::retrieve_uniform_information());
-                    rname.assign(temp_name.get());
-                    actual_routine._routine_indices[rname] = comp_routines[r];
-                }
-#endif
         }
     }
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
@@ -699,6 +646,50 @@ program::uniform_raw(const std::string& name) const
     }
     else {
         return (uniform_ptr());
+    }
+}
+
+void
+program::uniform_sampler(const std::string& name, scm::int32 u)
+{
+    if (uniform_sampler_ptr p = uniform_sampler(name)) {
+        p->bound_unit(u);
+    }
+    else {
+        SCM_GL_DGB("program::uniform_sampler(): unable to find uniform sampler ('" << name << "').");
+    }
+}
+
+void
+program::uniform_sampler_handle(const std::string& name, scm::uint64 h)
+{
+    if (uniform_sampler_ptr p = uniform_sampler(name)) {
+        p->resident_handle(h);
+    }
+    else {
+        SCM_GL_DGB("program::uniform_sampler_handle(): unable to find uniform sampler ('" << name << "').");
+    }
+}
+
+void
+program::uniform_image(const std::string& name, scm::int32 u)
+{
+    if (uniform_image_ptr p = uniform_image(name)) {
+        p->bound_unit(u);
+    }
+    else {
+        SCM_GL_DGB("program::uniform_image(): unable to find uniform image ('" << name << "').");
+    }
+}
+
+void
+program::uniform_image_handle(const std::string& name, scm::uint64 h)
+{
+    if (uniform_image_ptr p = uniform_image(name)) {
+        p->resident_handle(h);
+    }
+    else {
+        SCM_GL_DGB("program::uniform_image_handle(): unable to find uniform image ('" << name << "').");
     }
 }
 

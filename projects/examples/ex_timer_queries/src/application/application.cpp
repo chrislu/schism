@@ -274,7 +274,7 @@ application_window::display(const gl::render_context_ptr& context)
 
         for (size_t vs = 0; vs < view_matrices.size(); ++vs) {
             const mat4f& v = view_matrices[vs];
-            view_mat_uniform->value(0, v);
+            view_mat_uniform->set_value(0, v);
 
             if (_model_grid_queries && _model_grid_queries_available) {
                 context->begin_query(_time_queries[vs]);

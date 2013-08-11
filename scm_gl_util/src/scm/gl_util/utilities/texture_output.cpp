@@ -150,7 +150,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_color) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_color program"));
     }
-    _fs_program_color->uniform("in_texture", 0);
+    _fs_program_color->uniform_sampler("in_texture", 0);
     _fs_program_color->uniform("mvp", pass_mvp);
 
     _fs_program_color_uint = device->create_program(list_of(device->create_shader(scm::gl::STAGE_VERTEX_SHADER,   fs_vsrc,            "texture_output::fs_vsrc"))
@@ -160,7 +160,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_color_uint) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_color_uint program"));
     }
-    _fs_program_color_uint->uniform("in_texture", 0);
+    _fs_program_color_uint->uniform_sampler("in_texture", 0);
     _fs_program_color_uint->uniform("mvp", pass_mvp);
 
     _fs_program_color_uint8_bit_rev = device->create_program(list_of(device->create_shader(scm::gl::STAGE_VERTEX_SHADER,   fs_vsrc,                     "texture_output::fs_vsrc"))
@@ -170,7 +170,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_color_uint8_bit_rev) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_color_uint8_bit_rev program"));
     }
-    _fs_program_color_uint8_bit_rev->uniform("in_texture", 0);
+    _fs_program_color_uint8_bit_rev->uniform_sampler("in_texture", 0);
     _fs_program_color_uint8_bit_rev->uniform("mvp", pass_mvp);
     _fs_program_color_uint8_bit_rev->uniform("in_scale", vec4f(1.0f / 255.0f));
 
@@ -181,7 +181,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_gray) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_gray program"));
     }
-    _fs_program_gray->uniform("in_texture", 0);
+    _fs_program_gray->uniform_sampler("in_texture", 0);
     _fs_program_gray->uniform("mvp", pass_mvp);
 
     _fs_program_gray_uint = device->create_program(list_of(device->create_shader(scm::gl::STAGE_VERTEX_SHADER,   fs_vsrc,           "texture_output::fs_vsrc"))
@@ -191,7 +191,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_gray_uint) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_gray_uint program"));
     }
-    _fs_program_gray_uint->uniform("in_texture", 0);
+    _fs_program_gray_uint->uniform_sampler("in_texture", 0);
     _fs_program_gray_uint->uniform("mvp", pass_mvp);
 
     _fs_program_gray_uint8_bit_rev = device->create_program(list_of(device->create_shader(scm::gl::STAGE_VERTEX_SHADER,   fs_vsrc,                    "texture_output::fs_vsrc"))
@@ -201,7 +201,7 @@ texture_output::texture_output(const gl::render_device_ptr& device)
     if(!_fs_program_gray_uint8_bit_rev) {
         throw (std::runtime_error("texture_output::texture_output(): error generating _fs_program_gray_uint8_bit_rev program"));
     }
-    _fs_program_gray_uint8_bit_rev->uniform("in_texture", 0);
+    _fs_program_gray_uint8_bit_rev->uniform_sampler("in_texture", 0);
     _fs_program_gray_uint8_bit_rev->uniform("mvp", pass_mvp);
     _fs_program_gray_uint8_bit_rev->uniform("in_scale", vec4f(1.0f / 255.0f));
 

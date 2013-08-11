@@ -261,10 +261,10 @@ application_window::display(const gl::render_context_ptr& context)
 
             vec2ui tex_handle_lin  = vec2ui(static_cast<uint32>(_texture_resident_handle_lin->native_handle() & 0x00000000ffffffffull),
                                             static_cast<uint32>(_texture_resident_handle_lin->native_handle() >> 32ull));
-            vec2ui tex_handle_near = vec2ui(static_cast<uint32>(_texture_resident_handle_near->native_handle() & 0x00000000ffffffffull),
-                                            static_cast<uint32>(_texture_resident_handle_near->native_handle() >> 32ull));
+            //vec2ui tex_handle_near = vec2ui(static_cast<uint32>(_texture_resident_handle_near->native_handle() & 0x00000000ffffffffull),
+            //                                static_cast<uint32>(_texture_resident_handle_near->native_handle() >> 32ull));
             _shader_prog->uniform("tex_color_resident_lin",  tex_handle_lin);
-            _shader_prog->uniform("tex_color_resident_near", tex_handle_near);
+            _shader_prog->uniform_sampler_handle("tex_color_resident_near", _texture_resident_handle_near->native_handle());
         }
 
         _model_geometry->draw_raw(context, geometry::MODE_SOLID);

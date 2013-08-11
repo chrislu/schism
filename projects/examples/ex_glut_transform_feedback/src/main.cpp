@@ -439,7 +439,7 @@ demo_app::display()
         mat4f   pass_mvp = mat4f::identity();
         ortho_matrix(pass_mvp, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 
-        _pass_through_shader->uniform("in_texture", 0);
+        _pass_through_shader->uniform_sampler("in_texture", 0);
         _pass_through_shader->uniform("mvp", pass_mvp);
 
         _context->set_default_frame_buffer();

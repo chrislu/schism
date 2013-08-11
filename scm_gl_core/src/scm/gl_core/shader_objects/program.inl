@@ -26,7 +26,7 @@ program::uniform(const std::string& name, int i, const T& v) const {
         typedef typename scm::gl::uniform_type<T>::type cur_uniform_type;
         const shared_ptr<cur_uniform_type> ut = dynamic_pointer_cast<cur_uniform_type>(u);
         if (ut) {
-            ut->value(i, v);
+            ut->set_value(i, v);
         }
         else {
             SCM_GL_DGB("program::uniform(): found non matching uniform type '" << type_string(uniform_data_type<T>::type)
