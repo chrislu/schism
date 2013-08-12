@@ -1205,12 +1205,10 @@ render_context::apply_texture_units()
             ati = cti;
         }
 #else // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
-        if (cti != ati) {
-            if (cti) {
-                texture_obj_ids[u] = cti->object_id();
-            }
-            ati = cti;
+        if (cti) {
+            texture_obj_ids[u] = cti->object_id();
         }
+        ati = cti;
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
 
         sampler_state_ptr&  css = _current_state._texture_units[u]._sampler_state;
@@ -1226,12 +1224,10 @@ render_context::apply_texture_units()
             ass = css;
         }
 #else // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
-        if (css != ass) {
-            if (css) {
-                sampler_obj_ids[u] = css->sampler_id();
-            }
-            ass = css;
+        if (css) {
+            sampler_obj_ids[u] = css->sampler_id();
         }
+        ass = css;
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_440
     }
 
