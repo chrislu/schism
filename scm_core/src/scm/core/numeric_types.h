@@ -6,7 +6,11 @@
 #define INT_TYPES_H_INCLUDED
 
 #include <cstddef>
+
 #include <boost/cstdint.hpp>
+#include <boost/static_assert.hpp>
+
+#include <scm/core/platform/platform.h>
 
 namespace scm {
 
@@ -37,6 +41,23 @@ typedef double              float64;
 
 } // namespace scm
 
+BOOST_STATIC_ASSERT(sizeof(scm::int8)    == 1);
+BOOST_STATIC_ASSERT(sizeof(scm::uint8)   == 1);
+BOOST_STATIC_ASSERT(sizeof(scm::int16)   == 2);
+BOOST_STATIC_ASSERT(sizeof(scm::uint16)  == 2);
+BOOST_STATIC_ASSERT(sizeof(scm::int32)   == 4);
+BOOST_STATIC_ASSERT(sizeof(scm::uint32)  == 4);
+BOOST_STATIC_ASSERT(sizeof(scm::int64)   == 8);
+BOOST_STATIC_ASSERT(sizeof(scm::uint64)  == 8);
+
+#if SCM_ARCHITECTURE_TYPE == SCM_ARCHITECTURE_32
+    BOOST_STATIC_ASSERT(sizeof(scm::size_t) == 4);
+#elif SCM_ARCHITECTURE_TYPE == SCM_ARCHITECTURE_64
+    BOOST_STATIC_ASSERT(sizeof(scm::size_t) == 8);
+#endif // SCM_ARCHITECTURE_TYPE == SCM_ARCHITECTURE_32
+
+BOOST_STATIC_ASSERT(sizeof(scm::float32) == 4);
+BOOST_STATIC_ASSERT(sizeof(scm::float64) == 8);
 
 namespace scm {
 
