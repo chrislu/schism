@@ -31,6 +31,10 @@ typedef boost::uintmax_t    uintmax;
 
 typedef std::size_t         size_t;
 
+// floating point types
+typedef float               float32;
+typedef double              float64;
+
 } // namespace scm
 
 
