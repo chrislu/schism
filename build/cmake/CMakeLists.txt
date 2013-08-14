@@ -5,7 +5,7 @@
 # set project name
 project(schism)
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8)
 
 # tell cmake where to look for our scripts
 set(CMAKE_MODULE_PATH ${schism_SOURCE_DIR}/custom_scripts ${CMAKE_MODULE_PATH})
