@@ -4,7 +4,6 @@
 
 include(schism_platform)
 
-option(SCHISM_CUDA_BUILD_DEBUG                     "Build debug"                            OFF)
 option(SCHISM_CUDA_BUILD_VERBOSE                   "Verbose Output"                         OFF)
 option(SCHISM_CUDA_BUILD_COMPUTE20                 "Enable Compute 2.0"                     ON)
 option(SCHISM_CUDA_BUILD_COMPUTE30                 "Enable Compute 3.0"                     OFF)
@@ -48,11 +47,8 @@ string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVC
 set(SCM_CUDA_NVCC_DEFINITIONS           "")
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES   "")
 
-if (SCHISM_CUDA_BUILD_DEBUG)
-    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
-else (SCHISM_CUDA_BUILD_DEBUG)
-    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --optimize 3 -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
-endif (SCHISM_CUDA_BUILD_DEBUG)
+set(SCM_CUDA_NVCC_OPTIONS_DEBUG   -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS}                CACHE STRING "schism cuda internal" FORCE)
+set(SCM_CUDA_NVCC_OPTIONS_RELEASE --optimize 3 -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
 
 if (SCHISM_CUDA_BUILD_VERBOSE)
   set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --ptxas-options=-v CACHE STRING "schism cuda internal" FORCE)
@@ -137,10 +133,15 @@ macro(scm_cuda_add_nvcc_prepass SCM_CUDA_OUTPUT_FILES)
 
             set(output_file_list ${output_file_list} ${CUDA_NVCC_OUTPUT_FILE})
 
+            #message("$<CONFIGURATION>")
+set(SCM_STRING_A "something")
+set(SCM_STRING_B "something something dark side")            
             # add the actual nvcc command to generate the .obj/.o file
             add_custom_command(OUTPUT   ${CUDA_NVCC_OUTPUT_FILE}
                                COMMAND  ${SCM_CUDA_NVCC_COMMAND}
-                                   ARGS ${SCM_CUDA_NVCC_OPTIONS}
+                                   ARGS "$<$<CONFIG:Release>:${SCM_CUDA_NVCC_OPTIONS_RELEASE}>"
+                                        "$<$<CONFIG:Debug>:${SCM_CUDA_NVCC_OPTIONS_DEBUG}>"
+                                        ${SCM_CUDA_NVCC_OPTIONS} 
                                         ${SCM_CUDA_NVCC_INC_DIR_STRING}
                                         ${SCM_CUDA_NVCC_DEF_STRING}
                                         -o \"${CUDA_NVCC_OUTPUT_FILE}\"
