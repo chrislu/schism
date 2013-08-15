@@ -99,6 +99,7 @@ application_window::application_window(const math::vec2ui&                    vp
   , _show_raw(false)
   , _cuda_render_mode(cuda::RENDER_SS_RAYS_SEQUENTIALLY_00)
   , _cuda_sample_count(4)
+  , _use_sample_shading(false)
   , _use_volume_supersampling(false)
   , _use_opencl_renderer(false)
   , _volume_data_dialog(0)
@@ -297,7 +298,7 @@ application_window::display_scene(const gl::render_context_ptr& context)
 
             context->set_viewport(viewport(o, s));
 
-#if 0
+#if 1
             mat4f mv_matrix = view_matrix * _volume_data->transform();
             _volume_highlight->draw(context, _volume_data->bbox_geometry(),
                                             proj_matrix, mv_matrix,
@@ -310,7 +311,7 @@ application_window::display_scene(const gl::render_context_ptr& context)
             else {
                 _volume_renderer->draw(context, _volume_data,
                                        _show_raw ? volume_renderer::volume_raw : volume_renderer::volume_color_map,
-                                       _use_volume_supersampling);
+                                       _use_sample_shading, _use_volume_supersampling);
             }
         }
     }
@@ -367,9 +368,10 @@ application_window::keyboard_input(int k, bool state, scm::uint32 mod)
             case Qt::Key_Escape:    close_program();break;
             case Qt::Key_Space:     _show_raw = !_show_raw;break;
             case Qt::Key_C:         _use_opencl_renderer = !_use_opencl_renderer; break;
-            case Qt::Key_S:         _volume_renderer->reload_shaders(_viewer->device());
+            case Qt::Key_S:         _volume_renderer->reload_shaders(_viewer->device());break;
                                     //_volume_renderer_cuda->reload_kernels(_viewer->device());
-            case Qt::Key_Q:         _use_volume_supersampling = !_use_volume_supersampling;
+            case Qt::Key_Q:         _use_volume_supersampling = !_use_volume_supersampling;break;
+            case Qt::Key_W:         _use_sample_shading = !_use_sample_shading;break;
             case Qt::Key_1:         _volume_data->selected_lod(_volume_data->selected_lod() - 0.25f);break;
             case Qt::Key_2:         _volume_data->selected_lod(_volume_data->selected_lod() + 0.25f);break;
 

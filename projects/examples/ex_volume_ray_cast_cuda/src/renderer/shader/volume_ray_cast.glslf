@@ -260,6 +260,13 @@ void main()
         }
     }
     out_color = ocol / float(ss_count);
+
+    // check if we really have subpixel values for sample shading
+    //if (fract(gl_FragCoord.x) > 0.5) {
+    //    out_color = vec4(red, 1.0);
+    //}
+
+
 #else
 
     vec3 ray_increment      = normalize(vertex_in.ray_entry_os - volume_data.os_camera_position.xyz) * volume_data.sampling_distance.x;

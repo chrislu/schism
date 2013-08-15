@@ -30,6 +30,7 @@ public:
     void                            draw(const gl::render_context_ptr& context,
                                          const volume_data_ptr&        vdata,
                                          const vr_mode                 mode,
+                                         bool                          use_sample_shading,
                                          bool                          use_supersampling) const;
     void                            update(const gl::render_context_ptr& context,
                                            const gl::camera&             cam);
@@ -44,6 +45,7 @@ protected:
     gl::depth_stencil_state_ptr     _dstate;
     gl::blend_state_ptr             _bstate;
     gl::rasterizer_state_ptr        _rstate;
+    gl::rasterizer_state_ptr        _rstate_sample_shading;
     gl::sampler_state_ptr           _sstate_lin;
     gl::sampler_state_ptr           _sstate_lin_mip;
 

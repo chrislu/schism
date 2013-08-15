@@ -44,7 +44,10 @@ volume_renderer::volume_renderer(const gl::render_device_ptr& device, const math
     _bstate = device->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
     //_bstate = device->create_blend_state(true, FUNC_SRC_ALPHA, FUNC_ONE_MINUS_SRC_ALPHA, FUNC_ONE, FUNC_ZERO);
     _dstate = device->create_depth_stencil_state(true, true, COMPARISON_LESS);
+
     _rstate = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true);
+    _rstate_sample_shading = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true, true, 1.0f);
+    
     _sstate_lin = device->create_sampler_state(FILTER_MIN_MAG_LINEAR, WRAP_CLAMP_TO_EDGE);
     _sstate_lin_mip = device->create_sampler_state(FILTER_MIN_MAG_MIP_LINEAR, WRAP_CLAMP_TO_EDGE);
 
@@ -77,6 +80,7 @@ volume_renderer::~volume_renderer()
     _dstate.reset();
     _bstate.reset();
     _rstate.reset();
+    _rstate_sample_shading.reset();
     _sstate_lin.reset();
     _sstate_lin_mip.reset();
 
@@ -87,6 +91,7 @@ void
 volume_renderer::draw(const gl::render_context_ptr& context,
                       const volume_data_ptr&        vdata,
                       const vr_mode                 mode,
+                      bool                          use_sample_shading,
                       bool                          use_supersampling) const
 {
     using namespace scm;
@@ -113,7 +118,7 @@ volume_renderer::draw(const gl::render_context_ptr& context,
 
     context->set_depth_stencil_state(_dstate);
     context->set_blend_state(_bstate);
-    context->set_rasterizer_state(_rstate);
+    context->set_rasterizer_state(use_sample_shading ? _rstate_sample_shading : _rstate);
 
     context->bind_uniform_buffer(_camera_block->block().block_buffer(), 0);
     context->bind_uniform_buffer(vdata->volume_block().block_buffer(),  1);
