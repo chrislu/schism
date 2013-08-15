@@ -34,6 +34,8 @@ struct __scm_export(gl_core) rasterizer_state_desc {
                           cull_mode                 in_cmode = CULL_BACK,
                           polygon_orientation       in_fface = ORIENT_CCW,
                           bool                      in_msample = false,
+                          bool                      in_sshading = false,
+                          float32                   in_min_sshading = 0.0f,
                           bool                      in_sctest = false,
                           bool                      in_smlines = false,
                           const point_raster_state& in_point_state = point_raster_state());
@@ -44,6 +46,9 @@ struct __scm_export(gl_core) rasterizer_state_desc {
     polygon_orientation     _front_face;
 
     bool                    _multi_sample;
+    bool                    _sample_shading;
+    float32                 _min_sample_shading;
+
     bool                    _scissor_test;
     bool                    _smooth_lines;
 

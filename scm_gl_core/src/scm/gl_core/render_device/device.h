@@ -321,7 +321,8 @@ public:
 
     rasterizer_state_ptr            create_rasterizer_state(const rasterizer_state_desc& in_desc);
     rasterizer_state_ptr            create_rasterizer_state(fill_mode in_fmode, cull_mode in_cmode = CULL_BACK, polygon_orientation in_fface = ORIENT_CCW,
-                                                            bool in_msample = false, bool in_sctest = false, bool in_smlines = false,
+                                                            bool in_msample = false, bool in_sshading = false, float32 in_min_sshading = 0.0f,
+                                                            bool in_sctest = false, bool in_smlines = false,
                                                             const point_raster_state& in_point_state = point_raster_state());
 
     blend_state_ptr                 create_blend_state(const blend_state_desc& in_desc);

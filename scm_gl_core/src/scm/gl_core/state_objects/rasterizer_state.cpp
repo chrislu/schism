@@ -50,6 +50,8 @@ rasterizer_state_desc::rasterizer_state_desc(
     cull_mode                 in_cmode,
     polygon_orientation       in_fface,
     bool                      in_msample,
+    bool                      in_sshading,
+    float32                   in_min_sshading,
     bool                      in_sctest,
     bool                      in_smlines,
     const point_raster_state& in_point_state)
@@ -57,6 +59,8 @@ rasterizer_state_desc::rasterizer_state_desc(
   , _cull_mode(in_cmode)
   , _front_face(in_fface)
   , _multi_sample(in_msample)
+  , _sample_shading(in_sshading)
+  , _min_sample_shading(in_min_sshading)
   , _scissor_test(in_sctest)
   , _smooth_lines(in_smlines)
   , _point_state(in_point_state)
@@ -117,6 +121,22 @@ rasterizer_state::apply(const render_context&   in_context,
         }
         gl_assert(glapi, rasterizer_state::apply() after GL_MULTISAMPLE);
     }
+
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        if (   _descriptor._multi_sample
+            && _descriptor._sample_shading)
+        {
+            glapi.glEnable(GL_SAMPLE_SHADING);
+        }
+        else {
+            glapi.glDisable(GL_SAMPLE_SHADING);
+        }
+        gl_assert(glapi, rasterizer_state::apply() after GL_SAMPLE_SHADING);
+
+        glapi.glMinSampleShading(math::clamp(_descriptor._min_sample_shading, 0.0f, 1.0f));
+        gl_assert(glapi, rasterizer_state::apply() after glMinSampleShading);
+    }
+
     if (_descriptor._scissor_test != in_applied_state._descriptor._scissor_test) {
         if (_descriptor._scissor_test) {
             glapi.glEnable(GL_SCISSOR_TEST);
@@ -187,6 +207,22 @@ rasterizer_state::force_apply(const render_context&   in_context,
         glapi.glDisable(GL_MULTISAMPLE);
     }
     gl_assert(glapi, rasterizer_state::force_apply() after GL_MULTISAMPLE);
+
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400) {
+        if (   _descriptor._multi_sample
+            && _descriptor._sample_shading)
+        {
+            glapi.glEnable(GL_SAMPLE_SHADING);
+        }
+        else {
+            glapi.glDisable(GL_SAMPLE_SHADING);
+        }
+        gl_assert(glapi, rasterizer_state::force_apply() after GL_SAMPLE_SHADING);
+
+        glapi.glMinSampleShading(math::clamp(_descriptor._min_sample_shading, 0.0f, 1.0f));
+        gl_assert(glapi, rasterizer_state::force_apply() after glMinSampleShading);
+    }
+
     if (_descriptor._scissor_test) {
         glapi.glEnable(GL_SCISSOR_TEST);
     }
