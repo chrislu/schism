@@ -145,6 +145,9 @@ render_context::render_context(render_device& in_device)
     _current_state._active_atomic_counter_buffers.resize(in_device.capabilities()._max_atomic_counter_buffer_bindings);
     _applied_state._active_atomic_counter_buffers.resize(in_device.capabilities()._max_atomic_counter_buffer_bindings);
 
+    _current_state._active_storage_buffers.resize(in_device.capabilities()._max_shader_storage_block_bindings);
+    _applied_state._active_storage_buffers.resize(in_device.capabilities()._max_shader_storage_block_bindings);
+
     glapi.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glapi.glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -180,6 +183,7 @@ render_context::apply()
     apply_state_objects();
     apply_uniform_buffer_bindings();
     apply_atomic_counter_bindings();
+    apply_storage_buffer_bindings();
     apply_program();
 
     assert(state().ok());
@@ -195,6 +199,7 @@ render_context::reset()
     reset_state_objects();
     reset_uniform_buffers();
     reset_atomic_counter_buffers();
+    reset_storage_buffers();
     reset_program();
 }
 
@@ -634,6 +639,47 @@ render_context::reset_atomic_counter_buffers()
 }
 
 void
+render_context::bind_storage_buffer(const buffer_ptr& in_buffer,
+                                    const unsigned    in_bind_point,
+                                    const scm::size_t in_offset,
+                                    const scm::size_t in_size)
+{
+    if (in_bind_point < _current_state._active_storage_buffers.size()) {
+        _current_state._active_storage_buffers[in_bind_point]._buffer = in_buffer;
+        _current_state._active_storage_buffers[in_bind_point]._offset = in_offset;
+        _current_state._active_storage_buffers[in_bind_point]._size   = in_size;
+    }
+    else {
+        glerr() << log::error
+                << "render_context::bind_storage_buffer() "
+                << "storage buffer binding point out of range "
+                << "(binding point: " << in_bind_point
+                << ", max binding point" << _current_state._active_storage_buffers.size()
+                << ")." << log::end;
+    }
+}
+
+void
+render_context::set_storage_buffers(const buffer_binding_array& in_buffers)
+{
+    _current_state._active_storage_buffers = in_buffers;
+}
+
+const render_context::buffer_binding_array&
+render_context::current_storage_buffers() const
+{
+    return _current_state._active_storage_buffers;
+}
+
+void
+render_context::reset_storage_buffers()
+{
+    std::fill(_current_state._active_storage_buffers.begin(),
+              _current_state._active_storage_buffers.end(),
+              buffer_binding());
+}
+
+void
 render_context::bind_unpack_buffer(const buffer_ptr& in_buffer)
 {
     if (_unpack_buffer != in_buffer) {
@@ -950,6 +996,26 @@ render_context::apply_atomic_counter_bindings()
                 aubb._buffer->unbind_range(*this, BIND_ATOMIC_COUNTER_BUFFER, i);
             }
             aubb = cubb;
+        }
+    }
+}
+
+void
+render_context::apply_storage_buffer_bindings()
+{
+    for (int i = 0; i < _current_state._active_storage_buffers.size(); ++i) {
+        const buffer_binding&   csbb = _current_state._active_storage_buffers[i];
+        buffer_binding&         asbb = _applied_state._active_storage_buffers[i];
+
+        if (csbb != asbb) {
+            if (csbb._buffer) {
+                csbb._buffer->bind_range(*this, BIND_STORAGE_BUFFER, i, csbb._offset, csbb._size);
+                assert(csbb._buffer->ok());
+            }
+            else {
+                csbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
+            }
+            asbb = csbb;
         }
     }
 }

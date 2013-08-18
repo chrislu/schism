@@ -16,6 +16,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include <scm/core/io/tools.h>
+#include <scm/core/io/iomanip.h>
 #include <scm/core/log/logger_state.h>
 #include <scm/core/utilities/foreach.h>
 
@@ -251,10 +252,10 @@ render_device::init_capabilities()
 
     if (   SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_420
         || glcore.extension_ARB_map_buffer_alignment) {
-        glcore.glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &_capabilities._min_buffer_alignment);
+        glcore.glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &_capabilities._min_map_buffer_alignment);
     }
     else {
-        _capabilities._min_buffer_alignment = 1;
+        _capabilities._min_map_buffer_alignment = 1;
     }
 
     if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_410) {
@@ -268,8 +269,16 @@ render_device::init_capabilities()
         _capabilities._num_program_binary_formats = 0;
     }
 
-
-
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
+        glcore.glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS,     &_capabilities._max_shader_storage_block_bindings);
+        glcore.glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE,          &_capabilities._max_shader_storage_block_size);
+        glcore.glGetInteger64v(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &_capabilities._shader_storage_buffer_offset_alignment);
+    }
+    else {
+        _capabilities._max_shader_storage_block_bindings        = 0;
+        _capabilities._max_shader_storage_block_size            = 0;
+        _capabilities._shader_storage_buffer_offset_alignment   = 1;
+    }
 
     log::logger_format_saver ofs(glout().associated_logger());
     glout() << "render_device::init_capabilities(): OpenGL capabilities"
@@ -295,7 +304,7 @@ render_device::init_capabilities()
 
     glout() << "uniform blocks: " << log::nline
             << log::indent
-            << "MAX_UNIFORM_BLOCK_SIZE                      " << _capabilities._max_uniform_block_size << log::nline
+            << "MAX_UNIFORM_BLOCK_SIZE                      " << io::data_size(_capabilities._max_uniform_block_size) << log::nline
             << "MAX_VERTEX_UNIFORM_BLOCKS                   " << _capabilities._max_vertex_uniform_blocks << log::nline
             << "MAX_GEOMETRY_UNIFORM_BLOCKS                 " << _capabilities._max_geometry_uniform_blocks << log::nline
             << "MAX_FRAGMENT_UNIFORM_BLOCKS                 " << _capabilities._max_fragment_uniform_blocks << log::nline
@@ -330,7 +339,14 @@ render_device::init_capabilities()
 
     glout() << "map buffer alignment: " << log::nline
             << log::indent
-            << "MIN_MAP_BUFFER_ALIGNMENT                    " << _capabilities._min_buffer_alignment
+            << "MIN_MAP_BUFFER_ALIGNMENT                    " << _capabilities._min_map_buffer_alignment
+            << log::outdent;
+
+    glout() << "shader storage buffers: " << log::nline
+            << log::indent
+            << "MAX_SHADER_STORAGE_BUFFER_BINDINGS          " << _capabilities._max_shader_storage_block_bindings << log::nline
+            << "MAX_SHADER_STORAGE_BLOCK_SIZE               " << io::data_size(_capabilities._max_shader_storage_block_size) << log::nline
+            << "SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT      " << _capabilities._shader_storage_buffer_offset_alignment
             << log::outdent;
 
     std::stringstream pbf;

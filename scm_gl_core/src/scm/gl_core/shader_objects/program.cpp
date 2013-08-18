@@ -217,6 +217,18 @@ program::bind_uniforms(render_context& ren_ctx) const
             }
         }
     }
+    { // storage buffers
+        name_storage_buffer_map::const_iterator b = _storage_buffers.begin();
+        name_storage_buffer_map::const_iterator e = _storage_buffers.end();
+        for (; b != e; ++b) {
+            if (b->second._update_required) {
+                glapi.glShaderStorageBlockBinding(_gl_program_obj, b->second._index, b->second._binding);
+                b->second._update_required = false;
+
+                gl_assert(glapi, program::bind_uniforms() after glShaderStorageBlockBinding());
+            }
+        }
+    }
     { // subroutines
         for (int s = 0; s < SHADER_STAGE_COUNT; ++s) {
             name_subroutine_uniform_map::const_iterator b = _subroutine_uniforms[s].begin();
@@ -625,14 +637,54 @@ program::retrieve_uniform_information(render_device& in_device)
                         _subroutines[stge][actual_routine_name] = actual_routine;
                         gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine info);
                     }
-
-
                 }
                 gl_assert(glapi, program::retrieve_uniform_information() after retrieving subroutine uniform info);
             }
         }
     }
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_400
+
+    // shader storage buffers
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
+        int act_sblocks      = 0;
+        int act_sblocks_nlen = 0;
+        scoped_array<char>  temp_name;
+
+        glapi.glGetProgramInterfaceiv(_gl_program_obj, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &act_sblocks);
+        glapi.glGetProgramInterfaceiv(_gl_program_obj, GL_SHADER_STORAGE_BLOCK, GL_MAX_NAME_LENGTH,  &act_sblocks_nlen);
+        gl_assert(glapi, program::retrieve_uniform_information() after retrieving shader storage block infos);
+
+        act_sblocks_nlen = math::max(act_sblocks_nlen, 100);
+
+        temp_name.reset(new char[act_sblocks_nlen + 1]); // reserve for null termination
+
+        for (int i = 0; i < act_sblocks; ++i) {
+            int         sblock_size     = 0;
+            int         sblock_location = -1;
+            int         sblock_idx       = -1;
+            std::string sblock_name;
+
+
+            glapi.glGetProgramResourceName(_gl_program_obj, GL_SHADER_STORAGE_BLOCK, i, act_sblocks_nlen, 0, temp_name.get());
+            sblock_name.assign(temp_name.get());
+
+            sblock_location = glapi.glGetProgramResourceIndex(_gl_program_obj, GL_SHADER_STORAGE_BLOCK, sblock_name.c_str());
+
+            GLenum      sblock_params[2]       = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING };
+            int         sblock_param_values[2] = {-1, -1};
+            glapi.glGetProgramResourceiv(_gl_program_obj, GL_SHADER_STORAGE_BLOCK, i, 2, sblock_params, 2, 0, sblock_param_values);
+            
+            sblock_size = sblock_param_values[0];
+            sblock_idx  = sblock_param_values[1];
+
+            _storage_buffers[sblock_name] = storage_buffer_type(sblock_name,
+                                                                sblock_location,
+                                                                sblock_size,
+                                                                sblock_idx);
+
+            gl_assert(glapi, program::retrieve_uniform_information() after retrieving shader storage block infos);
+        }
+    }
 
     gl_assert(glapi, leaving program::retrieve_uniform_information());
 }
@@ -728,6 +780,26 @@ program::uniform_subroutine(const shader_stage stage, const std::string& name, c
         SCM_GL_DGB("program::uniform_subroutine(): unable to find subroutine ('" << name << "').");
     }
 #endif
+}
+
+void
+program::storage_buffer(const std::string& name, const unsigned binding)
+{
+    name_storage_buffer_map::iterator  u = _storage_buffers.find(name);
+
+    if (u != _storage_buffers.end()) {
+        if (u->second._binding != binding) {
+            u->second._binding = binding;
+            u->second._update_required = true;
+
+            if (u->second._binding != u->second._static_binding) {
+                SCM_GL_DGB("program::storage_buffer(): overriding shader defined binding on storage buffer ('" << name << "').");
+            }
+        }
+    }
+    else {
+        SCM_GL_DGB("program::storage_buffer(): unable to find storage buffer ('" << name << "').");
+    }
 }
 
 

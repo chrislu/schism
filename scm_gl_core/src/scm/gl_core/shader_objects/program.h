@@ -69,12 +69,24 @@ public:
         std::string         _name;
         unsigned            _index;
     };
+    struct storage_buffer_type {
+        storage_buffer_type() : _index(-1), _size(-1), _binding(-1), _update_required(false) {}
+        storage_buffer_type(const std::string& n, int i, scm::size_t s, int b) : _name(n), _index(i), _size(s), _static_binding(b), _binding(-1), _update_required(false) {}
+        std::string     _name;
+        int             _index;
+        scm::size_t     _size;
+        int             _static_binding;
+        int             _binding;
+        mutable bool    _update_required;
+    };
+
 
     typedef boost::unordered_map<std::string, variable_type>            name_variable_map;
     typedef boost::unordered_map<std::string, uniform_ptr>              name_uniform_map;
     typedef boost::unordered_map<std::string, uniform_block_type>       name_uniform_block_map;
     typedef boost::unordered_map<std::string, subroutine_uniform_type>  name_subroutine_uniform_map;
     typedef boost::unordered_map<std::string, subroutine_type>          name_subroutine_map;
+    typedef boost::unordered_map<std::string, storage_buffer_type>      name_storage_buffer_map;
 
 public:
     virtual ~program();
@@ -127,6 +139,8 @@ public:
     void                        uniform_buffer(const std::string& name, const unsigned binding);
     void                        uniform_subroutine(const shader_stage stage, const std::string& name, const std::string& routine);
 
+    void                        storage_buffer(const std::string& name, const unsigned binding);
+
     int                         attribute_location(const std::string& name) const;
 
     bool                        rasterization_discard() const;
@@ -162,6 +176,7 @@ protected:
     name_location_map           _samplers;
     name_subroutine_uniform_map _subroutine_uniforms[SHADER_STAGE_COUNT];
     name_subroutine_map         _subroutines[SHADER_STAGE_COUNT];
+    name_storage_buffer_map     _storage_buffers;
 
     unsigned                    _gl_program_obj;
     std::string                 _info_log;
