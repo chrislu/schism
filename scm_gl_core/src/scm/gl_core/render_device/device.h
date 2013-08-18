@@ -102,10 +102,14 @@ public:
         int             _max_fragment_atomic_counters;
         int             _max_combined_atomic_counters;
         int             _max_atomic_counter_buffer_bindings;
-        int             _min_buffer_alignment;
+        int             _min_map_buffer_alignment;
 
         int             _num_program_binary_formats;
         shared_array<int>   _program_binary_formats;
+
+        int             _max_shader_storage_block_bindings;
+        int             _max_shader_storage_block_size;
+        int64           _shader_storage_buffer_offset_alignment;
     }; // struct device_capabilities
 
 protected:

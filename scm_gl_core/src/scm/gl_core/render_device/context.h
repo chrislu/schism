@@ -104,6 +104,7 @@ private:
         index_buffer_binding                _index_buffer_binding;
         buffer_binding_array                _active_uniform_buffers;
         buffer_binding_array                _active_atomic_counter_buffers;
+        buffer_binding_array                _active_storage_buffers;
         // state objects //////////////////////////////////////////////////////////////////////////
         // depth state
         depth_stencil_state_ptr             _depth_stencil_state;
@@ -199,11 +200,20 @@ public:
     void                        set_atomic_counter_buffers(const buffer_binding_array& in_buffers);
     const buffer_binding_array& current_atomic_counter_buffers() const;
 
+    void                        bind_storage_buffer(const buffer_ptr& in_buffer,
+                                                    const unsigned    in_bind_point,
+                                                    const scm::size_t in_offset = 0,
+                                                    const scm::size_t in_size = 0);
+
+    void                        set_storage_buffers(const buffer_binding_array& in_buffers);
+    const buffer_binding_array& current_storage_buffers() const;
+
     void                        bind_unpack_buffer(const buffer_ptr& in_buffer);
     const buffer_ptr&           current_unpack_buffer() const;
 
     void                        reset_uniform_buffers();
     void                        reset_atomic_counter_buffers();
+    void                        reset_storage_buffers();
 
     void                        bind_vertex_array(const vertex_array_ptr& in_vertex_array);
     const vertex_array_ptr&     current_vertex_array() const;
@@ -233,6 +243,7 @@ protected:
     void                        apply_vertex_input();
     void                        apply_uniform_buffer_bindings();
     void                        apply_atomic_counter_bindings();
+    void                        apply_storage_buffer_bindings();
 
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:

@@ -102,6 +102,27 @@ private:
     const render_context::buffer_binding_array  _save_atomic_counter_buffers;
 }; // class context_atomic_counter_buffer_guard
 
+class context_storage_buffer_guard : boost::noncopyable
+{
+public:
+    context_storage_buffer_guard(const render_context_ptr& in_context)
+        : _guarded_context(in_context)
+        , _save_storage_buffers(in_context->current_storage_buffers())
+    {
+    }
+    ~context_storage_buffer_guard()
+    {
+        restore();
+    }
+    void restore()
+    {
+        _guarded_context->set_storage_buffers(_save_storage_buffers);
+    }
+private:
+    const render_context_ptr&                   _guarded_context;
+    const render_context::buffer_binding_array  _save_storage_buffers;
+}; // class context_storage_buffer_guard
+
 class context_unpack_buffer_guard : boost::noncopyable
 {
 public:
@@ -242,6 +263,7 @@ public:
       , _v_guard(in_context)
       , _u_guard(in_context)
       , _ac_guard(in_context)
+      , _ss_guard(in_context)
       , _up_guard(in_context)
       , _s_guard(in_context)
       , _t_guard(in_context)
@@ -257,6 +279,7 @@ private:
     context_vertex_input_guard          _v_guard;
     context_uniform_buffer_guard        _u_guard;
     context_atomic_counter_buffer_guard _ac_guard;
+    context_storage_buffer_guard        _ss_guard;
     context_unpack_buffer_guard         _up_guard;
     context_state_objects_guard         _s_guard;
     context_texture_units_guard         _t_guard;
