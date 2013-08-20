@@ -4,7 +4,7 @@
 
 include(schism_platform)
 
-option(SCHISM_CUDA_BUILD_DEBUG                     "Build debug"                            OFF)
+#option(SCHISM_CUDA_BUILD_DEBUG                     "Build debug"                            OFF)
 option(SCHISM_CUDA_BUILD_VERBOSE                   "Verbose Output"                         OFF)
 option(SCHISM_CUDA_BUILD_COMPUTE20                 "Enable Compute 2.0"                     ON)
 option(SCHISM_CUDA_BUILD_COMPUTE30                 "Enable Compute 3.0"                     OFF)
@@ -48,11 +48,16 @@ string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVC
 set(SCM_CUDA_NVCC_DEFINITIONS           "")
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES   "")
 
-if (SCHISM_CUDA_BUILD_DEBUG)
-    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
-else (SCHISM_CUDA_BUILD_DEBUG)
-    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --optimize 3 -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
-endif (SCHISM_CUDA_BUILD_DEBUG)
+#if (SCHISM_CUDA_BUILD_DEBUG)
+#    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
+#else (SCHISM_CUDA_BUILD_DEBUG)
+#    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --optimize 3 -Xcompiler ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS} CACHE STRING "schism cuda internal" FORCE)
+#endif (SCHISM_CUDA_BUILD_DEBUG)
+
+set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -Xcompiler                                                                           CACHE STRING "schism cuda internal" FORCE)
+set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} $<$<CONFIG:Debug>:${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG}${SCM_CUDA_NVCC_CXX_FLAGS}>        CACHE STRING "schism cuda internal" FORCE)
+set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} $<$<CONFIG:Release>:${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE}${SCM_CUDA_NVCC_CXX_FLAGS}>    CACHE STRING "schism cuda internal" FORCE)
+set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} $<$<CONFIG:Release>:--optimize> $<$<CONFIG:Release>:3>                               CACHE STRING "schism cuda internal" FORCE)
 
 if (SCHISM_CUDA_BUILD_VERBOSE)
   set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --ptxas-options=-v CACHE STRING "schism cuda internal" FORCE)
