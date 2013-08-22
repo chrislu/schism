@@ -44,6 +44,7 @@ public:
                                                        const gl::camera&             cam);
     void                            draw(const gl::render_context_ptr& context,
                                          const height_field_data_ptr&  hf_data,
+                                               bool                    super_sample = false,
                                          const mesh_mode               hf_mesh_mode = MODE_QUAD_PATCHES,
                                          const draw_mode               hf_draw_mode = MODE_SOLID) const;
 
@@ -58,6 +59,7 @@ protected:
     gl::depth_stencil_state_ptr     _dstate_less;
     gl::rasterizer_state_ptr        _rstate_ms_wire;
     gl::rasterizer_state_ptr        _rstate_ms_solid;
+    gl::rasterizer_state_ptr        _rstate_ms_solid_ss;
     gl::sampler_state_ptr           _sstate_nearest;
     gl::sampler_state_ptr           _sstate_linear;
     gl::sampler_state_ptr           _sstate_linear_mip;

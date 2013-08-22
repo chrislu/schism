@@ -221,8 +221,8 @@ application_window::display(const gl::render_context_ptr& context)
         context->set_depth_stencil_state(_dstate_less);
         context->set_blend_state(_bstate_off);
 
-        context->bind_texture(_texture,       _sstate_linear,  0);
-        context->bind_texture(_texture_alpha, _sstate_nearest, 1);
+        context->bind_texture(_texture,       _sstate_linear, 0);
+        context->bind_texture(_texture_alpha, _sstate_linear, 1);
 
         _model_geometry->draw_raw(context, geometry::MODE_SOLID);
     }

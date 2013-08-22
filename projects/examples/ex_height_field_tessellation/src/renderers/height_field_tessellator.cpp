@@ -42,6 +42,7 @@ height_field_tessellator::height_field_tessellator(const gl::render_device_ptr& 
 
     _rstate_ms_wire      = device->create_rasterizer_state(FILL_WIREFRAME, CULL_NONE, ORIENT_CCW, true);
     _rstate_ms_solid     = device->create_rasterizer_state(FILL_SOLID, CULL_NONE, ORIENT_CCW, true);
+    _rstate_ms_solid_ss  = device->create_rasterizer_state(FILL_SOLID, CULL_NONE, ORIENT_CCW, true, true, 1.0f);
     //_rstate_ms_wire      = device->create_rasterizer_state(FILL_WIREFRAME, CULL_BACK, ORIENT_CCW, true);
     //_rstate_ms_solid     = device->create_rasterizer_state(FILL_SOLID, CULL_BACK, ORIENT_CCW, true);
 
@@ -153,6 +154,7 @@ height_field_tessellator::update_main_camera(const gl::render_context_ptr& conte
 void
 height_field_tessellator::draw(const gl::render_context_ptr& context,
                                const height_field_data_ptr&  hf_data,
+                                     bool                    super_sample,
                                const mesh_mode               hf_mesh_mode,
                                const draw_mode               hf_draw_mode) const
 {
@@ -185,7 +187,7 @@ height_field_tessellator::draw(const gl::render_context_ptr& context,
     //context->set_blend_state(_bstate_omsa);
 
     if (hf_draw_mode == MODE_SOLID) {
-        context->set_rasterizer_state(_rstate_ms_solid);
+        context->set_rasterizer_state(super_sample ? _rstate_ms_solid_ss : _rstate_ms_solid);
     }
     else if (hf_draw_mode == MODE_WIRE_FRAME) {
         context->set_rasterizer_state(_rstate_ms_wire);
