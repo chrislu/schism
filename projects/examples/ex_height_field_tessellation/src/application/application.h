@@ -64,6 +64,8 @@ protected:
     // 
     std::string                     _input_file;
 
+    bool                            _super_sample;
+
     // height field renderer
     hf_ptr_container                _height_fields;
     height_field_tessellator_ptr    _height_field_renderer;

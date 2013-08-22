@@ -60,6 +60,7 @@ application_window::application_window(const std::string&                     in
                                        const gl::wm::surface::format_desc&    win_fmt)
   : gl::gui::viewer_window(vp_size, view_attrib, ctx_attrib, win_fmt)
   , _input_file(input_file)
+  , _super_sample(false)
 {
     if (!init_renderer()) {
         std::stringstream msg;
@@ -203,7 +204,7 @@ application_window::display(const gl::render_context_ptr& context)
         height_field_tessellator::mesh_mode  hf_mesh_mode = _hf_draw_quad_mesh ? height_field_tessellator::MODE_QUAD_PATCHES : height_field_tessellator::MODE_TRIANGLE_PATCHES;
 
         for (size_t h = 0; h < _height_fields.size(); ++h) {
-            _height_field_renderer->draw(context, _height_fields[h], hf_mesh_mode, hf_draw_mode);
+            _height_field_renderer->draw(context, _height_fields[h], _super_sample, hf_mesh_mode, hf_draw_mode);
 
             mat4f mv_matrix = view_matrix * _height_fields[h]->transform();
             _hf_mouse_over_highlight->draw(context, _height_fields[h]->bbox_geometry(),
@@ -242,6 +243,7 @@ application_window::keyboard_input(int k, bool state, scm::uint32 mod)
     if (state) { // only fire on key down
         switch(k) {
             case Qt::Key_Escape:    close_program();break;
+            case Qt::Key_S:         _super_sample = !_super_sample;break;
             case Qt::Key_A:
                 _height_field_renderer->pixel_tolerance(_height_field_renderer->pixel_tolerance() / pixel_tolerance_fact);
                 out() << "pixel_tolerance: " << std::fixed << std::setprecision(2) << _height_field_renderer->pixel_tolerance() << log::end;
