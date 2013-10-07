@@ -13,6 +13,9 @@
 # SCM_CGC_GEOMETRY_PROFILE
 # G80           gp4gp
 
+# SCM_CGC_COMPUTE_PROFILE
+# G104          gp4gp
+
 SET(SCM_CGC_MIN_VERSION_MAJOR 2)
 SET(SCM_CGC_MIN_VERSION_MINOR 0)
 SET(SCM_CGC_MIN_VERSION_BUILD 0)
@@ -77,7 +80,12 @@ macro(scm_add_cgc_glsl_command SCM_CGC_OUTPUT_FILES)
                 MESSAGE(FATAL_ERROR "no fragment profile defined. define SCM_CGC_GEOMETRY_PROFILE (see /build/cmake/schism_glsl.cmake)")
             endif (NOT SCM_CGC_GEOMETRY_PROFILE)
             set(output_file_cgc_profile ${SCM_CGC_GEOMETRY_PROFILE})
-        else (input_file_ext STREQUAL ".glslf")
+        elseif (input_file_ext STREQUAL ".glslc")
+            if (NOT SCM_CGC_COMPUTE_PROFILE)
+                MESSAGE(FATAL_ERROR "no fragment profile defined. define SCM_CGC_COMPUTE_PROFILE (see /build/cmake/schism_glsl.cmake)")
+            endif (NOT SCM_CGC_COMPUTE_PROFILE)
+            set(output_file_cgc_profile ${SCM_CGC_COMPUTE_PROFILE})
+		else (input_file_ext STREQUAL ".glslf")
             message("the found shader file extension (${input_file_ext}) is not supported by this script, so no offline compile support will be generated for this file (${input_file})")
         endif (input_file_ext STREQUAL ".glslf")
 

@@ -1,4 +1,4 @@
-
+﻿
 // Copyright (c) 2012 Christopher Lux <christopherlux@gmail.com>
 // Distributed under the Modified BSD License, see license.txt.
 
@@ -259,6 +259,12 @@ render_context::sync()
 {
     flush();
     opengl_api().glFinish();
+}
+
+void
+render_context::compute(const unsigned num_groups_x​, const unsigned num_groups_y​, const unsigned num_groups_z​) const
+{    
+    opengl_api().glDispatchCompute(num_groups_x​, num_groups_y​, num_groups_z​);
 }
 
 // debug api //////////////////////////////////////////////////////////////////////////////////
