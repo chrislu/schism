@@ -1,0 +1,41 @@
+
+// Copyright (c) 2013 Sebastian Thiele <sebastianthiele@gmail.com>
+// Distributed under the Modified BSD License, see license.txt.
+
+#version 430
+
+// In order to write to a texture, we have to introduce it as image2D.
+    // local_size_x/y/z layout variables define the work group size.
+    // gl_GlobalInvocationID is a uvec3 variable giving the global ID of the thread,
+    // gl_LocalInvocationID is the local index within the work group, and
+    // gl_WorkGroupID is the work group's index
+
+uniform float roll;
+layout(RGBA8) uniform image2D in_texture_RGBA8;
+layout(RGBA8) uniform image2D in_texture_RG16;
+       
+layout (local_size_x = 32, local_size_y = 32) in;
+         
+void main() {
+	
+	ivec2 storePos   = ivec2(gl_GlobalInvocationID.xy);
+
+	float localCoef  = length( vec2( ivec2( gl_LocalInvocationID.xy ) - 8) / 8.0 );
+
+	float globalCoef = sin( float( gl_WorkGroupID.x + gl_WorkGroupID.y ) * 0.1 + roll ) * 0.5;
+
+    vec4 c;
+    
+    if(storePos.x > 256){
+        c = imageLoad( in_texture_RGBA8,  storePos);
+    }
+    else{
+        c = vec4(imageLoad( in_texture_RG16,  storePos).xy, 0.0, 1.0);
+    }
+    //vec4 c = vec4(1.0,0.0,1.0,1.0);
+
+    float coef = 1.0 - globalCoef * localCoef;
+
+	imageStore( in_texture_RGBA8, storePos, vec4(coef * c.x, c.y, c.z, 1.0) );
+
+}
