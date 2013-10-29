@@ -561,8 +561,6 @@ volume_data::update(const gl::render_context_ptr& context,
         _volume_block->_os_camera_position          = mv_matrix_inv.column(3) / mv_matrix_inv.column(3).w;
         _volume_block->_value_range                 = vec4f(min_value(), max_value(), max_value() - min_value(), 1.0f / (max_value() - min_value()));
 
-        //std::cout << "In Update - Value Range v: " << _volume_block->_value_range << std::endl;
-
         _volume_block->_m_matrix                     = transform();
         _volume_block->_m_matrix_inverse             = inverse(transform());
         _volume_block->_m_matrix_inverse_transpose   = transpose(_volume_block->_m_matrix_inverse);

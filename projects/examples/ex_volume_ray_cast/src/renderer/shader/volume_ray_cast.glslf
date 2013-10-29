@@ -90,7 +90,7 @@ vec4 raw_lookup(in vec3 spos)
 #else // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     float v = textureLod(volume_raw, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
 #endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
-    //v *= 65535.0;
+    //v *= 65535.0/4096.0;
 
     return vec4((v - volume_data.value_range.x) * volume_data.value_range.w);
 }
@@ -126,7 +126,7 @@ vec4 raw_color_map_lookup(in vec3 spos)
 #endif // SCM_TEST_NV_BINDLESS_TEX_BUFFER == 1
 #else // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
     float v = textureLod(volume_raw, spos * volume_data.scale_obj_to_tex.xyz, volume_lod).r;
-    v = (v - volume_data.value_range.x) * volume_data.value_range.w * 255.0;// + 0.03;
+    v = (v - volume_data.value_range.x) * volume_data.value_range.w;
 
     return texture(color_map, v);
 #endif // SCM_TEXT_NV_BINDLESS_TEXTURES == 1
