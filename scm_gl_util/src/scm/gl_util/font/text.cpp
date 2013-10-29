@@ -264,8 +264,11 @@ text::update()
         using namespace scm::math;
 
 #if GEOM_SHADER_FONT == 1
-        if (0 < _text_string.size())
-        {
+        if (_text_string.empty()) {
+            _indices_count     = 0;
+            _text_bounding_box = math::vec2i(0, 0);
+        }
+        else {
             scoped_buffer_map vb_map(context, _vertex_buffer, 0, _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER);
 
             if (!vb_map) {
@@ -318,8 +321,6 @@ text::update()
                 }
             });
             _text_bounding_box.x  = max(current_lw, _text_bounding_box.x);
-
-            //context->unmap_buffer(_vertex_buffer);
         }
 #else
         vec2i           current_pos = vec2i(0, 0);
