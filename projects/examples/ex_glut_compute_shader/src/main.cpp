@@ -368,7 +368,7 @@ demo_app::initialize()
     _framebuffer->attach_depth_stencil_buffer(_depth_buffer);
 
     _color_buffer_resolved = _device->create_texture_2d(vec2ui(winx, winy), FORMAT_RGBA_8);
-    _color_buffer_resolved_view = _device->create_texture_2d(vec2ui(winx * 0.5f, winy * 0.5f) * 1, FORMAT_RG_16);
+    _color_buffer_resolved_view = _device->create_texture_2d(vec2ui(winx / 2, winy / 2) * 1, FORMAT_RG_16);
         
     const opengl::gl_core& glapi = _device->opengl_api();
     //glapi.glBindTexture(GL_TEXTURE_2D, _color_buffer_resolved_view->object_id());
@@ -500,7 +500,7 @@ demo_app::display()
 
         //const opengl::gl_core& glapi = _device->opengl_api();
         //glapi.glDispatchCompute(winx/32, winy/32, 1);   
-        _context->compute(winx/32, winy/32, 1);
+        _context->dispatch_compute(scm::math::vec3ui(winx/32, winy/32, 1));
 
         //_context->compute(winx/32, winy/32, 1);
         
