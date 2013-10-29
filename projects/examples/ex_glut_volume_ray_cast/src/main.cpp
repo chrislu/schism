@@ -100,7 +100,6 @@ public:
     void keyboard(unsigned char key, int x, int y);
 
 protected:
-    scm::gl::texture_3d_ptr load_volume(scm::gl::render_device& in_device, const std::string& in_file_name) const;
     scm::gl::texture_1d_ptr create_color_map(scm::gl::render_device& in_device,
                                              unsigned in_size,
                                              const scm::data::piecewise_function_1d<float, float>& in_alpha,
@@ -212,73 +211,6 @@ demo_app::~demo_app()
 
     _context.reset();
     _device.reset();
-}
-
-scm::gl::texture_3d_ptr
-demo_app::load_volume(scm::gl::render_device& in_device, const std::string& in_file_name) const
-{
-    using namespace scm;
-    using namespace scm::gl;
-    using namespace scm::math;
-    using namespace boost::filesystem;
-
-    scoped_ptr<gl::volume_reader> vol_reader;
-    path                    file_path(in_file_name);
-    std::string             file_name       = file_path.filename().string();
-    std::string             file_extension  = file_path.extension().string();
-
-    data_format volume_data_format     = FORMAT_NULL;
-
-    boost::algorithm::to_lower(file_extension);
-
-    if (file_extension == ".raw") {
-        vol_reader.reset(new scm::gl::volume_reader_raw(file_path.string(), false));
-    }
-    else if (file_extension == ".vol") {
-        vol_reader.reset(new scm::gl::volume_reader_vgeo(file_path.string(), true));
-    }
-    else {
-        std::cout << "demo_app::load_volume(): unsupported volume file format ('" << file_extension << "')." << std::endl;
-        return (texture_3d_ptr());
-    }
-
-    if (!(*vol_reader)) {
-        std::cout << "demo_app::load_volume(): unable to open file ('" << in_file_name << "')." << std::endl;
-        return (texture_3d_ptr());
-    }
-
-    int    max_volume_dim  = in_device.capabilities()._max_texture_3d_size;
-    vec3ui data_offset = vec3ui(0);
-    vec3ui data_dimensions = vol_reader->dimensions();
-    volume_data_format     = vol_reader->format();
-
-    if (max(max(data_dimensions.x, data_dimensions.y), data_dimensions.z) > static_cast<unsigned>(max_volume_dim)) {
-        std::cout << "demo_app::load_volume(): volume too large to load as single texture ('" << data_dimensions << "')." << std::endl;
-        return (texture_3d_ptr());
-    }
-
-    scm::shared_array<unsigned char>    read_buffer;
-    scm::size_t                         read_buffer_size =   data_dimensions.x * data_dimensions.y * data_dimensions.z
-                                                           * size_of_format(volume_data_format);
-
-    read_buffer.reset(new unsigned char[read_buffer_size]);
-
-    if (!vol_reader->read(data_offset, data_dimensions, read_buffer.get())) {
-        std::cout << "demo_app::load_volume(): unable to read data from file ('" << in_file_name << "')." << std::endl;
-        return (texture_3d_ptr());
-    }
-
-    if (volume_data_format == FORMAT_NULL) {
-        std::cout << "demo_app::load_volume(): unable to determine volume data format ('" << in_file_name << "')." << std::endl;
-        return (texture_3d_ptr());
-    }
-
-    std::vector<void*> in_data;
-    in_data.push_back(read_buffer.get());
-    texture_3d_ptr new_volume_tex =
-        in_device.create_texture_3d(data_dimensions, volume_data_format, 1, volume_data_format, in_data);
-
-    return (new_volume_tex);
 }
 
 scm::gl::texture_1d_ptr
