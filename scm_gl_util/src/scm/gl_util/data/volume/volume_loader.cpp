@@ -46,26 +46,6 @@
 
 namespace scm {
 namespace gl {
-namespace util {
-
-//inline
-//unsigned
-//max_mip_levels(const math::vec2ui& in_tex_size)
-//{
-//    using namespace scm::math;
-//
-//    double max_size   = max(in_tex_size.x, in_tex_size.y);
-//    double log2_msize = math::log(max_size) / math::log(2.0);
-//
-//    return static_cast<unsigned>(floor(log2_msize)) + 1;
-//}
-
-}
-
-namespace {
-
-
-} // namespace
 
 texture_3d_ptr
 volume_loader::load_texture_3d(render_device&       in_device,
@@ -75,7 +55,7 @@ volume_loader::load_texture_3d(render_device&       in_device,
                                 const data_format    in_force_internal_format)
 {
  
-   using namespace scm;
+    using namespace scm;
     using namespace scm::gl;
     using namespace scm::math;
     using namespace boost::filesystem;
@@ -96,12 +76,13 @@ volume_loader::load_texture_3d(render_device&       in_device,
         vol_reader.reset(new scm::gl::volume_reader_vgeo(file_path.string(), true));
     }
     else {
-        std::cout << "demo_app::load_volume(): unsupported volume file format ('" << file_extension << "')." << std::endl;
+        err() << log::error
+              << "volume_loader::load_texture_3d(): unsupported volume file format ('" << file_extension << "')." << log::end;
         return (texture_3d_ptr());
     }
 
     if (!(*vol_reader)) {
-        std::cout << "demo_app::load_volume(): unable to open file ('" << in_image_path << "')." << std::endl;
+        std::cout << "volume_loader::load_texture_3d(): unable to open file ('" << in_image_path << "')." << log::end;
         return (texture_3d_ptr());
     }
 
@@ -111,7 +92,8 @@ volume_loader::load_texture_3d(render_device&       in_device,
     volume_data_format     = vol_reader->format();
 
     if (max(max(data_dimensions.x, data_dimensions.y), data_dimensions.z) > static_cast<unsigned>(max_volume_dim)) {
-        std::cout << "demo_app::load_volume(): volume too large to load as single texture ('" << data_dimensions << "')." << std::endl;
+        err() << log::error
+              << "volume_loader::load_texture_3d(): volume too large to load as single texture ('" << data_dimensions << "')." << log::end;
         return (texture_3d_ptr());
     }
 
@@ -122,12 +104,14 @@ volume_loader::load_texture_3d(render_device&       in_device,
     read_buffer.reset(new unsigned char[read_buffer_size]);
 
     if (!vol_reader->read(data_offset, data_dimensions, read_buffer.get())) {
-        std::cout << "demo_app::load_volume(): unable to read data from file ('" << in_image_path << "')." << std::endl;
+        err() << log::error
+              << "volume_loader::load_texture_3d(): unable to read data from file ('" << in_image_path << "')." << log::end;
         return (texture_3d_ptr());
     }
 
     if (volume_data_format == FORMAT_NULL) {
-        std::cout << "demo_app::load_volume(): unable to determine volume data format ('" << in_image_path << "')." << std::endl;
+        err() << log::error
+              << "volume_loader::load_texture_3d(): unable to determine volume data format ('" << in_image_path << "')." << log::end;
         return (texture_3d_ptr());
     }
 
@@ -137,22 +121,6 @@ volume_loader::load_texture_3d(render_device&       in_device,
         in_device.create_texture_3d(data_dimensions, volume_data_format, 1, volume_data_format, in_data);
 
     return (new_volume_tex);
-}
-
-
-bool
-volume_loader::load_texture_volume(const render_device_ptr& in_device,
-                                   const texture_3d_ptr&    in_texture,
-                                   const std::string&       in_image_path,
-                                   const texture_region&    in_region,
-                                   const unsigned           in_level)
-{
-    using namespace scm::gl;
-    using namespace scm::math;
-
-    
-
-    return (false);
 }
 
 texture_3d_ptr
@@ -200,14 +168,8 @@ volume_loader::load_volume_data(const std::string&  in_image_path)
     }
     out() << "source data dimensions: " << vol_reader->dimensions() << log::end;
 
-#if 0
-    vec3ui data_offset = vec3ui(0u, vol_reader->dimensions().y / 2, vol_reader->dimensions().z / 2);//vol_reader->dimensions() / vec3ui(2, 2, 2);
-    data_dimensions    = vol_reader->dimensions() / vec3ui(1, 20, 10);
-#else
     vec3ui data_offset = vec3ui(0);
     data_dimensions    = vol_reader->dimensions();
-#endif
-    //data_dimensions.x  = 2048;
     data_format        = vol_reader->format();
 
     read_buffer_size =   static_cast<scm::size_t>(data_dimensions.x) * data_dimensions.y * data_dimensions.z

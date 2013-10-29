@@ -33,12 +33,6 @@ public:
                                                 bool                 in_color_mips  = false,
                                                 const data_format    in_force_internal_format = FORMAT_NULL);
 
-    bool                        load_texture_volume(const render_device_ptr& in_device,
-                                                   const texture_3d_ptr&    in_texture,
-                                                   const std::string&       in_volume_path,
-                                                   const texture_region&    in_region,
-                                                   const unsigned           in_level);
-
     texture_3d_ptr              load_volume_data(const std::string&  in_volume_path);
 
 }; // class volume_loader
