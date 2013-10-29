@@ -260,11 +260,85 @@ render_context::sync()
     flush();
     opengl_api().glFinish();
 }
+    void                        dispatch_compute(const math::vec3ui& num_groups);
+    void                        dispatch_compute(const math::vec3ui& num_groups,
+                                                 const math::vec3ui& group_sizes);
 
 void
-render_context::compute(const unsigned num_groups_x​, const unsigned num_groups_y​, const unsigned num_groups_z​) const
+render_context::dispatch_compute(const math::vec3ui& num_groups)
 {    
-    opengl_api().glDispatchCompute(num_groups_x​, num_groups_y​, num_groups_z​);
+    gl_assert(glapi, entering render_context::dispatch_compute());
+
+    const opengl::gl_core& glapi = opengl_api();
+
+    if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
+        if (   num_groups.x != 0
+            && num_groups.y != 0
+            && num_groups.z != 0)
+        {
+            glapi.glDispatchCompute(num_groups.x, num_groups.y, num_groups.z);
+        }
+        else {
+            out() << log::warning
+                  << "render_context::dispatch_compute(): "
+                  << "no compute work dispatched due to zero sized num_groups "
+                  << "(num_groups: " << num_groups << ")." << log::end;
+        }
+    }
+    else {
+        glerr() << log::error
+                << "render_context::dispatch_compute(): "
+                << "the compute shader functionality is only available using scm_gl_core with OpenGL4.3 capabilities enabled on a OpenGL4.3+ context."
+                << log::end;
+    }
+
+    gl_assert(glapi, leaving render_context::dispatch_compute());
+}
+
+void
+render_context::dispatch_compute(const math::vec3ui& num_groups,
+                                 const math::vec3ui& group_sizes)
+{    
+    gl_assert(glapi, entering render_context::dispatch_compute(variable));
+
+    const opengl::gl_core& glapi = opengl_api();
+
+    if (   SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
+        && glapi.extension_ARB_compute_variable_group_size)
+    {
+        if (   num_groups.x  != 0
+            && num_groups.y  != 0
+            && num_groups.z  != 0
+            && group_sizes.x != 0
+            && group_sizes.y != 0
+            && group_sizes.z != 0)
+        {
+            glapi.glDispatchComputeGroupSizeARB(num_groups.x, num_groups.y, num_groups.z,
+                                                group_sizes.x, group_sizes.y, group_sizes.z);
+        }
+        else {
+            out() << log::warning
+                  << "render_context::dispatch_compute(): "
+                  << "no compute work dispatched due to zero sized num_groups or group sizes "
+                  << "(num_groups: " << num_groups << ", group_sizes: " << group_sizes << ")." << log::end;
+        }
+    }
+    else {
+        if (!glapi.extension_ARB_compute_variable_group_size) {
+            glerr() << log::error
+                    << "render_context::dispatch_compute(): "
+                    << "the variable group size compute shader functionality is only available with the ARB_compute_variable_group_size extension on a OpenGL4.3+ context."
+                    << log::end;
+        }
+        if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
+            glerr() << log::error
+                    << "render_context::dispatch_compute(): "
+                    << "the compute shader functionality is only available using scm_gl_core with OpenGL4.3 capabilities enabled on a OpenGL4.3+ context."
+                    << log::end;
+        }
+    }
+
+    gl_assert(glapi, leaving render_context::dispatch_compute(variable));
 }
 
 // debug api //////////////////////////////////////////////////////////////////////////////////

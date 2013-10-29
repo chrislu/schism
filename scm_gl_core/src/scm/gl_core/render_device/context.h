@@ -138,7 +138,10 @@ public:
     void                        flush();
     void                        sync();
 
-    void                        compute(const unsigned num_groups_x​, const unsigned num_groups_y​, const unsigned num_groups_z​) const;
+    // compute api ////////////////////////////////////////////////////////////////////////////////
+    void                        dispatch_compute(const math::vec3ui& num_groups);
+    void                        dispatch_compute(const math::vec3ui& num_groups,
+                                                 const math::vec3ui& group_sizes);
 
     // debug api //////////////////////////////////////////////////////////////////////////////////
 public:
