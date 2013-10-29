@@ -88,8 +88,6 @@ protected:
 
     bool                            _use_sample_shading;
     bool                            _use_volume_supersampling;
-    int                             _cuda_render_mode;
-    int                             _cuda_sample_count;
 
     bool                            _use_opencl_renderer;
 

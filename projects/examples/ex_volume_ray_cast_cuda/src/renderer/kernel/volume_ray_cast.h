@@ -10,23 +10,11 @@
 namespace scm {
 namespace cuda {
 
-enum render_mode {
-    RENDER_SS_RAYS_SEQUENTIALLY_00     = 0x00,
-    RENDER_SS_RAYS_SEQUENTIALLY_01     = 0x01,
-    RENDER_SS_RAYS_PARALLEL_00         = 0x02,
-    RENDER_SS_RAYS_PARALLEL_01         = 0x03,
-
-    RENDER_MODES_COUNT
-};
-
 void
 startup_ray_cast_kernel(unsigned out_image_w, unsigned out_image_h,
                         cudaGraphicsResource_t                   output_image_res,
                         cudaGraphicsResource_t                   volume_image_res,
                         cudaGraphicsResource_t                   cmap_image_res,
-                        int                                      render_mode,
-                        int                                      sample_count,
-                        bool                                     use_supersampling,
                         cudaStream_t                             cuda_stream);
 
 bool

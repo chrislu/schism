@@ -33,10 +33,7 @@ public:
     virtual ~cuda_volume_renderer();
 
     void                            draw(const gl::render_context_ptr& context,
-                                         const cuda_volume_data_ptr&   vdata,
-                                         int                           render_mode,
-                                         int                           sample_count,
-                                         bool                          use_supersampling);
+                                         const cuda_volume_data_ptr&   vdata);
     void                            present(const gl::render_context_ptr& context) const;
 
 protected:

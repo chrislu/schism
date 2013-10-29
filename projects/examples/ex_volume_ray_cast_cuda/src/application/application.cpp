@@ -66,20 +66,6 @@ struct scm_debug_output : public scm::gl::render_context::debug_output
     }
 };
 
-std::string
-render_mode_string(int m)
-{
-    std::string s;
-    switch (m) {
-        case scm::cuda::RENDER_SS_RAYS_SEQUENTIALLY_00: s.assign("SEQUENTIAL_00"); break;
-        case scm::cuda::RENDER_SS_RAYS_SEQUENTIALLY_01: s.assign("SEQUENTIAL_01"); break;
-        case scm::cuda::RENDER_SS_RAYS_PARALLEL_00:     s.assign("PARALLEL_00");   break;
-        case scm::cuda::RENDER_SS_RAYS_PARALLEL_01:     s.assign("PARALLEL_01");   break;
-        default: s.assign("unknown mode");
-    }
-    return s;
-}
-
 } // namespace
 
 namespace scm {
@@ -97,8 +83,6 @@ application_window::application_window(const math::vec2ui&                    vp
   : gl::gui::viewer_window(vp_size, view_attrib, ctx_attrib, win_fmt)
   , _viewport_size(vp_size)
   , _show_raw(false)
-  , _cuda_render_mode(cuda::RENDER_SS_RAYS_SEQUENTIALLY_00)
-  , _cuda_sample_count(4)
   , _use_sample_shading(false)
   , _use_volume_supersampling(false)
   , _use_opencl_renderer(false)
@@ -196,7 +180,7 @@ application_window::init_renderer()
     //std::string vfile = "e:/data/volume/vrgeo/new_zealand/volumes/pari_full_rm_8float_bri_TRIMMED.vol";
     //std::string vfile = "g:/volume/vrgeo/eni_fp_volume/test_data3far.segy";
     //std::string vfile = "e:/data/volume/vrgeo/reflect.vol";
-    std::string vfile = "e:/data/volume/vrgeo/gfaks.vol";
+    std::string vfile = "d:/data/vrgeo/gfaks.vol";
     //std::string vfile = "c:/data/seismic_volume_raw_w751_h321_d326_c1_b8.raw";
     //std::string vfile = "e:/data/volume/vrgeo/wfarm_200_w512_h439_d512_c1_b8.raw";
 
@@ -305,7 +289,7 @@ application_window::display_scene(const gl::render_context_ptr& context)
                                             geometry::MODE_WIRE_FRAME, vec4f(0.0f, 1.0f, 0.3f, 1.0f), 2.0f);
 #endif
             if (_use_opencl_renderer) {
-                _volume_renderer_cuda->draw(context, _volume_data_cuda, _cuda_render_mode, _cuda_sample_count, _use_volume_supersampling);
+                _volume_renderer_cuda->draw(context, _volume_data_cuda);
                 _volume_renderer_cuda->present(context);
             }
             else {
@@ -332,9 +316,7 @@ application_window::display_gui(const gl::render_context_ptr& context)
                    << "CUDA "
                    << (_show_raw ? "Raw Volume " : "Color-Mapped Volume ")
                    << "LOD: " << _volume_data->selected_lod()
-                   << ", size: " << lod_size
-                   << ", mode " << render_mode_string(_cuda_render_mode)
-                   << ", samples " << _cuda_sample_count << std::endl;
+                   << ", size: " << lod_size << std::endl;
             }
             else {
                 os << std::fixed << std::setprecision(3)
@@ -375,12 +357,6 @@ application_window::keyboard_input(int k, bool state, scm::uint32 mod)
             case Qt::Key_1:         _volume_data->selected_lod(_volume_data->selected_lod() - 0.25f);break;
             case Qt::Key_2:         _volume_data->selected_lod(_volume_data->selected_lod() + 0.25f);break;
 
-            case Qt::Key_M:         _cuda_render_mode = (_cuda_render_mode + 1) % cuda::RENDER_MODES_COUNT;break;
-            case Qt::Key_N:         {
-                                    const int pot = math::floor_log2(static_cast<unsigned>(_cuda_sample_count));
-                                    _cuda_sample_count = 1 << ((pot + 1) % 4);
-                                    _cuda_sample_count = _cuda_sample_count == 2 ? 4 : _cuda_sample_count;
-                                    }
                                     break;
             default:;
         }
