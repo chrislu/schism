@@ -149,6 +149,12 @@ volume_reader_raw::volume_reader_raw(const std::string& file_path,
                          + _data_start_offset;
     if (_file->size() != expect_fs) {
         _file.reset();
+
+        std::cout  << "volume_reader_raw::volume_reader_raw(): "
+                << "file size does not match data dimensions and data format"
+                << " (file_size: " << _file->size()
+                << ", expected size: " << expect_fs << ")." << scm::log::end;
+
         glerr() << scm::log::error
                 << "volume_reader_raw::volume_reader_raw(): "
                 << "file size does not match data dimensions and data format"

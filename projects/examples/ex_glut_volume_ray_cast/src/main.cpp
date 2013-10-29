@@ -32,6 +32,8 @@
 #include <scm/gl_core/buffer_objects/uniform_buffer_adaptor.h>
 
 #include <scm/gl_util/data/imaging/texture_loader.h>
+#include <scm/gl_util/data/volume/volume_loader.h>
+
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 #include <scm/gl_util/primitives/box.h>
 #include <scm/gl_util/primitives/quad.h>
@@ -395,8 +397,13 @@ demo_app::initialize()
     _filter_linear  = _device->create_sampler_state(FILTER_MIN_MAG_LINEAR, WRAP_CLAMP_TO_EDGE);
     _filter_nearest = _device->create_sampler_state(FILTER_MIN_MAG_NEAREST, WRAP_CLAMP_TO_EDGE);
 
+    volume_loader loader;
+    
+    _volume_texture = loader.load_texture_3d(*_device, "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw", false);
+
+
     //_volume_texture = load_volume(*_device, "f:/data/src/Lux_Christopher_20999_4_1_mm_WT_w512_h512_d202_c1_b16.raw");
-    _volume_texture = load_volume(*_device, "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw");
+    //_volume_texture = load_volume(*_device, "../../../res/volume/Engine_w256_h256_d256_c1_b8.raw");
     //_volume_texture = load_volume(*_device, "e:/data/volume/vrgeo/new_zealand/pari_full_rm_8float_bri_TRIMMED.vol");
     //_volume_texture = load_volume(*_device, "d:/data/src/Engine_w256_h256_d256_c1_b8.raw");
     //_volume_texture = load_volume(*_device, "f:/data/src/wfarm_w512_h439_d512_c1_b8.raw");
@@ -807,7 +814,7 @@ int main(int argc, char **argv)
 
     // the stuff that has to be done
     glutInit(&argc, argv);
-    glutInitContextVersion(4, 2);
+    glutInitContextVersion(4, 3);
     glutInitContextProfile(GLUT_CORE_PROFILE);
     //glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 

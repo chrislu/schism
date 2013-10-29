@@ -264,7 +264,7 @@ text::update()
         using namespace scm::math;
 
 #if GEOM_SHADER_FONT == 1
-        //if (0 < _text_string.size())
+        if (0 < _text_string.size())
         {
             scoped_buffer_map vb_map(context, _vertex_buffer, 0, _text_string.size() * sizeof(vertex), ACCESS_WRITE_INVALIDATE_BUFFER);
 
