@@ -286,7 +286,7 @@ core::parse_command_line(int argc, char **argv)
                    << "core::parse_command_line(): error parsing command line (" << e.what() << ")" << log::end;
         // print out usage
         scm::err() << log::fatal
-                   << "usage: " << log::end
+                   << "usage: " << log::nline
                    << _command_line_options;
 
         continue_after_parse = false;
@@ -297,7 +297,7 @@ core::parse_command_line(int argc, char **argv)
         using std::string;
 
         if (_command_line.count("help")) {
-            cout << "usage: " << log::end;
+            cout << "usage: " << std::endl;
             cout << _command_line_options;
 
             continue_after_parse = false;
