@@ -25,6 +25,7 @@
 
 #include <scm/core/math/vec_stream_io.h>
 #include <scm/core/math/mat_stream_io.h>
+#include <scm/core/math/quat_stream_io.h>
 
 namespace scm {
 namespace math {
