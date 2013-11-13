@@ -58,6 +58,7 @@ public:
 template<typename scal_type> const quat<scal_type>              operator*(const quat<scal_type>& lhs, const quat<scal_type>& rhs);
 template<typename scal_l, typename scal_r> const quat<scal_l>   operator*(const quat<scal_l>& lhs, const quat<scal_r>& rhs);
 template<typename scal_type> const vec<scal_type, 3>            operator*(const quat<scal_type>& lhs, const vec<scal_type, 3>& rhs);
+template<typename scal_type> bool                               operator==(const quat<scal_type>& lhs, const quat<scal_type>& rhs);
 
 template<typename scal_type> const quat<scal_type>      normalize(const quat<scal_type>& lhs);
 template<typename scal_type> const quat<scal_type>      conjugate(const quat<scal_type>& lhs);
