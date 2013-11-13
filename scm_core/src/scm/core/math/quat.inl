@@ -378,6 +378,17 @@ operator*(const quat<scal_type>& lhs, const vec<scal_type, 3>& rhs)
     return vec<scal_type, 3>(res.x, res.y, res.z);
 }
 
+template<typename scal_type>
+inline
+bool                               
+operator==(const quat<scal_type>& lhs, const quat<scal_type>& rhs)
+{
+  return lhs.w == rhs.w &&
+         lhs.i == rhs.i &&
+         lhs.j == rhs.j &&
+         lhs.i == rhs.k;
+}
+
 // library functions //////////////////////////////////////////////////////////////////////////////
 template<typename scal_type>
 inline 
