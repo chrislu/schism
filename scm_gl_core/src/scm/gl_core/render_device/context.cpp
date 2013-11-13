@@ -266,10 +266,10 @@ render_context::sync()
 
 void
 render_context::dispatch_compute(const math::vec3ui& num_groups)
-{   
+{    
     const opengl::gl_core& glapi = opengl_api();
 
-	gl_assert(glapi, entering render_context::dispatch_compute());
+    gl_assert(glapi, entering render_context::dispatch_compute());
 
     if (SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
         if (   num_groups.x != 0
@@ -298,10 +298,10 @@ render_context::dispatch_compute(const math::vec3ui& num_groups)
 void
 render_context::dispatch_compute(const math::vec3ui& num_groups,
                                  const math::vec3ui& group_sizes)
-{   
+{    
     const opengl::gl_core& glapi = opengl_api();
 
-	gl_assert(glapi, entering render_context::dispatch_compute(variable));
+    gl_assert(glapi, entering render_context::dispatch_compute(variable));
 
     if (   SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_430
         && glapi.extension_ARB_compute_variable_group_size)
