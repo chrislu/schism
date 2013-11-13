@@ -33,7 +33,10 @@ public:
                                                 bool                 in_color_mips  = false,
                                                 const data_format    in_force_internal_format = FORMAT_NULL);
 
-    texture_3d_ptr              load_volume_data(const std::string&  in_volume_path);
+	texture_3d_ptr              load_volume_data(render_device&       in_device,
+											     const std::string&  in_volume_path);
+
+	scm::math::vec3ui			read_dimensions(const std::string&  in_volume_path);
 
 }; // class volume_loader
 

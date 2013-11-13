@@ -124,7 +124,8 @@ volume_loader::load_texture_3d(render_device&       in_device,
 }
 
 texture_3d_ptr
-volume_loader::load_volume_data(const std::string&  in_image_path)
+volume_loader::load_volume_data(render_device&      in_device,
+								const std::string&  in_image_path)
 {
     using namespace scm::gl;
     using namespace scm::math;
@@ -251,7 +252,7 @@ volume_loader::load_volume_data(const std::string&  in_image_path)
           << ", size : " << std::fixed << std::setprecision(3) << static_cast<double>(read_buffer_size) / (1024.0*1024.0) << "MiB)..."
           << log::end;
     timer.start();
-    texture_3d_ptr new_volume_tex;// = in_device->create_texture_3d(data_dimensions, data_format, mip_count, data_format, mip_init_data);
+    texture_3d_ptr new_volume_tex = in_device.create_texture_3d(data_dimensions, data_format, mip_count, data_format, mip_init_data);
     timer.stop();
     out() << "allocating texture storage done."
           << " (elapsed time: " << std::fixed << std::setprecision(3)
@@ -262,6 +263,57 @@ volume_loader::load_volume_data(const std::string&  in_image_path)
     out() << log::outdent;
 
     return new_volume_tex;
+}
+
+scm::math::vec3ui
+volume_loader::read_dimensions(const std::string&  in_image_path)
+{
+	using namespace scm::gl;
+	using namespace scm::math;
+	using namespace boost::filesystem;
+
+	path                    file_path(in_image_path);
+	std::string             file_name = file_path.filename().string();
+	std::string             file_extension = file_path.extension().string();
+
+	boost::algorithm::to_lower(file_extension);
+
+	vec3ui      data_dimensions = vec3ui(0u);
+	data_format data_format = FORMAT_NULL;
+	scm::shared_array<unsigned char> read_buffer;
+	scm::size_t                      read_buffer_size = 0;
+
+	scoped_ptr<gl::volume_reader> vol_reader;
+
+	out() << log::indent;
+	time::high_res_timer timer;
+
+	if (file_extension == ".raw") {
+		vol_reader.reset(new volume_reader_raw(file_path.string(), false));
+	}
+	else if (file_extension == ".vol") {
+		vol_reader.reset(new volume_reader_vgeo(file_path.string(), true));
+	}
+	else if (file_extension == ".segy" || file_extension == ".sgy") {
+		vol_reader.reset(new volume_reader_segy(file_path.string(), true));
+	}
+	else {
+		err() << log::error
+			<< "volume_data::load_volume(): unable to open file ('" << in_image_path << "')." << log::end;
+		return scm::math::vec3ui::zero();
+	}
+
+	if (!(*vol_reader)) {
+		err() << log::error
+			<< "volume_data::load_volume(): unable to open file ('" << in_image_path << "')." << log::end;
+		return scm::math::vec3ui::zero();
+	}
+	//out() << "source data dimensions: " << vol_reader->dimensions() << log::end;
+
+	data_dimensions = vol_reader->dimensions();
+	data_format = vol_reader->format();
+
+	return data_dimensions;
 }
 
 } // namespace gl
