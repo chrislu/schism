@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cstring>
 
 #include <scm/gl_core/buffer_objects.h>
 #include <scm/gl_core/render_device.h>
