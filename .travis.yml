@@ -27,13 +27,10 @@ before_install:
   - sudo ln -s /usr/local/cuda-6.0 /opt/cuda/current/cuda
 
   # build schism
-  - mkdir externals
-  - cd externals/
-  - git clone https://github.com/bernstein/schism.git schism
-  - cd schism/build && mkdir build && cd build
+  - cd build && mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=Release -DSCHISM_BUILD_STATIC=OFF -DSCM_BOOST_INC_DIR=/usr/include -DSCM_BOOST_LIB_DIR=${BOOST_LIB_DIR} ../cmake
   - make -j2
-  - cd ../../../..
+  # - cd ../../../..
 
 install: true
 
