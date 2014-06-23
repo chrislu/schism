@@ -1,5 +1,5 @@
 env:
-  - BOOST_LIB_DIR=/usr/lib/x86_64-linux-gnu BOOST_LIBRARIES="/usr/lib/x86_64-linux-gnu/libboost_regex.so;/usr/lib/x86_64-linux-gnu/libboost_wave.so;/usr/lib/x86_64-linux-gnu/libboost_random.so;/usr/lib/x86_64-linux-gnu/libboost_program_options.so;/usr/lib/x86_64-linux-gnu/libboost_thread.so;/usr/lib/x86_64-linux-gnu/libboost_signals.so;/usr/lib/x86_64-linux-gnu/libboost_locale.so;/usr/lib/x86_64-linux-gnu/libboost_filesystem.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_math_tr1.so;/usr/lib/x86_64-linux-gnu/libboost_math_tr1l.so;/usr/lib/x86_64-linux-gnu/libboost_math_c99f.so;/usr/lib/x86_64-linux-gnu/libboost_chrono.so;/usr/lib/x86_64-linux-gnu/libboost_wserialization.so;/usr/lib/x86_64-linux-gnu/libboost_iostreams.so;/usr/lib/x86_64-linux-gnu/libboost_math_tr1f.so;/usr/lib/x86_64-linux-gnu/libboost_math_c99l.so;/usr/lib/x86_64-linux-gnu/libboost_math_c99.so;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_timer.so;/usr/lib/x86_64-linux-gnu/libboost_prg_exec_monitor.so"
+  - BOOST_LIB_DIR=/usr/lib/x86_64-linux-gnu
 
 language: cpp
 compiler: gcc
@@ -11,7 +11,7 @@ before_install:
   - sudo add-apt-repository --yes ppa:kalakris/cmake
   - sudo add-apt-repository --yes ppa:boost-latest/ppa
   - sudo apt-get update -qq
-  - sudo apt-get install -qq g++-4.8 cmake libboost1.55-all-dev libunittest++-dev cmake opencl-headers libfreeimage-dev libjsoncpp-dev libglew1.6-dev libassimp-dev
+  - sudo apt-get install -qq g++-4.8 cmake libboost1.55-all-dev libunittest++-dev cmake opencl-headers libfreeimage-dev libglew1.6-dev
   - sudo apt-get install --force-yes
 
   # use g++-4.8
@@ -24,18 +24,13 @@ before_install:
   - sudo mkdir -p /opt/cuda/current
   - sudo ln -s /usr/local/cuda-6.0 /opt/cuda/current/cuda
 
-  # build schism
-  #- cd build && mkdir build && cd build
-  #- cmake -DCMAKE_BUILD_TYPE=Release -DSCHISM_BUILD_STATIC=OFF -DSCM_BOOST_INC_DIR=/usr/include -DSCM_BOOST_LIB_DIR=${BOOST_LIB_DIR} ../cmake
-  # - make -j2
-  # - cd ../..
-
 install: true
 
-script: # ./tests/runTravis.sh
-  # build schism
+before_script:
   - cd build && mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=Release -DSCHISM_BUILD_STATIC=OFF -DSCM_BOOST_INC_DIR=/usr/include -DSCM_BOOST_LIB_DIR=${BOOST_LIB_DIR} ../cmake
+
+script: # ./tests/runTravis.sh
   - make -j2
 
 branches:
