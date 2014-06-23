@@ -10,8 +10,6 @@
 
 #include <scm/cl_core/opencl/opencl_fwd.h>
 
-#include <CL/cl_fwd.hpp>
-
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
 
