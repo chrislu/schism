@@ -368,6 +368,14 @@ enum sync_wait_result {
     SYNC_WAIT_RESULT_COUNT
 }; // enum sync_wait_result
 
+enum occlusion_query_mode {
+    SAMPLES_PASSED = 0x00,
+    ANY_SAMPLES_PASSED,
+    ANY_SAMPLES_PASSED_CONSERVATIVE,
+
+    OCCLUSION_QUERY_MODE_COUNT
+}; // occlusion_query_mode
+
 const scm::uint64 sync_timeout_ignored = 0xffffffffffffffffull;
 
 } // namespace gl
