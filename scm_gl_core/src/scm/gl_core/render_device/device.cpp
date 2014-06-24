@@ -1343,6 +1343,22 @@ render_device::create_transform_feedback_statistics_query(int stream)
     }
 }
 
+occlusion_query_ptr
+render_device::create_occlusion_query(const occlusion_query_mode in_oq_mode)
+{
+    occlusion_query_ptr new_oq(new occlusion_query(*this, in_oq_mode));
+    if (new_oq->fail()) {
+        if (new_oq->bad()) {
+            glerr() << log::error << "render_device::create_occlusion_query(): unable to create occlusion query object("
+                    << new_oq->state().state_string() << ")." << log::end;
+        }
+        return occlusion_query_ptr();
+    }
+    else {
+        return new_oq;
+    }
+}
+
 // debug //////////////////////////////////////////////////////////////////////////////////////////
 void
 render_device::dump_memory_info(std::ostream& os) const
