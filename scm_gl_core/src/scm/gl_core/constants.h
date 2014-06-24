@@ -369,9 +369,9 @@ enum sync_wait_result {
 }; // enum sync_wait_result
 
 enum occlusion_query_mode {
-    SAMPLES_PASSED = 0x00,
-    ANY_SAMPLES_PASSED,
-    ANY_SAMPLES_PASSED_CONSERVATIVE,
+    OQMODE_SAMPLES_PASSED = 0x00,
+    OQMODE_ANY_SAMPLES_PASSED,
+    OQMODE_ANY_SAMPLES_PASSED_CONSERVATIVE,
 
     OCCLUSION_QUERY_MODE_COUNT
 }; // occlusion_query_mode

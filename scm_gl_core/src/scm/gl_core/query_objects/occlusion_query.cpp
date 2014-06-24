@@ -20,11 +20,11 @@ occlusion_query::occlusion_query(render_device& in_device, const occlusion_query
     _result(0)
 {
     switch(in_oq_mode) {
-        case SAMPLES_PASSED: {
+        case OQMODE_SAMPLES_PASSED: {
                     _gl_query_type = GL_SAMPLES_PASSED;
                     break;
         }
-        case ANY_SAMPLES_PASSED: {
+        case OQMODE_ANY_SAMPLES_PASSED: {
             if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_330) {
                 // < GL3.3
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
@@ -34,7 +34,7 @@ occlusion_query::occlusion_query(render_device& in_device, const occlusion_query
             _gl_query_type = GL_ANY_SAMPLES_PASSED;
             break;
         }
-        case ANY_SAMPLES_PASSED_CONSERVATIVE: {
+        case OQMODE_ANY_SAMPLES_PASSED_CONSERVATIVE: {
             if (SCM_GL_CORE_OPENGL_CORE_VERSION < SCM_GL_CORE_OPENGL_CORE_VERSION_430) {
                 // < GL4.3
                 state().set(object_state::OS_ERROR_INVALID_VALUE);
