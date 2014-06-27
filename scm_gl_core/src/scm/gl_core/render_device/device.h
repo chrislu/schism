@@ -340,6 +340,7 @@ public:
     // query api //////////////////////////////////////////////////////////////////////////////////
 public:
     timer_query_ptr                 create_timer_query();
+    occlusion_query_ptr             create_occlusion_query(const occlusion_query_mode in_oq_mode);
     transform_feedback_statistics_query_ptr create_transform_feedback_statistics_query(int stream = 0);
 
     // debug //////////////////////////////////////////////////////////////////////////////////////
