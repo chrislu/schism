@@ -934,6 +934,8 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
 
     glapi.glDrawArrays(util::gl_primitive_topology(in_topology), in_first_index, in_count);
 
+    post_draw_setup();
+
     gl_assert(glapi, leaving render_context::draw_arrays());
 }
 
