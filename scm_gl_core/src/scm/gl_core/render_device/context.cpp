@@ -969,6 +969,33 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
     gl_assert(glapi, leaving render_context::draw_elements());
 }
 
+bool
+render_context::make_resident(const buffer_ptr& in_buffer,
+                              const access_mode in_access)
+{
+    if (!opengl_api().extension_NV_shader_buffer_load) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_shader_buffer_load extension."
+                << log::end;
+        return false;
+    }
+    return in_buffer->make_resident(*this, in_access);
+}
+
+bool
+render_context::make_non_resident(const buffer_ptr& in_buffer)
+{
+    if (!opengl_api().extension_NV_shader_buffer_load) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_shader_buffer_load extension."
+                << log::end;
+        return false;
+    }
+    return in_buffer->make_non_resident(*this);
+}
+
 void
 render_context::pre_draw_setup()
 {
