@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 
+#include <scm/gl_core/log.h>
 #include <scm/gl_core/config.h>
 #include <scm/gl_core/render_device/context.h>
 #include <scm/gl_core/render_device/device.h>
@@ -30,6 +31,8 @@ buffer::buffer(render_device&     ren_dev,
   , _mapped(false)
   , _mapped_interval_offset(0)
   , _mapped_interval_length(0)
+  , _native_handle(0ull)
+  , _native_handle_resident(false)
 {
     const opengl::gl_core& glapi = ren_dev.opengl_api();
 
@@ -512,6 +515,100 @@ buffer::copy_buffer_data(const render_context& in_context,
     return true;
 }
 
+bool
+buffer::make_resident(const render_context& in_context,
+                      const access_mode     in_access)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+    util::gl_error         glerror(glapi);
+
+    if (!glapi.extension_NV_shader_buffer_load) {
+        return false;
+    }
+
+    unsigned access_flags = util::gl_image_access_mode(in_access);
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (0 == access_flags) {
+        state().set(object_state::OS_ERROR_INVALID_VALUE);
+        return false;
+    }
+
+    if (   _native_handle
+        && _native_handle_resident) {
+        if (!make_non_resident(in_context)) {
+            glerr() << log::error
+                    << "buffer::make_resident() error making current resident handle non-resident (NV_shader_buffer_load).";
+            return false;
+        }
+    }
+
+    {
+        util::buffer_binding_guard save_guard(glapi, object_target(), object_binding());
+
+        glapi.glBindBuffer(object_target(), object_id());
+        glapi.glGetBufferParameterui64vNV(object_target(), GL_BUFFER_GPU_ADDRESS_NV,
+                                          &_native_handle);
+
+        if (glerror || 0ull == _native_handle) {
+            glerr() << log::error
+                << "buffer::make_resident() error getting buffer handle (NV_shader_buffer_load): "
+                << glerror.error_string();
+            return false;
+        }
+
+        glapi.glMakeBufferResidentNV(object_target(), access_flags);
+
+        if (glerror) {
+            glerr() << log::error
+                << "buffer::make_resident() error making buffer handle resident (NV_shader_buffer_load): "
+                << glerror.error_string();
+            return false;
+        }
+
+    }
+    _native_handle_resident = true;
+    return true;
+}
+
+bool 
+buffer::make_non_resident(const render_context& in_context)
+{
+    const opengl::gl_core& glapi = in_context.opengl_api();
+    util::gl_error         glerror(glapi);
+
+    if (!glapi.extension_NV_shader_buffer_load) {
+        return false;
+    }
+
+    if (0 == object_id()) {
+        state().set(object_state::OS_ERROR_INVALID_OPERATION);
+        return false;
+    }
+
+    if (   _native_handle
+        && _native_handle_resident) {
+
+        util::buffer_binding_guard save_guard(glapi, object_target(), object_binding());
+
+        glapi.glBindBuffer(object_target(), object_id());
+        glapi.glMakeBufferNonResidentNV(object_target());
+        
+        if (glerror) {
+            glerr() << log::error
+                    << "buffer::make_non_resident() error making buffer handle non-resident (NV_shader_buffer_load): "
+                    << glerror.error_string();
+            return false;
+        }
+        _native_handle_resident = false;
+    }
+
+    return true;
+}
 
 const buffer_desc&
 buffer::descriptor() const

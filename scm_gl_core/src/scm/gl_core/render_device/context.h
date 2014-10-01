@@ -239,6 +239,10 @@ public:
     void                        draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count);
     void                        draw_elements(const int in_count, const int in_start_index = 0, const int in_base_vertex = 0);
 
+    bool                        make_resident(const buffer_ptr&     in_buffer,
+                                              const access_mode     in_access);
+    bool                        make_non_resident(const buffer_ptr& in_buffer);
+
 protected:
     void                        pre_draw_setup();
     void                        post_draw_setup();
