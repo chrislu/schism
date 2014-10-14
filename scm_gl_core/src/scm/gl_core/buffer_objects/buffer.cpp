@@ -396,7 +396,7 @@ buffer::clear_buffer_sub_data(const render_context& in_context,
     unsigned gl_base_format     = util::gl_base_format(in_format);
     unsigned gl_base_type       = util::gl_base_type(in_format);
     if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-        glcore.glClearNamedBufferSubDataEXT(object_id(), gl_internal_format, gl_base_format, gl_base_type, in_offset, in_size, in_data);
+        glcore.glClearNamedBufferSubDataEXT(object_id(), gl_internal_format, in_offset, in_size, gl_base_format, gl_base_type, in_data);
     }
     else {
         util::buffer_binding_guard save_guard(glcore, object_target(), object_binding());
