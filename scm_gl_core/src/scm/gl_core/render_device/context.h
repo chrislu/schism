@@ -300,16 +300,15 @@ public:
                                                             void*              in_data);
 
 #if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
-    //bool                        clear_texture(const texture_image_ptr& in_texture,
-    //                                          const unsigned           in_level,
-
-    //                                                    data_format in_format,
-    //                                              const void*       in_data) const;
-    //bool                        clear_buffer_sub_data(const buffer_ptr& in_buffer,
-    //                                                        data_format in_format,
-    //                                                        scm::size_t in_offset,
-    //                                                        scm::size_t in_size,
-    //                                                  const void*       in_data) const;
+    bool                        clear_image_data(const texture_image_ptr& in_texture,
+                                                 const unsigned           in_level,
+                                                 const data_format        in_data_format,
+                                                 const void*const         in_data);
+    bool                        clear_image_sub_data(const texture_image_ptr& in_texture,
+                                                     const texture_region&    in_region,
+                                                     const unsigned           in_level,
+                                                     const data_format        in_data_format,
+                                                     const void*const         in_data);
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
 
     bool                        make_resident(const texture_ptr&       in_texture,

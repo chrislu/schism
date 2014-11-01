@@ -51,11 +51,16 @@ protected:
     bool            retrieve_image_data(const render_context& in_context,
                                         const unsigned        in_level,
                                               void*           in_data);
-    bool            clear_sub_data(const render_context& in_context,
-                                   const texture_region& in_region,
-                                   const unsigned        in_level,
-                                   const data_format     in_data_format,
-                                   const void*const      in_data);
+
+    bool            clear_image_data(const render_context& in_context,
+                                     const unsigned        in_level,
+                                     const data_format     in_data_format,
+                                     const void*const      in_data);
+    bool            clear_image_sub_data(const render_context& in_context,
+                                         const texture_region& in_region,
+                                         const unsigned        in_level,
+                                         const data_format     in_data_format,
+                                         const void*const      in_data);
 
 private:
     friend class render_device;

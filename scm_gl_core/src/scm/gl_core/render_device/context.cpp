@@ -1311,6 +1311,37 @@ render_context::retrieve_texture_data(const texture_image_ptr& in_texture,
     return true;
 }
 
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+bool
+render_context::clear_image_data(const texture_image_ptr& in_texture,
+                                 const unsigned           in_level,
+                                 const data_format        in_data_format,
+                                 const void*const         in_data)
+{
+    if (!in_texture->clear_image_data(*this, in_level, in_data_format, in_data)) {
+        SCM_GL_DGB("render_context::clear_image_data(): error clearing image data ('"
+                   << in_texture->state().state_string() << "')");
+        return false;
+    }
+    return true;
+}
+
+bool
+render_context::clear_image_sub_data(const texture_image_ptr& in_texture,
+                                     const texture_region&    in_region,
+                                     const unsigned           in_level,
+                                     const data_format        in_data_format,
+                                     const void*const         in_data)
+{
+    if (!in_texture->clear_image_sub_data(*this, in_region, in_level, in_data_format, in_data)) {
+        SCM_GL_DGB("render_context::clear_image_sub_data(): error clearing image sub data ('"
+                   << in_texture->state().state_string() << "')");
+        return false;
+    }
+    return true;
+}
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+
 bool
 render_context::make_resident(const texture_ptr&       in_texture,
                               const sampler_state_ptr& in_sstate)
