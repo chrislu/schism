@@ -243,16 +243,16 @@ public:
                                               const access_mode     in_access);
     bool                        make_non_resident(const buffer_ptr& in_buffer);
 
+    void                        apply_vertex_input();
+    void                        apply_uniform_buffer_bindings();
+    void                        apply_atomic_counter_bindings();
+    void                        apply_storage_buffer_bindings();
+
 protected:
     void                        pre_draw_setup();
     void                        post_draw_setup();
 
     void                        start_transform_feedback();
-
-    void                        apply_vertex_input();
-    void                        apply_uniform_buffer_bindings();
-    void                        apply_atomic_counter_bindings();
-    void                        apply_storage_buffer_bindings();
 
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:
@@ -260,8 +260,6 @@ public:
     const program_ptr&          current_program() const;
 
     void                        reset_program();
-
-protected:
     void                        apply_program();
 
 protected:
@@ -316,7 +314,6 @@ public:
                                               const sampler_state_ptr& in_sstate);
     bool                        make_non_resident(const texture_ptr&       in_texture);
 
-protected:
     void                        apply_texture_units();
     void                        apply_image_units();
 
@@ -371,7 +368,6 @@ public:
                                                      const buffer_ptr&       in_target_buffer,
                                                      const size_t            in_offset = 0);
 
-protected:
     void                        apply_frame_buffer();
 
 
@@ -394,8 +390,6 @@ public:
     const math::vec4f&              current_blend_color() const;
 
     void                            reset_state_objects();
-
-protected:
     void                            apply_state_objects();
      
     // active queries /////////////////////////////////////////////////////////////////////////////
