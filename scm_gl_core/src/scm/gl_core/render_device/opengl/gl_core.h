@@ -111,6 +111,7 @@ public:
     bool extension_EXT_texture_compression_s3tc;
 
     bool extension_NV_bindless_texture;
+    bool extension_NV_shader_buffer_load;
     bool extension_NVX_gpu_memory_info;
 
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
@@ -974,6 +975,22 @@ public:
     PFNGLVERTEXATTRIBL1UI64ARBPROC                  glVertexAttribL1ui64ARB;
     PFNGLVERTEXATTRIBL1UI64VARBPROC                 glVertexAttribL1ui64vARB;
     PFNGLGETVERTEXATTRIBLUI64VARBPROC               glGetVertexAttribLui64vARB;
+
+    // GL_NV_shader_buffer_load
+    PFNGLMAKEBUFFERRESIDENTNVPROC                   glMakeBufferResidentNV;
+    PFNGLMAKEBUFFERNONRESIDENTNVPROC                glMakeBufferNonResidentNV;
+    PFNGLISBUFFERRESIDENTNVPROC                     glIsBufferResidentNV;
+    PFNGLMAKENAMEDBUFFERRESIDENTNVPROC              glMakeNamedBufferResidentNV;
+    PFNGLMAKENAMEDBUFFERNONRESIDENTNVPROC           glMakeNamedBufferNonResidentNV;
+    PFNGLISNAMEDBUFFERRESIDENTNVPROC                glIsNamedBufferResidentNV;
+    PFNGLGETBUFFERPARAMETERUI64VNVPROC              glGetBufferParameterui64vNV;
+    PFNGLGETNAMEDBUFFERPARAMETERUI64VNVPROC         glGetNamedBufferParameterui64vNV;
+    PFNGLGETINTEGERUI64VNVPROC                      glGetIntegerui64vNV;
+    PFNGLUNIFORMUI64NVPROC                          glUniformui64NV;
+    PFNGLUNIFORMUI64VNVPROC                         glUniformui64vNV;
+    PFNGLGETUNIFORMUI64VNVPROC                      glGetUniformui64vNV;
+    PFNGLPROGRAMUNIFORMUI64NVPROC                   glProgramUniformui64NV;
+    PFNGLPROGRAMUNIFORMUI64VNVPROC                  glProgramUniformui64vNV;
 
     // ARB_sparse_texture
     PFNGLTEXPAGECOMMITMENTARBPROC                   glTexPageCommitmentARB;

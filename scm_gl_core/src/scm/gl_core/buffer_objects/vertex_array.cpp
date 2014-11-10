@@ -120,7 +120,9 @@ vertex_array::build_buffer_slots(const render_device&           in_ren_dev,
             return (false);
         }
         if (   0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_VERTEX_BUFFER)
-            && 0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_TRANSFORM_FEEDBACK_BUFFER)) {
+            && 0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_TRANSFORM_FEEDBACK_BUFFER)
+            && 0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_STORAGE_BUFFER)
+            && 0 == (in_attrib_buffers[new_elmt._buffer_stream]->descriptor()._bindings & BIND_TEXTURE_BUFFER)) {
             state().set(object_state::OS_ERROR_INVALID_VALUE);
             return (false);
         }
