@@ -15,7 +15,7 @@
 #   define SCM_GL_DEBUG 0
 #endif
 
-#define SCM_GL_CORE_OPENGL_PROFILE          SCM_GL_CORE_OPENGL_430_PROFILE
+#define SCM_GL_CORE_OPENGL_PROFILE          SCM_GL_CORE_OPENGL_420_PROFILE
 
 // to use the direct state access extension define this token
 //  - currently used in:

@@ -130,6 +130,7 @@ display::display_impl::display_impl(const std::string& name)
         ZeroMemory(&wnd_class, sizeof(WNDCLASSEX));
         wnd_class.cbSize        = sizeof(WNDCLASSEX);
         wnd_class.lpfnWndProc   = &DefWindowProc;      
+        //wnd_class.lpfnWndProc   = &DebugWndProc;
         wnd_class.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
         wnd_class.hInstance     = _hinstance;
         wnd_class.hbrBackground = 0;//(HBRUSH)::GetStockObject(DKGRAY_BRUSH);
