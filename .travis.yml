@@ -1,0 +1,39 @@
+env:
+  - BOOST_LIB_DIR=/usr/lib/x86_64-linux-gnu
+
+language: cpp
+compiler: gcc
+
+before_install:
+  - wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1204/x86_64/cuda-repo-ubuntu1204_6.0-37_amd64.deb
+  - sudo dpkg -i cuda-repo-ubuntu1204_6.0-37_amd64.deb
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository --yes ppa:kalakris/cmake
+  - sudo add-apt-repository --yes ppa:boost-latest/ppa
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-4.8 cmake libboost1.55-all-dev libunittest++-dev cmake opencl-headers libfreeimage-dev libglew1.6-dev
+  - sudo apt-get install --force-yes
+
+  # use g++-4.8
+  - |
+    if [ "$CXX" = "g++" ]; then
+      export CXX="g++-4.8" CC="gcc-4.8";
+    fi
+  # install cuda
+  - sudo apt-get install cuda
+  - sudo mkdir -p /opt/cuda/current
+  - sudo ln -s /usr/local/cuda-6.0 /opt/cuda/current/cuda
+
+install: true
+
+before_script:
+  - cd build && mkdir build && cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release -DSCHISM_BUILD_STATIC=OFF -DSCM_BOOST_INC_DIR=/usr/include -DSCM_BOOST_LIB_DIR=${BOOST_LIB_DIR} ../cmake
+
+script: # ./tests/runTravis.sh
+  - make -j2
+
+branches:
+  only:
+    - master
+    - feature/travis

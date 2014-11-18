@@ -239,16 +239,20 @@ public:
     void                        draw_arrays(const primitive_topology in_topology, const int in_first_index, const int in_count);
     void                        draw_elements(const int in_count, const int in_start_index = 0, const int in_base_vertex = 0);
 
-protected:
-    void                        pre_draw_setup();
-    void                        post_draw_setup();
-
-    void                        start_transform_feedback();
+    bool                        make_resident(const buffer_ptr&     in_buffer,
+                                              const access_mode     in_access);
+    bool                        make_non_resident(const buffer_ptr& in_buffer);
 
     void                        apply_vertex_input();
     void                        apply_uniform_buffer_bindings();
     void                        apply_atomic_counter_bindings();
     void                        apply_storage_buffer_bindings();
+
+protected:
+    void                        pre_draw_setup();
+    void                        post_draw_setup();
+
+    void                        start_transform_feedback();
 
     // shader api /////////////////////////////////////////////////////////////////////////////////
 public:
@@ -256,8 +260,6 @@ public:
     const program_ptr&          current_program() const;
 
     void                        reset_program();
-
-protected:
     void                        apply_program();
 
 protected:
@@ -296,23 +298,21 @@ public:
                                                             void*              in_data);
 
 #if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
-    //bool                        clear_texture(const texture_image_ptr& in_texture,
-    //                                          const unsigned           in_level,
-
-    //                                                    data_format in_format,
-    //                                              const void*       in_data) const;
-    //bool                        clear_buffer_sub_data(const buffer_ptr& in_buffer,
-    //                                                        data_format in_format,
-    //                                                        scm::size_t in_offset,
-    //                                                        scm::size_t in_size,
-    //                                                  const void*       in_data) const;
+    bool                        clear_image_data(const texture_image_ptr& in_texture,
+                                                 const unsigned           in_level,
+                                                 const data_format        in_data_format,
+                                                 const void*const         in_data);
+    bool                        clear_image_sub_data(const texture_image_ptr& in_texture,
+                                                     const texture_region&    in_region,
+                                                     const unsigned           in_level,
+                                                     const data_format        in_data_format,
+                                                     const void*const         in_data);
 #endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
 
     bool                        make_resident(const texture_ptr&       in_texture,
                                               const sampler_state_ptr& in_sstate);
     bool                        make_non_resident(const texture_ptr&       in_texture);
 
-protected:
     void                        apply_texture_units();
     void                        apply_image_units();
 
@@ -367,7 +367,6 @@ public:
                                                      const buffer_ptr&       in_target_buffer,
                                                      const size_t            in_offset = 0);
 
-protected:
     void                        apply_frame_buffer();
 
 
@@ -390,8 +389,6 @@ public:
     const math::vec4f&              current_blend_color() const;
 
     void                            reset_state_objects();
-
-protected:
     void                            apply_state_objects();
      
     // active queries /////////////////////////////////////////////////////////////////////////////
