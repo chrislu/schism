@@ -1374,12 +1374,6 @@ render_device::dump_memory_info(std::ostream& os) const
         { // protect this function from multiple thread access
             boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
 
-            static const unsigned int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX           = 0x9047u;
-            static const unsigned int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX     = 0x9048u;
-            static const unsigned int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX   = 0x9049u;
-            static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
-            static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
-
             int dedicated_vidmem         = 0;
             int total_available_memory   = 0;
             int current_available_vidmem = 0;
