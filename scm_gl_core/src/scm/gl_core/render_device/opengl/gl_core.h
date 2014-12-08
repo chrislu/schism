@@ -107,6 +107,18 @@ public:
     bool extension_NV_shader_buffer_load;
     bool extension_NVX_gpu_memory_info;
 
+    bool extension_EXT_raster_multisample;
+    bool extension_NV_framebuffer_mixed_samples;
+    bool extension_NV_fragment_coverage_to_color;
+    bool extension_NV_sample_locations;
+    bool extension_NV_conservative_raster;
+    bool extension_EXT_post_depth_coverage;
+    bool extension_EXT_sparse_texture2;
+    bool extension_NV_shader_atomic_int64;
+    bool extension_NV_fragment_shader_interlock;
+    bool extension_NV_sample_mask_override_coverage;
+    bool extension_NV_fill_rectangle;
+
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
     PFNGLCULLFACEPROC                               glCullFace;
     PFNGLFRONTFACEPROC                              glFrontFace;
@@ -991,6 +1003,25 @@ public:
 
     // ARB_compute_variable_group_size
     PFNGLDISPATCHCOMPUTEGROUPSIZEARBPROC            glDispatchComputeGroupSizeARB;
+
+    // EXT_raster_multisample
+    PFNGLRASTERSAMPLESEXTPROC                       glRasterSamplesEXT;
+
+    // NV_framebuffer_mixed_samples
+    PFNGLCOVERAGEMODULATIONTABLENVPROC              glCoverageModulationTableNV;
+    PFNGLGETCOVERAGEMODULATIONTABLENVPROC           glGetCoverageModulationTableNV;
+    PFNGLCOVERAGEMODULATIONNVPROC                   glCoverageModulationNV;
+
+    // NV_fragment_coverage_to_color
+    PFNGLFRAGMENTCOVERAGECOLORNVPROC                glFragmentCoverageColorNV;
+
+    // NV_sample_locations
+    PFNGLFRAMEBUFFERSAMPLELOCATIONSFVNVPROC         glFramebufferSampleLocationsfvNV;
+    PFNGLNAMEDFRAMEBUFFERSAMPLELOCATIONSFVNVPROC    glNamedFramebufferSampleLocationsfvNV;
+    PFNGLRESOLVEDEPTHVALUESNVPROC                   glResolveDepthValuesNV;
+
+    // NV_conservative_raster
+    PFNGLSUBPIXELPRECISIONBIASNVPROC                glSubpixelPrecisionBiasNV;
 
 }; // class gl_core
 
