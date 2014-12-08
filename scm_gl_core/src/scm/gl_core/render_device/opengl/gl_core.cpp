@@ -133,6 +133,18 @@ gl_core::gl_core()
     extension_NVX_gpu_memory_info               = false;
     extension_NV_bindless_texture               = false;
     extension_NV_shader_buffer_load             = false;
+
+    extension_EXT_raster_multisample            = false;
+    extension_NV_framebuffer_mixed_samples      = false;
+    extension_NV_fragment_coverage_to_color     = false;
+    extension_NV_sample_locations               = false;
+    extension_NV_conservative_raster            = false;
+    extension_EXT_post_depth_coverage           = false;
+    extension_EXT_sparse_texture2               = false;
+    extension_NV_shader_atomic_int64            = false;
+    extension_NV_fragment_shader_interlock      = false;
+    extension_NV_sample_mask_override_coverage  = false;
+    extension_NV_fill_rectangle                 = false;
 }
 
 bool
@@ -258,19 +270,31 @@ gl_core::initialize()
         glout() << log::warning << "gl_core::initialize(): ARB_robustness reported but missing entry points detected" << log::end;
     }
 
-    extension_ARB_shading_language_include = extension_ARB_shading_language_include && is_supported("GL_ARB_shading_language_include");
-    extension_ARB_cl_event                 = extension_ARB_cl_event                 && is_supported("GL_ARB_cl_event");
-    extension_ARB_debug_output             = extension_ARB_debug_output             && is_supported("GL_ARB_debug_output");
-    extension_ARB_robustness               = extension_ARB_robustness               && is_supported("GL_ARB_robustness");
-    extension_EXT_shader_image_load_store  = extension_EXT_shader_image_load_store  && is_supported("GL_EXT_shader_image_load_store");
+    extension_ARB_shading_language_include  = extension_ARB_shading_language_include  && is_supported("GL_ARB_shading_language_include");
+    extension_ARB_cl_event                  = extension_ARB_cl_event                  && is_supported("GL_ARB_cl_event");
+    extension_ARB_debug_output              = extension_ARB_debug_output              && is_supported("GL_ARB_debug_output");
+    extension_ARB_robustness                = extension_ARB_robustness                && is_supported("GL_ARB_robustness");
+    extension_EXT_shader_image_load_store   = extension_EXT_shader_image_load_store   && is_supported("GL_EXT_shader_image_load_store");
 
-    extension_ARB_map_buffer_alignment     = is_supported("GL_ARB_map_buffer_alignment");
-    extension_EXT_texture_compression_s3tc = is_supported("GL_EXT_texture_compression_s3tc");
-    extension_ARB_texture_compression_bptc = is_supported("GL_ARB_texture_compression_bptc");
-    extension_NVX_gpu_memory_info          = is_supported("GL_NVX_gpu_memory_info");
+    extension_ARB_map_buffer_alignment      = is_supported("GL_ARB_map_buffer_alignment");
+    extension_EXT_texture_compression_s3tc  = is_supported("GL_EXT_texture_compression_s3tc");
+    extension_ARB_texture_compression_bptc  = is_supported("GL_ARB_texture_compression_bptc");
+    extension_NVX_gpu_memory_info           = is_supported("GL_NVX_gpu_memory_info");
 
-    extension_NV_bindless_texture          = extension_NV_bindless_texture && is_supported("GL_NV_bindless_texture");
-    extension_NV_shader_buffer_load        = extension_NV_shader_buffer_load && is_supported("GL_NV_shader_buffer_load");
+    extension_NV_bindless_texture           = extension_NV_bindless_texture           && is_supported("GL_NV_bindless_texture");
+    extension_NV_shader_buffer_load         = extension_NV_shader_buffer_load         && is_supported("GL_NV_shader_buffer_load");
+
+    extension_EXT_raster_multisample        = extension_EXT_raster_multisample        && is_supported("GL_EXT_raster_multisample");
+    extension_NV_framebuffer_mixed_samples  = extension_NV_framebuffer_mixed_samples  && is_supported("GL_NV_framebuffer_mixed_samples");
+    extension_NV_fragment_coverage_to_color = extension_NV_fragment_coverage_to_color && is_supported("GL_NV_fragment_coverage_to_color");
+    extension_NV_sample_locations           = extension_NV_sample_locations           && is_supported("GL_NV_sample_locations");
+    extension_NV_conservative_raster        = extension_NV_conservative_raster        && is_supported("GL_NV_conservative_raster");
+    extension_EXT_post_depth_coverage       = is_supported("GL_EXT_post_depth_coverage");
+    extension_EXT_sparse_texture2           = is_supported("GL_EXT_sparse_texture2");
+    extension_NV_shader_atomic_int64        = is_supported("GL_NV_shader_atomic_int64");
+    extension_NV_fragment_shader_interlock  = is_supported("GL_NV_fragment_shader_interlock");
+    extension_NV_sample_mask_override_coverage = is_supported("GL_NV_sample_mask_override_coverage");
+    extension_NV_fill_rectangle             = is_supported("GL_NV_fill_rectangle");
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
@@ -1274,6 +1298,34 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLDISPATCHCOMPUTEGROUPSIZEARBPROC, glDispatchComputeGroupSizeARB, "ARB_compute_variable_group_size", init_success);
     extension_ARB_compute_variable_group_size = init_success;
 
+    // EXT_raster_multisample
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLRASTERSAMPLESEXTPROC, glRasterSamplesEXT, "EXT_raster_multisample", init_success);
+    extension_EXT_raster_multisample = init_success;
+
+    // NV_framebuffer_mixed_samples
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLCOVERAGEMODULATIONTABLENVPROC, glCoverageModulationTableNV, "NV_framebuffer_mixed_samples", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETCOVERAGEMODULATIONTABLENVPROC, glGetCoverageModulationTableNV, "NV_framebuffer_mixed_samples", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLCOVERAGEMODULATIONNVPROC, glCoverageModulationNV, "NV_framebuffer_mixed_samples", init_success);
+    extension_NV_framebuffer_mixed_samples = init_success;
+
+    // NV_fragment_coverage_to_color
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLFRAGMENTCOVERAGECOLORNVPROC, glFragmentCoverageColorNV, "NV_fragment_coverage_to_color", init_success);
+    extension_NV_fragment_coverage_to_color = init_success;
+
+    // NV_sample_locations
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLFRAMEBUFFERSAMPLELOCATIONSFVNVPROC, glFramebufferSampleLocationsfvNV, "NV_sample_locations", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLNAMEDFRAMEBUFFERSAMPLELOCATIONSFVNVPROC, glNamedFramebufferSampleLocationsfvNV, "NV_sample_locations", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLRESOLVEDEPTHVALUESNVPROC, glResolveDepthValuesNV, "NV_sample_locations", init_success);
+    extension_NV_sample_locations = init_success;
+
+    // NV_conservative_raster
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLSUBPIXELPRECISIONBIASNVPROC, glSubpixelPrecisionBiasNV, "NV_conservative_raster", init_success);
+    extension_NV_conservative_raster = init_success;
 
     glout() << log::outdent;
     glout() << log::info << "finished initializing function entry points..." << log::end;
