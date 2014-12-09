@@ -33,6 +33,17 @@ public:
                                                 bool                 in_color_mips  = false,
                                                 const data_format    in_force_internal_format = FORMAT_NULL);
 
+    texture_cube_ptr            load_texture_cube(render_device&       in_device,
+                                                  const std::string&   in_image_path_px,
+                                                  const std::string&   in_image_path_nx,
+                                                  const std::string&   in_image_path_py,
+                                                  const std::string&   in_image_path_ny,
+                                                  const std::string&   in_image_path_pz,
+                                                  const std::string&   in_image_path_nz,
+                                                  bool                 in_create_mips,
+                                                  bool                 in_color_mips  = false,
+                                                  const data_format    in_force_internal_format = FORMAT_NULL);
+
     bool                        load_texture_image(const render_device_ptr& in_device,
                                                    const texture_2d_ptr&    in_texture,
                                                    const std::string&       in_image_path,

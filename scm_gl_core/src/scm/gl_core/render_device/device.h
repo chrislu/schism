@@ -274,6 +274,29 @@ public:
                                                       const data_format         in_format,
                                                       const math::vec2ui&       in_mip_range);
 
+    texture_cube_ptr                create_texture_cube(const texture_cube_desc& in_desc);
+    texture_cube_ptr                create_texture_cube(const texture_cube_desc& in_desc,
+                                                        const data_format          in_initial_data_format,
+                                                        const std::vector<void*>& in_initial_mip_level_data_px,
+                                                        const std::vector<void*>& in_initial_mip_level_data_nx,
+                                                        const std::vector<void*>& in_initial_mip_level_data_py,
+                                                        const std::vector<void*>& in_initial_mip_level_data_ny,
+                                                        const std::vector<void*>& in_initial_mip_level_data_pz,
+                                                        const std::vector<void*>& in_initial_mip_level_data_nz);
+    texture_cube_ptr                create_texture_cube(const math::vec2ui& in_size,
+                                                        const data_format   in_format,
+                                                        const unsigned      in_mip_levels = 1);
+    texture_cube_ptr                create_texture_cube(const math::vec2ui&      in_size,
+                                                        const data_format          in_format,
+                                                        const unsigned             in_mip_levels,
+                                                        const data_format          in_initial_data_format,
+                                                        const std::vector<void*>& in_initial_mip_level_data_px,
+                                                        const std::vector<void*>& in_initial_mip_level_data_nx,
+                                                        const std::vector<void*>& in_initial_mip_level_data_py,
+                                                        const std::vector<void*>& in_initial_mip_level_data_ny,
+                                                        const std::vector<void*>& in_initial_mip_level_data_pz,
+                                                        const std::vector<void*>& in_initial_mip_level_data_nz);
+
     texture_buffer_ptr              create_texture_buffer(const texture_buffer_desc& in_desc);
     texture_buffer_ptr              create_texture_buffer(const data_format   in_format,
                                                           const buffer_ptr&   in_buffer);
