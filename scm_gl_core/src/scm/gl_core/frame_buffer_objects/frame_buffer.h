@@ -28,13 +28,14 @@ class __scm_export(gl_core) frame_buffer : public context_bindable_object, publi
 {
 protected:
     struct attachment {
-        attachment(const render_target_ptr& in_target = render_target_ptr(), unsigned in_level = 0, int in_layer = -1);
+        attachment(const render_target_ptr& in_target = render_target_ptr(), unsigned in_level = 0, int in_layer = -1, unsigned tex_target = 0);
         bool operator==(const attachment& rhs) const;
         bool operator!=(const attachment& rhs) const;
 
         render_target_ptr   _target;
         unsigned            _level;
         int                 _layer;
+        unsigned            _tex_target;
     }; // struct attachment
     typedef std::vector<attachment> attachment_array;
     typedef std::vector<unsigned>   draw_buffer_array;
@@ -43,7 +44,7 @@ public:
     virtual ~frame_buffer();
 
     void                            attach_color_buffer(unsigned in_color_attachment, const render_target_ptr& in_target,
-                                                        unsigned in_level = 0, unsigned in_layer = 0);
+                                                        unsigned in_level = 0, unsigned in_layer = 0, unsigned tex_target = 0);
     void                            attach_depth_stencil_buffer(const render_target_ptr& in_target,
                                                                 unsigned in_level = 0, unsigned in_layer = 0);
 
