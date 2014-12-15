@@ -23,27 +23,30 @@
 namespace scm {
 namespace gl {
 
-frame_buffer::attachment::attachment(const render_target_ptr& in_target, unsigned in_level, int in_layer)
+frame_buffer::attachment::attachment(const render_target_ptr& in_target, unsigned in_level, int in_layer, unsigned tex_target)
   : _target(in_target),
     _level(in_level),
-    _layer(in_layer)
+    _layer(in_layer),
+    _tex_target(tex_target)
 {
 }
 
 bool
 frame_buffer::attachment::operator==(const attachment& rhs) const
 {
-    return (   (_target == rhs._target)
-            && (_level  == rhs._level)
-            && (_layer  == rhs._layer));
+    return (   (_target     == rhs._target)
+            && (_level      == rhs._level)
+            && (_layer      == rhs._layer)
+            && (_tex_target == rhs._tex_target));
 }
 
 bool
 frame_buffer::attachment::operator!=(const attachment& rhs) const
 {
-    return (   (_target != rhs._target)
-            || (_level  != rhs._level)
-            || (_layer  != rhs._layer));
+    return (   (_target     != rhs._target)
+            || (_level      != rhs._level)
+            || (_layer      != rhs._layer)
+            || (_tex_target != rhs._tex_target));
 }
 
 frame_buffer::frame_buffer(render_device& in_device)
@@ -83,11 +86,11 @@ frame_buffer::~frame_buffer()
 
 void
 frame_buffer::attach_color_buffer(unsigned in_color_attachment, const render_target_ptr& in_target,
-                                  unsigned in_level, unsigned in_layer)
+                                  unsigned in_level, unsigned in_layer, unsigned tex_target)
 {
     assert(in_color_attachment < _selected_color_attachments.size());
 
-    _selected_color_attachments[in_color_attachment] = attachment(in_target, in_level, in_layer);
+    _selected_color_attachments[in_color_attachment] = attachment(in_target, in_level, in_layer, tex_target);
 
     _drawable_region.x = math::min(in_target->dimensions().x, _drawable_region.x);
     _drawable_region.y = math::min(in_target->dimensions().y, _drawable_region.y);
@@ -516,19 +519,38 @@ frame_buffer::apply_attachment(const render_context& in_context, unsigned in_att
             gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTextureLayer());
         }
         else {
-            if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
-                glapi.glNamedFramebufferTextureEXT(object_id(),
-                                                    in_attach_point,
-                                                    in_attachment._target->object_id(),
-                                                    in_attachment._level);
-            }
+            if (in_attachment._tex_target == 0) {
+                if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                    glapi.glNamedFramebufferTextureEXT(object_id(),
+                                                        in_attach_point,
+                                                        in_attachment._target->object_id(),
+                                                        in_attachment._level);
+                }
+                else {
+                    glapi.glFramebufferTexture(object_target(),
+                                                in_attach_point,
+                                                in_attachment._target->object_id(),
+                                                in_attachment._level);
+                }
+                gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTexture());
+            } 
             else {
-                glapi.glFramebufferTexture(object_target(),
-                                            in_attach_point,
-                                            in_attachment._target->object_id(),
-                                            in_attachment._level);
+                if (SCM_GL_CORE_USE_EXT_DIRECT_STATE_ACCESS) {
+                    glapi.glNamedFramebufferTexture2DEXT(object_id(),
+                                                        in_attach_point,
+                                                        in_attachment._tex_target,
+                                                        in_attachment._target->object_id(),
+                                                        in_attachment._level);
+                }
+                else {
+                    glapi.glFramebufferTexture2D(object_target(),
+                                                in_attach_point,
+                                                in_attachment._tex_target,
+                                                in_attachment._target->object_id(),
+                                                in_attachment._level);
+                }
+                gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTexture2D());
             }
-            gl_assert(glapi, frame_buffer::apply_attachment() after glFramebufferTexture());
         }
     }
 }
