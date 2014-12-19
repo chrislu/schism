@@ -25,6 +25,9 @@ class  texture_2d;
 struct texture_3d_desc;
 class  texture_3d;
 
+struct texture_cube_desc;
+class  texture_cube;
+
 struct texture_buffer_desc;
 class  texture_buffer;
 
@@ -40,6 +43,8 @@ typedef shared_ptr<texture_2d>              texture_2d_ptr;
 typedef shared_ptr<texture_2d const>        texture_2d_cptr;
 typedef shared_ptr<texture_3d>              texture_3d_ptr;
 typedef shared_ptr<texture_3d const>        texture_3d_cptr;
+typedef shared_ptr<texture_cube>            texture_cube_ptr;
+typedef shared_ptr<texture_cube const>      texture_cube_cptr;
 typedef shared_ptr<texture_buffer>          texture_buffer_ptr;
 typedef shared_ptr<texture_buffer const>    texture_buffer_cptr;
 

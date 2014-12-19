@@ -1093,6 +1093,89 @@ render_device::create_texture_3d(const texture_3d_ptr&     in_orig_texture,
     }
 }
 
+texture_cube_ptr
+render_device::create_texture_cube(const texture_cube_desc&   in_desc)
+{
+    texture_cube_ptr  new_tex(new texture_cube(*this, in_desc));
+    if (new_tex->fail()) {
+        if (new_tex->bad()) {
+            glerr() << log::error << "render_device::create_texture_cube(): unable to create texture object ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        else {
+            glerr() << log::error << "render_device::create_texture_cube(): unable to allocate texture image data ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        return texture_cube_ptr();
+    }
+    else {
+        return new_tex;
+    }
+}
+
+texture_cube_ptr
+render_device::create_texture_cube(const texture_cube_desc&    in_desc,
+                                   const data_format         in_initial_data_format,
+                                   const std::vector<void*>& in_initial_mip_level_data_px,
+                                   const std::vector<void*>& in_initial_mip_level_data_nx,
+                                   const std::vector<void*>& in_initial_mip_level_data_py,
+                                   const std::vector<void*>& in_initial_mip_level_data_ny,
+                                   const std::vector<void*>& in_initial_mip_level_data_pz,
+                                   const std::vector<void*>& in_initial_mip_level_data_nz)
+{
+    texture_cube_ptr  new_tex(new texture_cube(*this, in_desc, in_initial_data_format,
+                                                 in_initial_mip_level_data_px,
+                                                 in_initial_mip_level_data_nx,
+                                                 in_initial_mip_level_data_py,
+                                                 in_initial_mip_level_data_ny,
+                                                 in_initial_mip_level_data_pz,
+                                                 in_initial_mip_level_data_nz));
+    if (new_tex->fail()) {
+        if (new_tex->bad()) {
+            glerr() << log::error << "render_device::create_texture_cube(): unable to create texture object ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        else {
+            glerr() << log::error << "render_device::create_texture_cube(): unable to allocate texture image data ("
+                    << new_tex->state().state_string() << ")." << log::end;
+        }
+        return texture_cube_ptr();
+    }
+    else {
+        return new_tex;
+    }
+} 
+
+texture_cube_ptr
+render_device::create_texture_cube(const math::vec2ui& in_size,
+                                 const data_format   in_format,
+                                 const unsigned      in_mip_levels)
+{
+    return create_texture_cube(texture_cube_desc(in_size, in_format, in_mip_levels));
+}
+
+texture_cube_ptr
+render_device::create_texture_cube(const math::vec2ui&       in_size,
+                                   const data_format         in_format,
+                                   const unsigned            in_mip_levels,
+                                   const data_format         in_initial_data_format,
+                                   const std::vector<void*>& in_initial_mip_level_data_px,
+                                   const std::vector<void*>& in_initial_mip_level_data_nx,
+                                   const std::vector<void*>& in_initial_mip_level_data_py,
+                                   const std::vector<void*>& in_initial_mip_level_data_ny,
+                                   const std::vector<void*>& in_initial_mip_level_data_pz,
+                                   const std::vector<void*>& in_initial_mip_level_data_nz)
+{
+    return create_texture_cube(texture_cube_desc(in_size, in_format, in_mip_levels),
+                             in_initial_data_format,
+                             in_initial_mip_level_data_px,
+                             in_initial_mip_level_data_nx,
+                             in_initial_mip_level_data_py,
+                             in_initial_mip_level_data_ny,
+                             in_initial_mip_level_data_pz,
+                             in_initial_mip_level_data_nz);
+}
+
 texture_buffer_ptr
 render_device::create_texture_buffer(const texture_buffer_desc& in_desc)
 {
@@ -1373,12 +1456,6 @@ render_device::dump_memory_info(std::ostream& os) const
     else {
         { // protect this function from multiple thread access
             boost::mutex::scoped_lock lock(_mutex_impl->_mutex);
-
-            static const unsigned int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX           = 0x9047u;
-            static const unsigned int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX     = 0x9048u;
-            static const unsigned int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX   = 0x9049u;
-            static const unsigned int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX             = 0x904Au;
-            static const unsigned int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX             = 0x904Bu;
 
             int dedicated_vidmem         = 0;
             int total_available_memory   = 0;

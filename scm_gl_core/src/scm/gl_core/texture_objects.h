@@ -12,6 +12,7 @@
 #include <scm/gl_core/texture_objects/texture_1d.h>
 #include <scm/gl_core/texture_objects/texture_2d.h>
 #include <scm/gl_core/texture_objects/texture_3d.h>
+#include <scm/gl_core/texture_objects/texture_cube.h>
 #include <scm/gl_core/texture_objects/texture_buffer.h>
 
 #endif // SCM_GL_CORE_TEXTURE_OBJECTS_H_INCLUDED
