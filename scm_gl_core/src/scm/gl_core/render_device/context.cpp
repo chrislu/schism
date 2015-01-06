@@ -1115,14 +1115,14 @@ render_context::apply_storage_buffer_bindings()
     for (int i = 0; i < _current_state._active_storage_buffers.size(); ++i) {
         const buffer_binding&   csbb = _current_state._active_storage_buffers[i];
         buffer_binding&         asbb = _applied_state._active_storage_buffers[i];
-
+                
         if (csbb != asbb) {
             if (csbb._buffer) {
                 csbb._buffer->bind_range(*this, BIND_STORAGE_BUFFER, i, csbb._offset, csbb._size);
                 assert(csbb._buffer->ok());
             }
             else {
-                csbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
+                asbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
             }
             asbb = csbb;
         }
