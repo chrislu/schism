@@ -143,7 +143,8 @@ uniform_block_array<host_block_type>::uniform_block_array(const render_device_pt
   , _array_size(in_array_size)
 
 {
-    scm::size_t a = in_device->capabilities()._uniform_buffer_offset_alignment;
+    //scm::size_t a = in_device->capabilities()._uniform_buffer_offset_alignment;
+    scm::size_t a = 16;
     scm::size_t s = sizeof(host_block_type);
 
     _array_element_alignment = ((s / a) + (s % a > 0 ? 1 : 0)) * a; // rounded to the next multiple of the alignment
@@ -216,6 +217,13 @@ const buffer_ptr&
 uniform_block_array<host_block_type>::block_buffer() const
 {
     return (_device_block);
+}
+
+template <class host_block_type>
+const scm::size_t
+uniform_block_array<host_block_type>::array_size() const
+{
+  return _array_size;
 }
 
 template <class host_block_type>
