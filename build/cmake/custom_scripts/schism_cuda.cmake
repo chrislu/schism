@@ -9,6 +9,8 @@ option(SCHISM_CUDA_BUILD_VERBOSE                   "Verbose Output"             
 option(SCHISM_CUDA_BUILD_COMPUTE20                 "Enable Compute 2.0"                     ON)
 option(SCHISM_CUDA_BUILD_COMPUTE30                 "Enable Compute 3.0"                     OFF)
 option(SCHISM_CUDA_BUILD_COMPUTE35                 "Enable Compute 3.5"                     OFF)
+option(SCHISM_CUDA_BUILD_COMPUTE50                 "Enable Compute 5.0"                     OFF)
+option(SCHISM_CUDA_BUILD_COMPUTE52                 "Enable Compute 5.2"                     OFF)
 option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math calculations"  ON)
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
@@ -22,6 +24,11 @@ if (WIN32)
         set (SCM_CUDA_NVCC_OPTIONS --cl-version 2012 CACHE STRING "schism cuda internal" FORCE)
         set(SCM_CUDA_SHARED_LIB_NAME "cudart64_55" CACHE STRING "schism cuda internal" FORCE)
     endif(MSVC11)
+	
+    if (MSVC12)
+        set (SCM_CUDA_NVCC_OPTIONS --cl-version 2013 CACHE STRING "schism cuda internal" FORCE)
+        set(SCM_CUDA_SHARED_LIB_NAME "cudart64_65" CACHE STRING "schism cuda internal" FORCE)
+    endif(MSVC12)
 
     set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --use-local-env --compile CACHE STRING "schism cuda internal" FORCE)
     set(SCM_CUDA_NVCC_PATH                  ${GLOBAL_EXT_DIR}/bin/cuda/bin       CACHE PATH   "schism cuda internal")
@@ -75,15 +82,24 @@ if (SCHISM_CUDA_BUILD_COMPUTE35)
   set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_35\",code=\"sm_35\" CACHE STRING "schism cuda internal" FORCE)
 endif (SCHISM_CUDA_BUILD_COMPUTE35)
 
+if (SCHISM_CUDA_BUILD_COMPUTE50)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_50\",code=\"sm_50\" CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_COMPUTE50)
+
+if (SCHISM_CUDA_BUILD_COMPUTE52)
+  set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -gencode arch=\"compute_52\",code=\"sm_52\" CACHE STRING "schism cuda internal" FORCE)
+endif (SCHISM_CUDA_BUILD_COMPUTE52)
+
 if (SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES)
     if (WIN32)
         set(SCM_CUDA_NVCC_OPTIONS "${SCM_CUDA_NVCC_OPTIONS} --keep-dir \"x64\\Release\"" CACHE STRING "schism cuda internal" FORCE)
     endif (WIN32)
 endif(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES)
 
-if (SCHISM_CUDA_BUILD_USE_FAST_MATH)
-    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --use_fast_math --fmad=true  CACHE STRING "schism cuda internal" FORCE)
-endif(SCHISM_CUDA_BUILD_USE_FAST_MATH)
+set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} -restrict -use_fast_math -fmad=true -ftz=true -prec-div=false -prec-sqrt=false -Xptxas -v,-dlcm=ca CACHE STRING "schism cuda internal" FORCE)
+#if (SCHISM_CUDA_BUILD_USE_FAST_MATH)
+#    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --use_fast_math --fmad=true  CACHE STRING "schism cuda internal" FORCE)
+#endif(SCHISM_CUDA_BUILD_USE_FAST_MATH)
 
 # add include directories to pass to the nvcc command
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES "")
