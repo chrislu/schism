@@ -14,6 +14,8 @@ option(SCHISM_CUDA_BUILD_COMPUTE52                 "Enable Compute 5.2"         
 option(SCHISM_CUDA_BUILD_USE_FAST_MATH             "Use lower precision math calculations"  ON)
 option(SCHISM_CUDA_BUILD_KEEP_INTERMEDIATE_FILES   "Keep the generated intermediate files"  ON)
 
+set(SCM_CUDA_NVCC_OPTIONS "")
+
 if (WIN32)
     if (MSVC10)
         set (SCM_CUDA_NVCC_OPTIONS --cl-version 2010 CACHE STRING "schism cuda internal" FORCE)
@@ -38,7 +40,12 @@ if (WIN32)
         set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS}  --machine 32 -ccbin \"$(VCInstallDir)bin/x86_amd64/cl.exe\"  CACHE STRING "schism cuda internal" FORCE)
 	endif (${SCHISM_PLATFORM} MATCHES ${PLATFORM_WIN64})
 elseif (UNIX)
-    set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/cuda/bin                CACHE PATH   "schism cuda internal")
+    if (SCM_EXT_CUDA_BIN_DIR)
+        set(SCM_CUDA_NVCC_PATH                  ${SCM_EXT_CUDA_BIN_DIR}                   CACHE PATH   "schism cuda internal" FORCE)
+    else (SCM_EXT_CUDA_BIN_DIR)
+        set(SCM_CUDA_NVCC_PATH                  /opt/cuda/current/cuda/bin                CACHE PATH   "schism cuda internal" FORCE)
+    endif (SCM_EXT_CUDA_BIN_DIR)
+    set(SCM_CUDA_NVCC_OPTIONS ${SCM_CUDA_NVCC_OPTIONS} --compile --machine 64 CACHE STRING "schism cuda internal" FORCE)
 endif (WIN32)
 
 set(SCM_CUDA_NVCC_COMMAND "${SCM_CUDA_NVCC_PATH}/nvcc" CACHE STRING "schism cuda internal")
@@ -51,6 +58,11 @@ string(REPLACE " " "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${CMAKE_CXX_FLAGS_DEBUG}
 string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS          ${SCM_CUDA_NVCC_CXX_FLAGS})
 string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_RELEASE  ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE})
 string(REPLACE ",-std=c++0x" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG})
+
+# eat multiple commas
+string(REGEX REPLACE "[\\,]+" "," SCM_CUDA_NVCC_CXX_FLAGS          ${SCM_CUDA_NVCC_CXX_FLAGS})
+string(REGEX REPLACE "[\\,]+" "," SCM_CUDA_NVCC_CXX_FLAGS_RELEASE  ${SCM_CUDA_NVCC_CXX_FLAGS_RELEASE})
+string(REGEX REPLACE "[\\,]+" "," SCM_CUDA_NVCC_CXX_FLAGS_DEBUG    ${SCM_CUDA_NVCC_CXX_FLAGS_DEBUG})
 
 set(SCM_CUDA_NVCC_DEFINITIONS           "")
 set(SCM_CUDA_NVCC_INCLUDE_DIRECTORIES   "")
