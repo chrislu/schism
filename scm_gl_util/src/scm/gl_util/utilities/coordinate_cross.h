@@ -31,10 +31,16 @@ public:
                          const math::mat4f&            proj_matrix,
                          const math::mat4f&            view_matrix,
                          const float                   line_width = 1.0f);
+    void            draw_overlay(
+                         const gl::render_context_ptr& context,
+                         const math::mat4f&            proj_matrix,
+                         const math::mat4f&            view_matrix,
+                         const float                   line_width = 1.0f);
 
 private:
     gl::program_ptr                 _coord_program;
     gl::depth_stencil_state_ptr     _dstate_less;
+    gl::depth_stencil_state_ptr     _dstate_overlay;
     gl::rasterizer_state_ptr        _raster_no_cull;
     gl::blend_state_ptr             _no_blend;
 

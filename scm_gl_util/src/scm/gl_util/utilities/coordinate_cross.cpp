@@ -125,6 +125,7 @@ coordinate_cross::coordinate_cross(const gl::render_device_ptr& device,
 
     _no_blend       = device->create_blend_state(false, FUNC_ONE, FUNC_ZERO, FUNC_ONE, FUNC_ZERO);
     _dstate_less    = device->create_depth_stencil_state(true, true, COMPARISON_LESS);
+    _dstate_overlay = device->create_depth_stencil_state(false, false, COMPARISON_LESS);
     _raster_no_cull = device->create_rasterizer_state(FILL_SOLID, CULL_NONE, ORIENT_CCW, true);
 
     if (   !_no_blend
@@ -146,10 +147,11 @@ coordinate_cross::~coordinate_cross()
 }
 
 void
-coordinate_cross::draw(const gl::render_context_ptr& context,
-                       const math::mat4f&            proj_matrix,
-                       const math::mat4f&            view_matrix,
-                       const float                   line_width)
+coordinate_cross::draw(
+    const gl::render_context_ptr& context,
+    const math::mat4f&            proj_matrix,
+    const math::mat4f&            view_matrix,
+    const float                   line_width)
 {
     using namespace scm;
     using namespace scm::gl;
@@ -162,6 +164,34 @@ coordinate_cross::draw(const gl::render_context_ptr& context,
     _coord_program->uniform("in_mvp", proj_matrix * view_matrix);
         
     context->set_depth_stencil_state(_dstate_less);
+    context->set_blend_state(_no_blend);
+    context->set_rasterizer_state(_raster_no_cull, line_width);
+
+    context->bind_program(_coord_program);
+    context->bind_vertex_array(_vertex_array);
+    
+    context->apply();
+    context->draw_arrays(_prim_topology, 0, _vertex_count);
+}
+
+void
+coordinate_cross::draw_overlay(
+    const gl::render_context_ptr& context,
+    const math::mat4f&            proj_matrix,
+    const math::mat4f&            view_matrix,
+    const float                   line_width)
+{
+    using namespace scm;
+    using namespace scm::gl;
+    using namespace scm::math;
+
+    context_state_objects_guard csg(context);
+    context_program_guard       cpg(context);
+    context_vertex_input_guard  vig(context);
+    
+    _coord_program->uniform("in_mvp", proj_matrix * view_matrix);
+        
+    context->set_depth_stencil_state(_dstate_overlay);
     context->set_blend_state(_no_blend);
     context->set_rasterizer_state(_raster_no_cull, line_width);
 
