@@ -12,6 +12,9 @@
 #include <windows.h>
 #endif
 
+#include <chrono>
+#include <thread>
+
 #include <scm/core.h>
 #include <scm/log.h>
 #include <scm/core/pointer_types.h>
@@ -20,6 +23,8 @@
 #include <scm/core/time/high_res_timer.h>
 
 #include <scm/gl_core.h>
+
+#include <scm/gl_core/window_management/window.h>
 
 #include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
@@ -407,6 +412,8 @@ demo_app::display()
     //scale(model_matrix, 0.01f, 0.01f, 0.01f);
     mat4f    model_view_matrix   = view_matrix * model_matrix;
     mat4f    mv_inv_transpose    = transpose(inverse(model_view_matrix));
+
+    std::cout << model_view_matrix << std::endl;
 
     _shader_program->uniform("projection_matrix", _projection_matrix);
     _shader_program->uniform("model_view_matrix", model_view_matrix);
