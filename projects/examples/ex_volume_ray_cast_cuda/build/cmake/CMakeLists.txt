@@ -8,7 +8,7 @@ include(schism_project)
 include(schism_boost)
 include(schism_cuda)
 include(schism_macros)
-include(schism_qt4)
+include(schism_qt5)
 
 # source files
 scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)
@@ -46,7 +46,7 @@ scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_ROOT_DIR}/scm_input/src
                                       ${SCM_BOOST_INC_DIR}
-                                      ${SCM_QT_INC_DIR})
+                                      ${SCM_QT5_INC_DIR})
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
                                       ${GLOBAL_EXT_DIR}/inc/cuda
@@ -61,7 +61,7 @@ scm_project_include_directories(UNIX  /opt/OpenCL/include
 # set library directories
 scm_project_link_directories(ALL      ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                       ${SCM_BOOST_LIB_DIR}
-                                      ${SCM_QT_LIB_DIR})
+                                      ${SCM_QT5_LIB_DIR})
 scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64
                                       /usr/lib/nvidia-current)
 
@@ -88,8 +88,9 @@ scm_link_libraries(ALL
 scm_link_libraries(WIN32
     optimized libboost_filesystem-${SCM_BOOST_MT_REL}       debug libboost_filesystem-${SCM_BOOST_MT_DBG}
     optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
-    optimized QtCore4       debug QtCored4
-    optimized QtGui4        debug QtGuid4
+    optimized Qt5Core       debug Qt5Cored
+    optimized Qt5Gui        debug Qt5Guid
+    optimized Qt5Widgets    debug Qt5Widgetsd
     general FreeImage
     general FreeImagePlus
 )

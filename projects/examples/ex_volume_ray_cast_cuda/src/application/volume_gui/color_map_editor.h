@@ -8,11 +8,12 @@
 #include <vector>
 
 #include <QtCore/QPointF>
-#include <QtGui/QFrame>
 
 #include <QtGui/QBrush>
 #include <QtGui/QGradient>
 #include <QtGui/QPen>
+
+#include <QtWidgets/QFrame>
 
 #include <scm/core/memory.h>
 #include <scm/core/math.h>

@@ -6,7 +6,7 @@
 #define COLOR_PICKER_BUTTON_H_INCLUDED
 
 #include <QtGui/QColor>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QPushButton>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>

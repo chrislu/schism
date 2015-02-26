@@ -12,7 +12,7 @@ class QAction;
 #include <string>
 #include <vector>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <cuda_runtime.h>
 

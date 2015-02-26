@@ -4,8 +4,8 @@
 
 #include "color_picker_button.h"
 
-#include <QtGui/QColorDialog>
 #include <QtGui/QPainter>
+#include <QtWidgets/QColorDialog>
 
 namespace scm {
 namespace gui {

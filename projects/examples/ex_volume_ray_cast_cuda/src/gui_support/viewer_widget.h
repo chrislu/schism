@@ -2,7 +2,7 @@
 #ifndef SCM_IMAGE_GUI_SUPPORT_VIEWER_WIDGET_H_INCLUDED
 #define SCM_IMAGE_GUI_SUPPORT_VIEWER_WIDGET_H_INCLUDED
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <scm/core/memory.h>
 

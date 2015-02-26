@@ -10,7 +10,9 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QResizeEvent>
+#include <QtGui/QWindow>
 #include <QtCore/QTimer>
+#include <QtWidgets/QHBoxLayout>
 
 #include <scm/log.h>
 #include <scm/core/math/math.h>
@@ -63,6 +65,8 @@ viewer_widget::viewer_widget(QWidget* parent,
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
 
+    //parent->setAttribute(Qt::WA_NativeWindow, true);
+
     setAttribute(Qt::WA_NativeWindow, true);
     //setAttribute(Qt::WA_DontCreateNativeAncestors, false);
     setAttribute(Qt::WA_PaintOnScreen, true); // disables qt double buffering (seems X11 only since qt4.5, ...)
@@ -73,10 +77,27 @@ viewer_widget::viewer_widget(QWidget* parent,
     setAutoFillBackground(false);
 
     try {
-        _viewer = make_shared<viewer>(math::vec2ui(100, 100), parent->winId(), view_attrib, ctx_attrib, win_fmt);
+        //HWND par_hndl = (HWND)parent->winId();
+        //HWND this_hndl = (HWND)winId();
+        //out() << std::hex << par_hndl << " " << this_hndl;
+        _viewer = make_shared<viewer>(math::vec2ui(100, 100), wm::window::handle(this->winId()), view_attrib, ctx_attrib, win_fmt);
+        //HWND vwr_hndl = _viewer->window()->window_handle();
+        //out() << std::hex << par_hndl << " " << this_hndl << " " << vwr_hndl;
+        //_viewer->window()->show();
+
+        QWindow* nwnd = QWindow::fromWinId((WId)_viewer->window()->window_handle());
+        QWidget* vw   = QWidget::createWindowContainer(nwnd, this, Qt::WindowTransparentForInput);
+
+        vw->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+        QHBoxLayout* lo        = new QHBoxLayout(this);
+        lo->setContentsMargins(0, 0, 0, 0);
+        lo->addWidget(vw);
+
 
         // ok set the native window as this widgets window...and hold thumbs
-        this->create(_viewer->window()->window_handle(), true, true);
+        //this->destroy();
+        //this->create((WId)vwr_hndl, true, true);
         _viewer->window_context()->make_current(_viewer->window());
     }
     catch(std::exception& e) {
