@@ -12,7 +12,7 @@
 
 #include <boost/io/ios_state.hpp>
 
-#include <CL/cl.hpp>
+#include <scm/cl_core/opencl/CL/cl.hpp>
 
 #include <scm/core/time/cpu_accum_timer.h>
 
