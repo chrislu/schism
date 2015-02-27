@@ -79,6 +79,7 @@ namespace gl {
 
 viewer::viewer_settings::viewer_settings()
   : _vsync(true)
+  , _vsync_swap_interval(1)
   , _swap_explicit(false)
   , _clear_color(0.2f, 0.2f, 0.2f)
   , _clear_depth(1.0f)
@@ -567,7 +568,8 @@ viewer::send_render_display()
     }
 
     if (!_settings._swap_explicit) {
-        swap_buffers(_settings._vsync ? 1 : 0);
+        const int32 swap_interval = math::max(1, _settings._vsync_swap_interval);
+        swap_buffers(_settings._vsync ? swap_interval : 0);
     }
 
     // hack to catch a bug in fraps

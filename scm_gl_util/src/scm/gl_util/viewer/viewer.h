@@ -77,6 +77,7 @@ public:
         viewer_settings();
 
         bool        _vsync;
+        int32       _vsync_swap_interval;
         bool        _swap_explicit;
         math::vec3f _clear_color;
         float       _clear_depth;
