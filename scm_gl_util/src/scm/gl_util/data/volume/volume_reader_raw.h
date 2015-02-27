@@ -20,6 +20,10 @@ public:
 public:
     volume_reader_raw(const std::string& file_path,
                             bool         file_unbuffered = false);
+    volume_reader_raw(const std::string&         file_path,
+                      const math::vec3ui&        volume_dimensions,
+                            scm::gl::data_format voxel_fmt,
+                            bool                 file_unbuffered = false);
     virtual ~volume_reader_raw();
 
 }; // struct volume_reader_raw

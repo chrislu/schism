@@ -162,6 +162,58 @@ volume_reader_raw::volume_reader_raw(const std::string& file_path,
     _slice_buffer.reset(new uint8[slice_size]);
 }
 
+volume_reader_raw::volume_reader_raw(
+        const std::string&   file_path,
+        const math::vec3ui&  volume_dimensions,
+        scm::gl::data_format voxel_fmt,
+        bool                 file_unbuffered)
+  : volume_reader_blocked(file_path, file_unbuffered)
+{
+    using namespace boost::filesystem;
+
+    path            fpath(file_path);
+    std::string     fname = fpath.filename().string();
+    std::string     fext  = fpath.extension().string();
+
+    _format = voxel_fmt;
+    if (_format == FORMAT_NULL) {
+        glerr() << scm::log::error
+                << "volume_reader_raw::volume_reader_raw(): invalid voxel format)." << scm::log::end;
+        return;
+    }
+
+    _file = make_shared<io::file>();
+    
+    if (!_file->open(fpath.string(), std::ios_base::in, file_unbuffered)) {
+        _file.reset();
+        glerr() << scm::log::error
+                << "volume_reader_raw::volume_reader_raw(): "
+                << "error opening volume file (" << fpath.string() << ")." << scm::log::end;
+        return;
+    }
+
+    _dimensions = volume_dimensions;
+    // check if filesize checks out with given dimensions
+    size_t expect_fs =     static_cast<size_t>(_dimensions.x)
+                         * static_cast<size_t>(_dimensions.y)
+                         * static_cast<size_t>(_dimensions.z)
+                         * size_of_format(_format)
+                         + _data_start_offset;
+    if (_file->size() != expect_fs) {
+        _file.reset();
+
+        glerr() << scm::log::error
+                << "volume_reader_raw::volume_reader_raw(): "
+                << "file size does not match data dimensions and data format"
+                << " (file_size: " << _file->size()
+                << ", expected size: " << expect_fs << ")." << scm::log::end;
+        return;
+    }
+
+    size_t slice_size = static_cast<size_t>(_dimensions.x) * _dimensions.y * size_of_format(_format);
+    _slice_buffer.reset(new uint8[slice_size]);
+}
+
 volume_reader_raw::~volume_reader_raw()
 {
     _slice_buffer.reset();
