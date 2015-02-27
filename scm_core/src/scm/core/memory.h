@@ -9,6 +9,8 @@
 
 #if 1
 
+#include <memory>
+
 #include <boost/array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
@@ -38,6 +40,8 @@ using boost::const_pointer_cast;
 using boost::dynamic_pointer_cast;
 
 using boost::enable_shared_from_this;
+
+using std::unique_ptr;
 
 } // namespace scm
 
