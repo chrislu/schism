@@ -5,7 +5,7 @@
 #ifndef SCM_VOLREN_APP_VOLUME_PROPERTIES_DIALOG_H_INCLUDED
 #define SCM_VOLREN_APP_VOLUME_PROPERTIES_DIALOG_H_INCLUDED
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QCheckBox;
 class QLineEdit;

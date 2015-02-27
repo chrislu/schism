@@ -4,10 +4,10 @@
 
 #include "color_map_editor_widget.h"
 
-#include <QtGui/QFrame>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 
 #include <application/volume_gui/color_map_editor.h>
 #include <application/volume_gui/color_picker_button.h>

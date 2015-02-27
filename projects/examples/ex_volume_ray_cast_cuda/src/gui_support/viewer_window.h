@@ -9,7 +9,7 @@ class QAction;
 #include <string>
 #include <vector>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <scm/core/math.h>
 

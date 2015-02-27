@@ -7,7 +7,7 @@
 
 #include <boost/format.hpp>
 
-#include <boost/spirit.hpp>
+#include <boost/spirit/include/classic.hpp>
 #include <boost/io/ios_state.hpp>
 
 #include <string>
@@ -54,7 +54,7 @@ std::ostream& operator<<(std::ostream& out_stream,
 }
 
 // grammer for parsing of output
-struct piecewise_function_1d_grammar : public boost::spirit::grammar<piecewise_function_1d_grammar>
+struct piecewise_function_1d_grammar : public boost::spirit::classic::grammar<piecewise_function_1d_grammar>
 {
     piecewise_function_1d_grammar(unsigned& n)
         : num_stops(n){}
@@ -64,7 +64,7 @@ struct piecewise_function_1d_grammar : public boost::spirit::grammar<piecewise_f
     {
         definition(const piecewise_function_1d_grammar& self)
         {
-            using namespace boost::spirit;
+            using namespace boost::spirit::classic;
 
             header      =      lexeme_d[str_p("[piecewise function 1D]")]
                             >> str_p("num_stops")               >> ch_p('=') >> uint_p[assign_a(self.num_stops)]
@@ -77,9 +77,9 @@ struct piecewise_function_1d_grammar : public boost::spirit::grammar<piecewise_f
             expression  = header >> stops;
         }
 
-        boost::spirit::rule<ScannerT> expression, header, stops;
+        boost::spirit::classic::rule<ScannerT> expression, header, stops;
 
-        boost::spirit::rule<ScannerT> const&
+        boost::spirit::classic::rule<ScannerT> const&
         start() const { return expression; }
     };
 
@@ -101,7 +101,7 @@ std::istream& operator>>(std::istream& in_stream,
         return (in_stream);
     }
 
-    using namespace boost::spirit;
+    using namespace boost::spirit::classic;
 
     typedef std::istream_iterator<std::istream::char_type>     iterator_t;
 

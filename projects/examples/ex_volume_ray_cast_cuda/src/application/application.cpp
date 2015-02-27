@@ -4,15 +4,14 @@
 
 #include "application.h"
 
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-
 #include <exception>
 #include <stdexcept>
 #include <string>
 #include <sstream>
 
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
 
 #include <cuda.h>
 #include <cuda_runtime_api.h>

@@ -385,23 +385,23 @@ font_face::font_face(const render_device_ptr& device,
                     // fill texture
                     switch (bitmap.pixel_mode) {
                         case FT_PIXEL_MODE_GRAY:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 unsigned src_off = dy * bitmap.pitch;
                                 unsigned dst_off =    tex_array_dst.x
                                                    + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                    + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                                for (int dx = 0; dx < bitmap.width; ++dx) {
+                                for (unsigned dx = 0; dx < bitmap.width; ++dx) {
                                     glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
                                 }
                             }
                             break;
                         case FT_PIXEL_MODE_LCD:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 unsigned src_off = dy * bitmap.pitch;
                                 unsigned dst_off =    tex_array_dst.x
                                                    + (tex_array_dst.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                    + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                                for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
+                                for (unsigned dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
                                     glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
                                     glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
                                     glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
@@ -409,7 +409,7 @@ font_face::font_face(const render_device_ptr& device,
                             }
                             break;
                         case FT_PIXEL_MODE_MONO:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 for (int dx = 0; dx < bitmap.pitch; ++dx) {
                                     unsigned        src_off     = dx + dy * bitmap.pitch;
                                     unsigned char   src_byte    = bitmap.buffer[src_off];
@@ -510,23 +510,23 @@ font_face::font_face(const render_device_ptr& device,
                     // fill texture
                     switch (bitmap.pixel_mode) {
                         case FT_PIXEL_MODE_GRAY:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 unsigned src_off = dy * bitmap.pitch;
                                 unsigned dst_off =    tex_array_dst.x + box_diff.x
                                                    + (tex_array_dst.y + box_diff.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                    + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                                for (int dx = 0; dx < bitmap.width; ++dx) {
+                                for (unsigned dx = 0; dx < bitmap.width; ++dx) {
                                     glyph_texture[(dst_off + dx) * glyph_components] = bitmap.buffer[src_off + dx];
                                 }
                             }
                             break;
                         case FT_PIXEL_MODE_LCD:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 unsigned src_off = dy * bitmap.pitch;
                                 unsigned dst_off =    tex_array_dst.x + box_diff.x
                                                    + (tex_array_dst.y + box_diff.y + bitmap.rows - 1 - dy) * glyph_texture_dim.x
                                                    + i * (glyph_texture_dim.x * glyph_texture_dim.y);
-                                for (int dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
+                                for (unsigned dx = 0; dx < bitmap.width / glyph_bitmap_ycomp; ++dx) {
                                     glyph_texture[(dst_off + dx) * glyph_components    ] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp];
                                     glyph_texture[(dst_off + dx) * glyph_components + 1] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 1];
                                     glyph_texture[(dst_off + dx) * glyph_components + 2] = bitmap.buffer[src_off + dx * glyph_bitmap_ycomp + 2];
@@ -534,7 +534,7 @@ font_face::font_face(const render_device_ptr& device,
                             }
                             break;
                         case FT_PIXEL_MODE_MONO:
-                            for (int dy = 0; dy < bitmap.rows; ++dy) {
+                            for (unsigned dy = 0; dy < bitmap.rows; ++dy) {
                                 for (int dx = 0; dx < bitmap.pitch; ++dx) {
                                     unsigned        src_off     = dx + dy * bitmap.pitch;
                                     unsigned char   src_byte    = bitmap.buffer[src_off];

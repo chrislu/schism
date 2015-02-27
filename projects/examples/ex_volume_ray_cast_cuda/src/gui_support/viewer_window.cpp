@@ -10,13 +10,14 @@
 
 #include <boost/bind.hpp>
 
-#include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QVBoxLayout>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QVBoxLayout>
 
 #include <scm/log.h>
 #include <scm/core/math.h>
@@ -72,8 +73,8 @@ viewer_window::~viewer_window()
 
 bool
 viewer_window::init_viewer(const gl::viewer::viewer_attributes&     view_attrib,
-                                const gl::wm::context::attribute_desc&   ctx_attrib,
-                                const gl::wm::surface::format_desc&      win_fmt)
+                           const gl::wm::context::attribute_desc&   ctx_attrib,
+                           const gl::wm::surface::format_desc&      win_fmt)
 {
     //_viewer_widget      = new gl::gui::viewer_widget(this, format);
     _viewer_widget      = new gl::gui::viewer_widget(this, view_attrib, ctx_attrib, win_fmt);

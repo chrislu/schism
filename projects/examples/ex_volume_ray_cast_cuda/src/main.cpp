@@ -11,11 +11,11 @@
 #include <scm/core/utilities/boost_warning_enable.h>
 
 #include <QtCore/QSettings>
-#include <QtGui/QApplication>
-#include <QtGui/QPlastiqueStyle>
-#include <QtGui/QCleanlooksStyle>
-#include <QtGui/QWindowsXPStyle>
-#include <QtGui/QWindowsVistaStyle>
+#include <QtWidgets/QApplication>
+//#include <QtWidgets/QPlastiqueStyle>
+//#include <QtWidgets/QCleanlooksStyle>
+//#include <QtWidgets/QWindowsXPStyle>
+//#include <QtWidgets/QWindowsVistaStyle>
 
 #include <scm/core.h>
 #include <scm/core/math.h>
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
                                                 false /*debug*/,
                                                 false /*forward*/);
 
-    viewer_attribs._post_process_aa = true;
+    viewer_attribs._post_process_aa = false;
     viewer_attribs._multi_samples   = multi_samples;
     viewer_attribs._super_samples   = 1;
 

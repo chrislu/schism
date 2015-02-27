@@ -7,9 +7,9 @@
 
 #include <vector>
 
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QPushButton>
-#include <QtGui/QWidget>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWidget>
 
 #include <application/volume_gui/opacity_map_editor.h>
 
