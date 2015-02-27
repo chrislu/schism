@@ -8,6 +8,8 @@ include(schism_macros)
 include(schism_boost)
 include(schism_cuda)
 
+#option(SCHISM_ENABLE_OPENCL         "Enable Use of OpenCL"                OFF)
+
 set(SRC_DIR                         "${scm_cl_core_SOURCE_DIR}/../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})
 
@@ -22,8 +24,10 @@ scm_project_files(HEADER_FILES      ${SRC_DIR} *.h *.inl)
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/cl_core *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/cl_core *.h *.inl)
 
-scm_project_files(SOURCE_FILES      ${SRC_DIR}/cl_core/opencl *.cpp)
-scm_project_files(HEADER_FILES      ${SRC_DIR}/cl_core/opencl *.h *.inl)
+#if (SCHISM_ENABLE_OPENCL)
+    scm_project_files(SOURCE_FILES      ${SRC_DIR}/cl_core/opencl *.cpp)
+    scm_project_files(HEADER_FILES      ${SRC_DIR}/cl_core/opencl *.h *.inl)
+#endif (SCHISM_ENABLE_OPENCL)
 
 scm_project_files(SOURCE_FILES      ${SRC_DIR}/cl_core/cuda *.cpp)
 scm_project_files(HEADER_FILES      ${SRC_DIR}/cl_core/cuda *.h *.inl)
@@ -73,16 +77,20 @@ scm_link_libraries(ALL
 	general cudart
 )
 scm_link_libraries(WIN32
-    general OpenCL
     general opengl32
 )
 scm_link_libraries(UNIX
     general GL
-    general OpenCL
-
-    general cuda
-    general cudart
 )
+
+#if (SCHISM_ENABLE_OPENCL)
+    scm_link_libraries(WIN32
+        general OpenCL
+    )
+    scm_link_libraries(UNIX
+        general OpenCL
+    )
+#endif (SCHISM_ENABLE_OPENCL)
 
 add_dependencies(${PROJECT_NAME}
     scm_core

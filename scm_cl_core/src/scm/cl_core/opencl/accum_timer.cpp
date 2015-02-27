@@ -11,8 +11,8 @@
 #include <boost/chrono.hpp>
 #include <boost/io/ios_state.hpp>
 
-#include <CL/cl.hpp>
 #include <scm/cl_core/opencl.h>
+#include <scm/cl_core/opencl/CL/cl.hpp>
 
 namespace scm {
 namespace cl {

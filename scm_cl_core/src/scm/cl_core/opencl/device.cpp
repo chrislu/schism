@@ -17,7 +17,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <CL/cl.hpp>
+#include <scm/cl_core/opencl/CL/cl.hpp>
 
 #if SCM_PLATFORM == SCM_PLATFORM_LINUX
 

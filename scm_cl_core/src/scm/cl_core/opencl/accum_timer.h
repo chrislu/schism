@@ -9,6 +9,7 @@
 #include <scm/core/time/cpu_timer.h>
 
 #include <scm/cl_core/opencl/opencl_fwd.h>
+#include <scm/cl_core/opencl/CL/cl_fwd.hpp>
 
 #include <scm/core/platform/platform.h>
 #include <scm/core/utilities/platform_warning_disable.h>
