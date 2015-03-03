@@ -3,6 +3,7 @@
 // Distributed under the Modified BSD License, see license.txt.
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 
@@ -78,6 +79,111 @@ int main(int argc, char **argv)
 {
     // some standard things to turn off
     std::ios_base::sync_with_stdio(false);
+
+
+    std::string filename_to_nbr = "head4_w256_h256_d225_c1_b8";
+    std::string file_ending = "png";
+
+    unsigned x_res = 256;
+    unsigned y_res = 256;
+    unsigned z_slices = 224;
+
+    unsigned max_dim = scm::math::max(scm::math::max(x_res, y_res), z_slices);
+
+    float Ns = 96.078431;
+    scm::math::vec3f Ka(0.0);
+    scm::math::vec3f Kd(0.64);
+    scm::math::vec3f Ks(0.5);
+    float Ni = 1.0;
+    float d = 0.0;
+    int illum = 0;
+
+    float z_step = ((float)z_slices / max_dim) / (float)z_slices;
+
+    //newmtl head4_w256_h256_d225_c1_b80000
+    //    Ns 96.078431
+    //    Ka 0.000000 0.000000 0.000000
+    //    Kd 0.640000 0.640000 0.640000
+    //    Ks 0.500000 0.500000 0.500000
+    //    Ni 1.000000
+    //    d 0.000000
+    //    illum 0
+    //    map_Kd head4_w256_h256_d225_c1_b80000.png
+    //    map_d head4_w256_h256_d225_c1_b80000.png
+
+//# Blender v2.73 (sub 0) OBJ File : ''
+//# www.blender.org
+//    mtllib untitled.mtl
+//        o head4_w256_h256_d225_c1_b80000_Plane.225
+//        v - 0.768611 10.369658 0.925193
+//        v 0.231389 10.369658 0.925193
+//        v - 0.768611 10.369658 - 0.074807
+//        v 0.231389 10.369658 - 0.074807
+//        vt 0.000000 0.000000
+//        vt 1.000000 0.000000
+//        vt 1.000000 1.000000
+//        vt 0.000000 1.000000
+//        usemtl head4_w256_h256_d225_c1_b80000
+//        s off
+//        f 1 / 1 2 / 2 4 / 3 3 / 4
+
+    std::ofstream volume_mtl;
+    std::ofstream volume_obj;
+    volume_obj.open("volume_to_object.obj");
+    volume_mtl.open("volume_to_object.mtl");
+    volume_mtl << "# Blender MTL File: 'None'\n # Material Count: " << z_slices << std::endl << std::endl;
+
+    volume_obj << "# Blender v2.73 (sub 0) OBJ File : ''\n# www.blender.org\nmtllib volume_to_object.mtl" << std::endl;
+
+
+    for (unsigned m = 0; m != z_slices; ++m){
+        volume_mtl << "newmtl " << filename_to_nbr << m << "\n";
+
+        volume_mtl << "Ns " << Ns << "\n";
+        volume_mtl << "Ka " << Ka.x << " " << Ka.y << " " << Ka.z << "\n";
+        volume_mtl << "Kd " << Kd.x << " " << Kd.y << " " << Kd.z << "\n";
+        volume_mtl << "Ks " << Ks.x << " " << Ks.y << " " << Ks.z << "\n";
+        volume_mtl << "Ni " << Ni << "\n";
+        volume_mtl << "d " << d << "\n";
+        volume_mtl << "illum " << illum << "\n";
+        volume_mtl << "map_Kd " << filename_to_nbr;
+        if (m < 10)
+            volume_mtl << "000";
+        else if (m < 100)
+            volume_mtl << "00";
+        else if (m < 1000)
+            volume_mtl << "0";
+        volume_mtl << m << "." << file_ending << "\n";
+
+        volume_mtl << "map_d " << filename_to_nbr;
+        if (m < 10)
+            volume_mtl << "000";
+        else if (m < 100)
+            volume_mtl << "00";
+        else if (m < 1000)
+            volume_mtl << "0";
+        volume_mtl << m << "." << file_ending << "\n";
+
+        volume_mtl << std::endl;
+        
+        volume_obj << "o " << filename_to_nbr << m << "_Plane\n";
+        volume_obj << "v " << 0.0 << " " << z_step * m << " " << (float)y_res / max_dim << std::endl;
+        volume_obj << "v " << (float)y_res / max_dim << " " << z_step * m << " " << (float)y_res / max_dim << std::endl;
+        volume_obj << "v " << 0.0 << " " << z_step * m << " " << 0.0 << std::endl;
+        volume_obj << "v " << (float)y_res / max_dim << " " << z_step * m << " " << 0.0 << std::endl;
+        volume_obj << "vt " << 0.0 << " " << 0.0 << std::endl;
+        volume_obj << "vt " << 1.0 << " " << 0.0 << std::endl;
+        volume_obj << "vt " << 1.0 << " " << 1.0 << std::endl;
+        volume_obj << "vt " << 0.0 << " " << 1.0 << std::endl;
+        volume_obj << "usemtl " << filename_to_nbr << m << std::endl;
+        
+    }
+
+
+    volume_mtl.close();
+    volume_obj.close();
+
+    return 0;
 
 #if SCM_PLATFORM == SCM_PLATFORM_WINDOWS
 #ifdef NDEBUG

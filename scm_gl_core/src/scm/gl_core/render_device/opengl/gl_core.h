@@ -112,7 +112,7 @@ public:
 
     bool extension_NV_bindless_texture;
     bool extension_NVX_gpu_memory_info;
-
+        
     // version 1.0 ////////////////////////////////////////////////////////////////////////////////
     PFNGLCULLFACEPROC                               glCullFace;
     PFNGLFRONTFACEPROC                              glFrontFace;

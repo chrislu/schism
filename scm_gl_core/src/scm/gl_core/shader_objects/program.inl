@@ -37,7 +37,7 @@ program::uniform(const std::string& name, int i, const T& v) const {
         }
     }
     else {
-        SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
+        //SCM_GL_DGB("program::uniform(): unable to find uniform ('" << name << "').");
         //SCM_GL_LOG_ONCE(log::warning, "program::uniform(): unable to find uniform ('" << name << "').");
     }
 }

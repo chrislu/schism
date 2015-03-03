@@ -22,8 +22,10 @@ class __scm_export(gl_util) camera_uniform_block
 {
 public:
     struct camera_block {
+        math::vec4f _ws_view_port_size;
         math::vec4f _ws_position;
         math::vec4f _ws_near_plane;
+        math::vec4f _ws_projection_plane;
         
         math::mat4f _v_matrix;
         math::mat4f _v_matrix_inverse;

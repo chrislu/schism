@@ -35,12 +35,18 @@ camera::projection_perspective(float fovy, float aspect, float near_z, float far
     _far_plane     = far_z;
     _type          = camera::perspective;
     _projection_matrix = math::make_perspective_matrix(fovy, aspect, near_z, far_z);
+
+    // Distance to projection plane
+    _projection_plane = 1.0f / scm::math::tan(scm::math::deg2rad(fovy * 0.5f));
+    _projection_projection_screen_matrix = math::make_perspective_matrix(fovy, aspect, _projection_plane, _projection_plane * 2.0f);
+
     update();
 }
 
 void
 camera::projection_ortho(float left, float right, float bottom, float top, float near_z, float far_z)
 {
+    _projection_plane = 0.0f;
     _field_of_view = 0.0f;
     _aspect_ratio  = (right - left) / (top - bottom);
     _near_plane    = near_z;
@@ -53,12 +59,17 @@ camera::projection_ortho(float left, float right, float bottom, float top, float
 void
 camera::projection_ortho_2d(float left, float right, float bottom, float top)
 {
+    _projection_plane = 0.0f;
     _field_of_view = 0.0f;
     _aspect_ratio  = (right - left) / (top - bottom);
     _near_plane    = -1.0f;
     _far_plane     = 1.0f;
     _type          = camera::ortho;
     _projection_matrix = math::make_ortho_matrix(left, right, bottom, top, _near_plane, _far_plane);
+    
+    // Distance to projection plane
+    _projection_plane = 1.0f / scm::math::tan(scm::math::deg2rad(_field_of_view * 0.5f));
+    
     update();
 }
 
@@ -73,6 +84,10 @@ camera::projection_frustum(float left, float right, float bottom, float top, flo
     _far_plane     = far_z;
     _type          = camera::perspective;
     _projection_matrix = math::make_frustum_matrix(left, right, bottom, top, _near_plane, _far_plane);
+
+    // Distance to projection plane
+    _projection_plane = 1.0f / scm::math::tan(scm::math::deg2rad(_field_of_view * 0.5f));
+
     update();
 }
 
@@ -137,6 +152,13 @@ camera::view_frustum() const
     return (_view_frustum);
 }
 
+const frustumf&
+camera::view_screen_frustum() const
+{
+    return (_view_proj_frustum);
+}
+
+
 float
 camera::field_of_view() const
 {
@@ -159,12 +181,19 @@ camera::update()
     _view_projection_matrix_inverse = inverse(_view_projection_matrix);
 
     _view_frustum.update(_view_projection_matrix);
+    _view_proj_frustum.update(_projection_projection_screen_matrix * _view_matrix);
 }
 
 float
 camera::aspect_ratio() const
 {
     return (_aspect_ratio);
+}
+
+float
+camera::projection_plane() const
+{
+    return (_projection_plane);
 }
 
 float

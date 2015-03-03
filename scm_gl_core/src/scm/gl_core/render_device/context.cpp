@@ -1093,7 +1093,7 @@ render_context::apply_storage_buffer_bindings()
                 assert(csbb._buffer->ok());
             }
             else {
-                csbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
+                asbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
             }
             asbb = csbb;
         }
@@ -1454,7 +1454,7 @@ render_context::current_default_frame_buffer_target() const
 
 void
 render_context::set_viewport(const viewport& in_vp)
-{
+{    
     _current_state._viewports = viewport_array(in_vp);
 }
 

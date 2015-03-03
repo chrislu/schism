@@ -23,8 +23,10 @@ const std::string camera_block_include_src  = "     \
     layout(std140, column_major)                    \n\
     uniform camera_matrices                         \n\
     {                                               \n\
+        vec4 ws_viewport_size;                      \n\
         vec4 ws_position;                           \n\
         vec4 ws_near_plane;                         \n\
+        vec4 ws_projection_plane;                   \n\
                                                     \n\
         mat4 v_matrix;                              \n\
         mat4 v_matrix_inverse;                      \n\
@@ -62,8 +64,11 @@ camera_uniform_block::update(const render_context_ptr& context,
                              const camera&             cam)
 {
     _uniform_block.begin_manipulation(context); {
+        _uniform_block->_ws_view_port_size           = context->current_viewports().viewports()[0]._dimensions;
         _uniform_block->_ws_position                 = cam.position();
         _uniform_block->_ws_near_plane               = cam.view_frustum().get_plane(frustum::near_plane).vector();
+        //_uniform_block->_ws_projection_plane         = math::vec4(cam.near_plane(), cam.projection_plane(), 0.0, 0.0);
+        _uniform_block->_ws_projection_plane         = cam.view_screen_frustum().get_plane(frustum::near_plane).vector();
         _uniform_block->_p_matrix                    = cam.projection_matrix();
         _uniform_block->_p_matrix_inverse            = cam.projection_matrix_inverse();
         _uniform_block->_v_matrix                    = cam.view_matrix();
@@ -72,6 +77,11 @@ camera_uniform_block::update(const render_context_ptr& context,
         _uniform_block->_vp_matrix                   = cam.view_projection_matrix();
         _uniform_block->_vp_matrix_inverse           = cam.view_projection_matrix_inverse();
     } _uniform_block.end_manipulation();
+
+    //std::cout << std::endl;
+    //std::cout << "_ws_projection_plane: " << _uniform_block->_ws_projection_plane << " _ws_near_plane: " << _uniform_block->_ws_near_plane << " _ws_position " << _uniform_block->_ws_position << std::endl;
+    //std::cout  << std::endl;
+
 }
 
 const camera_uniform_block::block_type&
