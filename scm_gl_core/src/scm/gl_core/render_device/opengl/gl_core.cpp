@@ -132,6 +132,7 @@ gl_core::gl_core()
 
     extension_NVX_gpu_memory_info               = false;
     extension_NV_bindless_texture               = false;
+    extension_NV_shader_buffer_load             = false;
 }
 
 bool
@@ -269,6 +270,7 @@ gl_core::initialize()
     extension_NVX_gpu_memory_info          = is_supported("GL_NVX_gpu_memory_info");
 
     extension_NV_bindless_texture          = extension_NV_bindless_texture && is_supported("GL_NV_bindless_texture");
+    extension_NV_shader_buffer_load        = extension_NV_shader_buffer_load && is_supported("GL_NV_shader_buffer_load");
 
 #ifdef SCM_GL_CORE_USE_DIRECT_STATE_ACCESS
     if (!is_supported("GL_EXT_direct_state_access")) {
@@ -1241,6 +1243,25 @@ gl_core::init_entry_points()
     SCM_INIT_GL_ENTRY(PFNGLVERTEXATTRIBL1UI64VARBPROC, glVertexAttribL1ui64vARB, "GL_ARB_bindless_texture", init_success);
     SCM_INIT_GL_ENTRY(PFNGLGETVERTEXATTRIBLUI64VARBPROC, glGetVertexAttribLui64vARB, "GL_ARB_bindless_texture", init_success);
     extension_ARB_bindless_texture = init_success;
+
+    // GL_NV_shader_buffer_load
+    init_success = true;
+    SCM_INIT_GL_ENTRY(PFNGLMAKEBUFFERRESIDENTNVPROC, glMakeBufferResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKEBUFFERNONRESIDENTNVPROC, glMakeBufferNonResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISBUFFERRESIDENTNVPROC, glIsBufferResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKENAMEDBUFFERRESIDENTNVPROC, glMakeNamedBufferResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLMAKENAMEDBUFFERNONRESIDENTNVPROC, glMakeNamedBufferNonResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLISNAMEDBUFFERRESIDENTNVPROC, glIsNamedBufferResidentNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETBUFFERPARAMETERUI64VNVPROC, glGetBufferParameterui64vNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETNAMEDBUFFERPARAMETERUI64VNVPROC, glGetNamedBufferParameterui64vNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETINTEGERUI64VNVPROC, glGetIntegerui64vNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMUI64NVPROC, glUniformui64NV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLUNIFORMUI64VNVPROC, glUniformui64vNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLGETUNIFORMUI64VNVPROC, glGetUniformui64vNV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMUI64NVPROC, glProgramUniformui64NV, "GL_NV_shader_buffer_load", init_success);
+    SCM_INIT_GL_ENTRY(PFNGLPROGRAMUNIFORMUI64VNVPROC, glProgramUniformui64vNV, "GL_NV_shader_buffer_load", init_success);
+    extension_NV_shader_buffer_load = init_success;
+
 
     // ARB_sparse_texture
     init_success = true;

@@ -37,6 +37,9 @@ class __scm_export(gl_core) buffer : public context_bindable_object, public rend
 public:
     virtual ~buffer();
 
+    uint64                      native_handle() const { return _native_handle; }
+    bool                        native_handle_resident() const { return _native_handle_resident; }
+
     const buffer_desc&          descriptor() const;
     void                        print(std::ostream& os) const;
 
@@ -93,12 +96,21 @@ protected:
                                                        scm::size_t     in_dst_offset,
                                                        scm::size_t     in_src_offset,
                                                        scm::size_t     in_size);
+
+    bool                        make_resident(const render_context&    in_context,
+                                              const access_mode        in_access);
+
+    bool                        make_non_resident(const render_context& in_context);
+
 protected:
     buffer_desc                 _descriptor;
 
     bool                        _mapped;
     scm::size_t                 _mapped_interval_offset;
     scm::size_t                 _mapped_interval_length;
+
+    uint64                      _native_handle;
+    bool                        _native_handle_resident;
 
     friend class render_device;
     friend class render_context;

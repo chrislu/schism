@@ -934,6 +934,8 @@ render_context::draw_arrays(const primitive_topology in_topology, const int in_f
 
     glapi.glDrawArrays(util::gl_primitive_topology(in_topology), in_first_index, in_count);
 
+    post_draw_setup();
+
     gl_assert(glapi, leaving render_context::draw_arrays());
 }
 
@@ -965,6 +967,33 @@ render_context::draw_elements(const int in_count, const int in_start_index, cons
     post_draw_setup();
 
     gl_assert(glapi, leaving render_context::draw_elements());
+}
+
+bool
+render_context::make_resident(const buffer_ptr& in_buffer,
+                              const access_mode in_access)
+{
+    if (!opengl_api().extension_NV_shader_buffer_load) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_shader_buffer_load extension."
+                << log::end;
+        return false;
+    }
+    return in_buffer->make_resident(*this, in_access);
+}
+
+bool
+render_context::make_non_resident(const buffer_ptr& in_buffer)
+{
+    if (!opengl_api().extension_NV_shader_buffer_load) {
+        glerr() << log::error
+                << "render_context::make_resident(): "
+                << "this functionality is only available on platforms supporting the NV_shader_buffer_load extension."
+                << log::end;
+        return false;
+    }
+    return in_buffer->make_non_resident(*this);
 }
 
 void
@@ -1086,7 +1115,7 @@ render_context::apply_storage_buffer_bindings()
     for (int i = 0; i < _current_state._active_storage_buffers.size(); ++i) {
         const buffer_binding&   csbb = _current_state._active_storage_buffers[i];
         buffer_binding&         asbb = _applied_state._active_storage_buffers[i];
-
+                
         if (csbb != asbb) {
             if (csbb._buffer) {
                 csbb._buffer->bind_range(*this, BIND_STORAGE_BUFFER, i, csbb._offset, csbb._size);
@@ -1281,6 +1310,37 @@ render_context::retrieve_texture_data(const texture_image_ptr& in_texture,
     }
     return true;
 }
+
+#if SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
+bool
+render_context::clear_image_data(const texture_image_ptr& in_texture,
+                                 const unsigned           in_level,
+                                 const data_format        in_data_format,
+                                 const void*const         in_data)
+{
+    if (!in_texture->clear_image_data(*this, in_level, in_data_format, in_data)) {
+        SCM_GL_DGB("render_context::clear_image_data(): error clearing image data ('"
+                   << in_texture->state().state_string() << "')");
+        return false;
+    }
+    return true;
+}
+
+bool
+render_context::clear_image_sub_data(const texture_image_ptr& in_texture,
+                                     const texture_region&    in_region,
+                                     const unsigned           in_level,
+                                     const data_format        in_data_format,
+                                     const void*const         in_data)
+{
+    if (!in_texture->clear_image_sub_data(*this, in_region, in_level, in_data_format, in_data)) {
+        SCM_GL_DGB("render_context::clear_image_sub_data(): error clearing image sub data ('"
+                   << in_texture->state().state_string() << "')");
+        return false;
+    }
+    return true;
+}
+#endif // SCM_GL_CORE_OPENGL_CORE_VERSION >= SCM_GL_CORE_OPENGL_CORE_VERSION_440
 
 bool
 render_context::make_resident(const texture_ptr&       in_texture,

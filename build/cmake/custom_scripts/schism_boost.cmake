@@ -12,7 +12,7 @@ MATH(EXPR SCM_BOOST_MIN_VERSION_NUM "${SCM_BOOST_MIN_VERSION_MAJOR}*10000 + ${SC
 
 SET(SCM_BOOST_INCLUDE_SEARCH_DIRS
     ${GLOBAL_EXT_DIR}/inc/boost
-    /opt/boost/default/include
+    /opt/boost/latest/include
     ${CMAKE_SYSTEM_INCLUDE_PATH}
     ${CMAKE_INCLUDE_PATH}
     /usr/include
@@ -20,7 +20,7 @@ SET(SCM_BOOST_INCLUDE_SEARCH_DIRS
 
 SET(SCM_BOOST_LIBRARY_SEARCH_DIRS
     ${GLOBAL_EXT_DIR}/lib
-    /opt/boost/default/lib
+    /opt/boost/latest/lib
     ${CMAKE_SYSTEM_LIBRARY_PATH}
     ${CMAKE_LIBRARY_PATH}
     /usr/lib64
