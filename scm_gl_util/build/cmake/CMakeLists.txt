@@ -106,14 +106,12 @@ scm_link_libraries(ALL
     scm_input
 
 )
+
 scm_link_libraries(WIN32
-    scm_cl_core
     FreeImagePlus
     freetype2
-	general cuda
-	general cudart
-    general OpenCL
 )
+
 scm_link_libraries(UNIX
     freeimageplus
     freetype
@@ -121,7 +119,18 @@ scm_link_libraries(UNIX
 
 add_dependencies(${PROJECT_NAME}
     scm_core
-    scm_cl_core
     scm_gl_core
     scm_input
 )
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+	add_dependencies(${PROJECT_NAME}
+		scm_cl_core
+	)
+  scm_link_libraries(WIN32
+    scm_cl_core
+	  general cuda
+	  general cudart
+    general OpenCL
+  )
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})

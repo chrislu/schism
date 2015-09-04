@@ -1524,6 +1524,8 @@ render_device::device_context_version() const
     return s.str();
 }
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
+
 bool
 render_device::enable_cuda_interop()
 {
@@ -1594,6 +1596,7 @@ render_device::cuda_interop_device() const
 {
     return _cuda_device;
 }
+#endif
 
 void
 render_device::register_resource(render_device_resource* res_ptr)

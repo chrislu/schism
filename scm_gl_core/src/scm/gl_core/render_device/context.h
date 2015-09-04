@@ -11,6 +11,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
+#include <scm/config.h>
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
 
@@ -410,6 +411,7 @@ public:
                                                      bool            in_flush   = true);
     sync_status                     sync_signal_status(const sync_ptr& in_sync) const;
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     // compute interop ////////////////////////////////////////////////////////////////////////////
 public:
     bool                                enable_cuda_interop(const cu::cuda_device_ptr& cudev);
@@ -417,6 +419,7 @@ public:
 
     const cu::cuda_command_stream_ptr&  cuda_command_stream() const;
     const cl::command_queue_ptr&        opencl_command_queue() const;
+#endif
 
 protected:
     render_context(render_device& in_device);

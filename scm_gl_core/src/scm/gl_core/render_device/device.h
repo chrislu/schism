@@ -16,6 +16,7 @@
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 
+#include <scm/config.h>
 #include <scm/core/math.h>
 #include <scm/core/memory.h>
 
@@ -370,6 +371,7 @@ public:
 public:
     void                            dump_memory_info(std::ostream& os) const;
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     // compute interop ////////////////////////////////////////////////////////////////////////////
 public:
     bool                            enable_cuda_interop();
@@ -377,7 +379,7 @@ public:
 
     const cl::opencl_device_ptr     opencl_interop_device() const;
     const cu::cuda_device_ptr       cuda_interop_device() const;
-
+#endif
 
 ////// attributes /////////////////////////////////////////////////////////////////////////////////
 protected:
@@ -396,9 +398,11 @@ protected:
     device_capabilities             _capabilities;
     resource_ptr_set                _registered_resources;
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     // compute interop ////////////////////////////////////////////////////////////////////////////
     cl::opencl_device_ptr           _opencl_device;
     cu::cuda_device_ptr             _cuda_device;
+#endif
 
 }; // class render_device
 

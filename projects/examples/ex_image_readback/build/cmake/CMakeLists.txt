@@ -4,6 +4,11 @@
 
 project(ex_image_readback)
 
+IF (NOT ${SCM_ENABLE_CUDA_CL_SUPPORT})
+  message("Warning: Ignoring target ex_image_readback: Please enable SCM_ENABLE_CUDA_CL_SUPPORT to build this example.")
+  return()
+ENDIF (NOT ${SCM_ENABLE_CUDA_CL_SUPPORT})
+
 include(schism_project)
 include(schism_boost)
 include(schism_macros)
@@ -43,7 +48,7 @@ scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_ROOT_DIR}/scm_input/src
                                       ${SCM_BOOST_INC_DIR}
-                                      ${SCM_QT_INC_DIR})
+                                      ${SCM_QT4_INC_DIR})
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
 	                                  ${GLOBAL_EXT_DIR}/inc/cuda
@@ -52,7 +57,7 @@ scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
 # set library directories
 scm_project_link_directories(ALL      ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                       ${SCM_BOOST_LIB_DIR}
-                                      ${SCM_QT_LIB_DIR})
+                                      ${SCM_QT4_LIB_DIR})
 
 scm_project_link_directories(WIN32    ${GLOBAL_EXT_DIR}/lib)
 

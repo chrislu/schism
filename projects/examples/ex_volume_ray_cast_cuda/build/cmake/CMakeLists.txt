@@ -6,9 +6,13 @@ project(ex_volume_ray_cast_cuda)
 
 include(schism_project)
 include(schism_boost)
-include(schism_cuda)
 include(schism_macros)
 include(schism_qt5)
+
+IF (NOT ${SCM_ENABLE_CUDA_CL_SUPPORT})
+  message("Warning: Ignoring target ex_volume_ray_cast_cuda: Please enable SCM_ENABLE_CUDA_CL_SUPPORT to build this example.")
+  return()
+ENDIF (NOT ${SCM_ENABLE_CUDA_CL_SUPPORT})
 
 # source files
 scm_project_files(SOURCE_FILES      ${SRC_DIR} *.cpp)

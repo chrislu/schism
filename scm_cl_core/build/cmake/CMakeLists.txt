@@ -6,7 +6,6 @@ project(scm_cl_core)
 
 include(schism_macros)
 include(schism_boost)
-include(schism_cuda)
 
 #option(SCHISM_ENABLE_OPENCL         "Enable Use of OpenCL"                OFF)
 

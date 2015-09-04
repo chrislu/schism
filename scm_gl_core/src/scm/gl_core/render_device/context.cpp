@@ -23,9 +23,12 @@
 #include <scm/gl_core/render_device/opengl/util/data_type_helper.h>
 
 #include <scm/gl_core/log.h>
+#include <scm/config.h>
 
-#include <scm/cl_core/cuda/device.h>
-#include <scm/cl_core/opencl/device.h>
+#if SCM_ENABLE_CUDA_CL_SUPPORT
+  #include <scm/cl_core/cuda/device.h>
+  #include <scm/cl_core/opencl/device.h>
+#endif
 
 namespace scm {
 namespace gl {
@@ -2358,6 +2361,8 @@ render_context::sync_signal_status(const sync_ptr& in_sync) const
     return in_sync->status(*this);
 }
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
+
 bool
 render_context::enable_cuda_interop(const cu::cuda_device_ptr& cudev)
 {
@@ -2391,6 +2396,7 @@ render_context::opencl_command_queue() const
 {
     return _cl_command_queue;
 }
+#endif
 
 } // namespace gl
 } // namespace scm

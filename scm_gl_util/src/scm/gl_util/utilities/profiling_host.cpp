@@ -12,14 +12,17 @@
 
 #include <boost/io/ios_state.hpp>
 
+#include <scm/config.h>
 #include <scm/cl_core/opencl/CL/cl.hpp>
 
 #include <scm/core/time/cpu_accum_timer.h>
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 #include <scm/cl_core/cuda/accum_timer.h>
 #include <scm/cl_core/cuda/command_stream.h>
 #include <scm/cl_core/opencl/opencl_fwd.h>
 #include <scm/cl_core/opencl/accum_timer.h>
+#endif
 
 #include <scm/gl_core/render_device.h>
 #include <scm/gl_util/utilities/accum_timer_query.h>
@@ -28,8 +31,11 @@ namespace {
 
 typedef scm::time::cpu_accum_timer  cpu_accum_timer;
 typedef scm::gl::accum_timer_query  gl_accum_timer;
+
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 typedef scm::cu::util::accum_timer  cu_accum_timer;
 typedef scm::cl::util::accum_timer  cl_accum_timer;
+#endif
 
 struct null_deleter { void operator()(void const *) const {} };
 
@@ -118,6 +124,7 @@ profiling_host::gl_start(const std::string& tname, const render_context_ptr& con
     }
 }
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 void
 profiling_host::cu_start(const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream)
 {
@@ -179,6 +186,7 @@ profiling_host::cl_start(const std::string& tname)
         return 0;
     }
 }
+#endif
 
 void
 profiling_host::stop(const std::string& tname) const
@@ -329,8 +337,10 @@ profiling_host::timer_type_string(timer_type ttype) const
     switch (ttype) {
         case CPU_TIMER: r.assign("CPU_TIMER"); break;
         case GL_TIMER:  r.assign("GL_TIMER"); break;
+#if SCM_ENABLE_CUDA_CL_SUPPORT
         case CU_TIMER:  r.assign("CU_TIMER"); break;
         case CL_TIMER:  r.assign("CL_TIMER"); break;
+#endif
         default:        r.assign("unknown");
     }
 
@@ -357,8 +367,10 @@ profiling_host::timer_prefix_string(timer_type ttype) const
     switch (ttype) {
         case CPU_TIMER: r.assign("cpu"); break;
         case GL_TIMER:  r.assign("gl"); break;
+#if SCM_ENABLE_CUDA_CL_SUPPORT          
         case CU_TIMER:  r.assign("cuda"); break;
         case CL_TIMER:  r.assign("cl"); break;
+#endif
         default:        r.assign("unknown.");
     }
 
