@@ -173,6 +173,12 @@ endif (SCHISM_OPT_BUILD_deprecated_classic_scm_gl)
 
 add_dependencies(${PROJECT_NAME}
     scm_core
-    scm_cl_core
 )
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+	add_dependencies(${PROJECT_NAME}
+		scm_cl_core
+	)
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
+
 

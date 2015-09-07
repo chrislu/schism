@@ -10,6 +10,11 @@ include(schism_boost)
 set(SRC_DIR                         "${scm_core_SOURCE_DIR}/../../src/scm")
 set(SCM_PROJECT_SOURCE_DIR          ${SRC_DIR})
 
+configure_file(
+  ${SCM_PROJECT_SOURCE_DIR}/config.h.in
+  ${SCM_PROJECT_SOURCE_DIR}/config.h
+)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  ${SCHISM_LIBRARY_DIR})

@@ -4,8 +4,6 @@
 
 #include(GetPrerequisites)
 
-include(schism_cuda)
-
 macro(scm_project_files)
     set(out_file_list     ${ARGV0})
     set(in_project_path   ${ARGV1})

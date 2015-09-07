@@ -39,7 +39,7 @@ scm_project_include_directories(ALL   ${SRC_DIR}
                                       ${SCM_ROOT_DIR}/scm_gl_util/src
                                       ${SCM_ROOT_DIR}/scm_input/src
                                       ${SCM_BOOST_INC_DIR}
-                                      ${SCM_QT_INC_DIR})
+                                      ${SCM_QT4_INC_DIR})
 
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
                                       ${GLOBAL_EXT_DIR}/inc/freeimage)
@@ -47,7 +47,7 @@ scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc
 # set library directories
 scm_project_link_directories(ALL      ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                       ${SCM_BOOST_LIB_DIR}
-                                      ${SCM_QT_LIB_DIR})
+                                      ${SCM_QT4_LIB_DIR})
 
 #scm_project_link_directories(WIN32    ${GLOBAL_EXT_DIR}/lib)
 scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64)
