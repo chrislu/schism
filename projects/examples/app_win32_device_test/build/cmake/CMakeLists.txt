@@ -44,9 +44,9 @@ scm_link_libraries(ALL
 )
 scm_link_libraries(WIN32
     general freeglut
-    general FreeImage
-    general FreeImagePlus
-	general opengl32
+    optimized FreeImage     debug FreeImaged
+    optimized FreeImagePlus debug FreeImagePlusd
+	  general opengl32
 )
 scm_link_libraries(UNIX
     general freeglut

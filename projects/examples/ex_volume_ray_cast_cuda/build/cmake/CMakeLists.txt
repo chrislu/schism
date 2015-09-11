@@ -95,8 +95,8 @@ scm_link_libraries(WIN32
     optimized Qt5Core       debug Qt5Cored
     optimized Qt5Gui        debug Qt5Guid
     optimized Qt5Widgets    debug Qt5Widgetsd
-    general FreeImage
-    general FreeImagePlus
+    optimized FreeImage     debug FreeImaged
+    optimized FreeImagePlus debug FreeImagePlusd
 )
 scm_link_libraries(UNIX
     general boost_filesystem${SCM_BOOST_MT_REL}
