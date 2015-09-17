@@ -79,8 +79,8 @@ scm_link_libraries(WIN32
     optimized libboost_program_options-${SCM_BOOST_MT_REL}  debug libboost_program_options-${SCM_BOOST_MT_DBG}
     optimized QtCore4       debug QtCored4
     optimized QtGui4        debug QtGuid4
-    general FreeImage
-    general FreeImagePlus
+    optimized FreeImage     debug FreeImaged
+    optimized FreeImagePlus debug FreeImagePlusd
 )
 scm_link_libraries(UNIX
     general boost_filesystem${SCM_BOOST_MT_REL}
