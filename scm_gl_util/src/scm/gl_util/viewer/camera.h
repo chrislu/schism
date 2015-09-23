@@ -14,77 +14,83 @@
 #include <scm/core/utilities/platform_warning_disable.h>
 
 namespace scm {
-namespace gl {
+    namespace gl {
 
-class __scm_export(gl_util) camera
-{
-public:
-    enum projection_type {
-        perspective = 0x01,
-        ortho,
-        asymmetric
-    }; // enum type
+        class __scm_export(gl_util) camera
+        {
+        public:
+            enum projection_type {
+                perspective = 0x01,
+                ortho,
+                asymmetric
+            }; // enum type
 
-public:
-    camera();
-    virtual ~camera();
+        public:
+            camera();
+            virtual ~camera();
 
-    void                    projection_perspective(float fovy, float aspect, float near_z, float far_z);
-    void                    projection_ortho(float left, float right, float bottom, float top, float near_z, float far_z);
-    void                    projection_ortho_2d(float left, float right, float bottom, float top);
-    void                    projection_frustum(float left, float right, float bottom, float top, float near_z, float far_z);
+            void                    projection_perspective(float fovy, float aspect, float near_z, float far_z);
+            void                    projection_ortho(float left, float right, float bottom, float top, float near_z, float far_z);
+            void                    projection_ortho_2d(float left, float right, float bottom, float top);
+            void                    projection_frustum(float left, float right, float bottom, float top, float near_z, float far_z);
 
-    void                    view_matrix(const math::mat4f& v);
+            void                    view_matrix(const math::mat4f& v);
 
-    const math::mat4f&      projection_matrix() const;
-    const math::mat4f&      projection_matrix_inverse() const;
-    const math::mat4f&      view_matrix() const;
-    const math::mat4f&      view_matrix_inverse() const;
-    const math::mat4f&      view_matrix_inverse_transpose() const;
-    const math::mat4f&      view_projection_matrix() const;
-    const math::mat4f&      view_projection_matrix_inverse() const;
+            const math::mat4f&      projection_project_screen_matrix() const;
+            const math::mat4f&      projection_matrix() const;
+            const math::mat4f&      projection_matrix_inverse() const;
+            const math::mat4f&      view_matrix() const;
+            const math::mat4f&      view_matrix_inverse() const;
+            const math::mat4f&      view_matrix_inverse_transpose() const;
+            const math::mat4f&      view_projection_matrix() const;
+            const math::mat4f&      view_projection_matrix_inverse() const;
 
-    const math::vec4f       position() const;
+            const math::vec4f       position() const;
 
-    const frustumf&         view_frustum() const;
+            const frustumf&         view_frustum() const;
+            const frustumf&         view_screen_frustum() const;
 
-    float                   field_of_view() const;
-    float                   aspect_ratio() const;
-    float                   near_plane() const;
-    float                   far_plane() const;
+            float                   field_of_view() const;
+            float                   aspect_ratio() const;
+            float                   projection_plane() const;
+            float                   near_plane() const;
+            float                   far_plane() const;
 
-    ray                     generate_ray(const math::vec2f& nrm_coord) const;
+            ray                     generate_ray(const math::vec2f& nrm_coord) const;
 
-    projection_type         type() const;
+            projection_type         type() const;
 
-protected:
-    void                    update();
+        protected:
+            void                    update();
 
-protected:
-    float                   _field_of_view;
-    float                   _aspect_ratio;
-    float                   _near_plane;
-    float                   _far_plane;
+        protected:
+            float                   _field_of_view;
+            float                   _aspect_ratio;
+            float                   _near_plane;
+            float                   _far_plane;
+            float                   _projection_plane;
 
-    frustumf                _view_frustum; // world space
+            frustumf                _view_frustum; // world space
+            frustumf                _view_proj_frustum; // world space
 
-    projection_type         _type;
+            projection_type         _type;
 
-    math::mat4f             _projection_matrix;
-    math::mat4f             _projection_matrix_inverse;
+            math::mat4f             _projection_projection_screen_matrix;
+            math::mat4f             _projection_matrix;
+            math::mat4f             _projection_matrix_inverse;
 
-    math::mat4f             _view_matrix; // world to camera/eye space
-    math::mat4f             _view_matrix_inverse;
-    math::mat4f             _view_matrix_inverse_transpose;
+            math::mat4f             _view_matrix; // world to camera/eye space
+            math::mat4f             _view_matrix_inverse;
+            math::mat4f             _view_matrix_inverse_transpose;
 
-    math::mat4f             _view_projection_matrix;
-    math::mat4f             _view_projection_matrix_inverse;
+            math::mat4f             _view_projection_matrix;
+            math::mat4f             _view_projection_matrix_inverse;
 
-}; // class camera
+        }; // class camera
 
 
 
-} // namespace gl
+    } // namespace gl
 } // namespace scm
 
 #include <scm/core/utilities/platform_warning_enable.h>
