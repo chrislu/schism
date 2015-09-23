@@ -124,7 +124,6 @@ endif (WIN32)
 # set include and lib directories
 
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_BOOST_INC_DIR})
 
