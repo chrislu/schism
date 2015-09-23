@@ -403,12 +403,15 @@ scoped_timer::scoped_timer(profiling_host& phost, const std::string& tname, cons
     phost.gl_start(_tname, context);
 }
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 scoped_timer::scoped_timer(profiling_host& phost, const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream)
   : _phost(phost)
   , _tname(tname)
 {
     phost.cu_start(_tname, cu_stream);
 }
+
+#endif
 
 scoped_timer::~scoped_timer()
 {
