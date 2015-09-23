@@ -37,8 +37,10 @@
 #include <scm/gl_core/state_objects/sampler_state.h>
 #include <scm/gl_core/texture_objects.h>
 
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 #include <scm/cl_core/cuda/device.h>
 #include <scm/cl_core/opencl/device.h>
+#endif
 
 namespace scm {
 namespace gl {

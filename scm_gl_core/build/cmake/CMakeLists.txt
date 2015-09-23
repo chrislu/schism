@@ -122,10 +122,15 @@ endif (WIN32)
 
 
 # set include and lib directories
+
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_BOOST_INC_DIR})
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+scm_project_include_directories(ALL  ${SCM_ROOT_DIR}/scm_cl_core/src)
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
+
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
 
 # set library directories
@@ -152,9 +157,13 @@ endif (SCHISM_BUILD_STATIC)
 
 # link libraries
 scm_link_libraries(ALL
-	general scm_core
-    general scm_cl_core
+	general scm_core    
 )
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+scm_link_libraries(ALL  scm_cl_core)
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
+
 scm_link_libraries(WIN32
     general opengl32
 )
