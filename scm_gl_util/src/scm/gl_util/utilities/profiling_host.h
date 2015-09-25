@@ -50,9 +50,11 @@ public:
 protected:
     enum timer_type {
         CPU_TIMER = 0x00,
-        GL_TIMER,
-        CU_TIMER,
+        GL_TIMER
+#if SCM_ENABLE_CUDA_CL_SUPPORT
+        ,CU_TIMER,
         CL_TIMER
+#endif
     };
     struct timer_instance {
         timer_instance(timer_type t, time::accum_timer_base* tm) : _type(t), _timer(tm), _time(0) {}
@@ -71,8 +73,10 @@ public:
 
     void                    cpu_start(const std::string& tname);
     void                    gl_start(const std::string& tname, const render_context_ptr& context);
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     void                    cu_start(const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream);
     ::cl::Event*const       cl_start(const std::string& tname);
+#endif
 
     void                    stop(const std::string& tname) const;
     nanosec_type            time(const std::string& tname) const;

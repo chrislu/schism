@@ -21,36 +21,38 @@ namespace gl {
 class __scm_export(gl_util) camera_uniform_block
 {
 public:
-    struct camera_block {
-        math::vec4f _ws_position;
-        math::vec4f _ws_near_plane;
-        
-        math::mat4f _v_matrix;
-        math::mat4f _v_matrix_inverse;
-        math::mat4f _v_matrix_inverse_transpose;
+struct camera_block {
+    math::vec4f _ws_view_port_size;
+    math::vec4f _ws_position;
+    math::vec4f _ws_near_plane;
+    math::vec4f _ws_projection_plane;
 
-        math::mat4f _p_matrix;
-        math::mat4f _p_matrix_inverse;
+    math::mat4f _v_matrix;
+    math::mat4f _v_matrix_inverse;
+    math::mat4f _v_matrix_inverse_transpose;
 
-        math::mat4f _vp_matrix;
-        math::mat4f _vp_matrix_inverse;
-    }; // struct camera_block
-    typedef uniform_block<camera_block>     block_type;
+    math::mat4f _p_matrix;
+    math::mat4f _p_matrix_inverse;
 
-public:
-    camera_uniform_block(const render_device_ptr& device);
-    /*virtual*/ ~camera_uniform_block();
-
-    void                update(const render_context_ptr& context,
-                               const camera&             cam);
-
-    const block_type&   block() const;
+    math::mat4f _vp_matrix;
+    math::mat4f _vp_matrix_inverse;
+}; // struct camera_block
+typedef uniform_block<camera_block>     block_type;
 
 public:
-    static void         add_block_include_string(const render_device_ptr& device);
+camera_uniform_block(const render_device_ptr& device);
+/*virtual*/ ~camera_uniform_block();
+
+void                update(const render_context_ptr& context,
+    const camera&             cam);
+
+const block_type&   block() const;
+
+public:
+static void         add_block_include_string(const render_device_ptr& device);
 
 private:
-    block_type          _uniform_block;
+block_type          _uniform_block;
 
 }; // struct camera_uniform_block
 

@@ -1125,7 +1125,7 @@ render_context::apply_storage_buffer_bindings()
                 assert(csbb._buffer->ok());
             }
             else {
-                csbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
+                asbb._buffer->unbind_range(*this, BIND_STORAGE_BUFFER, i);
             }
             asbb = csbb;
         }

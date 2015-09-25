@@ -36,6 +36,7 @@ public:
 
     void                    view_matrix(const math::mat4f& v);
 
+    const math::mat4f&      projection_project_screen_matrix() const;
     const math::mat4f&      projection_matrix() const;
     const math::mat4f&      projection_matrix_inverse() const;
     const math::mat4f&      view_matrix() const;
@@ -47,9 +48,11 @@ public:
     const math::vec4f       position() const;
 
     const frustumf&         view_frustum() const;
+    const frustumf&         view_screen_frustum() const;
 
     float                   field_of_view() const;
     float                   aspect_ratio() const;
+    float                   projection_plane() const;
     float                   near_plane() const;
     float                   far_plane() const;
 
@@ -65,11 +68,14 @@ protected:
     float                   _aspect_ratio;
     float                   _near_plane;
     float                   _far_plane;
+    float                   _projection_plane;
 
     frustumf                _view_frustum; // world space
+    frustumf                _view_proj_frustum; // world space
 
     projection_type         _type;
 
+    math::mat4f             _projection_projection_screen_matrix;
     math::mat4f             _projection_matrix;
     math::mat4f             _projection_matrix_inverse;
 
