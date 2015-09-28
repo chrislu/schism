@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include <scm/config.h>
 #include <scm/core/math.h>
 #include <scm/core/numeric_types.h>
 #include <scm/core/memory.h>
@@ -29,6 +30,7 @@ class Event;
 } // namespace cl
 
 namespace scm {
+#if SCM_ENABLE_CUDA_CL_SUPPORT
 namespace cu {
 
 class cuda_command_stream;
@@ -37,7 +39,7 @@ typedef scm::shared_ptr<cuda_command_stream>        cuda_command_stream_ptr;
 typedef scm::shared_ptr<cuda_command_stream const>  cuda_command_stream_cptr;
 
 } // namespace cu
-
+#endif
 namespace gl {
 namespace util {
 
@@ -71,9 +73,10 @@ public:
 
     void                    cpu_start(const std::string& tname);
     void                    gl_start(const std::string& tname, const render_context_ptr& context);
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     void                    cu_start(const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream);
     ::cl::Event*const       cl_start(const std::string& tname);
-
+#endif
     void                    stop(const std::string& tname) const;
     nanosec_type            time(const std::string& tname) const;
 
@@ -111,7 +114,9 @@ class __scm_export(gl_util) scoped_timer
 public:
     scoped_timer(profiling_host& phost, const std::string& tname);
     scoped_timer(profiling_host& phost, const std::string& tname, const render_context_ptr& context);
+#if SCM_ENABLE_CUDA_CL_SUPPORT
     scoped_timer(profiling_host& phost, const std::string& tname, const cu::cuda_command_stream_ptr& cu_stream);
+#endif
     ~scoped_timer();
 
 private:
