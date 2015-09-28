@@ -123,17 +123,23 @@ endif (WIN32)
 
 # set include and lib directories
 scm_project_include_directories(ALL   ${SCM_ROOT_DIR}/scm_core/src
-                                      ${SCM_ROOT_DIR}/scm_cl_core/src
                                       ${SCM_ROOT_DIR}/scm_gl_core/src
                                       ${SCM_BOOST_INC_DIR})
 scm_project_include_directories(WIN32 ${GLOBAL_EXT_DIR}/inc)
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+  scm_project_include_directories(ALL ${SCM_ROOT_DIR}/scm_cl_core/src )
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
 
 # set library directories
 scm_project_link_directories(ALL   ${SCM_LIB_DIR}/${SCHISM_PLATFORM}
                                    ${SCM_BOOST_LIB_DIR})
 scm_project_link_directories(WIN32 ${GLOBAL_EXT_DIR}/lib)
-scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64
-                                      /usr/lib/nvidia-current)
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+  scm_project_link_directories(UNIX     /opt/cuda/current/cuda/lib64
+                                        /usr/lib/nvidia-current)
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
 
 #scm_project_link_directories(UNIX  )
 
@@ -153,8 +159,14 @@ endif (SCHISM_BUILD_STATIC)
 # link libraries
 scm_link_libraries(ALL
 	general scm_core
-    general scm_cl_core
 )
+
+IF (${SCM_ENABLE_CUDA_CL_SUPPORT})
+  scm_link_libraries(ALL
+    general scm_cl_core
+  )
+ENDIF (${SCM_ENABLE_CUDA_CL_SUPPORT})  
+
 scm_link_libraries(WIN32
     general opengl32
 )
