@@ -54,7 +54,7 @@ mip_level_dimensions(const unsigned      in_tex_size,
     double lsize = double(in_tex_size) / pow2i;
 
     unsigned ret_value;
-    ret_value = math::max(1u, static_cast<unsigned>(floor(lsize)));
+    ret_value = max(1u, static_cast<unsigned>(floor(lsize)));
 
     return ret_value;
 }
@@ -71,8 +71,8 @@ mip_level_dimensions(const math::vec2ui& in_tex_size,
     vec2d  lsize = vec2d(in_tex_size) / pow2i;
 
     vec2ui ret_value;
-    ret_value.x = math::max(1u, static_cast<unsigned>(floor(lsize.x)));
-    ret_value.y = math::max(1u, static_cast<unsigned>(floor(lsize.y)));
+    ret_value.x = max(1u, static_cast<unsigned>(floor(lsize.x)));
+    ret_value.y = max(1u, static_cast<unsigned>(floor(lsize.y)));
 
     return ret_value;
 }
@@ -88,9 +88,9 @@ mip_level_dimensions(const math::vec3ui& in_tex_size,
     vec3d  lsize = vec3d(in_tex_size) / pow2i;
 
     vec3ui ret_value;
-    ret_value.x = math::max(1u, static_cast<unsigned>(floor(lsize.x)));
-    ret_value.y = math::max(1u, static_cast<unsigned>(floor(lsize.y)));
-    ret_value.z = math::max(1u, static_cast<unsigned>(floor(lsize.z)));
+    ret_value.x = max(1u, static_cast<unsigned>(floor(lsize.x)));
+    ret_value.y = max(1u, static_cast<unsigned>(floor(lsize.y)));
+    ret_value.z = max(1u, static_cast<unsigned>(floor(lsize.z)));
 
     return ret_value;
 }
