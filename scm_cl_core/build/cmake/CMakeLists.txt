@@ -68,10 +68,15 @@ else (SCHISM_BUILD_STATIC)
 	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 endif (SCHISM_BUILD_STATIC)
 
+set_target_properties( ${PROJECT_NAME} 
+                PROPERTIES
+                DEBUG_OUTPUT_NAME ${PROJECT_NAME}${SCHISM_DEBUG_LIBRARY_EXTENSION}
+                RELEASE_OUTPUT_NAME ${PROJECT_NAME}
+)
+
 # link libraries
 scm_link_libraries(ALL
 	scm_core
-
 	general cuda
 	general cudart
 )
