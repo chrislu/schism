@@ -19,6 +19,9 @@ option(SCM_ENABLE_CUDA_CL_SUPPORT         "Enable and OpenCL/CUDA functionality 
 # set some directory constants
 set(GLOBAL_EXT_DIR ${schism_SOURCE_DIR}/../../externals)
 
+# set debug library extension
+set(SCHISM_DEBUG_LIBRARY_EXTENSION -gd)
+
 # include subprojects
 add_subdirectory(../../scm_core/build/cmake     ${CMAKE_CURRENT_BINARY_DIR}/scm_core_out)
 add_subdirectory(../../scm_gl_core/build/cmake  ${CMAKE_CURRENT_BINARY_DIR}/scm_gl_core_out)
